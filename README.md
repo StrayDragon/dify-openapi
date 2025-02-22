@@ -1,2 +1,1 @@
-# dify-openapi
-Dify API => OpenAPI Schema
+# Dify x OpenAPI
