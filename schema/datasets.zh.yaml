@@ -3,20 +3,27 @@ info:
   title: Dify Knowledge Base API
   description: |
     Dify Knowledge Base API 提供了一系列接口用于管理知识库、文档和检索功能。
-    所有 API 请求都需要在 Authorization HTTP Header 中包含 API-Key。
-  version: 1.0.0
+    所有 API 请求都需要在 Authorization HTTP Header 中包含知识库级 API-Key。
+  version: 0.15.3
 
 servers:
   - url: https://api.dify.ai/v1
     description: Dify API 服务器
 
+  - url: "{api_url}"
+    variables:
+      api_url:
+        default: https://api.dify.ai/v1
+        description: 自定义 API 服务器 URL
+
+security:
+  - bearerApiKeyAuth: []
+
 components:
   securitySchemes:
-    ApiKeyAuth:
-      type: apiKey
-      in: header
-      name: Authorization
-      description: 'Format: Bearer {API_KEY}'
+    bearerApiKeyAuth:
+      type: http
+      scheme: bearer
 
   schemas:
     Error:
@@ -106,7 +113,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/Dataset'
+            $ref: "#/components/schemas/Dataset"
         has_more:
           type: boolean
           description: 是否还有更多数据
@@ -151,6 +158,76 @@ components:
         external_knowledge_id:
           type: string
           description: 外部知识库 ID
+
+    RetrievalModel:
+      type: object
+      properties:
+        search_method:
+          type: string
+          enum: [hybrid_search, semantic_search, full_text_search]
+          description: 检索方法
+        reranking_enable:
+          type: boolean
+          description: 是否开启rerank
+        reranking_model:
+          type: object
+          properties:
+            reranking_provider_name:
+              type: string
+              description: Rerank 模型的提供商
+            reranking_model_name:
+              type: string
+              description: Rerank 模型的名称
+        top_k:
+          type: integer
+          description: 召回条数
+        score_threshold_enabled:
+          type: boolean
+          description: 是否开启召回分数限制
+        score_threshold:
+          type: number
+          format: float
+          description: 召回分数限制
+
+    DocumentMetadata:
+      type: object
+      description: 文档元数据，根据文档类型有不同的字段要求
+      properties:
+        title:
+          type: string
+          description: 标题
+        language:
+          type: string
+          description: 语言
+        author:
+          type: string
+          description: 作者
+        publisher:
+          type: string
+          description: 出版商/发布者
+        publication_date:
+          type: string
+          description: 发布日期
+        isbn:
+          type: string
+          description: ISBN号码（图书类型专用）
+        category:
+          type: string
+          description: 分类
+        url:
+          type: string
+          description: URL地址（网页类型专用）
+        topic:
+          type: string
+          description: 主题
+        keywords:
+          type: array
+          items:
+            type: string
+          description: 关键词
+        description:
+          type: string
+          description: 描述信息
 
     ProcessRule:
       type: object
@@ -343,7 +420,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           examples:
             no_file_uploaded:
               value:
@@ -366,7 +443,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           examples:
             archived_document_immutable:
               value:
@@ -379,7 +456,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           examples:
             dataset_name_duplicate:
               value:
@@ -392,7 +469,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           examples:
             file_too_large:
               value:
@@ -405,7 +482,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           examples:
             unsupported_file_type:
               value:
@@ -421,25 +498,23 @@ paths:
       operationId: createEmptyDataset
       tags:
         - Datasets
-      security:
-        - ApiKeyAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateDatasetRequest'
+              $ref: "#/components/schemas/CreateDatasetRequest"
       responses:
-        '200':
+        "200":
           description: 成功创建知识库
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Dataset'
-        '400':
-          $ref: '#/components/responses/Error400'
-        '409':
-          $ref: '#/components/responses/Error409'
+                $ref: "#/components/schemas/Dataset"
+        "400":
+          $ref: "#/components/responses/Error400"
+        "409":
+          $ref: "#/components/responses/Error409"
 
     get:
       summary: 获取知识库列表
@@ -447,8 +522,6 @@ paths:
       operationId: getDatasetList
       tags:
         - Datasets
-      security:
-        - ApiKeyAuth: []
       parameters:
         - name: page
           in: query
@@ -467,14 +540,14 @@ paths:
             minimum: 1
             maximum: 100
       responses:
-        '200':
+        "200":
           description: 成功获取知识库列表
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DatasetList'
-        '400':
-          $ref: '#/components/responses/Error400'
+                $ref: "#/components/schemas/DatasetList"
+        "400":
+          $ref: "#/components/responses/Error400"
 
   /datasets/{dataset_id}:
     delete:
@@ -483,8 +556,6 @@ paths:
       operationId: deleteDataset
       tags:
         - Datasets
-      security:
-        - ApiKeyAuth: []
       parameters:
         - name: dataset_id
           in: path
@@ -493,12 +564,12 @@ paths:
           schema:
             type: string
       responses:
-        '204':
+        "204":
           description: 成功删除知识库
-        '400':
-          $ref: '#/components/responses/Error400'
-        '403':
-          $ref: '#/components/responses/Error403'
+        "400":
+          $ref: "#/components/responses/Error400"
+        "403":
+          $ref: "#/components/responses/Error403"
 
   /datasets/{dataset_id}/retrieve:
     post:
@@ -507,8 +578,6 @@ paths:
       operationId: retrieveDataset
       tags:
         - Datasets
-      security:
-        - ApiKeyAuth: []
       parameters:
         - name: dataset_id
           in: path
@@ -570,7 +639,7 @@ paths:
                   type: object
                   description: 未启用字段
       responses:
-        '200':
+        "200":
           description: 检索成功
           content:
             application/json:
@@ -658,10 +727,10 @@ paths:
                         tsne_position:
                           type: object
                           nullable: true
-        '400':
-          $ref: '#/components/responses/Error400'
-        '403':
-          $ref: '#/components/responses/Error403'
+        "400":
+          $ref: "#/components/responses/Error400"
+        "403":
+          $ref: "#/components/responses/Error403"
 
   /datasets/{dataset_id}/document/create-by-text:
     post:
@@ -670,8 +739,6 @@ paths:
       operationId: createDocumentByText
       tags:
         - Documents
-      security:
-        - ApiKeyAuth: []
       parameters:
         - name: dataset_id
           in: path
@@ -730,9 +797,9 @@ paths:
                   type: string
                   description: 文档语言（Q&A 模式下必填）
                 process_rule:
-                  $ref: '#/components/schemas/ProcessRule'
+                  $ref: "#/components/schemas/ProcessRule"
       responses:
-        '200':
+        "200":
           description: 成功创建文档
           content:
             application/json:
@@ -740,15 +807,15 @@ paths:
                 type: object
                 properties:
                   document:
-                    $ref: '#/components/schemas/Document'
+                    $ref: "#/components/schemas/Document"
                   batch:
                     type: string
-        '400':
-          $ref: '#/components/responses/Error400'
-        '413':
-          $ref: '#/components/responses/Error413'
-        '415':
-          $ref: '#/components/responses/Error415'
+        "400":
+          $ref: "#/components/responses/Error400"
+        "413":
+          $ref: "#/components/responses/Error413"
+        "415":
+          $ref: "#/components/responses/Error415"
 
   /datasets/{dataset_id}/document/create-by-file:
     post:
@@ -757,8 +824,6 @@ paths:
       operationId: createDocumentByFile
       tags:
         - Documents
-      security:
-        - ApiKeyAuth: []
       parameters:
         - name: dataset_id
           in: path
@@ -776,15 +841,65 @@ paths:
                 - file
               properties:
                 data:
-                  type: string
+                  type: object
                   format: json
-                  description: 文档配置信息
+                  description: |
+                    文档配置信息，JSON字符串格式，包含以下字段：
+                    - original_document_id: 源文档ID（选填），用于重新上传或修改文档配置
+                    - indexing_technique: 索引方式（high_quality/economy）
+                    - doc_form: 索引内容形式（text_model/hierarchical_model/qa_model）
+                    - doc_type: 文档类型
+                    - doc_metadata: 文档元数据
+                    - doc_language: 文档语言（Q&A模式必填）
+                    - process_rule: 处理规则
+                  properties:
+                    original_document_id:
+                      type: string
+                      description: 源文档ID，用于重新上传或修改文档配置
+                    indexing_technique:
+                      type: string
+                      enum: [high_quality, economy]
+                      description: 索引方式
+                    doc_form:
+                      type: string
+                      enum: [text_model, hierarchical_model, qa_model]
+                      description: 索引内容形式
+                    doc_type:
+                      type: string
+                      enum:
+                        - book
+                        - web_page
+                        - paper
+                        - social_media_post
+                        - wikipedia_entry
+                        - personal_document
+                        - business_document
+                        - im_chat_log
+                        - synced_from_notion
+                        - synced_from_github
+                        - others
+                      description: 文档类型
+                    doc_metadata:
+                      $ref: "#/components/schemas/DocumentMetadata"
+                    doc_language:
+                      type: string
+                      description: 文档语言（Q&A模式必填）
+                    process_rule:
+                      $ref: "#/components/schemas/ProcessRule"
+                    retrieval_model:
+                      $ref: "#/components/schemas/RetrievalModel"
+                    embedding_model:
+                      type: string
+                      description: Embedding模型名称
+                    embedding_model_provider:
+                      type: string
+                      description: Embedding模型供应商
                 file:
                   type: string
                   format: binary
-                  description: 上传的文件
+                  description: 需要上传的文件
       responses:
-        '200':
+        "200":
           description: 成功创建文档
           content:
             application/json:
@@ -792,15 +907,16 @@ paths:
                 type: object
                 properties:
                   document:
-                    $ref: '#/components/schemas/Document'
+                    $ref: "#/components/schemas/Document"
                   batch:
                     type: string
-        '400':
-          $ref: '#/components/responses/Error400'
-        '413':
-          $ref: '#/components/responses/Error413'
-        '415':
-          $ref: '#/components/responses/Error415'
+                    description: 文档批次号
+        "400":
+          $ref: "#/components/responses/Error400"
+        "413":
+          $ref: "#/components/responses/Error413"
+        "415":
+          $ref: "#/components/responses/Error415"
 
   /datasets/{dataset_id}/documents/{document_id}/update-by-text:
     post:
@@ -809,8 +925,6 @@ paths:
       operationId: updateDocumentByText
       tags:
         - Documents
-      security:
-        - ApiKeyAuth: []
       parameters:
         - name: dataset_id
           in: path
@@ -856,9 +970,9 @@ paths:
                   type: object
                   description: 文档元数据
                 process_rule:
-                  $ref: '#/components/schemas/ProcessRule'
+                  $ref: "#/components/schemas/ProcessRule"
       responses:
-        '200':
+        "200":
           description: 成功更新文档
           content:
             application/json:
@@ -866,13 +980,13 @@ paths:
                 type: object
                 properties:
                   document:
-                    $ref: '#/components/schemas/Document'
+                    $ref: "#/components/schemas/Document"
                   batch:
                     type: string
-        '400':
-          $ref: '#/components/responses/Error400'
-        '403':
-          $ref: '#/components/responses/Error403'
+        "400":
+          $ref: "#/components/responses/Error400"
+        "403":
+          $ref: "#/components/responses/Error403"
 
   /datasets/{dataset_id}/documents/{document_id}/update-by-file:
     post:
@@ -881,8 +995,6 @@ paths:
       operationId: updateDocumentByFile
       tags:
         - Documents
-      security:
-        - ApiKeyAuth: []
       parameters:
         - name: dataset_id
           in: path
@@ -913,9 +1025,9 @@ paths:
                   format: binary
                   description: 上传的文件
                 process_rule:
-                  $ref: '#/components/schemas/ProcessRule'
+                  $ref: "#/components/schemas/ProcessRule"
       responses:
-        '200':
+        "200":
           description: 成功更新文档
           content:
             application/json:
@@ -923,17 +1035,17 @@ paths:
                 type: object
                 properties:
                   document:
-                    $ref: '#/components/schemas/Document'
+                    $ref: "#/components/schemas/Document"
                   batch:
                     type: string
-        '400':
-          $ref: '#/components/responses/Error400'
-        '403':
-          $ref: '#/components/responses/Error403'
-        '413':
-          $ref: '#/components/responses/Error413'
-        '415':
-          $ref: '#/components/responses/Error415'
+        "400":
+          $ref: "#/components/responses/Error400"
+        "403":
+          $ref: "#/components/responses/Error403"
+        "413":
+          $ref: "#/components/responses/Error413"
+        "415":
+          $ref: "#/components/responses/Error415"
 
   /datasets/{dataset_id}/documents/{batch}/indexing-status:
     get:
@@ -942,8 +1054,6 @@ paths:
       operationId: getDocumentIndexingStatus
       tags:
         - Documents
-      security:
-        - ApiKeyAuth: []
       parameters:
         - name: dataset_id
           in: path
@@ -958,7 +1068,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: 成功获取索引状态
           content:
             application/json:
@@ -1005,10 +1115,10 @@ paths:
                           type: integer
                         total_segments:
                           type: integer
-        '400':
-          $ref: '#/components/responses/Error400'
-        '403':
-          $ref: '#/components/responses/Error403'
+        "400":
+          $ref: "#/components/responses/Error400"
+        "403":
+          $ref: "#/components/responses/Error403"
 
   /datasets/{dataset_id}/documents:
     get:
@@ -1017,8 +1127,6 @@ paths:
       operationId: getDocumentList
       tags:
         - Documents
-      security:
-        - ApiKeyAuth: []
       parameters:
         - name: dataset_id
           in: path
@@ -1049,7 +1157,7 @@ paths:
             minimum: 1
             maximum: 100
       responses:
-        '200':
+        "200":
           description: 成功获取文档列表
           content:
             application/json:
@@ -1059,7 +1167,7 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Document'
+                      $ref: "#/components/schemas/Document"
                   has_more:
                     type: boolean
                   limit:
@@ -1068,8 +1176,8 @@ paths:
                     type: integer
                   page:
                     type: integer
-        '400':
-          $ref: '#/components/responses/Error400'
+        "400":
+          $ref: "#/components/responses/Error400"
 
   /datasets/{dataset_id}/documents/{document_id}:
     delete:
@@ -1078,8 +1186,6 @@ paths:
       operationId: deleteDocument
       tags:
         - Documents
-      security:
-        - ApiKeyAuth: []
       parameters:
         - name: dataset_id
           in: path
@@ -1094,7 +1200,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: 成功删除文档
           content:
             application/json:
@@ -1104,10 +1210,10 @@ paths:
                   result:
                     type: string
                     enum: [success]
-        '400':
-          $ref: '#/components/responses/Error400'
-        '403':
-          $ref: '#/components/responses/Error403'
+        "400":
+          $ref: "#/components/responses/Error400"
+        "403":
+          $ref: "#/components/responses/Error403"
 
   /datasets/{dataset_id}/documents/{document_id}/segments:
     post:
@@ -1116,8 +1222,6 @@ paths:
       operationId: createSegments
       tags:
         - Segments
-      security:
-        - ApiKeyAuth: []
       parameters:
         - name: dataset_id
           in: path
@@ -1159,7 +1263,7 @@ paths:
                           type: string
                         description: 关键字列表
       responses:
-        '200':
+        "200":
           description: 成功创建分段
           content:
             application/json:
@@ -1169,13 +1273,13 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Segment'
+                      $ref: "#/components/schemas/Segment"
                   doc_form:
                     type: string
-        '400':
-          $ref: '#/components/responses/Error400'
-        '403':
-          $ref: '#/components/responses/Error403'
+        "400":
+          $ref: "#/components/responses/Error400"
+        "403":
+          $ref: "#/components/responses/Error403"
 
     get:
       summary: 查询文档分段
@@ -1183,8 +1287,6 @@ paths:
       operationId: getSegments
       tags:
         - Segments
-      security:
-        - ApiKeyAuth: []
       parameters:
         - name: dataset_id
           in: path
@@ -1212,7 +1314,7 @@ paths:
             type: string
             enum: [completed]
       responses:
-        '200':
+        "200":
           description: 成功获取分段列表
           content:
             application/json:
@@ -1222,11 +1324,11 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Segment'
+                      $ref: "#/components/schemas/Segment"
                   doc_form:
                     type: string
-        '400':
-          $ref: '#/components/responses/Error400'
+        "400":
+          $ref: "#/components/responses/Error400"
 
   /datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}:
     delete:
@@ -1235,8 +1337,6 @@ paths:
       operationId: deleteSegment
       tags:
         - Segments
-      security:
-        - ApiKeyAuth: []
       parameters:
         - name: dataset_id
           in: path
@@ -1257,7 +1357,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: 成功删除分段
           content:
             application/json:
@@ -1267,10 +1367,10 @@ paths:
                   result:
                     type: string
                     enum: [success]
-        '400':
-          $ref: '#/components/responses/Error400'
-        '403':
-          $ref: '#/components/responses/Error403'
+        "400":
+          $ref: "#/components/responses/Error400"
+        "403":
+          $ref: "#/components/responses/Error403"
 
     post:
       summary: 更新文档分段
@@ -1278,8 +1378,6 @@ paths:
       operationId: updateSegment
       tags:
         - Segments
-      security:
-        - ApiKeyAuth: []
       parameters:
         - name: dataset_id
           in: path
@@ -1329,7 +1427,7 @@ paths:
                       type: boolean
                       description: 是否重新生成子分段
       responses:
-        '200':
+        "200":
           description: 成功更新分段
           content:
             application/json:
@@ -1339,13 +1437,13 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Segment'
+                      $ref: "#/components/schemas/Segment"
                   doc_form:
                     type: string
-        '400':
-          $ref: '#/components/responses/Error400'
-        '403':
-          $ref: '#/components/responses/Error403'
+        "400":
+          $ref: "#/components/responses/Error400"
+        "403":
+          $ref: "#/components/responses/Error403"
 
   /datasets/{dataset_id}/documents/{document_id}/upload-file:
     get:
@@ -1354,8 +1452,6 @@ paths:
       operationId: getUploadFile
       tags:
         - Documents
-      security:
-        - ApiKeyAuth: []
       parameters:
         - name: dataset_id
           in: path
@@ -1370,13 +1466,13 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: 成功获取文件信息
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UploadFile'
-        '400':
-          $ref: '#/components/responses/Error400'
-        '403':
-          $ref: '#/components/responses/Error403'
+                $ref: "#/components/schemas/UploadFile"
+        "400":
+          $ref: "#/components/responses/Error400"
+        "403":
+          $ref: "#/components/responses/Error403"
