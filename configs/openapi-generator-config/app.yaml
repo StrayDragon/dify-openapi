@@ -1,0 +1,11 @@
+dateFormat: "%Y-%m-%d"
+datetimeFormat: "%Y-%m-%dT%H:%M:%S%z"
+disallowAdditionalPropertiesIfNotPresent: false
+generateSourceCodeOnly: true
+# library: urllib3
+library: asyncio
+mapNumberTo: Union[StrictFloat, StrictInt]
+packageUrl: https://github.com/
+packageVersion: 1.0.0
+projectName: dify-openapi
+packageName: dify_openapi_app

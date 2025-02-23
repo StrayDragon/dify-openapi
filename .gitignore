@@ -1,3 +1,9 @@
+# User Custom
+.tmp/
+**/.ruff_cache/
+**/.openapi-generator/
+**/.openapi-generator-ignore
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
