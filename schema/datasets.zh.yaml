@@ -16,6 +16,10 @@ servers:
         default: https://api.dify.ai/v1
         description: 自定义 API 服务器 URL
 
+  - url: http://ai.urchinet.lan/v1
+    description: dify-openapi 项目 API 开发服务器
+
+
 security:
   - bearerApiKeyAuth: []
 
@@ -134,60 +138,80 @@ components:
       properties:
         name:
           type: string
-          description: 知识库名称
+          description: 知识库名称（必填）
         description:
           type: string
-          description: 知识库描述
+          description: 知识库描述（选填）
         indexing_technique:
           type: string
           enum: [high_quality, economy]
-          description: 索引模式
+          description: |
+            索引模式（选填，建议填写）
+            - high_quality: 高质量
+            - economy: 经济
         permission:
           type: string
           enum: [only_me, all_team_members, partial_members]
           default: only_me
-          description: 权限设置
+          description: |
+            权限（选填，默认 only_me）
+            - only_me: 仅自己
+            - all_team_members: 所有团队成员
+            - partial_members: 部分团队成员
         provider:
           type: string
           enum: [vendor, external]
           default: vendor
-          description: Provider
+          description: |
+            Provider（选填，默认 vendor）
+            - vendor: 上传文件
+            - external: 外部知识库
         external_knowledge_api_id:
           type: string
-          description: 外部知识库 API_ID
+          description: 外部知识库 API_ID（选填）
         external_knowledge_id:
           type: string
-          description: 外部知识库 ID
+          description: 外部知识库 ID（选填）
 
     RetrievalModel:
       type: object
       properties:
         search_method:
           type: string
-          enum: [hybrid_search, semantic_search, full_text_search]
-          description: 检索方法
+          enum: [keyword_search, semantic_search, full_text_search, hybrid_search]
+          description: |
+            检索方法：
+            - keyword_search: 关键字检索
+            - semantic_search: 语义检索
+            - full_text_search: 全文检索
+            - hybrid_search: 混合检索
         reranking_enable:
           type: boolean
-          description: 是否开启rerank
+          description: 是否启用 Reranking，非必填，如果检索模式为 semantic_search 模式或者 hybrid_search 则传值
         reranking_model:
           type: object
           properties:
             reranking_provider_name:
               type: string
-              description: Rerank 模型的提供商
+              description: Rerank 模型提供商
             reranking_model_name:
               type: string
-              description: Rerank 模型的名称
+              description: Rerank 模型名称
+          description: Rerank 模型配置，非必填，如果启用了 reranking 则传值
+        weights:
+          type: number
+          format: float
+          description: 混合检索模式下语意检索的权重设置
         top_k:
           type: integer
-          description: 召回条数
+          description: 返回结果数量，非必填
         score_threshold_enabled:
           type: boolean
-          description: 是否开启召回分数限制
+          description: 是否开启 score 阈值
         score_threshold:
           type: number
           format: float
-          description: 召回分数限制
+          description: Score 阈值
 
     DocumentMetadata:
       type: object
@@ -231,6 +255,8 @@ components:
 
     ProcessRule:
       type: object
+      required:
+        - mode
       properties:
         mode:
           type: string
@@ -437,6 +463,26 @@ components:
                 code: dataset_not_initialized
                 status: 400
                 message: The dataset is still being initialized or indexing. Please wait a moment.
+            high_quality_dataset_only:
+              value:
+                code: high_quality_dataset_only
+                status: 400
+                message: Current operation only supports 'high-quality' datasets.
+            document_already_finished:
+              value:
+                code: document_already_finished
+                status: 400
+                message: The document has been processed. Please refresh the page or go to the document details.
+            document_indexing:
+              value:
+                code: document_indexing
+                status: 400
+                message: The document is being processed and cannot be edited.
+            invalid_metadata:
+              value:
+                code: invalid_metadata
+                status: 400
+                message: The metadata content is incorrect. Please check and verify.
 
     Error403:
       description: 权限错误
@@ -755,6 +801,8 @@ paths:
               required:
                 - name
                 - text
+                - indexing_technique
+                - process_rule
               properties:
                 name:
                   type: string
@@ -841,6 +889,8 @@ paths:
                 - file
               properties:
                 data:
+                  example: |
+                    {"indexing_technique":"high_quality","process_rule":{"rules":{"pre_processing_rules":[{"id":"remove_extra_spaces","enabled":true},{"id":"remove_urls_emails","enabled":true}],"segmentation":{"separator":"###","max_tokens":500}},"mode":"custom"}}
                   type: object
                   format: json
                   description: |
@@ -970,6 +1020,7 @@ paths:
                   type: object
                   description: 文档元数据
                 process_rule:
+                  required: true # TODO: (E001) 必须提供 process_rule 参数, 否则会报错
                   $ref: "#/components/schemas/ProcessRule"
       responses:
         "200":
@@ -989,7 +1040,7 @@ paths:
           $ref: "#/components/responses/Error403"
 
   /datasets/{dataset_id}/documents/{document_id}/update-by-file:
-    post:
+    post:  # TODO: (E001) 接口有bug, https://github.com/langgenius/dify/pull/14243
       summary: 通过文件更新文档
       description: 通过文件更新已存在的文档
       operationId: updateDocumentByFile
@@ -1256,12 +1307,12 @@ paths:
                         description: 文本内容/问题内容
                       answer:
                         type: string
-                        description: 答案内容（Q&A 模式必填）
+                        description: 答案内容，非必填，如果知识库的模式为 Q&A 模式则传值
                       keywords:
                         type: array
                         items:
                           type: string
-                        description: 关键字列表
+                        description: 关键字列表，非必填
       responses:
         "200":
           description: 成功创建分段
@@ -1435,9 +1486,7 @@ paths:
                 type: object
                 properties:
                   data:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Segment"
+                    $ref: "#/components/schemas/Segment"
                   doc_form:
                     type: string
         "400":
