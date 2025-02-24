@@ -23,4 +23,7 @@ gen-client-by-openapi-generator:
     rm -rf {{ GENERATED_DIR }}/dify_openapi_datasets/test
     rm -rf {{ GENERATED_DIR }}/dify_openapi_app/test
     # format code
-    ruff format {{ GENERATED_DIR }}
+    ruff format {{ GENERATED_DIR }}run-openapi-ui:
+
+run-openapi-ui:
+    uv run scripts/preview-schema.py

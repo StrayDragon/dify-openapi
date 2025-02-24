@@ -50,7 +50,7 @@ class OpenAPIHandler(http.server.SimpleHTTPRequestHandler):
         },
         '/dataset': {
             'title': 'Dify 数据集 API',
-            'spec_path': 'schema/dataset.zh.yaml',
+            'spec_path': 'schema/datasets.zh.yaml',
             'api_path': '/dataset-api'
         }
     }
@@ -158,7 +158,7 @@ class OpenAPIHandler(http.server.SimpleHTTPRequestHandler):
         super().do_GET()
 
 def main():
-    PORT = 8123
+    PORT = 8124
     print(f"服务启动在 http://localhost:{PORT}")
     print(f"- 首页: http://localhost:{PORT}/")
     for path, route in OpenAPIHandler.API_ROUTES.items():
