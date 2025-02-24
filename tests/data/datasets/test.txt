@@ -1,0 +1,5 @@
+这是一个测试文档，用于测试检索功能。
+包含一些关键词：Python, API, 测试。
+
+def test_function():
+    print("Hello, World!")
