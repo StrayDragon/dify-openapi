@@ -3,30 +3,12 @@ set dotenv-load
 
 GENERATED_DIR := "src"
 
+
 default: help
+
 
 help:
     @echo "`just -l`"
-
-# NOTE: openapi-generator-cli is deprecated, use openapi-python-client instead, due to buggy client generation
-# gen-client-by-openapi-generator:
-#     # clean generated
-#     rm -rf {{ GENERATED_DIR }}
-#     # gen code
-#     uvx openapi-generator-cli generate \
-#         -i ./schema/datasets.zh.yaml \
-#         -g python \
-#         -c configs/openapi-generator-config/datasets.yaml \
-#         -o {{ GENERATED_DIR }}
-#     rm -rf {{ GENERATED_DIR }}/dify_openapi_datasets/test
-#     uvx openapi-generator-cli generate \
-#         -i ./schema/app.zh.yaml \
-#         -g python \
-#         -c configs/openapi-generator-config/app.yaml \
-#         -o {{ GENERATED_DIR }}
-#     rm -rf {{ GENERATED_DIR }}/dify_openapi_app/test
-#     # format code
-#     ruff format {{ GENERATED_DIR }}
 
 
 gen-client: && tmp-gen-cilent-full
@@ -49,6 +31,7 @@ gen-client: && tmp-gen-cilent-full
         --custom-template-path=configs/openapi-python-client/templates \
         --overwrite
 
+
 tmp-gen-cilent-full:
     mkdir -p .tmp/dify_openapi_datasets
     uvx openapi-python-client generate \
@@ -66,7 +49,6 @@ tmp-gen-cilent-full:
         --custom-template-path=configs/openapi-python-client/templates \
         --overwrite
     cp .tmp/dify_openapi_app/README.md src/dify_openapi_app/README.md
-
 
 
 run-openapi-ui:
