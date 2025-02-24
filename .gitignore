@@ -1,4 +1,5 @@
 # User Custom
+.vscode/
 .tmp/
 **/.ruff_cache/
 **/.openapi-generator/
