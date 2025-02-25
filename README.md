@@ -9,7 +9,7 @@
 
 <div align="center">
 
-[English](./docs/README.en.md) | 中文
+[English](./doc/README.en.md) | 中文
 
 </div>
 
