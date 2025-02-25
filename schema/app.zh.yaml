@@ -766,11 +766,11 @@ paths:
                   type: string
                   format: binary
                   description: 语音文件
-                  maxLength: 15728640  # 15MB
+                  maxLength: 15728640 # 15MB
                 user:
                   type: string
                   description: 用户标识
-                  example: 'user123'
+                  example: "user123"
       responses:
         "200":
           description: 成功响应

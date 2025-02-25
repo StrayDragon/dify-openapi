@@ -19,7 +19,6 @@ servers:
   - url: http://ai.urchinet.lan/v1
     description: dify-openapi 项目 API 开发服务器
 
-
 security:
   - bearerApiKeyAuth: []
 
@@ -178,7 +177,8 @@ components:
       properties:
         search_method:
           type: string
-          enum: [keyword_search, semantic_search, full_text_search, hybrid_search]
+          enum:
+            [keyword_search, semantic_search, full_text_search, hybrid_search]
           description: |
             检索方法：
             - keyword_search: 关键字检索
@@ -1040,7 +1040,7 @@ paths:
           $ref: "#/components/responses/Error403"
 
   /datasets/{dataset_id}/documents/{document_id}/update-by-file:
-    post:  # TODO: (E001) 接口有bug, https://github.com/langgenius/dify/pull/14243
+    post: # TODO: (E001) 接口有bug, https://github.com/langgenius/dify/pull/14243
       summary: 通过文件更新文档
       description: 通过文件更新已存在的文档
       operationId: updateDocumentByFile
