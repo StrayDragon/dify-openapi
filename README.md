@@ -15,6 +15,12 @@
 
 提供 [Dify](https://github.com/langgenius/dify) API 的 OpenAPI Schema，可以使用 [OpenAPI UI](https://github.com/swagger-api/swagger-ui) 预览或使用 [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator) 生成客户端
 
+## Swagger UI 在线查看
+
+- [知识库 - SwaggerUI](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/datasets.zh.yaml)
+- [聊天应用(聚合) - SwaggerUI](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/app.zh.yaml)
+
+
 ## 接口列表
 
 > [!tip]

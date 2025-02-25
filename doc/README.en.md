@@ -15,6 +15,11 @@ English | [中文](../README.md)
 
 Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, which can be previewed using [OpenAPI UI](https://github.com/swagger-api/swagger-ui) or used to generate clients with [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator)
 
+## Swagger UI Preview online
+
+- [Knowledge Base - SwaggerUI(English)](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/datasets.en.yaml)
+- [Chat Application (Aggregated) - SwaggerUI(English)](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/app.en.yaml)
+
 ## API List
 
 > [!tip]
