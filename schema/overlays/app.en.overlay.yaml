@@ -1,0 +1,616 @@
+overlay: 1.0.0
+info:
+  title: "English translation overlay for Dify API"
+  version: "1.0.0"
+extends: ../app.zh.yaml
+actions:
+  - target: $.info
+    update:
+      title: "Dify API"
+      description: |
+        Dify API provides a series of interfaces for text generation, conversation, and workflow functionality.
+        It supports text generation applications, conversational applications, workflow applications, and advanced conversational applications.
+        All API requests require an application-level API-Key in the Authorization HTTP Header.
+
+  - target: $.servers[0]
+    update:
+      description: "Dify API Server"
+
+  - target: $.servers[1].variables.api_url
+    update:
+      description: "Custom API server URL"
+
+  - target: $.components.schemas.Error.properties.code
+    update:
+      description: "Error code"
+
+  - target: $.components.schemas.Error.properties.status
+    update:
+      description: "HTTP status code"
+
+  - target: $.components.schemas.Error.properties.message
+    update:
+      description: "Error message description"
+
+  - target: $.components.schemas.Usage.properties.prompt_tokens
+    update:
+      description: "Number of tokens used for prompts"
+
+  - target: $.components.schemas.Usage.properties.completion_tokens
+    update:
+      description: "Number of tokens used for completion"
+
+  - target: $.components.schemas.Usage.properties.total_tokens
+    update:
+      description: "Total number of tokens used"
+
+  - target: $.components.schemas.Usage.properties.prompt_unit_price
+    update:
+      description: "Unit price for prompts"
+
+  - target: $.components.schemas.Usage.properties.prompt_price_unit
+    update:
+      description: "Price unit for prompts"
+
+  - target: $.components.schemas.Usage.properties.prompt_price
+    update:
+      description: "Total price for prompts"
+
+  - target: $.components.schemas.Usage.properties.completion_unit_price
+    update:
+      description: "Unit price for completion"
+
+  - target: $.components.schemas.Usage.properties.completion_price_unit
+    update:
+      description: "Price unit for completion"
+
+  - target: $.components.schemas.Usage.properties.completion_price
+    update:
+      description: "Total price for completion"
+
+  - target: $.components.schemas.Usage.properties.total_price
+    update:
+      description: "Total price"
+
+  - target: $.components.schemas.Usage.properties.currency
+    update:
+      description: "Currency unit"
+
+  - target: $.components.schemas.Usage.properties.latency
+    update:
+      description: "Latency time"
+
+  - target: $.components.schemas.RetrieverResource.properties.position
+    update:
+      description: "Position"
+
+  - target: $.components.schemas.RetrieverResource.properties.dataset_id
+    update:
+      description: "Dataset ID"
+
+  - target: $.components.schemas.RetrieverResource.properties.dataset_name
+    update:
+      description: "Dataset name"
+
+  - target: $.components.schemas.RetrieverResource.properties.document_id
+    update:
+      description: "Document ID"
+
+  - target: $.components.schemas.RetrieverResource.properties.document_name
+    update:
+      description: "Document name"
+
+  - target: $.components.schemas.RetrieverResource.properties.segment_id
+    update:
+      description: "Segment ID"
+
+  - target: $.components.schemas.RetrieverResource.properties.score
+    update:
+      description: "Relevance score"
+
+  - target: $.components.schemas.RetrieverResource.properties.content
+    update:
+      description: "Content"
+
+  - target: $.components.schemas.BaseMessage.properties.message_id
+    update:
+      description: "Unique message ID"
+
+  - target: $.components.schemas.BaseMessage.properties.created_at
+    update:
+      description: "Message creation timestamp"
+
+  - target: $.components.schemas.CompletionMessage.allOf[1].properties.mode
+    update:
+      description: "App mode, fixed as completion"
+
+  - target: $.components.schemas.CompletionMessage.allOf[1].properties.answer
+    update:
+      description: "Complete response content"
+
+  - target: $.components.schemas.ChatMessage.allOf[1].properties.conversation_id
+    update:
+      description: "Conversation ID"
+
+  - target: $.components.schemas.ChatMessage.allOf[1].properties.mode
+    update:
+      description: "App mode, fixed as chat"
+
+  - target: $.components.schemas.ChatMessage.allOf[1].properties.answer
+    update:
+      description: "Complete response content"
+
+  - target: $.components.schemas.WorkflowMessage.properties.workflow_run_id
+    update:
+      description: "Workflow execution ID"
+
+  - target: $.components.schemas.WorkflowMessage.properties.task_id
+    update:
+      description: "Task ID"
+
+  - target: $.components.schemas.WorkflowMessage.properties.data.properties.id
+    update:
+      description: "Workflow execution ID"
+
+  - target: $.components.schemas.WorkflowMessage.properties.data.properties.workflow_id
+    update:
+      description: "Associated Workflow ID"
+
+  - target: $.components.schemas.WorkflowMessage.properties.data.properties.status
+    update:
+      description: "Execution status"
+
+  - target: $.components.schemas.WorkflowMessage.properties.data.properties.outputs
+    update:
+      description: "Output content"
+
+  - target: $.components.schemas.WorkflowMessage.properties.data.properties.error
+    update:
+      description: "Error reason"
+
+  - target: $.components.schemas.WorkflowMessage.properties.data.properties.elapsed_time
+    update:
+      description: "Elapsed time (s)"
+
+  - target: $.components.schemas.WorkflowMessage.properties.data.properties.total_tokens
+    update:
+      description: "Total tokens used"
+
+  - target: $.components.schemas.WorkflowMessage.properties.data.properties.total_steps
+    update:
+      description: "Total steps"
+
+  - target: $.components.schemas.WorkflowMessage.properties.data.properties.created_at
+    update:
+      description: "Start time"
+
+  - target: $.components.schemas.WorkflowMessage.properties.data.properties.finished_at
+    update:
+      description: "End time"
+
+  - target: $.components.schemas.StreamEvent.properties.event
+    update:
+      description: "Event type"
+
+  - target: $.components.schemas.StreamEvent.properties.task_id
+    update:
+      description: "Task ID"
+
+  - target: $.components.schemas.StreamEvent.properties.message_id
+    update:
+      description: "Unique message ID"
+
+  - target: $.components.schemas.StreamEvent.properties.conversation_id
+    update:
+      description: "Conversation ID"
+
+  - target: $.components.schemas.StreamEvent.properties.workflow_run_id
+    update:
+      description: "Workflow execution ID"
+
+  - target: $.components.schemas.StreamEvent.properties.answer
+    update:
+      description: "Response content"
+
+  - target: $.components.schemas.StreamEvent.properties.audio
+    update:
+      description: "Voice synthesis audio data (base64 encoded)"
+
+  - target: $.components.schemas.StreamEvent.properties.data
+    update:
+      description: "Event related data"
+
+  - target: $.components.schemas.StreamEvent.properties.created_at
+    update:
+      description: "Creation timestamp"
+
+  - target: $.components.schemas.UploadedFile.properties.id
+    update:
+      description: "File ID"
+
+  - target: $.components.schemas.UploadedFile.properties.name
+    update:
+      description: "File name"
+
+  - target: $.components.schemas.UploadedFile.properties.size
+    update:
+      description: "File size (bytes)"
+
+  - target: $.components.schemas.UploadedFile.properties.extension
+    update:
+      description: "File extension"
+
+  - target: $.components.schemas.UploadedFile.properties.mime_type
+    update:
+      description: "File mime-type"
+
+  - target: $.components.schemas.UploadedFile.properties.created_by
+    update:
+      description: "Uploader ID"
+
+  - target: $.components.schemas.UploadedFile.properties.created_at
+    update:
+      description: "Upload time"
+
+  - target: $.components.schemas.Conversation.properties.id
+    update:
+      description: "Conversation ID"
+
+  - target: $.components.schemas.Conversation.properties.name
+    update:
+      description: "Conversation name"
+
+  - target: $.components.schemas.Conversation.properties.inputs
+    update:
+      description: "User input parameters"
+
+  - target: $.components.schemas.Conversation.properties.status
+    update:
+      description: "Conversation status"
+
+  - target: $.components.schemas.Conversation.properties.introduction
+    update:
+      description: "Opening statement"
+
+  - target: $.components.schemas.Conversation.properties.created_at
+    update:
+      description: "Creation time"
+
+  - target: $.components.schemas.Conversation.properties.updated_at
+    update:
+      description: "Update time"
+
+  - target: $.components.schemas.FileInput.properties.type
+    update:
+      description: "File type"
+
+  - target: $.components.schemas.FileInput.properties.transfer_method
+    update:
+      description: "Transfer method"
+
+  - target: $.components.schemas.FileInput.properties.url
+    update:
+      description: "Remote URL"
+
+  - target: $.components.schemas.FileInput.properties.upload_file_id
+    update:
+      description: "Upload file ID"
+
+  - target: $.components.responses.Error400.description
+    update: "Request error"
+
+  - target: $.components.responses.Error404.description
+    update: "Resource not found"
+
+  - target: $.components.responses.Error500.description
+    update: "Server error"
+
+  - target: $.paths['/completion-messages'].post
+    update:
+      summary: "Send Message (Text Generation App)"
+      description: "Send request to text generation application"
+
+  - target: $.paths['/completion-messages'].post.requestBody.content['application/json'].schema.properties.inputs.properties.query
+    update:
+      description: "User input text content"
+
+  - target: $.paths['/completion-messages'].post.requestBody.content['application/json'].schema.properties.response_mode
+    update:
+      description: |
+        Response mode:
+        - streaming: Streaming mode (recommended), implements typewriter-like output based on SSE
+        - blocking: Blocking mode, returns result after execution is complete
+
+  - target: $.paths['/completion-messages'].post.requestBody.content['application/json'].schema.properties.user
+    update:
+      description: "User identifier"
+
+  - target: $.paths['/completion-messages'].post.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/chat-messages'].post
+    update:
+      summary: "Send Chat Message (Conversational App)"
+      description: "Create conversation message"
+
+  - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.query
+    update:
+      description: "User input/question content"
+
+  - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.inputs
+    update:
+      description: "Allows passing values for variables defined by the App"
+
+  - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.response_mode
+    update:
+      description: |
+        Response mode:
+        - streaming: Streaming mode (recommended), implements typewriter-like output based on SSE
+        - blocking: Blocking mode, returns result after execution is complete
+
+  - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.user
+    update:
+      description: "User identifier"
+
+  - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.conversation_id
+    update:
+      description: "Conversation ID"
+
+  - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.auto_generate_name
+    update:
+      description: "Whether to automatically generate title"
+
+  - target: $.paths['/chat-messages'].post.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/workflows/run'].post
+    update:
+      summary: "Run Workflow (Workflow App)"
+      description: "Execute workflow; cannot be executed without a published workflow"
+
+  - target: $.paths['/workflows/run'].post.requestBody.content['application/json'].schema.properties.inputs
+    update:
+      description: "Workflow input parameters"
+
+  - target: $.paths['/workflows/run'].post.requestBody.content['application/json'].schema.properties.response_mode
+    update:
+      description: "Response mode"
+
+  - target: $.paths['/workflows/run'].post.requestBody.content['application/json'].schema.properties.user
+    update:
+      description: "User identifier"
+
+  - target: $.paths['/workflows/run'].post.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/files/upload'].post
+    update:
+      summary: "Upload File"
+      description: |
+        Upload files for use when sending messages.
+        Supported file types depend on application type and configuration.
+        Uploaded files are only available to the current end user.
+
+  - target: $.paths['/files/upload'].post.requestBody.content['multipart/form-data'].schema.properties.file
+    update:
+      description: "File to upload"
+
+  - target: $.paths['/files/upload'].post.requestBody.content['multipart/form-data'].schema.properties.user
+    update:
+      description: "User identifier"
+
+  - target: $.paths['/files/upload'].post.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/files/upload'].post.responses['413'].description
+    update: "File too large"
+
+  - target: $.paths['/files/upload'].post.responses['415'].description
+    update: "Unsupported file type"
+
+  - target: $.paths['/files/upload'].post.responses['503'].description
+    update: "Storage service error"
+
+  - target: $.paths['/conversations'].get
+    update:
+      summary: "Get Conversation List"
+      description: "Get conversation list for current user"
+
+  - target: $.paths['/conversations'].get.parameters[0]
+    update:
+      description: "User identifier"
+
+  - target: $.paths['/conversations'].get.parameters[1]
+    update:
+      description: "ID of the last record on current page"
+
+  - target: $.paths['/conversations'].get.parameters[2]
+    update:
+      description: "Records per page"
+
+  - target: $.paths['/conversations'].get.parameters[3]
+    update:
+      description: "Sort field"
+
+  - target: $.paths['/conversations'].get.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/conversations/{conversation_id}'].delete
+    update:
+      summary: "Delete Conversation"
+
+  - target: $.paths['/conversations/{conversation_id}'].delete.parameters[0]
+    update:
+      description: "Conversation ID"
+
+  - target: $.paths['/conversations/{conversation_id}'].delete.requestBody.content['application/json'].schema.properties.user
+    update:
+      description: "User identifier"
+
+  - target: $.paths['/conversations/{conversation_id}'].delete.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/conversations/{conversation_id}/name'].post
+    update:
+      summary: "Rename Conversation"
+
+  - target: $.paths['/conversations/{conversation_id}/name'].post.requestBody.content['application/json'].schema.properties.name
+    update:
+      description: "New name"
+
+  - target: $.paths['/conversations/{conversation_id}/name'].post.requestBody.content['application/json'].schema.properties.auto_generate
+    update:
+      description: "Whether to automatically generate"
+
+  - target: $.paths['/conversations/{conversation_id}/name'].post.requestBody.content['application/json'].schema.properties.user
+    update:
+      description: "User identifier"
+
+  - target: $.paths['/conversations/{conversation_id}/name'].post.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/messages'].get
+    update:
+      summary: "Get Conversation History Messages"
+
+  - target: $.paths['/messages'].get.parameters[0]
+    update:
+      description: "Conversation ID"
+
+  - target: $.paths['/messages'].get.parameters[1]
+    update:
+      description: "User identifier"
+
+  - target: $.paths['/messages'].get.parameters[2]
+    update:
+      description: "First message ID"
+
+  - target: $.paths['/messages'].get.parameters[3]
+    update:
+      description: "Limit"
+
+  - target: $.paths['/messages'].get.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/messages/{message_id}/feedbacks'].post
+    update:
+      summary: "Message Feedback"
+
+  - target: $.paths['/messages/{message_id}/feedbacks'].post.parameters[0]
+    update:
+      description: "Message ID"
+
+  - target: $.paths['/messages/{message_id}/feedbacks'].post.requestBody.content['application/json'].schema.properties.rating
+    update:
+      description: "Feedback type"
+
+  - target: $.paths['/messages/{message_id}/feedbacks'].post.requestBody.content['application/json'].schema.properties.user
+    update:
+      description: "User identifier"
+
+  - target: $.paths['/messages/{message_id}/feedbacks'].post.requestBody.content['application/json'].schema.properties.content
+    update:
+      description: "Feedback content"
+
+  - target: $.paths['/messages/{message_id}/feedbacks'].post.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/audio-to-text'].post
+    update:
+      summary: "Speech to Text"
+
+  - target: $.paths['/audio-to-text'].post.requestBody.content['multipart/form-data'].schema.properties.file
+    update:
+      description: "Audio file"
+
+  - target: $.paths['/audio-to-text'].post.requestBody.content['multipart/form-data'].schema.properties.user
+    update:
+      description: "User identifier"
+
+  - target: $.paths['/audio-to-text'].post.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/audio-to-text'].post.responses['200'].content['application/json'].schema.properties.text
+    update:
+      description: "Converted text"
+
+  - target: $.paths['/text-to-audio'].post
+    update:
+      summary: "Text to Speech"
+
+  - target: $.paths['/text-to-audio'].post.requestBody.content['application/json'].schema.properties.message_id
+    update:
+      description: "Message ID"
+
+  - target: $.paths['/text-to-audio'].post.requestBody.content['application/json'].schema.properties.text
+    update:
+      description: "Text to convert"
+
+  - target: $.paths['/text-to-audio'].post.requestBody.content['application/json'].schema.properties.user
+    update:
+      description: "User identifier"
+
+  - target: $.paths['/text-to-audio'].post.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/info'].get
+    update:
+      summary: "Get Application Basic Information"
+
+  - target: $.paths['/info'].get.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/info'].get.responses['200'].content['application/json'].schema.properties.name
+    update:
+      description: "Application name"
+
+  - target: $.paths['/info'].get.responses['200'].content['application/json'].schema.properties.description
+    update:
+      description: "Application description"
+
+  - target: $.paths['/info'].get.responses['200'].content['application/json'].schema.properties.tags
+    update:
+      description: "Application tags"
+
+  - target: $.paths['/parameters'].get
+    update:
+      summary: "Get Application Parameters"
+
+  - target: $.paths['/parameters'].get.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.opening_statement
+    update:
+      description: "Opening statement"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.suggested_questions
+    update:
+      description: "List of suggested opening questions"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.suggested_questions_after_answer
+    update:
+      description: "Settings for suggested questions after answer"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.speech_to_text
+    update:
+      description: "Speech to text settings"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.retriever_resource
+    update:
+      description: "Citation and attribution settings"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply
+    update:
+      description: "Annotation reply settings"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form
+    update:
+      description: "User input form configuration"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload
+    update:
+      description: "File upload configuration"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.system_parameters
+    update:
+      description: "System parameters"

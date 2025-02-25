@@ -51,6 +51,13 @@ tmp-gen-cilent-full:
     cp .tmp/dify_openapi_app/README.md src/dify_openapi_app/README.md
 
 
+apply-i18n-overlay-to-openapi-schema:
+    for name in app datasets; do \
+        for lang in en; do \
+            npx bump overlay schema/$name.zh.yaml schema/overlays/$name.$lang.overlay.yaml > schema/$name.$lang.yaml; \
+        done; \
+    done
+
 run-openapi-ui:
     uv run scripts/preview-schema.py
 
