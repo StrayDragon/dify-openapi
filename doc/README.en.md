@@ -111,6 +111,6 @@ just test
 #### Maintaining Multilingual Support
 
 1. Add a language overlay file, e.g., `./schema/overlays/app.en.overlay.yaml`
-2. Run `just gen-client` to generate client code
+2. Run `just apply-i18n-overlay-to-openapi-schema` to generate the corresponding language schema (if it is a new language, please check if it is handled in [justfile](./justfile))
 3. Run `just run-openapi-ui` to preview API documentation
 4. Submit PR

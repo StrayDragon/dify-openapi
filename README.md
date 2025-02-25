@@ -111,8 +111,8 @@ just test
 
 #### 维护多语言支持
 
-1. 新增语言的 overlay 文件, 例如 `./schema/overlays/app.en.overlay.yaml`
-2. 运行 `just gen-client` 生成客户端代码
+1. 新增/修改语言的 overlay 文件, 例如 `./schema/overlays/app.en.overlay.yaml`
+2. 运行 `just apply-i18n-overlay-to-openapi-schema` 生成对应语言的schema (如果是新的语言, 请检查 [justfile](./justfile) 中是否处理了对应的名字)
 3. 运行 `just run-openapi-ui` 预览 API 文档
 4. 提交 PR
 
