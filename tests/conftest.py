@@ -22,7 +22,7 @@ async def c():
     )
     app_client = dify_openapi_app.AuthenticatedClient(
         base_url=test_dify_host,
-        token=os.environ["TEST_DIFY_APP_API_KEY"],
+        token=os.environ["TEST_DIFY_APP_CHAT_API_KEY"],
     )
     yield AllClient(
         client=client,
