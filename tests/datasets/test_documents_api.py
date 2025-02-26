@@ -101,6 +101,10 @@ async def test_text_document_workflow(c, dataset1, text_file1):
         name="updated_test_document.txt",
         process_rule=ProcessRule(mode="automatic"),
     )
+
+    # 等待几秒，确保更新处理完成
+    await asyncio.sleep(5)
+
     update_response = await update_document_by_text.asyncio_detailed(
         client=c.client,
         dataset_id=str(dataset1.id),

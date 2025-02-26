@@ -4,6 +4,7 @@
 
 import asyncio
 from http import HTTPStatus
+import os
 import pytest
 
 from dify_openapi_datasets.models.create_dataset_request import CreateDatasetRequest
@@ -17,6 +18,12 @@ from dify_openapi_datasets.types import UNSET
 from dify_openapi_datasets.api.datasets import create_empty_dataset, delete_dataset
 from dify_openapi_datasets.api.documents import create_document_by_text
 from dify_openapi_datasets.api.segments import create_segments, get_segments, update_segment, delete_segment
+
+RUNNING_IN_CI = any(
+    [
+        os.getenv("GITHUB_ACTIONS"),
+    ]
+)
 
 
 @pytest.fixture
@@ -81,7 +88,10 @@ async def document_for_seg1(c, dataset_for_seg1):
     return create_response.parsed
 
 
-@pytest.mark.asyncio
+@pytest.mark.skipif(
+    RUNNING_IN_CI,
+    reason="这个测试中有些功能需要付费账号才能使用(CI中使用官方服务器, 测试账号受限), 请使用本地服务测试",
+)
 async def test_segments_workflow(c, dataset_for_seg1, document_for_seg1):
     """测试分段相关的完整工作流程"""
     # 1. 创建分段 - 文本模式
