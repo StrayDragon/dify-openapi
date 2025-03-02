@@ -16,7 +16,6 @@ from dify_openapi_datasets.models.update_document_by_text_body import UpdateDocu
 from dify_openapi_datasets.models.process_rule import ProcessRule
 from dify_openapi_datasets.models.create_document_by_file_body import CreateDocumentByFileBody
 from dify_openapi_datasets.models.create_document_by_file_body_data import CreateDocumentByFileBodyData
-from dify_openapi_datasets.models.update_document_by_file_body import UpdateDocumentByFileBody
 from dify_openapi_datasets.models.document import Document
 from dify_openapi_datasets.types import UNSET, File
 from dify_openapi_datasets.api.datasets import create_empty_dataset, delete_dataset
@@ -104,6 +103,20 @@ async def test_text_document_workflow(c, dataset1, text_file1):
 
     # 等待几秒，确保更新处理完成
     await asyncio.sleep(5)
+
+    # 查询状态直到处理完成
+    for sleep_time in [2, 4, 8, 16]:
+        get_response = await get_document_indexing_status.asyncio_detailed(
+            client=c.client,
+            dataset_id=str(dataset1.id),
+            batch=batch_id,
+        )
+        assert get_response is not None
+        assert get_response.parsed is not None
+        for data in get_response.parsed.data or []:
+            if data.indexing_status == "completed":
+                break
+        await asyncio.sleep(sleep_time)
 
     update_response = await update_document_by_text.asyncio_detailed(
         client=c.client,

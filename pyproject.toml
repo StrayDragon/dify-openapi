@@ -46,4 +46,4 @@ line-ending = "auto"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-addopts = "--showlocals -x --cov=src --cov-branch --cov-report=xml" # --cov-report=term-missing
+addopts = "-vv --ignore libs --showlocals -x --cov=src --cov-branch --cov-report=xml" # --cov-report=term-missing
