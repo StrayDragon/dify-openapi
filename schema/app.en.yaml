@@ -5,7 +5,7 @@ info:
     Dify API provides a series of interfaces for text generation, conversation, and workflow functionality.
     It supports text generation applications, conversational applications, workflow applications, and advanced conversational applications.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
-  version: 0.15.3
+  version: 1.0.0
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
