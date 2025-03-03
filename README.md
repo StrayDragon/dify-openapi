@@ -51,8 +51,8 @@ Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, whic
   - [x] GET /messages - Get conversation history messages
   - [x] GET /info - Get application basic information
   - [x] GET /parameters - Get application parameters
-  - [ ] POST /audio-to-text - Speech to text
-  - [ ] POST /text-to-audio - Text to speech
+  - [x] POST /audio-to-text - Speech to text
+  - [x] POST /text-to-audio - Text to speech
 
 
 ## Project Structure

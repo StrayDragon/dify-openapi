@@ -1,0 +1,15 @@
+# yaml-language-server: $schema=https://schema.buildwithfern.dev/generators-yml.json
+default-group: local
+groups:
+  local:
+    generators:
+      - name: fernapi/fern-python-sdk
+        version: 4.3.14
+        output:
+          location: local-file-system
+          path: ../src/dify_sdk
+        config:
+api:
+  specs:
+    - openapi: openapi/app.en.yaml
+    - openapi: openapi/datasets.en.yaml

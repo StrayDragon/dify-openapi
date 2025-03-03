@@ -37,4 +37,6 @@ async def c():
 @pytest.fixture(autouse=True, scope="session")
 def warning_info():
     if TEST_DIFY_HOST == OFFICIAL_DIFY_HOST:
-        warnings.warn("=== You are using the official Dify API, ensure you account has enough privileges and tokens! ===")
+        warnings.warn(
+            "=== You are using the official Dify API, ensure you account has enough privileges and tokens! ==="
+        )

@@ -11,7 +11,11 @@ help:
     @echo "`just -l`"
 
 
-gen-client: && tmp-gen-cilent-full
+update-fern-schema:
+    cp schema/app.en.yaml schema/datasets.en.yaml fern/openapi/
+
+gen-client: apply-i18n-overlay-to-openapi-schema update-fern-schema && tmp-gen-cilent-full
+    # TODO: @l8ng remove old generated clients replace with fern (better code implementation)
     rm -rf {{ GENERATED_DIR }}/dify_openapi_datasets
     mkdir -p {{ GENERATED_DIR }}/dify_openapi_datasets
     uvx openapi-python-client generate \
@@ -30,6 +34,9 @@ gen-client: && tmp-gen-cilent-full
         --config configs/openapi-python-client/config.yaml \
         --custom-template-path=configs/openapi-python-client/templates \
         --overwrite
+
+    fern generate --local
+    ruff format src/
 
 
 tmp-gen-cilent-full:

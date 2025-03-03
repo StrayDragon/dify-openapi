@@ -517,7 +517,7 @@ actions:
 
   - target: $.paths['/audio-to-text'].post
     update:
-      summary: "Speech to Text"
+      summary: "Audio to Text"
 
   - target: $.paths['/audio-to-text'].post.requestBody.content['multipart/form-data'].schema.properties.file
     update:
@@ -536,7 +536,7 @@ actions:
 
   - target: $.paths['/text-to-audio'].post
     update:
-      summary: "Text to Speech"
+      summary: "Text to Audio"
 
   - target: $.paths['/text-to-audio'].post.requestBody.content['application/json'].schema.properties.message_id
     update:
@@ -593,7 +593,7 @@ actions:
 
   - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.speech_to_text
     update:
-      description: "Speech to text settings"
+      description: "Audio to text settings"
 
   - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.retriever_resource
     update:
