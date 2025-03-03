@@ -1,0 +1,1568 @@
+openapi: 3.0.0
+info:
+  title: Dify Knowledge Base API
+  description: |
+    Dify Knowledge Base API provides a series of interfaces for managing knowledge bases, documents, and retrieval functions.
+    All API requests require a knowledge base level API-Key in the Authorization HTTP Header.
+  version: 1.0.0
+servers:
+  - url: 'https://api.dify.ai/v1'
+    description: Dify API Server
+  - url: '{api_url}'
+    variables:
+      api_url:
+        default: 'https://api.dify.ai/v1'
+        description: Custom API server URL
+  - url: 'http://ai.urchinet.lan/v1'
+    description: dify-openapi project API development server
+security:
+  - bearerApiKeyAuth: []
+components:
+  securitySchemes:
+    bearerApiKeyAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code
+        status:
+          type: integer
+          description: HTTP status code
+        message:
+          type: string
+          description: Error message description
+      required:
+        - code
+        - status
+        - message
+    Dataset:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Knowledge Base ID
+        name:
+          type: string
+          description: Knowledge Base name
+        description:
+          type: string
+          nullable: true
+          description: Knowledge Base description
+        provider:
+          type: string
+          enum:
+            - vendor
+            - external
+          description: Knowledge Base provider
+        permission:
+          type: string
+          enum:
+            - only_me
+            - all_team_members
+            - partial_members
+          description: Access permission
+        data_source_type:
+          type: string
+          nullable: true
+          description: Data source type
+        indexing_technique:
+          type: string
+          nullable: true
+          enum:
+            - high_quality
+            - economy
+          description: Indexing technique
+        app_count:
+          type: integer
+          description: Number of applications
+        document_count:
+          type: integer
+          description: Number of documents
+        word_count:
+          type: integer
+          description: Word count
+        created_by:
+          type: string
+          description: Creator ID
+        created_at:
+          type: integer
+          description: Creation timestamp
+        updated_by:
+          type: string
+          description: Last updated by ID
+        updated_at:
+          type: integer
+          description: Last updated timestamp
+        embedding_model:
+          type: string
+          nullable: true
+          description: Embedding model name
+        embedding_model_provider:
+          type: string
+          nullable: true
+          description: Embedding model provider
+        embedding_available:
+          type: boolean
+          nullable: true
+          description: Whether embedding is available
+    DatasetList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Dataset'
+        has_more:
+          type: boolean
+          description: Whether there is more data
+        limit:
+          type: integer
+          description: Page size limit
+        total:
+          type: integer
+          description: Total record count
+        page:
+          type: integer
+          description: Current page number
+    CreateDatasetRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Knowledge Base name (required)
+        description:
+          type: string
+          description: Knowledge Base description (optional)
+        indexing_technique:
+          type: string
+          enum:
+            - high_quality
+            - economy
+          description: |
+            Indexing mode (optional, recommended)
+            - high_quality: High quality
+            - economy: Economy
+        permission:
+          type: string
+          enum:
+            - only_me
+            - all_team_members
+            - partial_members
+          default: only_me
+          description: |
+            Permission (optional, default only_me)
+            - only_me: Only me
+            - all_team_members: All team members
+            - partial_members: Partial team members
+        provider:
+          type: string
+          enum:
+            - vendor
+            - external
+          default: vendor
+          description: |
+            Provider (optional, default vendor)
+            - vendor: Upload files
+            - external: External knowledge base
+        external_knowledge_api_id:
+          type: string
+          description: External knowledge API_ID (optional)
+        external_knowledge_id:
+          type: string
+          description: External knowledge ID (optional)
+    RetrievalModel:
+      type: object
+      properties:
+        search_method:
+          type: string
+          enum:
+            - keyword_search
+            - semantic_search
+            - full_text_search
+            - hybrid_search
+          description: |
+            Search method:
+            - keyword_search: Keyword search
+            - semantic_search: Semantic search
+            - full_text_search: Full text search
+            - hybrid_search: Hybrid search
+        reranking_enable:
+          type: boolean
+          description: 'Whether to enable Reranking, optional, required if retrieval mode is semantic_search or hybrid_search'
+        reranking_model:
+          type: object
+          properties:
+            reranking_provider_name:
+              type: string
+              description: Rerank model provider
+            reranking_model_name:
+              type: string
+              description: Rerank model name
+          description: 'Rerank model configuration, optional, required if reranking is enabled'
+        weights:
+          type: number
+          format: float
+          description: Weight setting for semantic search in hybrid search mode
+        top_k:
+          type: integer
+          description: 'Number of results returned, optional'
+        score_threshold_enabled:
+          type: boolean
+          description: Whether to enable score threshold
+        score_threshold:
+          type: number
+          format: float
+          description: Score threshold
+    DocumentMetadata:
+      type: object
+      description: 'Document metadata, varies based on document type'
+      properties:
+        title:
+          type: string
+          description: Title
+        language:
+          type: string
+          description: Language
+        author:
+          type: string
+          description: Author
+        publisher:
+          type: string
+          description: Publisher
+        publication_date:
+          type: string
+          description: Publication date
+        isbn:
+          type: string
+          description: ISBN number (for book type only)
+        category:
+          type: string
+          description: Category
+        url:
+          type: string
+          description: URL address (for web page type only)
+        topic:
+          type: string
+          description: Topic
+        keywords:
+          type: array
+          items:
+            type: string
+          description: Keywords
+        description:
+          type: string
+          description: Description
+    ProcessRule:
+      type: object
+      required:
+        - mode
+      properties:
+        mode:
+          type: string
+          enum:
+            - automatic
+            - custom
+          description: Cleaning and segmentation mode
+        rules:
+          type: object
+          description: Custom rules (empty for automatic mode)
+          properties:
+            pre_processing_rules:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    enum:
+                      - remove_extra_spaces
+                      - remove_urls_emails
+                    description: Unique identifier for preprocessing rule
+                  enabled:
+                    type: boolean
+                    description: Whether this rule is selected
+              description: Pre-processing rules
+            segmentation:
+              type: object
+              properties:
+                separator:
+                  type: string
+                  description: Custom segmentation identifier
+                max_tokens:
+                  type: integer
+                  description: Maximum length (tokens)
+              description: Segmentation configuration
+            parent_mode:
+              type: string
+              enum:
+                - full-doc
+                - paragraph
+              description: Parent segment recall mode
+            subchunk_segmentation:
+              type: object
+              properties:
+                separator:
+                  type: string
+                  description: Segmentation identifier
+                max_tokens:
+                  type: integer
+                  description: Maximum length (tokens)
+                chunk_overlap:
+                  type: integer
+                  description: Segment overlap length
+              description: Sub-segment configuration
+    Document:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Document ID
+        position:
+          type: integer
+          description: Position
+        data_source_type:
+          type: string
+          description: Data source type
+        data_source_info:
+          type: object
+          properties:
+            upload_file_id:
+              type: string
+              description: Upload file ID
+          description: Data source information
+        dataset_process_rule_id:
+          type: string
+          description: Dataset process rule ID
+        name:
+          type: string
+          description: Document name
+        created_from:
+          type: string
+          description: Created from
+        created_by:
+          type: string
+          description: Creator ID
+        created_at:
+          type: integer
+          description: Creation timestamp
+        tokens:
+          type: integer
+          description: Token count
+        indexing_status:
+          type: string
+          description: Indexing status
+        error:
+          type: string
+          nullable: true
+          description: Error message
+        enabled:
+          type: boolean
+          description: Whether enabled
+        disabled_at:
+          type: string
+          nullable: true
+          description: Disabled timestamp
+        disabled_by:
+          type: string
+          nullable: true
+          description: Disabled by user ID
+        archived:
+          type: boolean
+          description: Whether archived
+        display_status:
+          type: string
+          description: Display status
+        word_count:
+          type: integer
+          description: Word count
+        hit_count:
+          type: integer
+          description: Hit count
+        doc_form:
+          type: string
+          description: Document form
+    Segment:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Segment ID
+        position:
+          type: integer
+          description: Position
+        document_id:
+          type: string
+          description: Document ID
+        content:
+          type: string
+          description: Content
+        answer:
+          type: string
+          nullable: true
+          description: Answer
+        word_count:
+          type: integer
+          description: Word count
+        tokens:
+          type: integer
+          description: Token count
+        keywords:
+          type: array
+          items:
+            type: string
+          description: Keywords
+        index_node_id:
+          type: string
+          description: Index node ID
+        index_node_hash:
+          type: string
+          description: Index node hash
+        hit_count:
+          type: integer
+          description: Hit count
+        enabled:
+          type: boolean
+          description: Whether enabled
+        disabled_at:
+          type: string
+          nullable: true
+          description: Disabled timestamp
+        disabled_by:
+          type: string
+          nullable: true
+          description: Disabled by user ID
+        status:
+          type: string
+          description: Status
+        created_by:
+          type: string
+          description: Creator ID
+        created_at:
+          type: integer
+          description: Creation timestamp
+        indexing_at:
+          type: integer
+          description: Indexing timestamp
+        completed_at:
+          type: integer
+          description: Completion timestamp
+        error:
+          type: string
+          nullable: true
+          description: Error message
+        stopped_at:
+          type: string
+          nullable: true
+          description: Stop timestamp
+    UploadFile:
+      type: object
+      properties:
+        id:
+          type: string
+          description: File ID
+        name:
+          type: string
+          description: File name
+        size:
+          type: integer
+          description: File size
+        extension:
+          type: string
+          description: File extension
+        url:
+          type: string
+          description: Preview URL
+        download_url:
+          type: string
+          description: Download URL
+        mime_type:
+          type: string
+          description: MIME type
+        created_by:
+          type: string
+          description: Creator ID
+        created_at:
+          type: integer
+          description: Creation timestamp
+  responses:
+    Error400:
+      description: Request parameter error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            no_file_uploaded:
+              value:
+                code: no_file_uploaded
+                status: 400
+                message: Please upload your file.
+            too_many_files:
+              value:
+                code: too_many_files
+                status: 400
+                message: Only one file is allowed.
+            dataset_not_initialized:
+              value:
+                code: dataset_not_initialized
+                status: 400
+                message: The dataset is still being initialized or indexing. Please wait a moment.
+            high_quality_dataset_only:
+              value:
+                code: high_quality_dataset_only
+                status: 400
+                message: Current operation only supports 'high-quality' datasets.
+            document_already_finished:
+              value:
+                code: document_already_finished
+                status: 400
+                message: The document has been processed. Please refresh the page or go to the document details.
+            document_indexing:
+              value:
+                code: document_indexing
+                status: 400
+                message: The document is being processed and cannot be edited.
+            invalid_metadata:
+              value:
+                code: invalid_metadata
+                status: 400
+                message: The metadata content is incorrect. Please check and verify.
+    Error403:
+      description: Permission error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            archived_document_immutable:
+              value:
+                code: archived_document_immutable
+                status: 403
+                message: The archived document is not editable.
+    Error409:
+      description: Resource conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            dataset_name_duplicate:
+              value:
+                code: dataset_name_duplicate
+                status: 409
+                message: The dataset name already exists. Please modify your dataset name.
+    Error413:
+      description: Request entity too large
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            file_too_large:
+              value:
+                code: file_too_large
+                status: 413
+                message: File size exceeded.
+    Error415:
+      description: Unsupported media type
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            unsupported_file_type:
+              value:
+                code: unsupported_file_type
+                status: 415
+                message: File type not allowed.
+paths:
+  /datasets:
+    post:
+      summary: Create Empty Knowledge Base
+      description: Create a new empty knowledge base
+      operationId: createEmptyDataset
+      tags:
+        - Datasets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDatasetRequest'
+      responses:
+        '200':
+          description: Successfully created knowledge base
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dataset'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '409':
+          $ref: '#/components/responses/Error409'
+    get:
+      summary: Get Knowledge Base List
+      description: Get a list of all knowledge bases
+      operationId: getDatasetList
+      tags:
+        - Datasets
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: Successfully retrieved knowledge base list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatasetList'
+        '400':
+          $ref: '#/components/responses/Error400'
+  '/datasets/{dataset_id}':
+    delete:
+      summary: Delete Knowledge Base
+      description: Delete specified knowledge base
+      operationId: deleteDataset
+      tags:
+        - Datasets
+      parameters:
+        - name: dataset_id
+          in: path
+          description: Knowledge Base ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successfully deleted knowledge base
+        '400':
+          $ref: '#/components/responses/Error400'
+        '403':
+          $ref: '#/components/responses/Error403'
+  '/datasets/{dataset_id}/retrieve':
+    post:
+      summary: Retrieve Knowledge Base
+      description: Retrieve content from specified knowledge base
+      operationId: retrieveDataset
+      tags:
+        - Datasets
+      parameters:
+        - name: dataset_id
+          in: path
+          description: Knowledge Base ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - query
+              properties:
+                query:
+                  type: string
+                  description: Search keyword
+                retrieval_model:
+                  type: object
+                  description: Retrieval parameter configuration
+                  properties:
+                    search_method:
+                      type: string
+                      enum:
+                        - keyword_search
+                        - semantic_search
+                        - full_text_search
+                        - hybrid_search
+                      description: Search method
+                    reranking_enable:
+                      type: boolean
+                      description: Whether to enable Reranking
+                    reranking_model:
+                      type: object
+                      properties:
+                        reranking_provider_name:
+                          type: string
+                          description: Rerank model provider
+                        reranking_model_name:
+                          type: string
+                          description: Rerank model name
+                    weights:
+                      type: number
+                      format: float
+                      description: Weight setting for semantic search in hybrid search mode
+                    top_k:
+                      type: integer
+                      description: Number of results to return
+                    score_threshold_enabled:
+                      type: boolean
+                      description: Whether to enable score threshold
+                    score_threshold:
+                      type: number
+                      format: float
+                      description: Score threshold
+                external_retrieval_model:
+                  type: object
+                  description: Unused field
+      responses:
+        '200':
+          description: Retrieval successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  query:
+                    type: object
+                    properties:
+                      content:
+                        type: string
+                        description: Search keyword
+                  records:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        segment:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            position:
+                              type: integer
+                            document_id:
+                              type: string
+                            content:
+                              type: string
+                            answer:
+                              type: string
+                              nullable: true
+                            word_count:
+                              type: integer
+                            tokens:
+                              type: integer
+                            keywords:
+                              type: array
+                              items:
+                                type: string
+                            index_node_id:
+                              type: string
+                            index_node_hash:
+                              type: string
+                            hit_count:
+                              type: integer
+                            enabled:
+                              type: boolean
+                            disabled_at:
+                              type: string
+                              nullable: true
+                            disabled_by:
+                              type: string
+                              nullable: true
+                            status:
+                              type: string
+                            created_by:
+                              type: string
+                            created_at:
+                              type: integer
+                            indexing_at:
+                              type: integer
+                            completed_at:
+                              type: integer
+                            error:
+                              type: string
+                              nullable: true
+                            stopped_at:
+                              type: string
+                              nullable: true
+                            document:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                data_source_type:
+                                  type: string
+                                name:
+                                  type: string
+                                doc_type:
+                                  type: string
+                                  nullable: true
+                        score:
+                          type: number
+                          format: float
+                        tsne_position:
+                          type: object
+                          nullable: true
+        '400':
+          $ref: '#/components/responses/Error400'
+        '403':
+          $ref: '#/components/responses/Error403'
+  '/datasets/{dataset_id}/document/create-by-text':
+    post:
+      summary: Create Document by Text
+      description: Create a new document from text based on existing knowledge base
+      operationId: createDocumentByText
+      tags:
+        - Documents
+      parameters:
+        - name: dataset_id
+          in: path
+          description: Knowledge Base ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - text
+                - indexing_technique
+                - process_rule
+              properties:
+                name:
+                  type: string
+                  description: Document name
+                text:
+                  type: string
+                  description: Document content
+                doc_type:
+                  type: string
+                  enum:
+                    - book
+                    - web_page
+                    - paper
+                    - social_media_post
+                    - wikipedia_entry
+                    - personal_document
+                    - business_document
+                    - im_chat_log
+                    - synced_from_notion
+                    - synced_from_github
+                    - others
+                  description: Document type
+                doc_metadata:
+                  type: object
+                  description: Document metadata
+                indexing_technique:
+                  type: string
+                  enum:
+                    - high_quality
+                    - economy
+                  description: Indexing technique
+                doc_form:
+                  type: string
+                  enum:
+                    - text_model
+                    - hierarchical_model
+                    - qa_model
+                  description: Document form
+                doc_language:
+                  type: string
+                  description: Document language (required for Q&A mode)
+                process_rule:
+                  $ref: '#/components/schemas/ProcessRule'
+      responses:
+        '200':
+          description: Successfully created document
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  document:
+                    $ref: '#/components/schemas/Document'
+                  batch:
+                    type: string
+        '400':
+          $ref: '#/components/responses/Error400'
+        '413':
+          $ref: '#/components/responses/Error413'
+        '415':
+          $ref: '#/components/responses/Error415'
+  '/datasets/{dataset_id}/document/create-by-file':
+    post:
+      summary: Create Document by File
+      description: Create a new document from file based on existing knowledge base
+      operationId: createDocumentByFile
+      tags:
+        - Documents
+      parameters:
+        - name: dataset_id
+          in: path
+          description: Knowledge Base ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                data:
+                  example: |
+                    {"indexing_technique":"high_quality","process_rule":{"rules":{"pre_processing_rules":[{"id":"remove_extra_spaces","enabled":true},{"id":"remove_urls_emails","enabled":true}],"segmentation":{"separator":"###","max_tokens":500}},"mode":"custom"}}
+                  type: object
+                  format: json
+                  description: |
+                    Document configuration information in JSON string format, including the following fields:
+                    - original_document_id: Source document ID (optional), used for re-uploading or modifying document configuration
+                    - indexing_technique: Indexing technique (high_quality/economy)
+                    - doc_form: Document form (text_model/hierarchical_model/qa_model)
+                    - doc_type: Document type
+                    - doc_metadata: Document metadata
+                    - doc_language: Document language (required for Q&A mode)
+                    - process_rule: Processing rules
+                  properties:
+                    original_document_id:
+                      type: string
+                      description: 'Source document ID, used for re-uploading or modifying document configuration'
+                    indexing_technique:
+                      type: string
+                      enum:
+                        - high_quality
+                        - economy
+                      description: Indexing technique
+                    doc_form:
+                      type: string
+                      enum:
+                        - text_model
+                        - hierarchical_model
+                        - qa_model
+                      description: Document form
+                    doc_type:
+                      type: string
+                      enum:
+                        - book
+                        - web_page
+                        - paper
+                        - social_media_post
+                        - wikipedia_entry
+                        - personal_document
+                        - business_document
+                        - im_chat_log
+                        - synced_from_notion
+                        - synced_from_github
+                        - others
+                      description: Document type
+                    doc_metadata:
+                      $ref: '#/components/schemas/DocumentMetadata'
+                    doc_language:
+                      type: string
+                      description: Document language (required for Q&A mode)
+                    process_rule:
+                      $ref: '#/components/schemas/ProcessRule'
+                    retrieval_model:
+                      $ref: '#/components/schemas/RetrievalModel'
+                    embedding_model:
+                      type: string
+                      description: Embedding model name
+                    embedding_model_provider:
+                      type: string
+                      description: Embedding model provider
+                file:
+                  type: string
+                  format: binary
+                  description: File to be uploaded
+      responses:
+        '200':
+          description: Successfully created document
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  document:
+                    $ref: '#/components/schemas/Document'
+                  batch:
+                    type: string
+                    description: Document batch number
+        '400':
+          $ref: '#/components/responses/Error400'
+        '413':
+          $ref: '#/components/responses/Error413'
+        '415':
+          $ref: '#/components/responses/Error415'
+  '/datasets/{dataset_id}/documents/{document_id}/update-by-text':
+    post:
+      summary: Update Document by Text
+      description: Update existing document using text
+      operationId: updateDocumentByText
+      tags:
+        - Documents
+      parameters:
+        - name: dataset_id
+          in: path
+          description: Knowledge Base ID
+          required: true
+          schema:
+            type: string
+        - name: document_id
+          in: path
+          description: Document ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Document name
+                text:
+                  type: string
+                  description: Document content
+                doc_type:
+                  type: string
+                  enum:
+                    - book
+                    - web_page
+                    - paper
+                    - social_media_post
+                    - wikipedia_entry
+                    - personal_document
+                    - business_document
+                    - im_chat_log
+                    - synced_from_notion
+                    - synced_from_github
+                    - others
+                  description: Document type
+                doc_metadata:
+                  type: object
+                  description: Document metadata
+                process_rule:
+                  required: true
+                  $ref: '#/components/schemas/ProcessRule'
+                  description: Processing rules
+      responses:
+        '200':
+          description: Successfully updated document
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  document:
+                    $ref: '#/components/schemas/Document'
+                  batch:
+                    type: string
+        '400':
+          $ref: '#/components/responses/Error400'
+        '403':
+          $ref: '#/components/responses/Error403'
+  '/datasets/{dataset_id}/documents/{document_id}/update-by-file':
+    post: # TODO: (E001) 接口有bug, https://github.com/langgenius/dify/pull/14243
+      summary: Update Document by File
+      description: Update existing document using file
+      operationId: updateDocumentByFile
+      tags:
+        - Documents
+        - Documents
+      parameters:
+        - name: dataset_id
+          in: path
+          description: Knowledge Base ID
+          required: true
+          schema:
+            type: string
+        - name: document_id
+          in: path
+          description: Document ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                name:
+                  type: string
+                  description: Document name
+                file:
+                  type: string
+                  format: binary
+                  description: File to be uploaded
+                process_rule:
+                  $ref: '#/components/schemas/ProcessRule'
+      responses:
+        '200':
+          description: Successfully updated document
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  document:
+                    $ref: '#/components/schemas/Document'
+                  batch:
+                    type: string
+        '400':
+          $ref: '#/components/responses/Error400'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '413':
+          $ref: '#/components/responses/Error413'
+        '415':
+          $ref: '#/components/responses/Error415'
+  '/datasets/{dataset_id}/documents/{batch}/indexing-status':
+    get:
+      summary: Get Document Embedding Status
+      description: Get document processing and indexing progress status
+      operationId: getDocumentIndexingStatus
+      tags:
+        - Documents
+      parameters:
+        - name: dataset_id
+          in: path
+          description: Knowledge Base ID
+          required: true
+          schema:
+            type: string
+        - name: batch
+          in: path
+          description: Document batch number
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved indexing status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        indexing_status:
+                          type: string
+                        processing_started_at:
+                          type: number
+                          format: float
+                        parsing_completed_at:
+                          type: number
+                          format: float
+                        cleaning_completed_at:
+                          type: number
+                          format: float
+                        splitting_completed_at:
+                          type: number
+                          format: float
+                        completed_at:
+                          type: number
+                          format: float
+                          nullable: true
+                        paused_at:
+                          type: number
+                          format: float
+                          nullable: true
+                        error:
+                          type: string
+                          nullable: true
+                        stopped_at:
+                          type: number
+                          format: float
+                          nullable: true
+                        completed_segments:
+                          type: integer
+                        total_segments:
+                          type: integer
+        '400':
+          $ref: '#/components/responses/Error400'
+        '403':
+          $ref: '#/components/responses/Error403'
+  '/datasets/{dataset_id}/documents':
+    get:
+      summary: Get Knowledge Base Document List
+      description: Get a list of all documents in the specified knowledge base
+      operationId: getDocumentList
+      tags:
+        - Documents
+      parameters:
+        - name: dataset_id
+          in: path
+          description: Knowledge Base ID
+          required: true
+          schema:
+            type: string
+        - name: keyword
+          in: query
+          description: Search keyword
+          required: false
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Items per page
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: Successfully retrieved document list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Document'
+                  has_more:
+                    type: boolean
+                  limit:
+                    type: integer
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/Error400'
+  '/datasets/{dataset_id}/documents/{document_id}':
+    delete:
+      summary: Delete Document
+      description: Delete specified document
+      operationId: deleteDocument
+      tags:
+        - Documents
+      parameters:
+        - name: dataset_id
+          in: path
+          description: Knowledge Base ID
+          required: true
+          schema:
+            type: string
+        - name: document_id
+          in: path
+          description: Document ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully deleted document
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    enum:
+                      - success
+        '400':
+          $ref: '#/components/responses/Error400'
+        '403':
+          $ref: '#/components/responses/Error403'
+  '/datasets/{dataset_id}/documents/{document_id}/segments':
+    post:
+      summary: Add Segment
+      description: Add a new segment to specified document
+      operationId: createSegments
+      tags:
+        - Segments
+      parameters:
+        - name: dataset_id
+          in: path
+          description: Knowledge Base ID
+          required: true
+          schema:
+            type: string
+        - name: document_id
+          in: path
+          description: Document ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - segments
+              properties:
+                segments:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - content
+                    properties:
+                      content:
+                        type: string
+                        description: Text content/question content
+                      answer:
+                        type: string
+                        description: 'Answer content, optional, required if knowledge base is in Q&A mode'
+                      keywords:
+                        type: array
+                        items:
+                          type: string
+                        description: 'Keyword list, optional'
+      responses:
+        '200':
+          description: Successfully created segment
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Segment'
+                  doc_form:
+                    type: string
+        '400':
+          $ref: '#/components/responses/Error400'
+        '403':
+          $ref: '#/components/responses/Error403'
+    get:
+      summary: Query Document Segments
+      description: Get all segments of specified document
+      operationId: getSegments
+      tags:
+        - Segments
+      parameters:
+        - name: dataset_id
+          in: path
+          description: Knowledge Base ID
+          required: true
+          schema:
+            type: string
+        - name: document_id
+          in: path
+          description: Document ID
+          required: true
+          schema:
+            type: string
+        - name: keyword
+          in: query
+          description: Search keyword
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: Segment status
+          required: false
+          schema:
+            type: string
+            enum:
+              - completed
+      responses:
+        '200':
+          description: Successfully retrieved segment list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Segment'
+                  doc_form:
+                    type: string
+        '400':
+          $ref: '#/components/responses/Error400'
+  '/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}':
+    delete:
+      summary: Delete Document Segment
+      description: Delete specified document segment
+      operationId: deleteSegment
+      tags:
+        - Segments
+      parameters:
+        - name: dataset_id
+          in: path
+          description: Knowledge Base ID
+          required: true
+          schema:
+            type: string
+        - name: document_id
+          in: path
+          description: Document ID
+          required: true
+          schema:
+            type: string
+        - name: segment_id
+          in: path
+          description: Segment ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully deleted segment
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    enum:
+                      - success
+        '400':
+          $ref: '#/components/responses/Error400'
+        '403':
+          $ref: '#/components/responses/Error403'
+    post:
+      summary: Update Document Segment
+      description: Update specified document segment
+      operationId: updateSegment
+      tags:
+        - Segments
+      parameters:
+        - name: dataset_id
+          in: path
+          description: Knowledge Base ID
+          required: true
+          schema:
+            type: string
+        - name: document_id
+          in: path
+          description: Document ID
+          required: true
+          schema:
+            type: string
+        - name: segment_id
+          in: path
+          description: Segment ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - segment
+              properties:
+                segment:
+                  type: object
+                  properties:
+                    content:
+                      type: string
+                      description: Text content/question content
+                    answer:
+                      type: string
+                      description: Answer content (required for Q&A mode)
+                    keywords:
+                      type: array
+                      items:
+                        type: string
+                      description: Keyword list
+                    enabled:
+                      type: boolean
+                      description: Whether enabled
+                    regenerate_child_chunks:
+                      type: boolean
+                      description: Whether to regenerate child segments
+      responses:
+        '200':
+          description: Successfully updated segment
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Segment'
+                  doc_form:
+                    type: string
+        '400':
+          $ref: '#/components/responses/Error400'
+        '403':
+          $ref: '#/components/responses/Error403'
+  '/datasets/{dataset_id}/documents/{document_id}/upload-file':
+    get:
+      summary: Get Upload File
+      description: Get upload file information of specified document
+      operationId: getUploadFile
+      tags:
+        - Documents
+      parameters:
+        - name: dataset_id
+          in: path
+          description: Knowledge Base ID
+          required: true
+          schema:
+            type: string
+        - name: document_id
+          in: path
+          description: Document ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved file information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadFile'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '403':
+          $ref: '#/components/responses/Error403'
+
