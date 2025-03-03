@@ -52,8 +52,8 @@
   - [x] GET /messages - 获取会话历史消息
   - [x] GET /info - 获取应用基本信息
   - [x] GET /parameters - 获取应用参数
-  - [ ] POST /audio-to-text - 语音转文字
-  - [ ] POST /text-to-audio - 文字转语音
+  - [x] POST /audio-to-text - 语音转文字
+  - [x] POST /text-to-audio - 文字转语音
 
 
 ## 项目结构
