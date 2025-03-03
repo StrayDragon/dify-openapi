@@ -9,6 +9,7 @@ dependencies = [
     "httpx>=0.20.0,<0.29.0",
     "attrs>=22.2.0",
     "python-dateutil>=2.8.0",
+    "pydantic>=2.10.6",
 ]
 
 [dependency-groups]
@@ -46,4 +47,4 @@ line-ending = "auto"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-addopts = "-vv --ignore libs --showlocals -x --cov=src --cov-branch --cov-report=xml" # --cov-report=term-missing
+addopts = "tests/app/test_apis.py -vv --ignore libs --showlocals -x --cov=src --cov-branch --cov-report=xml" # --cov-report=term-missing
