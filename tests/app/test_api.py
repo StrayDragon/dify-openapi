@@ -1,288 +1,236 @@
 import pytest
 from pathlib import Path
-from io import BytesIO
-from typing import cast, Optional, Union
+from typing import Any, Optional
 
-from dify_openapi_app.models.post_chat_messages_body import PostChatMessagesBody
-from dify_openapi_app.models.delete_conversations_conversation_id_body import DeleteConversationsConversationIdBody
-from dify_openapi_app.models.post_messages_message_id_feedbacks_body import PostMessagesMessageIdFeedbacksBody
-from dify_openapi_app.models.post_conversations_conversation_id_name_body import PostConversationsConversationIdNameBody
-from dify_openapi_app.models.post_text_to_audio_body import PostTextToAudioBody
-from dify_openapi_app.models.file_input import FileInput
-from dify_openapi_app.models.post_chat_messages_body_inputs import PostChatMessagesBodyInputs
-from dify_openapi_app.models.post_files_upload_body import PostFilesUploadBody
-from dify_openapi_app.models.post_audio_to_text_body import PostAudioToTextBody
-from dify_openapi_app.models.chat_message import ChatMessage
-from dify_openapi_app.models.conversation import Conversation
-from dify_openapi_app.models.uploaded_file import UploadedFile
-from dify_openapi_app.types import UNSET, File, Unset
-
-from dify_openapi_app.api.default import (
-    get_info,
-    get_parameters,
-    get_conversations,
-    get_messages,
-    post_chat_messages,
-    post_messages_message_id_feedbacks,
-    post_conversations_conversation_id_name,
-    delete_conversations_conversation_id,
-    post_files_upload,
-    post_audio_to_text,
-    post_text_to_audio,
+from dify_sdk.client import AsyncDifyApi
+from dify_sdk.types import (
+    PostCompletionMessagesRequestInputs,
+    FileInput,
 )
 
 LOGIN_USER_ID = "test123"
 
 
-async def test_get_app_info(c):
-    """测试获取应用基本信息接口"""
-    response = await get_info.asyncio(client=c.app_client)
+async def test_get_app_info(app_chat_client: AsyncDifyApi):
+    """测试获取应用信息"""
+    response = await app_chat_client.get_application_basic_information()
+    assert response.name is not None and len(response.name) > 0
+    assert response.description is not None
+    assert isinstance(response.tags, list)
 
-    # 验证响应不为空
-    assert response is not None
-
-    # 验证基本字段存在
-    assert hasattr(response, "name")
-    assert hasattr(response, "description")
-    assert hasattr(response, "tags")
-
-    # 验证name字段类型正确且不为空
-    assert isinstance(response.name, str)
-    assert len(response.name) > 0
-
-    # 如果有tags，验证其为列表类型
-    if response.tags:
-        assert isinstance(response.tags, list)
-        for tag in response.tags:
-            assert isinstance(tag, str)
+    for tag in response.tags:
+        assert isinstance(tag, str)
 
 
-async def test_get_app_info_error_handling(c):
-    """测试获取应用基本信息接口的错误处理"""
-    # 这里我们可以通过修改client的配置来触发错误
-    # 比如修改host为一个无效的地址
-    original_host = c.app_client._base_url
-    c.app_client._base_url = "https://invalid.example.com"
+async def test_get_app_info_error_handling(app_chat_client: AsyncDifyApi):
+    """测试获取应用信息时错误处理"""
+    original_host = app_chat_client._client_wrapper._base_url  # type: ignore
+    app_chat_client._client_wrapper._base_url = "https://invalid.example.com"  # type: ignore
 
     with pytest.raises(Exception):
-        await get_info.asyncio(client=c.app_client)
+        await app_chat_client.get_application_basic_information()
 
-    # 恢复原始配置
-    c.app_client._base_url = original_host
+    app_chat_client._client_wrapper._base_url = original_host  # type: ignore
 
 
-async def test_chat_messages(c):
-    """测试发送对话消息接口"""
-    inputs = PostChatMessagesBodyInputs()
-    request = PostChatMessagesBody(
+async def test_chat_messages(app_chat_client: AsyncDifyApi) -> Optional[str]:
+    """测试对话消息接口"""
+    response = await app_chat_client.send_chat_message_conversational_app(
         query="ping",
-        user=LOGIN_USER_ID,
         response_mode="blocking",
-        inputs=inputs,
+        user=LOGIN_USER_ID,
+        inputs=None,
     )
-
-    response = await post_chat_messages.asyncio(client=c.app_client, body=request)
     assert response is not None
-    assert hasattr(response, "message_id")
-
-    # 保存message_id用于后续测试
+    assert response.message_id is not None
     return response.message_id
 
 
-async def test_message_feedback(c):
+async def test_message_feedback(app_chat_client: AsyncDifyApi):
     """测试消息反馈接口"""
-    # 先发送一条消息
-    message_id = await test_chat_messages(c)
-    if message_id is None or isinstance(message_id, Unset):
-        pytest.skip("无法获取消息ID")
+    message_id = await test_chat_messages(app_chat_client)
+    assert message_id is not None
 
-    # 测试点赞功能
-    request = PostMessagesMessageIdFeedbacksBody(
+    response = await app_chat_client.message_feedback(
+        message_id=message_id,
         rating="like",
         user=LOGIN_USER_ID,
     )
-
-    response = await post_messages_message_id_feedbacks.asyncio(
-        client=c.app_client, message_id=str(message_id), body=request
-    )
     assert response is not None
-    assert hasattr(response, "result")
     assert response.result == "success"
 
 
-async def test_conversation_management(c):
+async def test_conversation_management(app_chat_client: AsyncDifyApi):
     """测试会话管理相关接口"""
-    # 1. 获取会话列表
-    conversations = await get_conversations.asyncio(client=c.app_client, user=LOGIN_USER_ID)
+    conversations = await app_chat_client.get_conversation_list(user=LOGIN_USER_ID, sort_by="created_at")
     assert conversations is not None
-    assert hasattr(conversations, "data")
+    assert conversations.data is not None
 
-    if (
-        conversations.data is not None
-        and isinstance(conversations.data, list)
-        and len(conversations.data) > 0
-        and isinstance(conversations.data[0], Conversation)
-    ):
+    if conversations.data and len(conversations.data) > 0:
         conversation = conversations.data[0]
-        if conversation.id is None or isinstance(conversation.id, Unset):
-            pytest.skip("无法获取会话ID")
+        assert conversation.id is not None
         conversation_id = str(conversation.id)
 
-        # 2. 测试重命名会话
-        rename_request = PostConversationsConversationIdNameBody(
-            name="dify-openapi 测试会话",
+        renamed = await app_chat_client.rename_conversation(
+            conversation_id=conversation_id,
             user=LOGIN_USER_ID,
-        )
-        renamed = await post_conversations_conversation_id_name.asyncio(
-            client=c.app_client, conversation_id=conversation_id, body=rename_request
+            name="dify-openapi 测试会话",
         )
         assert renamed is not None
         assert renamed.name == "dify-openapi 测试会话"
-        if renamed.id is None or isinstance(renamed.id, Unset):
+        if renamed.id is None:
             pytest.skip("无法获取重命名后的会话ID")
         conversation_id = str(renamed.id)
 
-        # 3. 获取会话历史消息
-        messages = await get_messages.asyncio(
-            client=c.app_client,
+        messages = await app_chat_client.get_conversation_history_messages(
             conversation_id=conversation_id,
             user=LOGIN_USER_ID,
         )
         assert messages is not None
-        assert hasattr(messages, "data")
+        assert messages.data is not None
 
-        # 4. 删除会话
-        delete_request = DeleteConversationsConversationIdBody(
-            user=LOGIN_USER_ID,
-        )
-        delete_response = await delete_conversations_conversation_id.asyncio(
-            client=c.app_client,
+        delete_response = await app_chat_client.delete_conversation(
             conversation_id=conversation_id,
-            body=delete_request,
+            user=LOGIN_USER_ID,
         )
         assert delete_response is not None
         assert delete_response.result == "success"
 
 
-async def test_get_parameters(c):
-    """测试获取应用参数接口"""
-    response = await get_parameters.asyncio(client=c.app_client)
+async def test_get_parameters(app_chat_client: AsyncDifyApi):
+    """测试获取应用参数"""
+    response = await app_chat_client.get_application_parameters()
     assert response is not None
-
-    # 验证关键参数字段存在
-    assert hasattr(response, "opening_statement")
-    assert hasattr(response, "suggested_questions")
-    assert hasattr(response, "speech_to_text")
-    assert hasattr(response, "retriever_resource")
+    assert response.opening_statement is not None
+    assert response.suggested_questions is not None
+    assert response.speech_to_text is not None
+    assert response.retriever_resource is not None
 
 
 @pytest.fixture
-def test_file_path():
-    yield Path("tests/data/app/test.txt")
+def test_file_path() -> Path:
+    """测试用的文件路径"""
+    return Path("tests/data/app/test.txt")
 
 
 @pytest.fixture
-def test_audio_file_path():
+def test_audio_file_path() -> Path:
     """创建测试用的临时音频文件"""
-    file_path = Path("tests/data/app/audio.mp3")
-    yield file_path
+    return Path("tests/data/app/audio.mp3")
 
 
-async def test_file_upload(c, test_file_path):
+async def test_file_upload(app_chat_client: AsyncDifyApi, test_file_path: Path) -> Optional[str]:
     """测试文件上传接口"""
-    with open(test_file_path, "rb") as f:
-        file_data = BytesIO(f.read())
-        request = PostFilesUploadBody(
-            file=File(payload=file_data),
-            user=LOGIN_USER_ID,
-        )
-        response = await post_files_upload.asyncio(client=c.app_client, body=request)
-        if isinstance(response, UploadedFile):
-            assert response.id is not None
-            return response.id
-        return None
-
-
-@pytest.mark.skip(reason="FIXME: sdk暂不支持, 可以直接用openapi-ui测试")
-async def test_audio_to_text(c, test_audio_file_path):
-    """测试语音转文字接口"""
-    file_data = BytesIO(test_audio_file_path.read_bytes())
-    request = PostAudioToTextBody(
-        file=File(payload=file_data),
+    response = await app_chat_client.upload_file(
+        file=("test.txt", test_file_path.read_bytes(), "text/plain"),
         user=LOGIN_USER_ID,
     )
-    response = await post_audio_to_text.asyncio(client=c.app_client, body=request)
-
-    assert response is not None
-    assert hasattr(response, "text")
-    return response.text
+    assert response.id is not None
+    return response.id
 
 
-@pytest.mark.skip(reason="FIXME: sdk暂不支持, 可以直接用openapi-ui测试")
-async def test_text_to_audio(c):
-    """测试文字转语音接口"""
-    request = PostTextToAudioBody(
-        text="dify-openapi 测试文本转语音",
-        user=LOGIN_USER_ID,
-    )
-
-    # 注意：这个接口返回二进制音频数据
-    response = await post_text_to_audio.asyncio_detailed(client=c.app_client, body=request)
-    assert response is not None
-    assert len(response.content) > 0  # 确保返回了音频数据
-
-
-async def test_chat_with_suggested_questions(c):
+async def test_chat_with_suggested_questions(app_chat_client: AsyncDifyApi):
     """测试对话并获取下一轮建议问题"""
     # 1. 发送对话消息
-    inputs = PostChatMessagesBodyInputs()
-    request = PostChatMessagesBody(
+    chat_response = await app_chat_client.send_chat_message_conversational_app(
         query="dify-openapi 测试问题",
-        user=LOGIN_USER_ID,
         response_mode="blocking",
-        inputs=inputs,
+        user=LOGIN_USER_ID,
+        inputs=None,
     )
-
-    chat_response = await post_chat_messages.asyncio(client=c.app_client, body=request)
     assert chat_response is not None
-    if not isinstance(chat_response, ChatMessage):
-        pytest.skip("响应类型不正确")
 
     # 2. 获取应用参数，检查是否启用了建议问题功能
-    params = await get_parameters.asyncio(client=c.app_client)
-    if (
-        params is not None
-        and params.suggested_questions_after_answer
-        and params.suggested_questions_after_answer.enabled
-    ):
-        # 如果启用了建议问题功能，应该在chat_response的additional_properties中包含建议问题
-        if "suggested_questions" in chat_response.additional_properties:
-            suggested_questions = chat_response.additional_properties["suggested_questions"]
+    params = await app_chat_client.get_application_parameters()
+    if params.suggested_questions_after_answer and params.suggested_questions_after_answer.enabled:
+        # 如果启用了建议问题功能，应该在chat_response中包含建议问题
+        response_dict = chat_response.model_dump()
+        if "suggested_questions" in response_dict:
+            suggested_questions: list[str] = response_dict["suggested_questions"]
             assert isinstance(suggested_questions, list)
             for question in suggested_questions:
                 assert isinstance(question, str)
 
 
-@pytest.mark.skip(reason="FIXME: sdk不支持")
-async def test_chat_with_file(c, test_file_path):
+async def test_chat_with_file(app_chat_client: AsyncDifyApi, test_file_path: Path):
     """测试带文件的对话"""
     # 1. 先上传文件
-    file_id = await test_file_upload(c, test_file_path)
+    file_id = await test_file_upload(app_chat_client, test_file_path)
 
     # 2. 发送带文件的对话消息
-    inputs = PostChatMessagesBodyInputs()
-    request = PostChatMessagesBody(
-        query="dify-openapi 测试问题 - 请分析上传的文件",
-        user=LOGIN_USER_ID,
-        response_mode="blocking",
-        files=[
-            FileInput(
-                type_="document", transfer_method="local_file", upload_file_id=file_id if file_id is not None else UNSET
-            )
-        ],
-        inputs=inputs,
+    file_input = FileInput(
+        type="document",
+        transfer_method="local_file",
+        upload_file_id=file_id,
     )
 
-    response = await post_chat_messages.asyncio(client=c.app_client, body=request)
+    response = await app_chat_client.send_chat_message_conversational_app(
+        query="dify-openapi 测试问题 - 请分析上传的文件",
+        response_mode="blocking",
+        user=LOGIN_USER_ID,
+        files=[file_input],
+        inputs=None,
+    )
     assert response is not None
     assert hasattr(response, "message_id")
+
+
+async def test_audio_to_text(app_chat_client: AsyncDifyApi, test_audio_file_path: Path):
+    """测试语音转文字接口"""
+    response = await app_chat_client.audio_to_text(
+        file=("test.mp3", test_audio_file_path.read_bytes(), "audio/mp3"),
+        user=LOGIN_USER_ID,
+    )
+    assert response is not None
+    assert hasattr(response, "text")
+    assert response.text is not None
+    assert response.text != ""
+
+
+async def test_text_to_audio(app_chat_client: AsyncDifyApi):
+    """测试文字转语音接口"""
+    audio_chunks: list[bytes] = []
+    audio_stream = app_chat_client.text_to_audio(
+        text="Hi",
+        user=LOGIN_USER_ID,
+    )
+    async for chunk in audio_stream:
+        audio_chunks.append(chunk)
+
+    assert len(audio_chunks) > 0
+    for chunk in audio_chunks:
+        assert isinstance(chunk, bytes)
+
+
+async def test_completion_message(app_completion_client: AsyncDifyApi):
+    """测试文本生成接口"""
+    response = await app_completion_client.send_message_text_generation_app(
+        inputs=PostCompletionMessagesRequestInputs(query="ping"),
+        response_mode="blocking",
+        user=LOGIN_USER_ID,
+    )
+
+    assert response is not None
+    assert response.message_id is not None
+
+
+async def test_workflow_run(app_workflow_client: AsyncDifyApi):
+    """Test workflow execution API"""
+    workflow_inputs: dict[str, Any] = {
+        "query": "ping",
+        "inputs": {},
+        "files": [],
+    }
+
+    response = await app_workflow_client.run_workflow_workflow_app(
+        inputs=workflow_inputs,
+        response_mode="blocking",
+        user=LOGIN_USER_ID,
+    )
+    assert response is not None
+    assert response.workflow_run_id is not None
+    assert response.task_id is not None
+    assert response.data is not None
+    assert response.data.id is not None
+    assert response.data.workflow_id is not None
+    assert response.data.status in ["running", "succeeded", "failed", "stopped"]
