@@ -502,6 +502,58 @@ actions:
     update:
       description: "Creation timestamp"
 
+  - target: $.components.schemas.CreateDocumentByFileRequestData
+    update:
+      description: |
+        Document configuration information in JSON string format, including the following fields:
+        - original_document_id: Source document ID (optional), used for re-uploading or modifying document configuration
+        - indexing_technique: Indexing technique (high_quality/economy)
+        - doc_form: Document form (text_model/hierarchical_model/qa_model)
+        - doc_type: Document type
+        - doc_metadata: Document metadata
+        - doc_language: Document language (required for Q&A mode)
+        - process_rule: Processing rules
+
+  - target: $.components.schemas.CreateDocumentByFileRequestData.properties.original_document_id
+    update:
+      description: "Source document ID, used for re-uploading or modifying document configuration"
+
+  - target: $.components.schemas.CreateDocumentByFileRequestData.properties.indexing_technique
+    update:
+      description: "Indexing technique"
+
+  - target: $.components.schemas.CreateDocumentByFileRequestData.properties.doc_form
+    update:
+      description: "Document form"
+
+  - target: $.components.schemas.CreateDocumentByFileRequestData.properties.doc_type
+    update:
+      description: "Document type"
+
+  - target: $.components.schemas.CreateDocumentByFileRequestData.properties.doc_metadata
+    update:
+      description: "Document metadata"
+
+  - target: $.components.schemas.CreateDocumentByFileRequestData.properties.doc_language
+    update:
+      description: "Document language (required for Q&A mode)"
+
+  - target: $.components.schemas.CreateDocumentByFileRequestData.properties.process_rule
+    update:
+      description: "Processing rules"
+
+  - target: $.components.schemas.CreateDocumentByFileRequestData.properties.retrieval_model
+    update:
+      description: "Retrieval model configuration"
+
+  - target: $.components.schemas.CreateDocumentByFileRequestData.properties.embedding_model
+    update:
+      description: "Embedding model name"
+
+  - target: $.components.schemas.CreateDocumentByFileRequestData.properties.embedding_model_provider
+    update:
+      description: "Embedding model provider"
+
   - target: $.paths['/datasets'].post
     update:
       summary: "Create Empty Knowledge Base"
@@ -696,10 +748,6 @@ actions:
   - target: $.paths['/datasets/{dataset_id}/document/create-by-file'].post.responses['200'].description
     update: "Successfully created document"
 
-  - target: $.paths['/datasets/{dataset_id}/document/create-by-file'].post.responses['200'].content['application/json'].schema.properties.batch
-    update:
-      description: "Document batch number"
-
   - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/update-by-text'].post.responses['200'].description
     update: "Successfully updated document"
 
@@ -778,42 +826,6 @@ actions:
   - target: $.components.responses.Error415.content['application/json'].examples.unsupported_file_type.value.message
     update: "File type not allowed."
 
-  - target: $.paths['/datasets/{dataset_id}/document/create-by-file'].post.parameters[0]
-    update:
-      description: "Knowledge Base ID"
-
-  - target: $.paths['/datasets/{dataset_id}/document/create-by-file'].post.requestBody.content['multipart/form-data'].schema.properties.data
-    update:
-      description: |
-        Document configuration information in JSON string format, including the following fields:
-        - original_document_id: Source document ID (optional), used for re-uploading or modifying document configuration
-        - indexing_technique: Indexing technique (high_quality/economy)
-        - doc_form: Document form (text_model/hierarchical_model/qa_model)
-        - doc_type: Document type
-        - doc_metadata: Document metadata
-        - doc_language: Document language (required for Q&A mode)
-        - process_rule: Processing rules
-
-  - target: $.paths['/datasets/{dataset_id}/document/create-by-file'].post.requestBody.content['multipart/form-data'].schema.properties.data.properties.original_document_id
-    update:
-      description: "Source document ID, used for re-uploading or modifying document configuration"
-
-  - target: $.paths['/datasets/{dataset_id}/document/create-by-file'].post.requestBody.content['multipart/form-data'].schema.properties.data.properties.indexing_technique
-    update:
-      description: "Indexing technique"
-
-  - target: $.paths['/datasets/{dataset_id}/document/create-by-file'].post.requestBody.content['multipart/form-data'].schema.properties.data.properties.doc_form
-    update:
-      description: "Document form"
-
-  - target: $.paths['/datasets/{dataset_id}/document/create-by-file'].post.requestBody.content['multipart/form-data'].schema.properties.data.properties.doc_type
-    update:
-      description: "Document type"
-
-  - target: $.paths['/datasets/{dataset_id}/document/create-by-file'].post.requestBody.content['multipart/form-data'].schema.properties.data.properties.doc_language
-    update:
-      description: "Document language (required for Q&A mode)"
-
   - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/update-by-text'].post.parameters[0]
     update:
       description: "Knowledge Base ID"
@@ -842,9 +854,28 @@ actions:
     update:
       description: "Processing rules"
 
+  - target: $.paths['/datasets/{dataset_id}/document/create-by-file'].post.parameters[0]
+    update:
+      description: "Knowledge Base ID"
+
+  - target: $.paths['/datasets/{dataset_id}/document/create-by-file'].post.requestBody.content['multipart/form-data'].schema.properties.data
+    update:
+      description: "Document configuration information in JSON string format, see CreateDocumentByFileRequestData schema for details"
+
+  - target: $.paths['/datasets/{dataset_id}/document/create-by-file'].post.requestBody.content['multipart/form-data'].schema.properties.data
+    update:
+      description: "Document configuration information in JSON string format, see CreateDocumentByFileRequestData schema for details"
+
   - target: $.paths['/datasets/{dataset_id}/document/create-by-file'].post.requestBody.content['multipart/form-data'].schema.properties.file
     update:
       description: "File to be uploaded"
+
+  - target: $.paths['/datasets/{dataset_id}/document/create-by-file'].post.responses['200'].description
+    update: "Successfully created document"
+
+  - target: $.paths['/datasets/{dataset_id}/document/create-by-file'].post.responses['200'].content['application/json'].schema.properties.batch
+    update:
+      description: "Document batch number"
 
   - target: $.paths['/datasets/{dataset_id}/documents/{document_id}'].delete.parameters[0]
     update:
@@ -909,14 +940,6 @@ actions:
   - target: $.paths['/datasets/{dataset_id}/documents'].get.parameters[3]
     update:
       description: "Items per page"
-
-  - target: $.paths['/datasets/{dataset_id}/document/create-by-file'].post.requestBody.content['multipart/form-data'].schema.properties.data.properties.embedding_model
-    update:
-      description: "Embedding model name"
-
-  - target: $.paths['/datasets/{dataset_id}/document/create-by-file'].post.requestBody.content['multipart/form-data'].schema.properties.data.properties.embedding_model_provider
-    update:
-      description: "Embedding model provider"
 
   - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/update-by-file'].post.parameters[0]
     update:
