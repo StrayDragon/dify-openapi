@@ -6,6 +6,10 @@ from .types import (
     ChatMessage,
     CompletionMessage,
     Conversation,
+    CreateDocumentByFileRequestData,
+    CreateDocumentByFileRequestDataDocForm,
+    CreateDocumentByFileRequestDataDocType,
+    CreateDocumentByFileRequestDataIndexingTechnique,
     Dataset,
     DatasetIndexingTechnique,
     DatasetList,
@@ -83,10 +87,6 @@ from .datasets import (
     RetrieveDatasetResponseRecordsItemSegmentDocument,
 )
 from .documents import (
-    CreateDocumentByFileRequestData,
-    CreateDocumentByFileRequestDataDocForm,
-    CreateDocumentByFileRequestDataDocType,
-    CreateDocumentByFileRequestDataIndexingTechnique,
     CreateDocumentByFileResponse,
     CreateDocumentByTextRequestDocForm,
     CreateDocumentByTextRequestDocType,

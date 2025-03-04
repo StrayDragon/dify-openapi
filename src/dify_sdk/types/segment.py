@@ -67,7 +67,7 @@ class Segment(UniversalBaseModel):
     Whether enabled
     """
 
-    disabled_at: typing.Optional[str] = pydantic.Field(default=None)
+    disabled_at: typing.Optional[float] = pydantic.Field(default=None)
     """
     Disabled timestamp
     """
@@ -87,17 +87,17 @@ class Segment(UniversalBaseModel):
     Creator ID
     """
 
-    created_at: typing.Optional[int] = pydantic.Field(default=None)
+    created_at: typing.Optional[float] = pydantic.Field(default=None)
     """
     Creation timestamp
     """
 
-    indexing_at: typing.Optional[int] = pydantic.Field(default=None)
+    indexing_at: typing.Optional[float] = pydantic.Field(default=None)
     """
     Indexing timestamp
     """
 
-    completed_at: typing.Optional[int] = pydantic.Field(default=None)
+    completed_at: typing.Optional[float] = pydantic.Field(default=None)
     """
     Completion timestamp
     """
@@ -107,7 +107,7 @@ class Segment(UniversalBaseModel):
     Error message
     """
 
-    stopped_at: typing.Optional[str] = pydantic.Field(default=None)
+    stopped_at: typing.Optional[float] = pydantic.Field(default=None)
     """
     Stop timestamp
     """

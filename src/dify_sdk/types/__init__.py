@@ -5,6 +5,16 @@ from .base_message_metadata import BaseMessageMetadata
 from .chat_message import ChatMessage
 from .completion_message import CompletionMessage
 from .conversation import Conversation
+from .create_document_by_file_request_data import CreateDocumentByFileRequestData
+from .create_document_by_file_request_data_doc_form import (
+    CreateDocumentByFileRequestDataDocForm,
+)
+from .create_document_by_file_request_data_doc_type import (
+    CreateDocumentByFileRequestDataDocType,
+)
+from .create_document_by_file_request_data_indexing_technique import (
+    CreateDocumentByFileRequestDataIndexingTechnique,
+)
 from .dataset import Dataset
 from .dataset_indexing_technique import DatasetIndexingTechnique
 from .dataset_list import DatasetList
@@ -84,6 +94,10 @@ __all__ = [
     "ChatMessage",
     "CompletionMessage",
     "Conversation",
+    "CreateDocumentByFileRequestData",
+    "CreateDocumentByFileRequestDataDocForm",
+    "CreateDocumentByFileRequestDataDocType",
+    "CreateDocumentByFileRequestDataIndexingTechnique",
     "Dataset",
     "DatasetIndexingTechnique",
     "DatasetList",
