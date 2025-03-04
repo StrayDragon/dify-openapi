@@ -89,13 +89,13 @@ components:
           type: string
           description: Creator ID
         created_at:
-          type: integer
+          type: number
           description: Creation timestamp
         updated_by:
           type: string
           description: Last updated by ID
         updated_at:
-          type: integer
+          type: number
           description: Last updated timestamp
         embedding_model:
           type: string
@@ -349,7 +349,8 @@ components:
           type: string
           description: Creator ID
         created_at:
-          type: integer
+          type: number
+          nullable: true
           description: Creation timestamp
         tokens:
           type: integer
@@ -365,11 +366,11 @@ components:
           type: boolean
           description: Whether enabled
         disabled_at:
-          type: string
+          type: number
           nullable: true
           description: Disabled timestamp
         disabled_by:
-          type: string
+          type: number
           nullable: true
           description: Disabled by user ID
         archived:
@@ -430,7 +431,7 @@ components:
           type: boolean
           description: Whether enabled
         disabled_at:
-          type: string
+          type: number
           nullable: true
           description: Disabled timestamp
         disabled_by:
@@ -444,20 +445,23 @@ components:
           type: string
           description: Creator ID
         created_at:
-          type: integer
+          type: number
+          nullable: true
           description: Creation timestamp
         indexing_at:
-          type: integer
+          type: number
+          nullable: true
           description: Indexing timestamp
         completed_at:
-          type: integer
+          type: number
+          nullable: true
           description: Completion timestamp
         error:
           type: string
           nullable: true
           description: Error message
         stopped_at:
-          type: string
+          type: number
           nullable: true
           description: Stop timestamp
     UploadFile:
@@ -488,8 +492,71 @@ components:
           type: string
           description: Creator ID
         created_at:
-          type: integer
+          type: number
           description: Creation timestamp
+    CreateDocumentByFileRequestData:
+      example: |
+        {"indexing_technique":"high_quality","process_rule":{"rules":{"pre_processing_rules":[{"id":"remove_extra_spaces","enabled":true},{"id":"remove_urls_emails","enabled":true}],"segmentation":{"separator":"###","max_tokens":500}},"mode":"custom"}}
+      type: object
+      description: |
+        Document configuration information in JSON string format, including the following fields:
+        - original_document_id: Source document ID (optional), used for re-uploading or modifying document configuration
+        - indexing_technique: Indexing technique (high_quality/economy)
+        - doc_form: Document form (text_model/hierarchical_model/qa_model)
+        - doc_type: Document type
+        - doc_metadata: Document metadata
+        - doc_language: Document language (required for Q&A mode)
+        - process_rule: Processing rules
+      properties:
+        original_document_id:
+          type: string
+          description: 'Source document ID, used for re-uploading or modifying document configuration'
+        indexing_technique:
+          type: string
+          enum:
+            - high_quality
+            - economy
+          description: Indexing technique
+        doc_form:
+          type: string
+          enum:
+            - text_model
+            - hierarchical_model
+            - qa_model
+          description: Document form
+        doc_type:
+          type: string
+          enum:
+            - book
+            - web_page
+            - paper
+            - social_media_post
+            - wikipedia_entry
+            - personal_document
+            - business_document
+            - im_chat_log
+            - synced_from_notion
+            - synced_from_github
+            - others
+          description: Document type
+        doc_metadata:
+          $ref: '#/components/schemas/DocumentMetadata'
+          description: Document metadata
+        doc_language:
+          type: string
+          description: Document language (required for Q&A mode)
+        process_rule:
+          $ref: '#/components/schemas/ProcessRule'
+          description: Processing rules
+        retrieval_model:
+          $ref: '#/components/schemas/RetrievalModel'
+          description: Retrieval model configuration
+        embedding_model:
+          type: string
+          description: Embedding model name
+        embedding_model_provider:
+          type: string
+          description: Embedding model provider
   responses:
     Error400:
       description: Request parameter error
@@ -776,7 +843,7 @@ paths:
                             enabled:
                               type: boolean
                             disabled_at:
-                              type: string
+                              type: number
                               nullable: true
                             disabled_by:
                               type: string
@@ -786,16 +853,19 @@ paths:
                             created_by:
                               type: string
                             created_at:
-                              type: integer
+                              type: number
+                              nullable: true
                             indexing_at:
-                              type: integer
+                              type: number
+                              nullable: true
                             completed_at:
-                              type: integer
+                              type: number
+                              nullable: true
                             error:
                               type: string
                               nullable: true
                             stopped_at:
-                              type: string
+                              type: number
                               nullable: true
                             document:
                               type: object
@@ -929,66 +999,11 @@ paths:
                 - file
               properties:
                 data:
-                  example: |
-                    {"indexing_technique":"high_quality","process_rule":{"rules":{"pre_processing_rules":[{"id":"remove_extra_spaces","enabled":true},{"id":"remove_urls_emails","enabled":true}],"segmentation":{"separator":"###","max_tokens":500}},"mode":"custom"}}
-                  type: object
+                  # type: object
+                  # NOTE: `format: json` maybe not force to impl in many sdks , use `type: string` get more compatible with some sdk, if your generator can handle this, please use `type: object` for better type checking and completion
+                  type: string
                   format: json
-                  description: |
-                    Document configuration information in JSON string format, including the following fields:
-                    - original_document_id: Source document ID (optional), used for re-uploading or modifying document configuration
-                    - indexing_technique: Indexing technique (high_quality/economy)
-                    - doc_form: Document form (text_model/hierarchical_model/qa_model)
-                    - doc_type: Document type
-                    - doc_metadata: Document metadata
-                    - doc_language: Document language (required for Q&A mode)
-                    - process_rule: Processing rules
-                  properties:
-                    original_document_id:
-                      type: string
-                      description: 'Source document ID, used for re-uploading or modifying document configuration'
-                    indexing_technique:
-                      type: string
-                      enum:
-                        - high_quality
-                        - economy
-                      description: Indexing technique
-                    doc_form:
-                      type: string
-                      enum:
-                        - text_model
-                        - hierarchical_model
-                        - qa_model
-                      description: Document form
-                    doc_type:
-                      type: string
-                      enum:
-                        - book
-                        - web_page
-                        - paper
-                        - social_media_post
-                        - wikipedia_entry
-                        - personal_document
-                        - business_document
-                        - im_chat_log
-                        - synced_from_notion
-                        - synced_from_github
-                        - others
-                      description: Document type
-                    doc_metadata:
-                      $ref: '#/components/schemas/DocumentMetadata'
-                    doc_language:
-                      type: string
-                      description: Document language (required for Q&A mode)
-                    process_rule:
-                      $ref: '#/components/schemas/ProcessRule'
-                    retrieval_model:
-                      $ref: '#/components/schemas/RetrievalModel'
-                    embedding_model:
-                      type: string
-                      description: Embedding model name
-                    embedding_model_provider:
-                      type: string
-                      description: Embedding model provider
+                  description: 'Document configuration information in JSON string format, see CreateDocumentByFileRequestData schema for details' #/components/schemas/CreateDocumentByFileRequestData
                 file:
                   type: string
                   format: binary

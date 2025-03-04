@@ -89,13 +89,13 @@ components:
           type: string
           description: 创建者 ID
         created_at:
-          type: integer
+          type: number
           description: 创建时间戳
         updated_by:
           type: string
           description: 最后更新者 ID
         updated_at:
-          type: integer
+          type: number
           description: 最后更新时间戳
         embedding_model:
           type: string
@@ -329,7 +329,8 @@ components:
         created_by:
           type: string
         created_at:
-          type: integer
+          type: number
+          nullable: true
         tokens:
           type: integer
         indexing_status:
@@ -340,10 +341,10 @@ components:
         enabled:
           type: boolean
         disabled_at:
-          type: string
+          type: number
           nullable: true
         disabled_by:
-          type: string
+          type: number
           nullable: true
         archived:
           type: boolean
@@ -387,7 +388,7 @@ components:
         enabled:
           type: boolean
         disabled_at:
-          type: string
+          type: number
           nullable: true
         disabled_by:
           type: string
@@ -397,16 +398,19 @@ components:
         created_by:
           type: string
         created_at:
-          type: integer
+          type: number
+          nullable: true
         indexing_at:
-          type: integer
+          type: number
+          nullable: true
         completed_at:
-          type: integer
+          type: number
+          nullable: true
         error:
           type: string
           nullable: true
         stopped_at:
-          type: string
+          type: number
           nullable: true
 
     UploadFile:
@@ -437,9 +441,64 @@ components:
           type: string
           description: 创建者 ID
         created_at:
-          type: integer
+          type: number
           description: 创建时间戳
 
+    CreateDocumentByFileRequestData:
+      example: |
+        {"indexing_technique":"high_quality","process_rule":{"rules":{"pre_processing_rules":[{"id":"remove_extra_spaces","enabled":true},{"id":"remove_urls_emails","enabled":true}],"segmentation":{"separator":"###","max_tokens":500}},"mode":"custom"}}
+      type: object
+      description: |
+        文档配置信息，JSON字符串格式，包含以下字段：
+        - original_document_id: 源文档ID（选填），用于重新上传或修改文档配置
+        - indexing_technique: 索引方式（high_quality/economy）
+        - doc_form: 索引内容形式（text_model/hierarchical_model/qa_model）
+        - doc_type: 文档类型
+        - doc_metadata: 文档元数据
+        - doc_language: 文档语言（Q&A模式必填）
+        - process_rule: 处理规则
+      properties:
+        original_document_id:
+          type: string
+          description: 源文档ID，用于重新上传或修改文档配置
+        indexing_technique:
+          type: string
+          enum: [high_quality, economy]
+          description: 索引方式
+        doc_form:
+          type: string
+          enum: [text_model, hierarchical_model, qa_model]
+          description: 索引内容形式
+        doc_type:
+          type: string
+          enum:
+            - book
+            - web_page
+            - paper
+            - social_media_post
+            - wikipedia_entry
+            - personal_document
+            - business_document
+            - im_chat_log
+            - synced_from_notion
+            - synced_from_github
+            - others
+          description: 文档类型
+        doc_metadata:
+          $ref: "#/components/schemas/DocumentMetadata"
+        doc_language:
+          type: string
+          description: 文档语言（Q&A模式必填）
+        process_rule:
+          $ref: "#/components/schemas/ProcessRule"
+        retrieval_model:
+          $ref: "#/components/schemas/RetrievalModel"
+        embedding_model:
+          type: string
+          description: Embedding模型名称
+        embedding_model_provider:
+          type: string
+          description: Embedding模型供应商
   responses:
     Error400:
       description: 请求参数错误
@@ -734,7 +793,7 @@ paths:
                             enabled:
                               type: boolean
                             disabled_at:
-                              type: string
+                              type: number
                               nullable: true
                             disabled_by:
                               type: string
@@ -744,16 +803,19 @@ paths:
                             created_by:
                               type: string
                             created_at:
-                              type: integer
+                              type: number
+                              nullable: true
                             indexing_at:
-                              type: integer
+                              type: number
+                              nullable: true
                             completed_at:
-                              type: integer
+                              type: number
+                              nullable: true
                             error:
                               type: string
                               nullable: true
                             stopped_at:
-                              type: string
+                              type: number
                               nullable: true
                             document:
                               type: object
@@ -889,61 +951,12 @@ paths:
                 - file
               properties:
                 data:
-                  example: |
-                    {"indexing_technique":"high_quality","process_rule":{"rules":{"pre_processing_rules":[{"id":"remove_extra_spaces","enabled":true},{"id":"remove_urls_emails","enabled":true}],"segmentation":{"separator":"###","max_tokens":500}},"mode":"custom"}}
-                  type: object
+                  # NOTE: `format: json` maybe not force to impl in many sdks , use `type: string` get more compatible with some sdk, if your generator can handle this, please use `type: object` for better type checking and completion
+                  # type: object
+                  type: string
                   format: json
-                  description: |
-                    文档配置信息，JSON字符串格式，包含以下字段：
-                    - original_document_id: 源文档ID（选填），用于重新上传或修改文档配置
-                    - indexing_technique: 索引方式（high_quality/economy）
-                    - doc_form: 索引内容形式（text_model/hierarchical_model/qa_model）
-                    - doc_type: 文档类型
-                    - doc_metadata: 文档元数据
-                    - doc_language: 文档语言（Q&A模式必填）
-                    - process_rule: 处理规则
-                  properties:
-                    original_document_id:
-                      type: string
-                      description: 源文档ID，用于重新上传或修改文档配置
-                    indexing_technique:
-                      type: string
-                      enum: [high_quality, economy]
-                      description: 索引方式
-                    doc_form:
-                      type: string
-                      enum: [text_model, hierarchical_model, qa_model]
-                      description: 索引内容形式
-                    doc_type:
-                      type: string
-                      enum:
-                        - book
-                        - web_page
-                        - paper
-                        - social_media_post
-                        - wikipedia_entry
-                        - personal_document
-                        - business_document
-                        - im_chat_log
-                        - synced_from_notion
-                        - synced_from_github
-                        - others
-                      description: 文档类型
-                    doc_metadata:
-                      $ref: "#/components/schemas/DocumentMetadata"
-                    doc_language:
-                      type: string
-                      description: 文档语言（Q&A模式必填）
-                    process_rule:
-                      $ref: "#/components/schemas/ProcessRule"
-                    retrieval_model:
-                      $ref: "#/components/schemas/RetrievalModel"
-                    embedding_model:
-                      type: string
-                      description: Embedding模型名称
-                    embedding_model_provider:
-                      type: string
-                      description: Embedding模型供应商
+                  description: ref #/components/schemas/CreateDocumentByFileRequestData
+
                 file:
                   type: string
                   format: binary

@@ -24,7 +24,6 @@ from ..errors.unsupported_media_type_error import UnsupportedMediaTypeError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from .. import core
-from .types.create_document_by_file_request_data import CreateDocumentByFileRequestData
 from .types.create_document_by_file_response import CreateDocumentByFileResponse
 from .types.update_document_by_text_request_doc_type import (
     UpdateDocumentByTextRequestDocType,
@@ -188,7 +187,7 @@ class DocumentsClient:
         dataset_id: str,
         *,
         file: core.File,
-        data: typing.Optional[CreateDocumentByFileRequestData] = OMIT,
+        data: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CreateDocumentByFileResponse:
         """
@@ -202,15 +201,8 @@ class DocumentsClient:
         file : core.File
             See core.File for more documentation
 
-        data : typing.Optional[CreateDocumentByFileRequestData]
-            Document configuration information in JSON string format, including the following fields:
-            - original_document_id: Source document ID (optional), used for re-uploading or modifying document configuration
-            - indexing_technique: Indexing technique (high_quality/economy)
-            - doc_form: Document form (text_model/hierarchical_model/qa_model)
-            - doc_type: Document type
-            - doc_metadata: Document metadata
-            - doc_language: Document language (required for Q&A mode)
-            - process_rule: Processing rules
+        data : typing.Optional[str]
+            Document configuration information in JSON string format, see CreateDocumentByFileRequestData schema for details
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -451,7 +443,7 @@ class DocumentsClient:
             method="POST",
             data={
                 "name": name,
-                "process_rule": process_rule,
+                "process_rule": process_rule.model_dump_json() if process_rule else None,
             },
             files={
                 "file": file,
@@ -976,7 +968,7 @@ class AsyncDocumentsClient:
         dataset_id: str,
         *,
         file: core.File,
-        data: typing.Optional[CreateDocumentByFileRequestData] = OMIT,
+        data: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CreateDocumentByFileResponse:
         """
@@ -990,15 +982,8 @@ class AsyncDocumentsClient:
         file : core.File
             See core.File for more documentation
 
-        data : typing.Optional[CreateDocumentByFileRequestData]
-            Document configuration information in JSON string format, including the following fields:
-            - original_document_id: Source document ID (optional), used for re-uploading or modifying document configuration
-            - indexing_technique: Indexing technique (high_quality/economy)
-            - doc_form: Document form (text_model/hierarchical_model/qa_model)
-            - doc_type: Document type
-            - doc_metadata: Document metadata
-            - doc_language: Document language (required for Q&A mode)
-            - process_rule: Processing rules
+        data : typing.Optional[str]
+            Document configuration information in JSON string format, see CreateDocumentByFileRequestData schema for details
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1263,7 +1248,7 @@ class AsyncDocumentsClient:
             method="POST",
             data={
                 "name": name,
-                "process_rule": process_rule,
+                "process_rule": process_rule.model_dump_json() if process_rule else None,
             },
             files={
                 "file": file,

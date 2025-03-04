@@ -3,31 +3,16 @@
 """
 
 import asyncio
-from http import HTTPStatus
-import os
 from pathlib import Path
 import pytest
 from io import BytesIO
-from typing import cast
 
-from dify_openapi_datasets.models.create_dataset_request import CreateDatasetRequest
-from dify_openapi_datasets.models.create_document_by_text_body import CreateDocumentByTextBody
-from dify_openapi_datasets.models.update_document_by_text_body import UpdateDocumentByTextBody
-from dify_openapi_datasets.models.process_rule import ProcessRule
-from dify_openapi_datasets.models.create_document_by_file_body import CreateDocumentByFileBody
-from dify_openapi_datasets.models.create_document_by_file_body_data import CreateDocumentByFileBodyData
-from dify_openapi_datasets.models.document import Document
-from dify_openapi_datasets.types import UNSET, File
-from dify_openapi_datasets.api.datasets import create_empty_dataset, delete_dataset
-from dify_openapi_datasets.api.documents import (
-    create_document_by_text,
-    create_document_by_file,
-    get_document_indexing_status,
-    update_document_by_text,
-    get_document_list,
-    delete_document,
-    get_upload_file,
+from dify_sdk import (
+    ProcessRule,
 )
+from dify_sdk.types.create_document_by_file_request_data import CreateDocumentByFileRequestData
+from dify_sdk.types.dataset import Dataset
+from dify_sdk_testing import KnowledgeBaseClient
 
 
 @pytest.fixture
@@ -41,162 +26,128 @@ def markdown_file1():
 
 
 @pytest.fixture
-async def dataset1(c):
+async def dataset1(kb_client: KnowledgeBaseClient):
     """创建一个测试用的知识库"""
-    dataset_request = CreateDatasetRequest(
+    ds = await kb_client.dataset.create_empty_dataset(
         name="dify-openapi 测试-文档测试库",
         description="用于测试文档相关接口",
         indexing_technique="high_quality",
     )
-
-    create_response = await create_empty_dataset.asyncio_detailed(client=c.client, body=dataset_request)
-    assert create_response is not None
-    assert create_response.parsed is not None
-    dataset = create_response.parsed
+    assert ds is not None
+    assert ds.id is not None
+    dataset_id = str(ds.id)
 
     try:
-        yield dataset
+        yield ds
     finally:
-        await delete_dataset.asyncio_detailed(client=c.client, dataset_id=str(dataset.id))
+        await kb_client.dataset.delete_dataset(dataset_id=dataset_id)
 
 
-async def test_text_document_workflow(c, dataset1, text_file1):
+async def test_text_document_workflow(kb_client: KnowledgeBaseClient, dataset1: Dataset, text_file1: Path):
     """测试文本文档相关的工作流程"""
     # 1. 通过文本创建文档
-    doc_request = CreateDocumentByTextBody(
+    create_response = await kb_client.document.create_document_by_text(
+        dataset_id=str(dataset1.id),
         name="test_document.txt",
         text=text_file1.read_text(),
         indexing_technique="high_quality",
-        process_rule=ProcessRule(mode="automatic"),
-    )
-
-    create_response = await create_document_by_text.asyncio_detailed(
-        client=c.client, dataset_id=str(dataset1.id), body=doc_request
+        process_rule=ProcessRule(mode="automatic", rules=None),
     )
     assert create_response is not None
-    assert create_response.status_code == HTTPStatus.OK
-    assert create_response.parsed is not None
-    assert create_response.parsed.document is not UNSET
-    document = cast(Document, create_response.parsed.document)
+    assert create_response.document is not None
+    document = create_response.document
     doc_id = str(document.id)
-    assert create_response.parsed.batch is not UNSET
-    batch_id = str(create_response.parsed.batch)
+    assert create_response.batch is not None
+    batch_id = str(create_response.batch)
 
-    # 2. 获取文档嵌入状态
-    status_response = await get_document_indexing_status.asyncio_detailed(
-        client=c.client,
-        dataset_id=str(dataset1.id),
-        batch=batch_id,
-    )
-    assert status_response is not None
-    assert status_response.parsed is not None
-
-    # 等待几秒，确保文档处理完成
-    await asyncio.sleep(5)
-
-    # 3. 更新文档内容
-    update_request = UpdateDocumentByTextBody(
-        text=text_file1.read_text() + "\n# 这是更新后的内容",
-        name="updated_test_document.txt",
-        process_rule=ProcessRule(mode="automatic"),
-    )
-
-    # 等待几秒，确保更新处理完成
-    await asyncio.sleep(5)
-
-    # 查询状态直到处理完成
-    for sleep_time in [2, 4, 8, 16]:
-        get_response = await get_document_indexing_status.asyncio_detailed(
-            client=c.client,
-            dataset_id=str(dataset1.id),
+    dataset_id = str(dataset1.id)
+    # 2. 获取文档嵌入状态, 查询状态直到处理完成
+    for sleep_time in [2, 4, 8, 16, 32, 64]:
+        status_response = await kb_client.document.get_document_indexing_status(
+            dataset_id=dataset_id,
             batch=batch_id,
         )
-        assert get_response is not None
-        assert get_response.parsed is not None
-        for data in get_response.parsed.data or []:
+        assert status_response is not None
+        for data in status_response.data or []:
             if data.indexing_status == "completed":
                 break
+
         await asyncio.sleep(sleep_time)
 
-    update_response = await update_document_by_text.asyncio_detailed(
-        client=c.client,
-        dataset_id=str(dataset1.id),
+    # 3. 更新文档内容
+    update_response = await kb_client.document.update_document_by_text(
+        dataset_id=dataset_id,
         document_id=doc_id,
-        body=update_request,
+        text=text_file1.read_text() + "\n# 这是更新后的内容",
+        name="updated_test_document.txt",
+        process_rule=ProcessRule(mode="automatic", rules=None),
     )
     assert update_response is not None
-    assert update_response.parsed is not None
+    assert update_response.document is not None
 
     # 4. 获取文档列表
-    list_response = await get_document_list.asyncio_detailed(
-        client=c.client,
-        dataset_id=str(dataset1.id),
+    list_response = await kb_client.document.get_document_list(
+        dataset_id=dataset_id,
         page=1,
         limit=20,
         keyword="test",  # 测试搜索功能
     )
     assert list_response is not None
-    assert list_response.parsed is not None
-    assert list_response.parsed.data is not UNSET
-    assert isinstance(list_response.parsed.data, list)
-    assert len(list_response.parsed.data) > 0
+    assert list_response.data is not None
+    assert isinstance(list_response.data, list)
+    assert len(list_response.data) > 0
 
     # 5. 删除文档
-    delete_response = await delete_document.asyncio_detailed(
-        client=c.client, dataset_id=str(dataset1.id), document_id=doc_id
-    )
+    delete_response = await kb_client.document.delete_document(dataset_id=dataset_id, document_id=doc_id)
     assert delete_response is not None
-    assert delete_response.status_code == HTTPStatus.OK
+    assert delete_response.result == "success"
 
 
-async def test_file_document_workflow(c, dataset1, markdown_file1):
+async def test_file_document_workflow(kb_client: KnowledgeBaseClient, dataset1: Dataset, markdown_file1: Path):
     """测试文件文档相关的工作流程"""
-    # 1. 通过文件创建文档
-    with open(markdown_file1, "rb") as f:
-        file_content = f.read()
-        file_doc_request = CreateDocumentByFileBody(
-            file=File(
-                payload=BytesIO(file_content),
-                file_name=os.path.basename(markdown_file1),
-                mime_type="text/markdown",
-            ),
-            data=CreateDocumentByFileBodyData(
-                indexing_technique="high_quality",
-                process_rule=ProcessRule(mode="automatic"),
-            ),
-        )
-
-        create_response = await create_document_by_file.asyncio_detailed(
-            client=c.client, dataset_id=str(dataset1.id), body=file_doc_request
-        )
-        assert create_response is not None
-        assert create_response.parsed is not None
-        assert create_response.parsed.document is not UNSET
-        document = cast(Document, create_response.parsed.document)
-        doc_id = str(document.id)
-
-    # 2. 更新文档内容 # FIXME: @l8ng 上游有bug，暂时跳过
-    # with open(markdown_file1, "rb") as f:
-    #     file_content = f.read()
-    #     update_request = UpdateDocumentByFileBody(
-    #         file=File(
-    #             payload=BytesIO(file_content),
-    #             file_name="updated_test_document.md",
-    #             mime_type="text/markdown",
-    #         ),
-    #         name="updated_test_document.md",
-    #         process_rule=ProcessRule(mode="automatic"),
-    #     )
-
-    #     update_response = await update_document_by_file.asyncio_detailed(
-    #         client=client2.client, dataset_id=str(dataset1.id), document_id=doc_id, body=update_request
-    #     )
-    #     assert update_response is not None
-    #     assert update_response.parsed is not None
-
-    # 3. 获取上传文件
-    file_response = await get_upload_file.asyncio_detailed(
-        client=c.client, dataset_id=str(dataset1.id), document_id=doc_id
+    create_response = await kb_client.document.create_document_by_file(
+        dataset_id=str(dataset1.id),
+        file=("test.md", markdown_file1.read_bytes(), "text/markdown"),
+        data=CreateDocumentByFileRequestData(
+            indexing_technique="high_quality",
+            process_rule=ProcessRule(mode="automatic", rules=None),
+            doc_form="text_model",
+            doc_language="English",
+        ).model_dump_json(),
     )
+    assert create_response is not None
+    assert create_response.document is not None
+    document = create_response.document
+    doc_id = str(document.id)
+    dataset_id = str(dataset1.id)
+    batch_id = str(create_response.batch)
+
+    for sleep_time in [2, 4, 8, 16, 32, 64]:
+        status_response = await kb_client.document.get_document_indexing_status(
+            dataset_id=dataset_id,
+            batch=batch_id,
+        )
+        assert status_response is not None
+        for data in status_response.data or []:
+            if data.indexing_status == "completed":
+                break
+
+        await asyncio.sleep(sleep_time)
+
+    NEW_UPDATED_NAME = "updated_test_document.md"
+    with BytesIO((markdown_file1.read_text() + "\n# 这是更新后的内容").encode("utf-8")) as fp:
+        update_response = await kb_client.document.update_document_by_file(
+            dataset_id=str(dataset1.id),
+            document_id=doc_id,
+            file=("test.md", fp, "text/markdown"),
+            name=NEW_UPDATED_NAME,
+            process_rule=ProcessRule(mode="automatic", rules=None),
+        )
+    assert update_response is not None
+    assert update_response.document is not None
+
+    file_response = await kb_client.document.get_upload_file(dataset_id=str(dataset1.id), document_id=doc_id)
     assert file_response is not None
-    assert file_response.parsed is not None
+    assert file_response.id is not None
+    assert file_response.size is not None
+    assert file_response.size > 0

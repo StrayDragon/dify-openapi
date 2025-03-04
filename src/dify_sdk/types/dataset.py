@@ -65,7 +65,7 @@ class Dataset(UniversalBaseModel):
     Creator ID
     """
 
-    created_at: typing.Optional[int] = pydantic.Field(default=None)
+    created_at: typing.Optional[float] = pydantic.Field(default=None)
     """
     Creation timestamp
     """
@@ -75,7 +75,7 @@ class Dataset(UniversalBaseModel):
     Last updated by ID
     """
 
-    updated_at: typing.Optional[int] = pydantic.Field(default=None)
+    updated_at: typing.Optional[float] = pydantic.Field(default=None)
     """
     Last updated timestamp
     """

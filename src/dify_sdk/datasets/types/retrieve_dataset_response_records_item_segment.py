@@ -22,15 +22,15 @@ class RetrieveDatasetResponseRecordsItemSegment(UniversalBaseModel):
     index_node_hash: typing.Optional[str] = None
     hit_count: typing.Optional[int] = None
     enabled: typing.Optional[bool] = None
-    disabled_at: typing.Optional[str] = None
+    disabled_at: typing.Optional[float] = None
     disabled_by: typing.Optional[str] = None
     status: typing.Optional[str] = None
     created_by: typing.Optional[str] = None
-    created_at: typing.Optional[int] = None
-    indexing_at: typing.Optional[int] = None
-    completed_at: typing.Optional[int] = None
+    created_at: typing.Optional[float] = None
+    indexing_at: typing.Optional[float] = None
+    completed_at: typing.Optional[float] = None
     error: typing.Optional[str] = None
-    stopped_at: typing.Optional[str] = None
+    stopped_at: typing.Optional[float] = None
     document: typing.Optional[RetrieveDatasetResponseRecordsItemSegmentDocument] = None
 
     if IS_PYDANTIC_V2:

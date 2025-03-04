@@ -9,6 +9,7 @@ groups:
           location: local-file-system
           path: ../src/dify_sdk
         config:
+
 api:
   specs:
     - openapi: openapi/app.en.yaml

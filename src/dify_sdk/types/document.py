@@ -48,7 +48,7 @@ class Document(UniversalBaseModel):
     Creator ID
     """
 
-    created_at: typing.Optional[int] = pydantic.Field(default=None)
+    created_at: typing.Optional[float] = pydantic.Field(default=None)
     """
     Creation timestamp
     """
@@ -73,12 +73,12 @@ class Document(UniversalBaseModel):
     Whether enabled
     """
 
-    disabled_at: typing.Optional[str] = pydantic.Field(default=None)
+    disabled_at: typing.Optional[float] = pydantic.Field(default=None)
     """
     Disabled timestamp
     """
 
-    disabled_by: typing.Optional[str] = pydantic.Field(default=None)
+    disabled_by: typing.Optional[float] = pydantic.Field(default=None)
     """
     Disabled by user ID
     """
