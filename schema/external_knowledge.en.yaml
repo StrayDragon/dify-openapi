@@ -1,0 +1,130 @@
+openapi: 3.0.0
+info:
+  title: Dify External Knowledge API
+  description: |
+    This API is used to connect to a knowledge base that is independent of Dify and maintained by developers. Users can use this schema to generate server-side code for their own implementation.
+    For more details, please refer to "Connecting to an External Knowledge Base" documentation (https://docs.dify.ai/guides/knowledge-base/external-knowledge-api-documentation).
+  version: 1.0.0
+servers:
+  - url: '{baseUrl}'
+    variables:
+      baseUrl:
+        default: 'https://your-endpoint'
+        description: External Knowledge API Server URL
+security:
+  - bearerApiKeyAuth: []
+paths:
+  /retrieval:
+    post:
+      summary: Retrieve Knowledge Content
+      description: Retrieve relevant content from external knowledge base based on user query
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - knowledge_id
+                - query
+                - retrieval_setting
+              properties:
+                knowledge_id:
+                  type: string
+                  description: Your knowledge's unique ID
+                  example: AAA-BBB-CCC
+                query:
+                  type: string
+                  description: User's query
+                  example: What is Dify?
+                retrieval_setting:
+                  type: object
+                  required:
+                    - top_k
+                    - score_threshold
+                  properties:
+                    top_k:
+                      type: integer
+                      description: Maximum number of retrieved results
+                      example: 5
+                    score_threshold:
+                      type: number
+                      description: 'The score limit of relevance of the result to the query, scope: 0~1'
+                      minimum: 0
+                      maximum: 1
+                      example: 0.5
+                  description: Knowledge's retrieval parameters
+      responses:
+        '200':
+          description: Successfully retrieved results
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - records
+                properties:
+                  records:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - content
+                        - score
+                        - title
+                      properties:
+                        content:
+                          type: string
+                          description: Contains a chunk of text from a data source in the knowledge base
+                          example: 'Dify:The Innovation Engine for GenAI Applications'
+                        score:
+                          type: number
+                          description: 'The score of relevance of the result to the query, scope: 0~1'
+                          minimum: 0
+                          maximum: 1
+                          example: 0.5
+                        title:
+                          type: string
+                          description: Document title
+                          example: Dify Introduction
+                        metadata:
+                          type: object
+                          description: Contains metadata attributes and their values for the document in the data source
+                          example: 's3://dify/knowledge.txt'
+        '403':
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  securitySchemes:
+    bearerApiKeyAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    Error:
+      type: object
+      required:
+        - error_code
+        - error_msg
+      properties:
+        error_code:
+          type: integer
+          description: Error code
+          enum:
+            - 1001
+            - 1002
+            - 2001
+          example: 1001
+        error_msg:
+          type: string
+          description: The description of API exception
+          example: Invalid Authorization header format. Expected 'Bearer ' format.
+
