@@ -1,0 +1,133 @@
+openapi: 3.0.0
+info:
+  title: Dify 外部知识库 API
+  description: |
+    此 API 用于连接独立于 Dify 并由开发者维护的知识库, 用户可使用该schema生成server端代码自己实现
+    更多详细信息请参考"连接外部知识库"文档 (https://docs.dify.ai/guides/knowledge-base/external-knowledge-api-documentation)。
+  version: 1.0.0
+
+servers:
+  - url: "{baseUrl}"
+    variables:
+      baseUrl:
+        default: https://your-endpoint
+        description: 外部知识库 API 服务器地址
+
+security:
+  - bearerApiKeyAuth: []
+
+paths:
+  /retrieval:
+    post:
+      summary: 检索知识库内容
+      description: 根据用户查询从外部知识库中检索相关内容
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - knowledge_id
+                - query
+                - retrieval_setting
+              properties:
+                knowledge_id:
+                  type: string
+                  description: 知识库的唯一标识符
+                  example: "AAA-BBB-CCC"
+                query:
+                  type: string
+                  description: 用户的查询内容
+                  example: "What is Dify?"
+                retrieval_setting:
+                  type: object
+                  required:
+                    - top_k
+                    - score_threshold
+                  properties:
+                    top_k:
+                      type: integer
+                      description: 最大检索结果数量
+                      example: 5
+                    score_threshold:
+                      type: number
+                      description: 结果与查询的相关性分数阈值（范围：0~1）
+                      minimum: 0
+                      maximum: 1
+                      example: 0.5
+      responses:
+        "200":
+          description: 成功检索到结果
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - records
+                properties:
+                  records:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - content
+                        - score
+                        - title
+                      properties:
+                        content:
+                          type: string
+                          description: 知识库中数据源的文本片段
+                          example: "Dify:The Innovation Engine for GenAI Applications"
+                        score:
+                          type: number
+                          description: 结果与查询的相关性分数（范围：0~1）
+                          minimum: 0
+                          maximum: 1
+                          example: 0.5
+                        title:
+                          type: string
+                          description: 文档标题
+                          example: "Dify Introduction"
+                        metadata:
+                          type: object
+                          description: 数据源文档的元数据属性及其值
+                          example: "s3://dify/knowledge.txt"
+        "403":
+          description: 访问被拒绝
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  securitySchemes:
+    bearerApiKeyAuth:
+      type: http
+      scheme: bearer
+
+  schemas:
+    Error:
+      type: object
+      required:
+        - error_code
+        - error_msg
+      properties:
+        error_code:
+          type: integer
+          description: 错误代码
+          enum:
+            - 1001 # 无效的 Authorization 头格式
+            - 1002 # 认证失败
+            - 2001 # 知识库不存在
+          example: 1001
+        error_msg:
+          type: string
+          description: API 异常描述
+          example: "Invalid Authorization header format. Expected 'Bearer ' format."

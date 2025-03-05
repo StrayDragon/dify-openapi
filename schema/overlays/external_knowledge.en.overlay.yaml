@@ -1,0 +1,77 @@
+overlay: 1.0.0
+info:
+  title: "English translation overlay for Dify External Knowledge API"
+  version: "1.0.0"
+extends: ../external_knowledge.zh.yaml
+actions:
+  - target: $.info
+    update:
+      title: "Dify External Knowledge API"
+      description: |
+        This API is used to connect to a knowledge base that is independent of Dify and maintained by developers. Users can use this schema to generate server-side code for their own implementation.
+        For more details, please refer to "Connecting to an External Knowledge Base" documentation (https://docs.dify.ai/guides/knowledge-base/external-knowledge-api-documentation).
+
+  - target: $.servers[0].variables.baseUrl
+    update:
+      description: "External Knowledge API Server URL"
+
+  - target: $.paths['/retrieval'].post
+    update:
+      summary: "Retrieve Knowledge Content"
+      description: "Retrieve relevant content from external knowledge base based on user query"
+
+  - target: $.paths['/retrieval'].post.requestBody.content['application/json'].schema.properties.knowledge_id
+    update:
+      description: "Your knowledge's unique ID"
+
+  - target: $.paths['/retrieval'].post.requestBody.content['application/json'].schema.properties.query
+    update:
+      description: "User's query"
+
+  - target: $.paths['/retrieval'].post.requestBody.content['application/json'].schema.properties.retrieval_setting
+    update:
+      description: "Knowledge's retrieval parameters"
+
+  - target: $.paths['/retrieval'].post.requestBody.content['application/json'].schema.properties.retrieval_setting.properties.top_k
+    update:
+      description: "Maximum number of retrieved results"
+
+  - target: $.paths['/retrieval'].post.requestBody.content['application/json'].schema.properties.retrieval_setting.properties.score_threshold
+    update:
+      description: "The score limit of relevance of the result to the query, scope: 0~1"
+
+  - target: $.paths['/retrieval'].post.responses['200']
+    update:
+      description: "Successfully retrieved results"
+
+  - target: $.paths['/retrieval'].post.responses['200'].content['application/json'].schema.properties.records.items.properties.content
+    update:
+      description: "Contains a chunk of text from a data source in the knowledge base"
+
+  - target: $.paths['/retrieval'].post.responses['200'].content['application/json'].schema.properties.records.items.properties.score
+    update:
+      description: "The score of relevance of the result to the query, scope: 0~1"
+
+  - target: $.paths['/retrieval'].post.responses['200'].content['application/json'].schema.properties.records.items.properties.title
+    update:
+      description: "Document title"
+
+  - target: $.paths['/retrieval'].post.responses['200'].content['application/json'].schema.properties.records.items.properties.metadata
+    update:
+      description: "Contains metadata attributes and their values for the document in the data source"
+
+  - target: $.paths['/retrieval'].post.responses['403']
+    update:
+      description: "Access denied"
+
+  - target: $.paths['/retrieval'].post.responses['500']
+    update:
+      description: "Internal server error"
+
+  - target: $.components.schemas.Error.properties.error_code
+    update:
+      description: "Error code"
+
+  - target: $.components.schemas.Error.properties.error_msg
+    update:
+      description: "The description of API exception"

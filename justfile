@@ -20,8 +20,9 @@ gen-client: apply-i18n-overlay-to-openapi-schema update-fern-schema
     bash misc/fern_sdk_hotfix_patch.sh
 
 apply-i18n-overlay-to-openapi-schema:
-    for name in app datasets; do \
+    for name in app datasets external_knowledge; do \
         for lang in en; do \
+            echo "=== $name.$lang.yaml ==="; \
             npx bump overlay schema/$name.zh.yaml schema/overlays/$name.$lang.overlay.yaml > schema/$name.$lang.yaml; \
         done; \
     done
