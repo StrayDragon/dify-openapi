@@ -1,8 +1,8 @@
 openapi: 3.0.0
 info:
-  title: Dify Knowledge Base API
+  title: Dify 知识库 API
   description: |
-    Dify Knowledge Base API 提供了一系列接口用于管理知识库、文档和检索功能。
+    Dify 知识库 API 提供了一系列接口用于管理知识库、文档和检索功能。
     所有 API 请求都需要在 Authorization HTTP Header 中包含知识库级 API-Key。
   version: 1.0.0
 

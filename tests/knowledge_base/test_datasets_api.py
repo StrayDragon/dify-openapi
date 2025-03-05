@@ -17,13 +17,13 @@ from dify_sdk_testing import KnowledgeBaseClient
 @pytest.fixture
 def test_text_file():
     """测试用的文本文件"""
-    yield Path("tests/data/datasets/test.txt")
+    yield Path("tests/data/knowledge_base/test.txt")
 
 
 @pytest.fixture
 def test_pdf_file():
     """测试用的PDF文件"""
-    yield Path("tests/data/datasets/test.pdf")
+    yield Path("tests/data/knowledge_base/test.pdf")
 
 
 async def test_datasets_workflow(kb_client: KnowledgeBaseClient, test_text_file: Path, test_pdf_file: Path):

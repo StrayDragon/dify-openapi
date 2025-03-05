@@ -12,7 +12,7 @@ help:
 
 
 update-fern-schema:
-    cp schema/app.en.yaml schema/datasets.en.yaml fern/openapi/
+    cp schema/app.en.yaml schema/knowledge_base.en.yaml fern/openapi/
 
 gen-client: apply-i18n-overlay-to-openapi-schema update-fern-schema
     fern generate --local
@@ -20,7 +20,7 @@ gen-client: apply-i18n-overlay-to-openapi-schema update-fern-schema
     bash misc/fern_sdk_hotfix_patch.sh
 
 apply-i18n-overlay-to-openapi-schema:
-    for name in app datasets external_knowledge; do \
+    for name in app knowledge_base external_knowledge_base; do \
         for lang in en; do \
             echo "=== $name.$lang.yaml ==="; \
             npx bump overlay schema/$name.zh.yaml schema/overlays/$name.$lang.overlay.yaml > schema/$name.$lang.yaml; \

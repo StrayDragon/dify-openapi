@@ -48,7 +48,7 @@ async def app_completion_client() -> AsyncGenerator[AsyncDifyApi, None]:
 @pytest.fixture()
 async def kb_client() -> AsyncGenerator[KnowledgeBaseClient, None]:
     client = AsyncDifyApi(
-        token=os.environ["TEST_DIFY_DATASETS_API_KEY"],
+        token=os.environ["TEST_DIFY_KNOWLEDGE_BASE_API_KEY"],
         base_url=TEST_DIFY_HOST,
     )
     yield KnowledgeBaseClient(

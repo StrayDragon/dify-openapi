@@ -26,7 +26,7 @@ jobs:
       - name: Run tests
         env:
           TEST_DIFY_HOST: ${{ secrets.TEST_DIFY_HOST }}
-          TEST_DIFY_DATASETS_API_KEY: ${{ secrets.TEST_DIFY_DATASETS_API_KEY }}
+          TEST_DIFY_KNOWLEDGE_BASE_API_KEY: ${{ secrets.TEST_DIFY_KNOWLEDGE_BASE_API_KEY }}
           TEST_DIFY_APP_CHAT_API_KEY: ${{ secrets.TEST_DIFY_APP_CHAT_API_KEY }}
           TEST_DIFY_APP_ADVANCED_CHAT_API_KEY: ${{ secrets.TEST_DIFY_APP_ADVANCED_CHAT_API_KEY }}
           TEST_DIFY_APP_WORKFLOW_API_KEY: ${{ secrets.TEST_DIFY_APP_WORKFLOW_API_KEY }}

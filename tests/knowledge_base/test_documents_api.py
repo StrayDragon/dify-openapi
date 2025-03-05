@@ -17,12 +17,12 @@ from dify_sdk_testing import KnowledgeBaseClient
 
 @pytest.fixture
 def text_file1():
-    yield Path("tests/data/datasets/test2.txt")
+    yield Path("tests/data/knowledge_base/test2.txt")
 
 
 @pytest.fixture
 def markdown_file1():
-    yield Path("tests/data/datasets/test.md")
+    yield Path("tests/data/knowledge_base/test.md")
 
 
 @pytest.fixture
