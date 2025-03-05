@@ -17,16 +17,16 @@ Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, whic
 
 ## Swagger UI Preview online
 
-- [Knowledge Base - SwaggerUI(English)](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/datasets.en.yaml)
 - [Chat Application (Aggregated) - SwaggerUI(English)](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/app.en.yaml)
-- [External Knowledge - SwaggerUI(English)](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/external_knowledge.en.yaml)
+- [Knowledge Base - SwaggerUI(English)](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/knowledge_base.en.yaml)
+- [External Knowledge - SwaggerUI(English)](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/external_knowledge_base.en.yaml)
 
 ## API List
 
 > [!tip]
 > This indicates that the API has passed at least one test case request. If you find any API errors, feel free to submit an issue or PR!
 
-- Knowledge Base: [OpenAPI Schema(中文)](../schema/datasets.zh.yaml) | [OpenAPI Schema(English)](../schema/datasets.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.0.0/web/app/(commonLayout)/datasets/template)
+- Knowledge Base: [OpenAPI Schema(中文)](../schema/knowledge_base.zh.yaml) | [OpenAPI Schema(English)](../schema/knowledge_base.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.0.0/web/app/(commonLayout)/datasets/template)
   - [x] POST /datasets - Create empty knowledge base
   - [x] GET /datasets/{dataset_id}/documents - Get document list
   - [x] DELETE /datasets/{dataset_id}/documents/{document_id} - Delete document
@@ -55,7 +55,7 @@ Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, whic
   - [x] POST /audio-to-text - Speech to text
   - [x] POST /text-to-audio - Text to speech
 
-- External Knowledge: [OpenAPI Schema(中文)](../schema/external_knowledge.zh.yaml) | [OpenAPI Schema(English)](../schema/external_knowledge.en.yaml) | [Official Documentation Source](https://docs.dify.ai/guides/knowledge-base/external-knowledge-api-documentation)
+- External Knowledge: [OpenAPI Schema(中文)](../schema/external_knowledge_base.zh.yaml) | [OpenAPI Schema(English)](../schema/external_knowledge_base.en.yaml) | [Official Documentation Source](https://docs.dify.ai/guides/knowledge-base/external-knowledge-api-documentation)
   - [ ] POST /retrieval - Retrieve knowledge content
 
 ## Project Structure

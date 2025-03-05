@@ -13,4 +13,4 @@ groups:
 api:
   specs:
     - openapi: openapi/app.en.yaml
-    - openapi: openapi/datasets.en.yaml
+    - openapi: openapi/knowledge_base.en.yaml

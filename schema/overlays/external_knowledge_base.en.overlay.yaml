@@ -2,7 +2,7 @@ overlay: 1.0.0
 info:
   title: "English translation overlay for Dify External Knowledge API"
   version: "1.0.0"
-extends: ../external_knowledge.zh.yaml
+extends: ../external_knowledge_base.zh.yaml
 actions:
   - target: $.info
     update:
