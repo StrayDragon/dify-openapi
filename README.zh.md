@@ -19,7 +19,7 @@
 
 - [知识库 - SwaggerUI](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/datasets.zh.yaml)
 - [聊天应用(聚合) - SwaggerUI](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/app.zh.yaml)
-
+- [外部知识库 - SwaggerUI](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/external_knowledge.zh.yaml)
 
 ## 接口列表
 
@@ -55,14 +55,14 @@
   - [x] POST /audio-to-text - 语音转文字
   - [x] POST /text-to-audio - 文字转语音
 
+- 外部知识库: [OpenAPI Schema(中文)](./schema/external_knowledge.zh.yaml) | [OpenAPI Schema(English)](./schema/external_knowledge.en.yaml) | [官方文档源码](https://docs.dify.ai/guides/knowledge-base/external-knowledge-api-documentation)
+  - [ ] POST /retrieval - 检索知识内容
 
 ## 项目结构
 
 ```
 .
 ├── schema/           # OpenAPI schema
-│   ├── app.zh.yaml      # 应用 API
-│   └── datasets.zh.yaml # 知识库 API
 ├── src/             # 生成的客户端代码
 ├── tests/           # 通过测试客户端代码, 校验 schema/* 是否正确
 └── configs/         # 代码生成器配置

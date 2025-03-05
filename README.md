@@ -19,6 +19,7 @@ Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, whic
 
 - [Knowledge Base - SwaggerUI(English)](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/datasets.en.yaml)
 - [Chat Application (Aggregated) - SwaggerUI(English)](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/app.en.yaml)
+- [External Knowledge - SwaggerUI(English)](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/external_knowledge.en.yaml)
 
 ## API List
 
@@ -54,14 +55,14 @@ Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, whic
   - [x] POST /audio-to-text - Speech to text
   - [x] POST /text-to-audio - Text to speech
 
+- External Knowledge: [OpenAPI Schema(中文)](../schema/external_knowledge.zh.yaml) | [OpenAPI Schema(English)](../schema/external_knowledge.en.yaml) | [Official Documentation Source](https://docs.dify.ai/guides/knowledge-base/external-knowledge-api-documentation)
+  - [ ] POST /retrieval - Retrieve knowledge content
 
 ## Project Structure
 
 ```
 .
 ├── schema/           # OpenAPI schema
-│   ├── app.zh.yaml      # Application API
-│   └── datasets.zh.yaml # Knowledge Base API
 ├── src/             # Generated client code
 ├── tests/           # Test client code to verify schema/* correctness
 └── configs/         # Code generator configuration
