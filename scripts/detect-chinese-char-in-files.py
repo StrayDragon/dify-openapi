@@ -20,11 +20,11 @@ app = typer.Typer()
 
 
 def detect_chinese(file_path: str) -> Tuple[bool, Optional[int], Optional[str]]:
-    chinese_pattern = re.compile(r'[\u4e00-\u9fff\u3400-\u4dbf\u3000-\u303f\uff00-\uffef]')
-    comment_pattern = re.compile(r'.*#.*')
+    chinese_pattern = re.compile(r"[\u4e00-\u9fff\u3400-\u4dbf\u3000-\u303f\uff00-\uffef]")
+    comment_pattern = re.compile(r".*#.*")
 
     try:
-        with open(file_path, 'r', encoding='utf-8') as file:
+        with open(file_path, "r", encoding="utf-8") as file:
             for line_num, line in enumerate(file, 1):
                 if comment_pattern.match(line):
                     continue
@@ -34,9 +34,9 @@ def detect_chinese(file_path: str) -> Tuple[bool, Optional[int], Optional[str]]:
                     return True, line_num, match.group(0)
         return False, None, None
     except UnicodeDecodeError:
-        for encoding in ['gbk', 'gb2312', 'big5']:
+        for encoding in ["gbk", "gb2312", "big5"]:
             try:
-                with open(file_path, 'r', encoding=encoding) as file:
+                with open(file_path, "r", encoding=encoding) as file:
                     for line_num, line in enumerate(file, 1):
                         if comment_pattern.match(line):
                             continue
@@ -66,15 +66,14 @@ def check(
             typer.echo(f"{path}: 不包含中文字符")
 
     elif os.path.isdir(path):
-        files_to_check = []
+        files_to_check: list[str] = []
 
         if recursive:
             for root, _, files in os.walk(path):
                 for file in files:
                     files_to_check.append(os.path.join(root, file))
         else:
-            files_to_check = [os.path.join(path, f) for f in os.listdir(path)
-                             if os.path.isfile(os.path.join(path, f))]
+            files_to_check = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
 
         total_files = 0
         chinese_files = 0

@@ -30,6 +30,8 @@ apply-i18n-overlay-to-openapi-schema:
 run-openapi-ui:
     uv run scripts/preview-schema.py
 
+bump-version-guide:
+    @echo "search/replace by vscode,add version to replace and selected match whole word, add files to exclude=> libs/dify,overlays,scripts,uv.lock"
 
 test:
     uv run pytest
