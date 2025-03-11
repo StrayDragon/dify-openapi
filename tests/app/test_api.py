@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 from dify_sdk.client import AsyncDifyApi
+from dify_sdk.core.request_options import RequestOptions
 from dify_sdk.types import (
     PostCompletionMessagesRequestInputs,
     FileInput,
@@ -193,6 +194,7 @@ async def test_text_to_audio(app_chat_client: AsyncDifyApi):
     audio_stream = app_chat_client.text_to_audio(
         text="Hi",
         user=LOGIN_USER_ID,
+        request_options=RequestOptions(timeout_in_seconds=30),
     )
     async for chunk in audio_stream:
         audio_chunks.append(chunk)
@@ -208,6 +210,7 @@ async def test_completion_message(app_completion_client: AsyncDifyApi):
         inputs=PostCompletionMessagesRequestInputs(query="ping"),
         response_mode="blocking",
         user=LOGIN_USER_ID,
+        request_options=RequestOptions(timeout_in_seconds=30),
     )
 
     assert response is not None
