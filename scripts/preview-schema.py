@@ -158,14 +158,14 @@ def main():
     for path, route in OpenAPIHandler.API_ROUTES.items():
         print(f"- {route['title']}: http://localhost:{PORT}{path}")
 
-    try:
-        with socketserver.TCPServer(("", PORT), OpenAPIHandler) as httpd:
+    with socketserver.TCPServer(("", PORT), OpenAPIHandler) as httpd:
+        try:
             print("按 Ctrl+C 停止服务器...")
             httpd.serve_forever()
-    except KeyboardInterrupt:
-        print("\n正在关闭服务器...")
-        httpd.shutdown()
-        print("服务器已关闭")
+        except KeyboardInterrupt:
+            print("\n正在关闭服务器...")
+            httpd.shutdown()
+            print("服务器已关闭")
 
 
 if __name__ == "__main__":
