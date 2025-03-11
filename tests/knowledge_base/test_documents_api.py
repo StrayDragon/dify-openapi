@@ -62,7 +62,7 @@ async def test_text_document_workflow(kb_client: KnowledgeBaseClient, dataset1: 
 
     dataset_id = str(dataset1.id)
     # 2. 获取文档嵌入状态, 查询状态直到处理完成
-    for sleep_time in [2, 4, 8, 16, 32, 64]:
+    for sleep_time in (2**i for i in range(7)):
         status_response = await kb_client.document.get_document_indexing_status(
             dataset_id=dataset_id,
             batch=batch_id,
@@ -122,7 +122,7 @@ async def test_file_document_workflow(kb_client: KnowledgeBaseClient, dataset1: 
     dataset_id = str(dataset1.id)
     batch_id = str(create_response.batch)
 
-    for sleep_time in [2, 4, 8, 16, 32, 64]:
+    for sleep_time in (2**i for i in range(7)):
         status_response = await kb_client.document.get_document_indexing_status(
             dataset_id=dataset_id,
             batch=batch_id,
