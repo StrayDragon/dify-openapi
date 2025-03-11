@@ -1,6 +1,6 @@
 [project]
 name = "dify-openapi"
-version = "1.0.0"
+version = "1.0.1"
 description = "a client for testing and validating dify openapi schema"
 readme = "README.md"
 authors = [{ name = "straydragon", email = "straydragonl@foxmail.com" }]
@@ -12,10 +12,13 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "ipython>=8.18.1",
     "pytest>=8.3.4",
     "pytest-asyncio>=0.25.3",
     "pytest-cov>=6.0.0",
+    "ipython>=8.18.1",
+    "langchain[openai]>=0.3.20",
+    "pyyaml>=6.0.2",
+    "typer>=0.15.2",
 ]
 
 [build-system]

@@ -4,7 +4,7 @@ info:
   description: |
     Dify Knowledge Base API provides a series of interfaces for managing knowledge bases, documents, and retrieval functions.
     All API requests require a knowledge base level API-Key in the Authorization HTTP Header.
-  version: 1.0.0
+  version: 1.0.1
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server

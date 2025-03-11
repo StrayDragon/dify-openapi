@@ -26,7 +26,7 @@
 > [!tip]
 > 这里指至少可以通过一次测试用例请求, 如果你发现有哪些API错误, 欢迎提issue或者pr!
 
-- 知识库: [OpenAPI Schema(中文)](./schema/knowledge_base.zh.yaml) | [OpenAPI Schema(English)](./schema/knowledge_base.en.yaml) | [官方文档源码](https://github.com/langgenius/dify/tree/1.0.0/web/app/(commonLayout)/datasets/template)
+- 知识库: [OpenAPI Schema(中文)](./schema/knowledge_base.zh.yaml) | [OpenAPI Schema(English)](./schema/knowledge_base.en.yaml) | [官方文档源码](https://github.com/langgenius/dify/tree/1.0.1/web/app/(commonLayout)/datasets/template)
   - [x] POST /datasets - 创建空知识库
   - [x] GET /datasets/{dataset_id}/documents - 获取文档列表
   - [x] DELETE /datasets/{dataset_id}/documents/{document_id} - 删除文档
@@ -41,7 +41,7 @@
   - [x] DELETE /datasets/{dataset_id}/documents/{document_id}/segments/{segment_id} - 删除文档分段
   - [x] POST /datasets/{dataset_id}/documents/{document_id}/segments/{segment_id} - 更新文档分段
 
-- 聊天应用(聚合): [OpenAPI Schema(中文)](./schema/app.zh.yaml) | [OpenAPI Schema(English)](./schema/app.en.yaml) | [官方文档源码](https://github.com/langgenius/dify/tree/1.0.0/web/app/components/develop/template)
+- 聊天应用(聚合): [OpenAPI Schema(中文)](./schema/app.zh.yaml) | [OpenAPI Schema(English)](./schema/app.en.yaml) | [官方文档源码](https://github.com/langgenius/dify/tree/1.0.1/web/app/components/develop/template)
   - [x] POST /completion-messages - 发送消息(文本生成型应用)
   - [x] POST /chat-messages - 发送对话消息(对话型应用)
   - [x] POST /workflows/run - 执行工作流(工作流应用)

@@ -26,7 +26,7 @@ Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, whic
 > [!tip]
 > This indicates that the API has passed at least one test case request. If you find any API errors, feel free to submit an issue or PR!
 
-- Knowledge Base: [OpenAPI Schema(中文)](./schema/knowledge_base.zh.yaml) | [OpenAPI Schema(English)](./schema/knowledge_base.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.0.0/web/app/(commonLayout)/datasets/template)
+- Knowledge Base: [OpenAPI Schema(中文)](./schema/knowledge_base.zh.yaml) | [OpenAPI Schema(English)](./schema/knowledge_base.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.0.1/web/app/(commonLayout)/datasets/template)
   - [x] POST /datasets - Create empty knowledge base
   - [x] GET /datasets/{dataset_id}/documents - Get document list
   - [x] DELETE /datasets/{dataset_id}/documents/{document_id} - Delete document
@@ -41,7 +41,7 @@ Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, whic
   - [x] DELETE /datasets/{dataset_id}/documents/{document_id}/segments/{segment_id} - Delete document segment
   - [x] POST /datasets/{dataset_id}/documents/{document_id}/segments/{segment_id} - Update document segment
 
-- Chat Application (Aggregated): [OpenAPI Schema(中文)](./schema/app.zh.yaml) | [OpenAPI Schema(English)](./schema/app.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.0.0/web/app/components/develop/template)
+- Chat Application (Aggregated): [OpenAPI Schema(中文)](./schema/app.zh.yaml) | [OpenAPI Schema(English)](./schema/app.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.0.1/web/app/components/develop/template)
   - [x] POST /completion-messages - Send message (text generation application)
   - [x] POST /chat-messages - Send conversation message (conversation application)
   - [x] POST /workflows/run - Execute workflow (workflow application)
