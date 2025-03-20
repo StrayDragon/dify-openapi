@@ -2,7 +2,6 @@
 测试知识库-文档相关的 API 接口，验证 OpenAPI Schema 的正确性
 """
 
-import asyncio
 from pathlib import Path
 import pytest
 from io import BytesIO
@@ -12,7 +11,7 @@ from dify_sdk import (
 )
 from dify_sdk.types.create_document_by_file_request_data import CreateDocumentByFileRequestData
 from dify_sdk.types.dataset import Dataset
-from dify_sdk_testing import KnowledgeBaseClient
+from dify_sdk_testing import KnowledgeBaseClient, wait_for_document_indexing_completed
 
 
 @pytest.fixture
@@ -43,21 +42,6 @@ async def dataset1(kb_client: KnowledgeBaseClient):
         await kb_client.dataset.delete_dataset(dataset_id=dataset_id)
 
 
-async def wait_for_indexing_completed(kb_client: KnowledgeBaseClient, dataset_id: str, batch_id: str, n: int = 7) -> None:
-    BREAK_STATUS = "completed"
-    for sleep_time in (2**i for i in range(n)):
-        status_response = await kb_client.document.get_document_indexing_status(
-            dataset_id=dataset_id,
-            batch=batch_id,
-        )
-        assert status_response is not None
-        for data in status_response.data or []:
-            if data.indexing_status == BREAK_STATUS:
-                return
-        await asyncio.sleep(sleep_time)
-    raise Exception("文档索引失败")
-
-
 async def test_text_document_workflow(kb_client: KnowledgeBaseClient, dataset1: Dataset, text_file1: Path):
     """测试文本文档相关的工作流程"""
     # 1. 通过文本创建文档
@@ -77,7 +61,7 @@ async def test_text_document_workflow(kb_client: KnowledgeBaseClient, dataset1: 
 
     dataset_id = str(dataset1.id)
     # 2. 获取文档嵌入状态, 查询状态直到处理完成
-    await wait_for_indexing_completed(kb_client=kb_client, dataset_id=dataset_id, batch_id=batch_id)
+    await wait_for_document_indexing_completed(kb_client=kb_client, dataset_id=dataset_id, batch_id=batch_id)
 
     # 3. 更新文档内容
     update_response = await kb_client.document.update_document_by_text(
@@ -127,7 +111,7 @@ async def test_file_document_workflow(kb_client: KnowledgeBaseClient, dataset1: 
     dataset_id = str(dataset1.id)
     batch_id = str(create_response.batch)
 
-    await wait_for_indexing_completed(kb_client=kb_client, dataset_id=dataset_id, batch_id=batch_id)
+    await wait_for_document_indexing_completed(kb_client=kb_client, dataset_id=dataset_id, batch_id=batch_id)
 
     NEW_UPDATED_NAME = "updated_test_document.md"
     with BytesIO((markdown_file1.read_text() + "\n# 这是更新后的内容").encode("utf-8")) as fp:
