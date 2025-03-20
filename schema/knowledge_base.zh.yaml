@@ -1542,7 +1542,7 @@ paths:
   /datasets/{dataset_id}/metadata:
     post:
       tags:
-        - knowledge_base
+        - metadata
       summary: 新增元数据
       operationId: createMetadata
       parameters:
@@ -1584,7 +1584,7 @@ paths:
 
     get:
       tags:
-        - knowledge_base
+        - metadata
       summary: 查询知识库元数据列表
       operationId: listDatasetMetadata
       parameters:
@@ -1620,7 +1620,7 @@ paths:
   /datasets/{dataset_id}/metadata/{metadata_id}:
     patch:
       tags:
-        - knowledge_base
+        - metadata
       summary: 更新元数据
       operationId: updateMetadata
       parameters:
@@ -1663,7 +1663,7 @@ paths:
 
     delete:
       tags:
-        - knowledge_base
+        - metadata
       summary: 删除元数据
       operationId: deleteMetadata
       parameters:
@@ -1684,7 +1684,7 @@ paths:
   /datasets/{dataset_id}/metadata/built-in/{action}:
     post:
       tags:
-        - knowledge_base
+        - metadata
       summary: 启用/禁用内置元数据
       operationId: toggleBuiltInMetadata
       parameters:
@@ -1706,7 +1706,7 @@ paths:
   /datasets/{dataset_id}/documents/metadata:
     post:
       tags:
-        - knowledge_base
+        - metadata
       summary: 更新文档元数据
       operationId: updateDocumentsMetadata
       parameters:

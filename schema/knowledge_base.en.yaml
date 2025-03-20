@@ -1583,7 +1583,7 @@ paths:
   '/datasets/{dataset_id}/metadata':
     post:
       tags:
-        - knowledge_base
+        - metadata
       summary: Create metadata
       operationId: createMetadata
       parameters:
@@ -1625,7 +1625,7 @@ paths:
       description: Create a new metadata field
     get:
       tags:
-        - knowledge_base
+        - metadata
       summary: List dataset metadata
       operationId: listDatasetMetadata
       parameters:
@@ -1661,7 +1661,7 @@ paths:
   '/datasets/{dataset_id}/metadata/{metadata_id}':
     patch:
       tags:
-        - knowledge_base
+        - metadata
       summary: Update metadata
       operationId: updateMetadata
       parameters:
@@ -1704,7 +1704,7 @@ paths:
       description: Update an existing metadata field
     delete:
       tags:
-        - knowledge_base
+        - metadata
       summary: Delete metadata
       operationId: deleteMetadata
       parameters:
@@ -1725,7 +1725,7 @@ paths:
   '/datasets/{dataset_id}/metadata/built-in/{action}':
     post:
       tags:
-        - knowledge_base
+        - metadata
       summary: Enable/disable built-in metadata
       operationId: toggleBuiltInMetadata
       parameters:
@@ -1749,7 +1749,7 @@ paths:
   '/datasets/{dataset_id}/documents/metadata':
     post:
       tags:
-        - knowledge_base
+        - metadata
       summary: Update document metadata
       operationId: updateDocumentsMetadata
       parameters:

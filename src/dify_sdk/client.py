@@ -7,7 +7,7 @@ from .core.client_wrapper import SyncClientWrapper
 from .datasets.client import DatasetsClient
 from .documents.client import DocumentsClient
 from .segments.client import SegmentsClient
-from .knowledge_base.client import KnowledgeBaseClient
+from .metadata.client import MetadataClient
 from .types.post_completion_messages_request_inputs import (
     PostCompletionMessagesRequestInputs,
 )
@@ -56,7 +56,7 @@ from .core.client_wrapper import AsyncClientWrapper
 from .datasets.client import AsyncDatasetsClient
 from .documents.client import AsyncDocumentsClient
 from .segments.client import AsyncSegmentsClient
-from .knowledge_base.client import AsyncKnowledgeBaseClient
+from .metadata.client import AsyncMetadataClient
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -123,7 +123,7 @@ class DifyApi:
         self.datasets = DatasetsClient(client_wrapper=self._client_wrapper)
         self.documents = DocumentsClient(client_wrapper=self._client_wrapper)
         self.segments = SegmentsClient(client_wrapper=self._client_wrapper)
-        self.knowledge_base = KnowledgeBaseClient(client_wrapper=self._client_wrapper)
+        self.metadata = MetadataClient(client_wrapper=self._client_wrapper)
 
     def send_message_text_generation_app(
         self,
@@ -1179,7 +1179,7 @@ class AsyncDifyApi:
         self.datasets = AsyncDatasetsClient(client_wrapper=self._client_wrapper)
         self.documents = AsyncDocumentsClient(client_wrapper=self._client_wrapper)
         self.segments = AsyncSegmentsClient(client_wrapper=self._client_wrapper)
-        self.knowledge_base = AsyncKnowledgeBaseClient(client_wrapper=self._client_wrapper)
+        self.metadata = AsyncMetadataClient(client_wrapper=self._client_wrapper)
 
     async def send_message_text_generation_app(
         self,

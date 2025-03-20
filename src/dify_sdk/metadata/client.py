@@ -23,7 +23,7 @@ from ..core.client_wrapper import AsyncClientWrapper
 OMIT = typing.cast(typing.Any, ...)
 
 
-class KnowledgeBaseClient:
+class MetadataClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
@@ -55,7 +55,7 @@ class KnowledgeBaseClient:
         client = DifyApi(
             token="YOUR_TOKEN",
         )
-        client.knowledge_base.list_dataset_metadata(
+        client.metadata.list_dataset_metadata(
             dataset_id="dataset_id",
         )
         """
@@ -114,7 +114,7 @@ class KnowledgeBaseClient:
         client = DifyApi(
             token="YOUR_TOKEN",
         )
-        client.knowledge_base.create_metadata(
+        client.metadata.create_metadata(
             dataset_id="dataset_id",
             type="type",
             name="name",
@@ -177,7 +177,7 @@ class KnowledgeBaseClient:
         client = DifyApi(
             token="YOUR_TOKEN",
         )
-        client.knowledge_base.delete_metadata(
+        client.metadata.delete_metadata(
             dataset_id="dataset_id",
             metadata_id="metadata_id",
         )
@@ -230,7 +230,7 @@ class KnowledgeBaseClient:
         client = DifyApi(
             token="YOUR_TOKEN",
         )
-        client.knowledge_base.update_metadata(
+        client.metadata.update_metadata(
             dataset_id="dataset_id",
             metadata_id="metadata_id",
             name="name",
@@ -292,7 +292,7 @@ class KnowledgeBaseClient:
         client = DifyApi(
             token="YOUR_TOKEN",
         )
-        client.knowledge_base.toggle_built_in_metadata(
+        client.metadata.toggle_built_in_metadata(
             dataset_id="dataset_id",
             action="enable",
         )
@@ -341,7 +341,7 @@ class KnowledgeBaseClient:
         client = DifyApi(
             token="YOUR_TOKEN",
         )
-        client.knowledge_base.update_documents_metadata(
+        client.metadata.update_documents_metadata(
             dataset_id="dataset_id",
         )
         """
@@ -370,7 +370,7 @@ class KnowledgeBaseClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
 
-class AsyncKnowledgeBaseClient:
+class AsyncMetadataClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
@@ -407,7 +407,7 @@ class AsyncKnowledgeBaseClient:
 
 
         async def main() -> None:
-            await client.knowledge_base.list_dataset_metadata(
+            await client.metadata.list_dataset_metadata(
                 dataset_id="dataset_id",
             )
 
@@ -474,7 +474,7 @@ class AsyncKnowledgeBaseClient:
 
 
         async def main() -> None:
-            await client.knowledge_base.create_metadata(
+            await client.metadata.create_metadata(
                 dataset_id="dataset_id",
                 type="type",
                 name="name",
@@ -545,7 +545,7 @@ class AsyncKnowledgeBaseClient:
 
 
         async def main() -> None:
-            await client.knowledge_base.delete_metadata(
+            await client.metadata.delete_metadata(
                 dataset_id="dataset_id",
                 metadata_id="metadata_id",
             )
@@ -606,7 +606,7 @@ class AsyncKnowledgeBaseClient:
 
 
         async def main() -> None:
-            await client.knowledge_base.update_metadata(
+            await client.metadata.update_metadata(
                 dataset_id="dataset_id",
                 metadata_id="metadata_id",
                 name="name",
@@ -676,7 +676,7 @@ class AsyncKnowledgeBaseClient:
 
 
         async def main() -> None:
-            await client.knowledge_base.toggle_built_in_metadata(
+            await client.metadata.toggle_built_in_metadata(
                 dataset_id="dataset_id",
                 action="enable",
             )
@@ -733,7 +733,7 @@ class AsyncKnowledgeBaseClient:
 
 
         async def main() -> None:
-            await client.knowledge_base.update_documents_metadata(
+            await client.metadata.update_documents_metadata(
                 dataset_id="dataset_id",
             )
 

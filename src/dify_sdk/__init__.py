@@ -71,7 +71,7 @@ from .errors import (
     ServiceUnavailableError,
     UnsupportedMediaTypeError,
 )
-from . import datasets, documents, knowledge_base, segments
+from . import datasets, documents, metadata, segments
 from .client import AsyncDifyApi, DifyApi
 from .datasets import (
     CreateDatasetRequestIndexingTechnique,
@@ -101,7 +101,7 @@ from .documents import (
     UpdateDocumentByTextResponse,
 )
 from .environment import DifyApiEnvironment
-from .knowledge_base import (
+from .metadata import (
     CreateMetadataResponse,
     ListDatasetMetadataResponse,
     ListDatasetMetadataResponseDocMetadataItem,
@@ -228,6 +228,6 @@ __all__ = [
     "WorkflowMessageDataStatus",
     "datasets",
     "documents",
-    "knowledge_base",
+    "metadata",
     "segments",
 ]
