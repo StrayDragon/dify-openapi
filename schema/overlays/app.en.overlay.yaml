@@ -339,7 +339,7 @@ actions:
 
   - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.inputs
     update:
-      description: "Allows passing values for variables defined by the App"
+      description: "Allows passing values for variables defined by the App. The inputs parameter contains multiple key/value pairs, where each key corresponds to a specific variable and each value is the value for that variable. Variables can be file list type. If the variable is a file list type, the corresponding value should be in list format, with each element containing the following: type, transfer_method, etc."
 
   - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.response_mode
     update:
@@ -370,7 +370,7 @@ actions:
 
   - target: $.paths['/workflows/run'].post.requestBody.content['application/json'].schema.properties.inputs
     update:
-      description: "Workflow input parameters"
+      description: "Workflow input parameters. The inputs parameter contains multiple key/value pairs, where each key corresponds to a specific variable and each value is the value for that variable. Variables can be file list type. If the variable is a file list type, the corresponding value should be in list format, with each element containing the following: type, transfer_method, etc."
 
   - target: $.paths['/workflows/run'].post.requestBody.content['application/json'].schema.properties.response_mode
     update:

@@ -4,7 +4,7 @@ info:
   description: |
     Dify 知识库 API 提供了一系列接口用于管理知识库、文档和检索功能。
     所有 API 请求都需要在 Authorization HTTP Header 中包含知识库级 API-Key。
-  version: 1.1.0
+  version: 1.1.1
 
 servers:
   - url: https://api.dify.ai/v1
@@ -213,46 +213,6 @@ components:
           format: float
           description: Score 阈值
 
-    DocumentMetadata:
-      type: object
-      description: 文档元数据，根据文档类型有不同的字段要求
-      properties:
-        title:
-          type: string
-          description: 标题
-        language:
-          type: string
-          description: 语言
-        author:
-          type: string
-          description: 作者
-        publisher:
-          type: string
-          description: 出版商/发布者
-        publication_date:
-          type: string
-          description: 发布日期
-        isbn:
-          type: string
-          description: ISBN号码（图书类型专用）
-        category:
-          type: string
-          description: 分类
-        url:
-          type: string
-          description: URL地址（网页类型专用）
-        topic:
-          type: string
-          description: 主题
-        keywords:
-          type: array
-          items:
-            type: string
-          description: 关键词
-        description:
-          type: string
-          description: 描述信息
-
     ProcessRule:
       type: object
       required:
@@ -261,101 +221,94 @@ components:
         mode:
           type: string
           enum: [automatic, custom]
-          description: 清洗、分段模式
+          description: |
+            清洗、分段模式
+            - automatic: 自动
+            - custom: 自定义
         rules:
           type: object
-          description: 自定义规则（自动模式下为空）
           properties:
             pre_processing_rules:
               type: array
               items:
                 type: object
+                description: 预处理规则列表
                 properties:
                   id:
                     type: string
-                    enum:
-                      - remove_extra_spaces
-                      - remove_urls_emails
-                    description: 预处理规则的唯一标识符
+                    description: 规则ID
                   enabled:
                     type: boolean
-                    description: 是否选中该规则
+                    description: 是否启用
+                  name:
+                    type: string
+                    description: 规则名称
             segmentation:
               type: object
-              properties:
-                separator:
-                  type: string
-                  description: 自定义分段标识符
-                max_tokens:
-                  type: integer
-                  description: 最大长度（token）
-            parent_mode:
-              type: string
-              enum: [full-doc, paragraph]
-              description: 父分段的召回模式
-            subchunk_segmentation:
-              type: object
+              description: 分段规则
               properties:
                 separator:
                   type: string
                   description: 分段标识符
                 max_tokens:
                   type: integer
-                  description: 最大长度（token）
+                  description: 最大长度 (token)
                 chunk_overlap:
                   type: integer
-                  description: 分段重叠长度
+                  description: 分段重叠
 
     Document:
       type: object
       properties:
         id:
           type: string
-        position:
-          type: integer
-        data_source_type:
+          description: 文档ID
+        dataset_id:
           type: string
-        data_source_info:
-          type: object
-          properties:
-            upload_file_id:
-              type: string
-        dataset_process_rule_id:
-          type: string
+          description: 所属知识库ID
         name:
           type: string
-        created_from:
-          type: string
-        created_by:
-          type: string
-        created_at:
-          type: number
-          nullable: true
-        tokens:
-          type: integer
-        indexing_status:
-          type: string
-        error:
+          description: 文档名称
+        data_source_type:
           type: string
           nullable: true
-        enabled:
-          type: boolean
-        disabled_at:
-          type: number
-          nullable: true
-        disabled_by:
-          type: number
-          nullable: true
-        archived:
-          type: boolean
+          description: 数据源类型
         display_status:
           type: string
+          enum: [indexing, index_failed, indexed, cleaning, clean_failed, cleaned, parsing, parse_failed, parsed, splitting, split_failed, splitted, embedding, embedding_failed, embedded]
+          description: 状态
+        enabled:
+          type: boolean
+          description: 是否启用
         word_count:
           type: integer
+          description: 字数统计
+        segment_count:
+          type: integer
+          nullable: true
+          description: 分段数量
+        created_from:
+          type: string
+          description: 创建来源
+        created_by:
+          type: string
+          description: 创建者
+        created_at:
+          type: number
+          description: 创建时间戳
+        updated_at:
+          type: number
+          description: 更新时间戳
+        archived:
+          type: boolean
+          description: 是否归档
+        batch:
+          type: string
+          nullable: true
+          description: 批次号
         hit_count:
           type: integer
-        doc_form:
-          type: string
+          description: 命中次数
 
     Segment:
       type: object
@@ -453,8 +406,6 @@ components:
         - original_document_id: 源文档ID（选填），用于重新上传或修改文档配置
         - indexing_technique: 索引方式（high_quality/economy）
         - doc_form: 索引内容形式（text_model/hierarchical_model/qa_model）
-        - doc_type: 文档类型
-        - doc_metadata: 文档元数据
         - doc_language: 文档语言（Q&A模式必填）
         - process_rule: 处理规则
       properties:
@@ -469,23 +420,6 @@ components:
           type: string
           enum: [text_model, hierarchical_model, qa_model]
           description: 索引内容形式
-        doc_type:
-          type: string
-          enum:
-            - book
-            - web_page
-            - paper
-            - social_media_post
-            - wikipedia_entry
-            - personal_document
-            - business_document
-            - im_chat_log
-            - synced_from_notion
-            - synced_from_github
-            - others
-          description: 文档类型
-        doc_metadata:
-          $ref: "#/components/schemas/DocumentMetadata"
         doc_language:
           type: string
           description: 文档语言（Q&A模式必填）
@@ -499,6 +433,89 @@ components:
         embedding_model_provider:
           type: string
           description: Embedding模型供应商
+
+    UploadDocument:
+      type: object
+      properties:
+        data_source:
+          type: object
+          properties:
+            type:
+              type: string
+              enum: [upload_file, notion_import, notion_sync, web_page, web_site, notion_page, github_repository]
+              description: |
+                文档来源类型
+                - upload_file: 上传文件
+                - notion_import: Notion 导入
+                - notion_sync: Notion 同步
+                - web_page: 网页
+                - web_site: 网站
+                - notion_page: Notion 页面
+                - github_repository: GitHub 仓库
+                必填，默认：upload_file
+            info_list:
+              type: array
+              items:
+                type: object
+                properties:
+                  file_id:
+                    type: string
+                    description: 文件ID
+
+    DocumentSegment:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 数据段ID
+        document_id:
+          type: string
+          description: 文档ID
+        content:
+          type: string
+          description: 数据段内容
+        answer:
+          type: string
+          nullable: true
+          description: 问题答案（如果模式为QA）
+        word_count:
+          type: integer
+          description: 字数统计
+        vector:
+          type: array
+          nullable: true
+          items:
+            type: number
+            format: float
+          description: 向量数据
+        created_by:
+          type: string
+          description: 创建者
+        created_at:
+          type: number
+          description: 创建时间戳
+        updated_by:
+          type: string
+          description: 更新者
+        updated_at:
+          type: number
+          description: 更新时间戳
+        status:
+          type: string
+          enum: [waiting, completed, error, processing]
+          description: 状态
+        indexing_at:
+          type: number
+          nullable: true
+          description: 索引时间戳
+        completed_at:
+          type: number
+          nullable: true
+          description: 完成时间戳
+        position:
+          type: integer
+          description: 位置序号
+
   responses:
     Error400:
       description: 请求参数错误
@@ -826,9 +843,6 @@ paths:
                                   type: string
                                 name:
                                   type: string
-                                doc_type:
-                                  type: string
-                                  nullable: true
                         score:
                           type: number
                           format: float
@@ -872,24 +886,6 @@ paths:
                 text:
                   type: string
                   description: 文档内容
-                doc_type:
-                  type: string
-                  enum:
-                    - book
-                    - web_page
-                    - paper
-                    - social_media_post
-                    - wikipedia_entry
-                    - personal_document
-                    - business_document
-                    - im_chat_log
-                    - synced_from_notion
-                    - synced_from_github
-                    - others
-                  description: 文档类型
-                doc_metadata:
-                  type: object
-                  description: 文档元数据
                 indexing_technique:
                   type: string
                   enum:
@@ -1014,24 +1010,22 @@ paths:
                 text:
                   type: string
                   description: 文档内容
-                doc_type:
+                indexing_technique:
                   type: string
                   enum:
-                    - book
-                    - web_page
-                    - paper
-                    - social_media_post
-                    - wikipedia_entry
-                    - personal_document
-                    - business_document
-                    - im_chat_log
-                    - synced_from_notion
-                    - synced_from_github
-                    - others
-                  description: 文档类型
-                doc_metadata:
-                  type: object
-                  description: 文档元数据
+                    - high_quality
+                    - economy
+                  description: 索引方式
+                doc_form:
+                  type: string
+                  enum:
+                    - text_model
+                    - hierarchical_model
+                    - qa_model
+                  description: 索引内容的形式
+                doc_language:
+                  type: string
+                  description: 文档语言（Q&A 模式下必填）
                 process_rule:
                   required: true # TODO: (E001) 必须提供 process_rule 参数, 否则会报错
                   $ref: "#/components/schemas/ProcessRule"
@@ -1601,19 +1595,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  doc_metadata:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                        name:
-                          type: string
-                        type:
-                          type: string
-                        use_count:
-                          type: integer
                   built_in_field_enabled:
                     type: boolean
 
