@@ -1595,6 +1595,19 @@ paths:
               schema:
                 type: object
                 properties:
+                  doc_metadata:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        type:
+                          type: string
+                        use_count:
+                          type: integer
                   built_in_field_enabled:
                     type: boolean
 
