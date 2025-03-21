@@ -21,6 +21,11 @@ class ProcessRuleRulesSegmentation(UniversalBaseModel):
     Maximum length (tokens)
     """
 
+    chunk_overlap: typing.Optional[int] = pydantic.Field(default=None)
+    """
+    Segment overlap
+    """
+
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
     else:

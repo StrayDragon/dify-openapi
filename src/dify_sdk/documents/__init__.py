@@ -3,7 +3,6 @@
 from .types import (
     CreateDocumentByFileResponse,
     CreateDocumentByTextRequestDocForm,
-    CreateDocumentByTextRequestDocType,
     CreateDocumentByTextRequestIndexingTechnique,
     CreateDocumentByTextResponse,
     DeleteDocumentResponse,
@@ -11,14 +10,14 @@ from .types import (
     GetDocumentIndexingStatusResponseDataItem,
     GetDocumentListResponse,
     UpdateDocumentByFileResponse,
-    UpdateDocumentByTextRequestDocType,
+    UpdateDocumentByTextRequestDocForm,
+    UpdateDocumentByTextRequestIndexingTechnique,
     UpdateDocumentByTextResponse,
 )
 
 __all__ = [
     "CreateDocumentByFileResponse",
     "CreateDocumentByTextRequestDocForm",
-    "CreateDocumentByTextRequestDocType",
     "CreateDocumentByTextRequestIndexingTechnique",
     "CreateDocumentByTextResponse",
     "DeleteDocumentResponse",
@@ -26,6 +25,7 @@ __all__ = [
     "GetDocumentIndexingStatusResponseDataItem",
     "GetDocumentListResponse",
     "UpdateDocumentByFileResponse",
-    "UpdateDocumentByTextRequestDocType",
+    "UpdateDocumentByTextRequestDocForm",
+    "UpdateDocumentByTextRequestIndexingTechnique",
     "UpdateDocumentByTextResponse",
 ]

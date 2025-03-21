@@ -6,9 +6,6 @@ from .types.create_document_by_text_request_indexing_technique import (
     CreateDocumentByTextRequestIndexingTechnique,
 )
 from ..types.process_rule import ProcessRule
-from .types.create_document_by_text_request_doc_type import (
-    CreateDocumentByTextRequestDocType,
-)
 from .types.create_document_by_text_request_doc_form import (
     CreateDocumentByTextRequestDocForm,
 )
@@ -25,8 +22,11 @@ from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from .. import core
 from .types.create_document_by_file_response import CreateDocumentByFileResponse
-from .types.update_document_by_text_request_doc_type import (
-    UpdateDocumentByTextRequestDocType,
+from .types.update_document_by_text_request_indexing_technique import (
+    UpdateDocumentByTextRequestIndexingTechnique,
+)
+from .types.update_document_by_text_request_doc_form import (
+    UpdateDocumentByTextRequestDocForm,
 )
 from .types.update_document_by_text_response import UpdateDocumentByTextResponse
 from ..errors.forbidden_error import ForbiddenError
@@ -55,8 +55,6 @@ class DocumentsClient:
         text: str,
         indexing_technique: CreateDocumentByTextRequestIndexingTechnique,
         process_rule: ProcessRule,
-        doc_type: typing.Optional[CreateDocumentByTextRequestDocType] = OMIT,
-        doc_metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         doc_form: typing.Optional[CreateDocumentByTextRequestDocForm] = OMIT,
         doc_language: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -79,12 +77,6 @@ class DocumentsClient:
             Indexing technique
 
         process_rule : ProcessRule
-
-        doc_type : typing.Optional[CreateDocumentByTextRequestDocType]
-            Document type
-
-        doc_metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Document metadata
 
         doc_form : typing.Optional[CreateDocumentByTextRequestDocForm]
             Document form
@@ -123,8 +115,6 @@ class DocumentsClient:
             json={
                 "name": name,
                 "text": text,
-                "doc_type": doc_type,
-                "doc_metadata": doc_metadata,
                 "indexing_technique": indexing_technique,
                 "doc_form": doc_form,
                 "doc_language": doc_language,
@@ -286,8 +276,9 @@ class DocumentsClient:
         *,
         name: typing.Optional[str] = OMIT,
         text: typing.Optional[str] = OMIT,
-        doc_type: typing.Optional[UpdateDocumentByTextRequestDocType] = OMIT,
-        doc_metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        indexing_technique: typing.Optional[UpdateDocumentByTextRequestIndexingTechnique] = OMIT,
+        doc_form: typing.Optional[UpdateDocumentByTextRequestDocForm] = OMIT,
+        doc_language: typing.Optional[str] = OMIT,
         process_rule: typing.Optional[ProcessRule] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> UpdateDocumentByTextResponse:
@@ -308,11 +299,14 @@ class DocumentsClient:
         text : typing.Optional[str]
             Document content
 
-        doc_type : typing.Optional[UpdateDocumentByTextRequestDocType]
-            Document type
+        indexing_technique : typing.Optional[UpdateDocumentByTextRequestIndexingTechnique]
+            Indexing technique
 
-        doc_metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Document metadata
+        doc_form : typing.Optional[UpdateDocumentByTextRequestDocForm]
+            Document form
+
+        doc_language : typing.Optional[str]
+            Document language (required for Q&A mode)
 
         process_rule : typing.Optional[ProcessRule]
             Processing rules
@@ -343,8 +337,9 @@ class DocumentsClient:
             json={
                 "name": name,
                 "text": text,
-                "doc_type": doc_type,
-                "doc_metadata": doc_metadata,
+                "indexing_technique": indexing_technique,
+                "doc_form": doc_form,
+                "doc_language": doc_language,
                 "process_rule": convert_and_respect_annotation_metadata(
                     object_=process_rule, annotation=ProcessRule, direction="write"
                 ),
@@ -828,8 +823,6 @@ class AsyncDocumentsClient:
         text: str,
         indexing_technique: CreateDocumentByTextRequestIndexingTechnique,
         process_rule: ProcessRule,
-        doc_type: typing.Optional[CreateDocumentByTextRequestDocType] = OMIT,
-        doc_metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         doc_form: typing.Optional[CreateDocumentByTextRequestDocForm] = OMIT,
         doc_language: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -852,12 +845,6 @@ class AsyncDocumentsClient:
             Indexing technique
 
         process_rule : ProcessRule
-
-        doc_type : typing.Optional[CreateDocumentByTextRequestDocType]
-            Document type
-
-        doc_metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Document metadata
 
         doc_form : typing.Optional[CreateDocumentByTextRequestDocForm]
             Document form
@@ -904,8 +891,6 @@ class AsyncDocumentsClient:
             json={
                 "name": name,
                 "text": text,
-                "doc_type": doc_type,
-                "doc_metadata": doc_metadata,
                 "indexing_technique": indexing_technique,
                 "doc_form": doc_form,
                 "doc_language": doc_language,
@@ -1075,8 +1060,9 @@ class AsyncDocumentsClient:
         *,
         name: typing.Optional[str] = OMIT,
         text: typing.Optional[str] = OMIT,
-        doc_type: typing.Optional[UpdateDocumentByTextRequestDocType] = OMIT,
-        doc_metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        indexing_technique: typing.Optional[UpdateDocumentByTextRequestIndexingTechnique] = OMIT,
+        doc_form: typing.Optional[UpdateDocumentByTextRequestDocForm] = OMIT,
+        doc_language: typing.Optional[str] = OMIT,
         process_rule: typing.Optional[ProcessRule] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> UpdateDocumentByTextResponse:
@@ -1097,11 +1083,14 @@ class AsyncDocumentsClient:
         text : typing.Optional[str]
             Document content
 
-        doc_type : typing.Optional[UpdateDocumentByTextRequestDocType]
-            Document type
+        indexing_technique : typing.Optional[UpdateDocumentByTextRequestIndexingTechnique]
+            Indexing technique
 
-        doc_metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Document metadata
+        doc_form : typing.Optional[UpdateDocumentByTextRequestDocForm]
+            Document form
+
+        doc_language : typing.Optional[str]
+            Document language (required for Q&A mode)
 
         process_rule : typing.Optional[ProcessRule]
             Processing rules
@@ -1140,8 +1129,9 @@ class AsyncDocumentsClient:
             json={
                 "name": name,
                 "text": text,
-                "doc_type": doc_type,
-                "doc_metadata": doc_metadata,
+                "indexing_technique": indexing_technique,
+                "doc_form": doc_form,
+                "doc_language": doc_language,
                 "process_rule": convert_and_respect_annotation_metadata(
                     object_=process_rule, annotation=ProcessRule, direction="write"
                 ),

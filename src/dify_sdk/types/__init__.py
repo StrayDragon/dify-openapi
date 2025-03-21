@@ -9,9 +9,6 @@ from .create_document_by_file_request_data import CreateDocumentByFileRequestDat
 from .create_document_by_file_request_data_doc_form import (
     CreateDocumentByFileRequestDataDocForm,
 )
-from .create_document_by_file_request_data_doc_type import (
-    CreateDocumentByFileRequestDataDocType,
-)
 from .create_document_by_file_request_data_indexing_technique import (
     CreateDocumentByFileRequestDataIndexingTechnique,
 )
@@ -24,8 +21,9 @@ from .delete_conversations_conversation_id_response import (
     DeleteConversationsConversationIdResponse,
 )
 from .document import Document
-from .document_data_source_info import DocumentDataSourceInfo
-from .document_metadata import DocumentMetadata
+from .document_display_status import DocumentDisplayStatus
+from .document_segment import DocumentSegment
+from .document_segment_status import DocumentSegmentStatus
 from .error import Error
 from .file_input import FileInput
 from .file_input_transfer_method import FileInputTransferMethod
@@ -62,17 +60,10 @@ from .post_workflows_run_request_response_mode import (
 from .process_rule import ProcessRule
 from .process_rule_mode import ProcessRuleMode
 from .process_rule_rules import ProcessRuleRules
-from .process_rule_rules_parent_mode import ProcessRuleRulesParentMode
 from .process_rule_rules_pre_processing_rules_item import (
     ProcessRuleRulesPreProcessingRulesItem,
 )
-from .process_rule_rules_pre_processing_rules_item_id import (
-    ProcessRuleRulesPreProcessingRulesItemId,
-)
 from .process_rule_rules_segmentation import ProcessRuleRulesSegmentation
-from .process_rule_rules_subchunk_segmentation import (
-    ProcessRuleRulesSubchunkSegmentation,
-)
 from .retrieval_model import RetrievalModel
 from .retrieval_model_reranking_model import RetrievalModelRerankingModel
 from .retrieval_model_search_method import RetrievalModelSearchMethod
@@ -81,6 +72,12 @@ from .segment import Segment
 from .stream_event import StreamEvent
 from .stream_event_event import StreamEventEvent
 from .stream_event_metadata import StreamEventMetadata
+from .upload_document import UploadDocument
+from .upload_document_data_source import UploadDocumentDataSource
+from .upload_document_data_source_info_list_item import (
+    UploadDocumentDataSourceInfoListItem,
+)
+from .upload_document_data_source_type import UploadDocumentDataSourceType
 from .upload_file import UploadFile
 from .uploaded_file import UploadedFile
 from .usage import Usage
@@ -96,7 +93,6 @@ __all__ = [
     "Conversation",
     "CreateDocumentByFileRequestData",
     "CreateDocumentByFileRequestDataDocForm",
-    "CreateDocumentByFileRequestDataDocType",
     "CreateDocumentByFileRequestDataIndexingTechnique",
     "Dataset",
     "DatasetIndexingTechnique",
@@ -105,8 +101,9 @@ __all__ = [
     "DatasetProvider",
     "DeleteConversationsConversationIdResponse",
     "Document",
-    "DocumentDataSourceInfo",
-    "DocumentMetadata",
+    "DocumentDisplayStatus",
+    "DocumentSegment",
+    "DocumentSegmentStatus",
     "Error",
     "FileInput",
     "FileInputTransferMethod",
@@ -129,11 +126,8 @@ __all__ = [
     "ProcessRule",
     "ProcessRuleMode",
     "ProcessRuleRules",
-    "ProcessRuleRulesParentMode",
     "ProcessRuleRulesPreProcessingRulesItem",
-    "ProcessRuleRulesPreProcessingRulesItemId",
     "ProcessRuleRulesSegmentation",
-    "ProcessRuleRulesSubchunkSegmentation",
     "RetrievalModel",
     "RetrievalModelRerankingModel",
     "RetrievalModelSearchMethod",
@@ -142,6 +136,10 @@ __all__ = [
     "StreamEvent",
     "StreamEventEvent",
     "StreamEventMetadata",
+    "UploadDocument",
+    "UploadDocumentDataSource",
+    "UploadDocumentDataSourceInfoListItem",
+    "UploadDocumentDataSourceType",
     "UploadFile",
     "UploadedFile",
     "Usage",

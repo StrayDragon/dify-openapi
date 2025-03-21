@@ -2,15 +2,16 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
-from .process_rule_rules_pre_processing_rules_item_id import (
-    ProcessRuleRulesPreProcessingRulesItemId,
-)
 import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class ProcessRuleRulesPreProcessingRulesItem(UniversalBaseModel):
-    id: typing.Optional[ProcessRuleRulesPreProcessingRulesItemId] = pydantic.Field(default=None)
+    """
+    Pre-processing rules list
+    """
+
+    id: typing.Optional[str] = pydantic.Field(default=None)
     """
     Unique identifier for preprocessing rule
     """
@@ -18,6 +19,11 @@ class ProcessRuleRulesPreProcessingRulesItem(UniversalBaseModel):
     enabled: typing.Optional[bool] = pydantic.Field(default=None)
     """
     Whether this rule is selected
+    """
+
+    name: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Rule name
     """
 
     if IS_PYDANTIC_V2:

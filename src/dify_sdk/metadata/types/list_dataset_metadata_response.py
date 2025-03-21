@@ -2,15 +2,11 @@
 
 from ...core.pydantic_utilities import UniversalBaseModel
 import typing
-from .list_dataset_metadata_response_doc_metadata_item import (
-    ListDatasetMetadataResponseDocMetadataItem,
-)
 from ...core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 
 
 class ListDatasetMetadataResponse(UniversalBaseModel):
-    doc_metadata: typing.Optional[typing.List[ListDatasetMetadataResponseDocMetadataItem]] = None
     built_in_field_enabled: typing.Optional[bool] = None
 
     if IS_PYDANTIC_V2:

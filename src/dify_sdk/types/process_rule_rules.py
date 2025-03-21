@@ -7,10 +7,6 @@ from .process_rule_rules_pre_processing_rules_item import (
 )
 import pydantic
 from .process_rule_rules_segmentation import ProcessRuleRulesSegmentation
-from .process_rule_rules_parent_mode import ProcessRuleRulesParentMode
-from .process_rule_rules_subchunk_segmentation import (
-    ProcessRuleRulesSubchunkSegmentation,
-)
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
@@ -29,16 +25,6 @@ class ProcessRuleRules(UniversalBaseModel):
     segmentation: typing.Optional[ProcessRuleRulesSegmentation] = pydantic.Field(default=None)
     """
     Segmentation configuration
-    """
-
-    parent_mode: typing.Optional[ProcessRuleRulesParentMode] = pydantic.Field(default=None)
-    """
-    Parent segment recall mode
-    """
-
-    subchunk_segmentation: typing.Optional[ProcessRuleRulesSubchunkSegmentation] = pydantic.Field(default=None)
-    """
-    Sub-segment configuration
     """
 
     if IS_PYDANTIC_V2:

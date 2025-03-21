@@ -9,10 +9,6 @@ from .create_document_by_file_request_data_indexing_technique import (
 from .create_document_by_file_request_data_doc_form import (
     CreateDocumentByFileRequestDataDocForm,
 )
-from .create_document_by_file_request_data_doc_type import (
-    CreateDocumentByFileRequestDataDocType,
-)
-from .document_metadata import DocumentMetadata
 from .process_rule import ProcessRule
 from .retrieval_model import RetrievalModel
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
@@ -22,10 +18,8 @@ class CreateDocumentByFileRequestData(UniversalBaseModel):
     """
     Document configuration information in JSON string format, including the following fields:
     - original_document_id: Source document ID (optional), used for re-uploading or modifying document configuration
-    - indexing_technique: Indexing technique (high_quality/economy)
-    - doc_form: Document form (text_model/hierarchical_model/qa_model)
-    - doc_type: Document type
-    - doc_metadata: Document metadata
+    - indexing_technique: Indexing method (high_quality/economy)
+    - doc_form: Indexing content form (text_model/hierarchical_model/qa_model)
     - doc_language: Document language (required for Q&A mode)
     - process_rule: Processing rules
     """
@@ -43,16 +37,6 @@ class CreateDocumentByFileRequestData(UniversalBaseModel):
     doc_form: typing.Optional[CreateDocumentByFileRequestDataDocForm] = pydantic.Field(default=None)
     """
     Document form
-    """
-
-    doc_type: typing.Optional[CreateDocumentByFileRequestDataDocType] = pydantic.Field(default=None)
-    """
-    Document type
-    """
-
-    doc_metadata: typing.Optional[DocumentMetadata] = pydantic.Field(default=None)
-    """
-    Document metadata
     """
 
     doc_language: typing.Optional[str] = pydantic.Field(default=None)
