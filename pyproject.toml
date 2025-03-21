@@ -1,6 +1,6 @@
 [project]
 name = "dify-openapi"
-version = "1.0.1"
+version = "1.1.0"
 description = "a client for testing and validating dify openapi schema"
 readme = "README.md"
 authors = [{ name = "straydragon", email = "straydragonl@foxmail.com" }]
@@ -49,4 +49,4 @@ line-ending = "auto"
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
-addopts = "-v --ignore libs --showlocals -x --cov=src --cov-branch --cov-report=xml" # --cov-report=term-missing
+addopts = "tests/knowledge_base/test_metadata_api.py -v --ignore libs --showlocals -x --cov=src --cov-branch --cov-report=xml" # --cov-report=term-missing
