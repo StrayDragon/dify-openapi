@@ -1024,3 +1024,72 @@ actions:
       operationId: "updateDocumentByFile"
       tags:
         - "Documents"
+
+  - target: $.paths['/datasets/{dataset_id}/metadata'].post
+    update:
+      summary: Create metadata
+      description: Create a new metadata field
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                type:
+                  description: Metadata type
+                name:
+                  description: Metadata name
+
+  - target: $.paths['/datasets/{dataset_id}/metadata'].get
+    update:
+      summary: List dataset metadata
+      description: Get list of metadata fields for a dataset
+
+  - target: $.paths['/datasets/{dataset_id}/metadata/{metadata_id}'].patch
+    update:
+      summary: Update metadata
+      description: Update an existing metadata field
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  description: New metadata name
+
+  - target: $.paths['/datasets/{dataset_id}/metadata/{metadata_id}'].delete
+    update:
+      summary: Delete metadata
+      description: Delete a metadata field
+
+  - target: $.paths['/datasets/{dataset_id}/metadata/built-in/{action}'].post
+    update:
+      summary: Enable/disable built-in metadata
+      description: Toggle built-in metadata fields
+
+  - target: $.paths['/datasets/{dataset_id}/documents/metadata'].post
+    update:
+      summary: Update document metadata
+      description: Update metadata for multiple documents
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                operation_data:
+                  description: List of document metadata operations
+                  items:
+                    properties:
+                      document_id:
+                        description: Document ID
+                      metadata_list:
+                        description: List of metadata to update
+                        items:
+                          properties:
+                            id:
+                              description: Metadata ID
+                            type:
+                              description: Metadata type
+                            value:
+                              description: Metadata value
+                            name:
+                              description: Metadata name

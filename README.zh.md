@@ -40,6 +40,12 @@
   - [x] POST /datasets/{dataset_id}/documents/{document_id}/segments - 创建文档分段
   - [x] DELETE /datasets/{dataset_id}/documents/{document_id}/segments/{segment_id} - 删除文档分段
   - [x] POST /datasets/{dataset_id}/documents/{document_id}/segments/{segment_id} - 更新文档分段
+  - [x] POST /datasets/{dataset_id}/metadata - 新增元数据
+  - [x] GET /datasets/{dataset_id}/metadata - 查询知识库元数据列表
+  - [x] PATCH /datasets/{dataset_id}/metadata/{metadata_id} - 更新元数据
+  - [x] DELETE /datasets/{dataset_id}/metadata/{metadata_id} - 删除元数据
+  - [x] POST /datasets/{dataset_id}/metadata/built-in/{action} - 启用/禁用内置元数据
+  - [x] POST /datasets/{dataset_id}/documents/metadata - 更新文档元数据
 
 - 聊天应用(聚合): [OpenAPI Schema(中文)](./schema/app.zh.yaml) | [OpenAPI Schema(English)](./schema/app.en.yaml) | [官方文档源码](https://github.com/langgenius/dify/tree/1.0.1/web/app/components/develop/template)
   - [x] POST /completion-messages - 发送消息(文本生成型应用)
@@ -76,6 +82,7 @@
 - [just](https://github.com/casey/just) - 替代 `Makefile`
 - [ruff](https://github.com/astral-sh/ruff) - Python 代码格式化和检查工具
 
+更多灵感请参考 [CONTRIBUTING.zh.md](./doc/CONTRIBUTING.zh.md)
 
 ### 开发流程
 

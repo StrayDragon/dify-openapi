@@ -4,7 +4,7 @@ info:
   description: |
     Dify 知识库 API 提供了一系列接口用于管理知识库、文档和检索功能。
     所有 API 请求都需要在 Authorization HTTP Header 中包含知识库级 API-Key。
-  version: 1.0.1
+  version: 1.1.0
 
 servers:
   - url: https://api.dify.ai/v1
@@ -1538,3 +1538,213 @@ paths:
           $ref: "#/components/responses/Error400"
         "403":
           $ref: "#/components/responses/Error403"
+
+  /datasets/{dataset_id}/metadata:
+    post:
+      tags:
+        - metadata
+      summary: 新增元数据
+      operationId: createMetadata
+      parameters:
+        - name: dataset_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+                - name
+              properties:
+                type:
+                  type: string
+                  description: 元数据类型
+                name:
+                  type: string
+                  description: 元数据名称
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  type:
+                    type: string
+                  name:
+                    type: string
+
+    get:
+      tags:
+        - metadata
+      summary: 查询知识库元数据列表
+      operationId: listDatasetMetadata
+      parameters:
+        - name: dataset_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  doc_metadata:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        type:
+                          type: string
+                        use_count:
+                          type: integer
+                  built_in_field_enabled:
+                    type: boolean
+
+  /datasets/{dataset_id}/metadata/{metadata_id}:
+    patch:
+      tags:
+        - metadata
+      summary: 更新元数据
+      operationId: updateMetadata
+      parameters:
+        - name: dataset_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: metadata_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  description: 元数据名称
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  type:
+                    type: string
+                  name:
+                    type: string
+
+    delete:
+      tags:
+        - metadata
+      summary: 删除元数据
+      operationId: deleteMetadata
+      parameters:
+        - name: dataset_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: metadata_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+
+  /datasets/{dataset_id}/metadata/built-in/{action}:
+    post:
+      tags:
+        - metadata
+      summary: 启用/禁用内置元数据
+      operationId: toggleBuiltInMetadata
+      parameters:
+        - name: dataset_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: action
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [enable, disable]
+      responses:
+        '204':
+          description: No Content
+
+  /datasets/{dataset_id}/documents/metadata:
+    post:
+      tags:
+        - metadata
+      summary: 更新文档元数据
+      operationId: updateDocumentsMetadata
+      parameters:
+        - name: dataset_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                operation_data:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - document_id
+                      - metadata_list
+                    properties:
+                      document_id:
+                        type: string
+                      metadata_list:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            type:
+                              type: string
+                            value:
+                              type: string
+                            name:
+                              type: string
+      responses:
+        '204':
+          description: No Content

@@ -71,7 +71,7 @@ from .errors import (
     ServiceUnavailableError,
     UnsupportedMediaTypeError,
 )
-from . import datasets, documents, segments
+from . import datasets, documents, metadata, segments
 from .client import AsyncDifyApi, DifyApi
 from .datasets import (
     CreateDatasetRequestIndexingTechnique,
@@ -101,6 +101,15 @@ from .documents import (
     UpdateDocumentByTextResponse,
 )
 from .environment import DifyApiEnvironment
+from .metadata import (
+    CreateMetadataResponse,
+    ListDatasetMetadataResponse,
+    ListDatasetMetadataResponseDocMetadataItem,
+    ToggleBuiltInMetadataRequestAction,
+    UpdateDocumentsMetadataRequestOperationDataItem,
+    UpdateDocumentsMetadataRequestOperationDataItemMetadataListItem,
+    UpdateMetadataResponse,
+)
 from .segments import (
     CreateSegmentsRequestSegmentsItem,
     CreateSegmentsResponse,
@@ -132,6 +141,7 @@ __all__ = [
     "CreateDocumentByTextRequestDocType",
     "CreateDocumentByTextRequestIndexingTechnique",
     "CreateDocumentByTextResponse",
+    "CreateMetadataResponse",
     "CreateSegmentsRequestSegmentsItem",
     "CreateSegmentsResponse",
     "Dataset",
@@ -166,6 +176,8 @@ __all__ = [
     "GetParametersResponseSuggestedQuestionsAfterAnswer",
     "GetSegmentsResponse",
     "InternalServerError",
+    "ListDatasetMetadataResponse",
+    "ListDatasetMetadataResponseDocMetadataItem",
     "NotFoundError",
     "PostAudioToTextResponse",
     "PostChatMessagesRequestResponseMode",
@@ -198,10 +210,14 @@ __all__ = [
     "StreamEvent",
     "StreamEventEvent",
     "StreamEventMetadata",
+    "ToggleBuiltInMetadataRequestAction",
     "UnsupportedMediaTypeError",
     "UpdateDocumentByFileResponse",
     "UpdateDocumentByTextRequestDocType",
     "UpdateDocumentByTextResponse",
+    "UpdateDocumentsMetadataRequestOperationDataItem",
+    "UpdateDocumentsMetadataRequestOperationDataItemMetadataListItem",
+    "UpdateMetadataResponse",
     "UpdateSegmentRequestSegment",
     "UpdateSegmentResponse",
     "UploadFile",
@@ -212,5 +228,6 @@ __all__ = [
     "WorkflowMessageDataStatus",
     "datasets",
     "documents",
+    "metadata",
     "segments",
 ]

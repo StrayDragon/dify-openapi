@@ -4,7 +4,7 @@ info:
   description: |
     Dify Knowledge Base API provides a series of interfaces for managing knowledge bases, documents, and retrieval functions.
     All API requests require a knowledge base level API-Key in the Authorization HTTP Header.
-  version: 1.0.1
+  version: 1.1.0
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -1580,4 +1580,223 @@ paths:
           $ref: '#/components/responses/Error400'
         '403':
           $ref: '#/components/responses/Error403'
+  '/datasets/{dataset_id}/metadata':
+    post:
+      tags:
+        - metadata
+      summary: Create metadata
+      operationId: createMetadata
+      parameters:
+        - name: dataset_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+                - name
+              properties:
+                type:
+                  type: string
+                  description: Metadata type
+                name:
+                  type: string
+                  description: Metadata name
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  type:
+                    type: string
+                  name:
+                    type: string
+      description: Create a new metadata field
+    get:
+      tags:
+        - metadata
+      summary: List dataset metadata
+      operationId: listDatasetMetadata
+      parameters:
+        - name: dataset_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  doc_metadata:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        type:
+                          type: string
+                        use_count:
+                          type: integer
+                  built_in_field_enabled:
+                    type: boolean
+      description: Get list of metadata fields for a dataset
+  '/datasets/{dataset_id}/metadata/{metadata_id}':
+    patch:
+      tags:
+        - metadata
+      summary: Update metadata
+      operationId: updateMetadata
+      parameters:
+        - name: dataset_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: metadata_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  description: New metadata name
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  type:
+                    type: string
+                  name:
+                    type: string
+      description: Update an existing metadata field
+    delete:
+      tags:
+        - metadata
+      summary: Delete metadata
+      operationId: deleteMetadata
+      parameters:
+        - name: dataset_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: metadata_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+      description: Delete a metadata field
+  '/datasets/{dataset_id}/metadata/built-in/{action}':
+    post:
+      tags:
+        - metadata
+      summary: Enable/disable built-in metadata
+      operationId: toggleBuiltInMetadata
+      parameters:
+        - name: dataset_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: action
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - enable
+              - disable
+      responses:
+        '204':
+          description: No Content
+      description: Toggle built-in metadata fields
+  '/datasets/{dataset_id}/documents/metadata':
+    post:
+      tags:
+        - metadata
+      summary: Update document metadata
+      operationId: updateDocumentsMetadata
+      parameters:
+        - name: dataset_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                operation_data:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - document_id
+                      - metadata_list
+                    properties:
+                      document_id:
+                        type: string
+                        description: Document ID
+                      metadata_list:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              description: Metadata ID
+                            type:
+                              type: string
+                              description: Metadata type
+                            value:
+                              type: string
+                              description: Metadata value
+                            name:
+                              type: string
+                              description: Metadata name
+                        description: List of metadata to update
+                  description: List of document metadata operations
+      responses:
+        '204':
+          description: No Content
+      description: Update metadata for multiple documents
 

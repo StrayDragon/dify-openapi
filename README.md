@@ -40,6 +40,12 @@ Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, whic
   - [x] POST /datasets/{dataset_id}/documents/{document_id}/segments - Create document segment
   - [x] DELETE /datasets/{dataset_id}/documents/{document_id}/segments/{segment_id} - Delete document segment
   - [x] POST /datasets/{dataset_id}/documents/{document_id}/segments/{segment_id} - Update document segment
+  - [x] POST /datasets/{dataset_id}/metadata - Create metadata
+  - [x] GET /datasets/{dataset_id}/metadata - List dataset metadata
+  - [x] PATCH /datasets/{dataset_id}/metadata/{metadata_id} - Update metadata
+  - [x] DELETE /datasets/{dataset_id}/metadata/{metadata_id} - Delete metadata
+  - [x] POST /datasets/{dataset_id}/metadata/built-in/{action} - Enable/disable built-in metadata
+  - [x] POST /datasets/{dataset_id}/documents/metadata - Update document metadata
 
 - Chat Application (Aggregated): [OpenAPI Schema(中文)](./schema/app.zh.yaml) | [OpenAPI Schema(English)](./schema/app.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.0.1/web/app/components/develop/template)
   - [x] POST /completion-messages - Send message (text generation application)
@@ -76,6 +82,7 @@ Install these tools:
 - [just](https://github.com/casey/just) - Alternative to `Makefile`
 - [ruff](https://github.com/astral-sh/ruff) - Python code formatting and checking tool
 
+See [CONTRIBUTING.md](./doc/CONTRIBUTING.md) for more inspiration
 
 ### Development Process
 
