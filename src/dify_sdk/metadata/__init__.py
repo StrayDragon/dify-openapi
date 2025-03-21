@@ -3,6 +3,7 @@
 from .types import (
     CreateMetadataResponse,
     ListDatasetMetadataResponse,
+    ListDatasetMetadataResponseDocMetadataItem,
     ToggleBuiltInMetadataRequestAction,
     UpdateDocumentsMetadataRequestOperationDataItem,
     UpdateDocumentsMetadataRequestOperationDataItemMetadataListItem,
@@ -12,6 +13,7 @@ from .types import (
 __all__ = [
     "CreateMetadataResponse",
     "ListDatasetMetadataResponse",
+    "ListDatasetMetadataResponseDocMetadataItem",
     "ToggleBuiltInMetadataRequestAction",
     "UpdateDocumentsMetadataRequestOperationDataItem",
     "UpdateDocumentsMetadataRequestOperationDataItemMetadataListItem",

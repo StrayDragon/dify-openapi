@@ -105,6 +105,7 @@ from .environment import DifyApiEnvironment
 from .metadata import (
     CreateMetadataResponse,
     ListDatasetMetadataResponse,
+    ListDatasetMetadataResponseDocMetadataItem,
     ToggleBuiltInMetadataRequestAction,
     UpdateDocumentsMetadataRequestOperationDataItem,
     UpdateDocumentsMetadataRequestOperationDataItemMetadataListItem,
@@ -176,6 +177,7 @@ __all__ = [
     "GetSegmentsResponse",
     "InternalServerError",
     "ListDatasetMetadataResponse",
+    "ListDatasetMetadataResponseDocMetadataItem",
     "NotFoundError",
     "PostAudioToTextResponse",
     "PostChatMessagesRequestResponseMode",
