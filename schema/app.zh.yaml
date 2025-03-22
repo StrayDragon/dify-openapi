@@ -806,7 +806,7 @@ paths:
         "200":
           description: 成功响应
           content:
-            audio/wav:
+            audio/mpeg:
               schema:
                 type: string
                 format: binary

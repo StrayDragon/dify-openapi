@@ -807,7 +807,7 @@ paths:
         '200':
           description: Successful response
           content:
-            audio/wav:
+            audio/mpeg:
               schema:
                 type: string
                 format: binary

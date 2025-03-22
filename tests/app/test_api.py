@@ -194,7 +194,10 @@ async def test_text_to_audio(app_chat_client: AsyncDifyApi):
     async for chunk in app_chat_client.text_to_audio(
         text="Hi",
         user=LOGIN_USER_ID,
-        request_options=RequestOptions(timeout_in_seconds=45),
+        request_options=RequestOptions(
+            timeout_in_seconds=30,
+            max_retries=3,
+        ),
     ):
         audio_chunks.append(chunk)
 
