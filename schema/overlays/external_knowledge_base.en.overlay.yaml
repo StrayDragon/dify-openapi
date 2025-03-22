@@ -40,6 +40,30 @@ actions:
     update:
       description: "The score limit of relevance of the result to the query, scope: 0~1"
 
+  - target: $.paths['/retrieval'].post.requestBody.content['application/json'].schema.properties.metadata_condition
+    update:
+      description: "Original array filtering"
+
+  - target: $.paths['/retrieval'].post.requestBody.content['application/json'].schema.properties.metadata_condition.properties.logical_operator
+    update:
+      description: "Logical operator, values can be 'and' or 'or', default is 'and'"
+
+  - target: $.paths['/retrieval'].post.requestBody.content['application/json'].schema.properties.metadata_condition.properties.conditions
+    update:
+      description: "List of conditions"
+
+  - target: $.paths['/retrieval'].post.requestBody.content['application/json'].schema.properties.metadata_condition.properties.conditions.items.properties.name
+    update:
+      description: "Names of the metadata to filter"
+
+  - target: $.paths['/retrieval'].post.requestBody.content['application/json'].schema.properties.metadata_condition.properties.conditions.items.properties.comparison_operator
+    update:
+      description: "Comparison operator"
+
+  - target: $.paths['/retrieval'].post.requestBody.content['application/json'].schema.properties.metadata_condition.properties.conditions.items.properties.value
+    update:
+      description: "Comparison value, can be omitted when the operator is 'empty', 'not empty', 'null', or 'not null'"
+
   - target: $.paths['/retrieval'].post.responses['200']
     update:
       description: "Successfully retrieved results"

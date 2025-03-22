@@ -198,54 +198,6 @@ actions:
     update:
       description: "Score threshold"
 
-  - target: $.components.schemas.DocumentMetadata
-    update:
-      description: "Document metadata, varies based on document type"
-
-  - target: $.components.schemas.DocumentMetadata.properties.title
-    update:
-      description: "Title"
-
-  - target: $.components.schemas.DocumentMetadata.properties.language
-    update:
-      description: "Language"
-
-  - target: $.components.schemas.DocumentMetadata.properties.author
-    update:
-      description: "Author"
-
-  - target: $.components.schemas.DocumentMetadata.properties.publisher
-    update:
-      description: "Publisher"
-
-  - target: $.components.schemas.DocumentMetadata.properties.publication_date
-    update:
-      description: "Publication date"
-
-  - target: $.components.schemas.DocumentMetadata.properties.isbn
-    update:
-      description: "ISBN number (for book type only)"
-
-  - target: $.components.schemas.DocumentMetadata.properties.category
-    update:
-      description: "Category"
-
-  - target: $.components.schemas.DocumentMetadata.properties.url
-    update:
-      description: "URL address (for web page type only)"
-
-  - target: $.components.schemas.DocumentMetadata.properties.topic
-    update:
-      description: "Topic"
-
-  - target: $.components.schemas.DocumentMetadata.properties.keywords
-    update:
-      description: "Keywords"
-
-  - target: $.components.schemas.DocumentMetadata.properties.description
-    update:
-      description: "Description"
-
   - target: $.components.schemas.ProcessRule.properties.mode
     update:
       description: "Cleaning and segmentation mode"
@@ -257,6 +209,10 @@ actions:
   - target: $.components.schemas.ProcessRule.properties.rules.properties.pre_processing_rules
     update:
       description: "Pre-processing rules"
+
+  - target: $.components.schemas.ProcessRule.properties.rules.properties.pre_processing_rules.items
+    update:
+      description: "Pre-processing rules list"
 
   - target: $.components.schemas.ProcessRule.properties.rules.properties.pre_processing_rules.items.properties.id
     update:
@@ -297,6 +253,10 @@ actions:
   - target: $.components.schemas.ProcessRule.properties.rules.properties.subchunk_segmentation.properties.chunk_overlap
     update:
       description: "Segment overlap length"
+
+  - target: $.components.schemas.ProcessRule.properties.rules.properties.pre_processing_rules.items.properties.name
+    update:
+      description: "Rule name"
 
   - target: $.components.schemas.Document.properties.id
     update:
@@ -362,6 +322,10 @@ actions:
     update:
       description: "Disabled by user ID"
 
+  - target: $.components.schemas.Document.properties.updated_at
+    update:
+      description: "Last updated timestamp"
+
   - target: $.components.schemas.Document.properties.archived
     update:
       description: "Whether archived"
@@ -381,6 +345,18 @@ actions:
   - target: $.components.schemas.Document.properties.doc_form
     update:
       description: "Document form"
+
+  - target: $.components.schemas.Document.properties.dataset_id
+    update:
+      description: "Associated knowledge base ID"
+
+  - target: $.components.schemas.Document.properties.segment_count
+    update:
+      description: "Number of segments"
+
+  - target: $.components.schemas.Document.properties.batch
+    update:
+      description: "Batch number"
 
   - target: $.components.schemas.Segment.properties.id
     update:
@@ -507,10 +483,8 @@ actions:
       description: |
         Document configuration information in JSON string format, including the following fields:
         - original_document_id: Source document ID (optional), used for re-uploading or modifying document configuration
-        - indexing_technique: Indexing technique (high_quality/economy)
-        - doc_form: Document form (text_model/hierarchical_model/qa_model)
-        - doc_type: Document type
-        - doc_metadata: Document metadata
+        - indexing_technique: Indexing method (high_quality/economy)
+        - doc_form: Indexing content form (text_model/hierarchical_model/qa_model)
         - doc_language: Document language (required for Q&A mode)
         - process_rule: Processing rules
 
@@ -525,14 +499,6 @@ actions:
   - target: $.components.schemas.CreateDocumentByFileRequestData.properties.doc_form
     update:
       description: "Document form"
-
-  - target: $.components.schemas.CreateDocumentByFileRequestData.properties.doc_type
-    update:
-      description: "Document type"
-
-  - target: $.components.schemas.CreateDocumentByFileRequestData.properties.doc_metadata
-    update:
-      description: "Document metadata"
 
   - target: $.components.schemas.CreateDocumentByFileRequestData.properties.doc_language
     update:
@@ -706,14 +672,6 @@ actions:
     update:
       description: "Document content"
 
-  - target: $.paths['/datasets/{dataset_id}/document/create-by-text'].post.requestBody.content['application/json'].schema.properties.doc_type
-    update:
-      description: "Document type"
-
-  - target: $.paths['/datasets/{dataset_id}/document/create-by-text'].post.requestBody.content['application/json'].schema.properties.doc_metadata
-    update:
-      description: "Document metadata"
-
   - target: $.paths['/datasets/{dataset_id}/document/create-by-text'].post.requestBody.content['application/json'].schema.properties.indexing_technique
     update:
       description: "Indexing technique"
@@ -842,13 +800,17 @@ actions:
     update:
       description: "Document content"
 
-  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/update-by-text'].post.requestBody.content['application/json'].schema.properties.doc_type
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/update-by-text'].post.requestBody.content['application/json'].schema.properties.indexing_technique
     update:
-      description: "Document type"
+      description: "Indexing technique"
 
-  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/update-by-text'].post.requestBody.content['application/json'].schema.properties.doc_metadata
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/update-by-text'].post.requestBody.content['application/json'].schema.properties.doc_form
     update:
-      description: "Document metadata"
+      description: "Document form"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/update-by-text'].post.requestBody.content['application/json'].schema.properties.doc_language
+    update:
+      description: "Document language (required for Q&A mode)"
 
   - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/update-by-text'].post.requestBody.content['application/json'].schema.properties.process_rule
     update:
@@ -857,10 +819,6 @@ actions:
   - target: $.paths['/datasets/{dataset_id}/document/create-by-file'].post.parameters[0]
     update:
       description: "Knowledge Base ID"
-
-  - target: $.paths['/datasets/{dataset_id}/document/create-by-file'].post.requestBody.content['multipart/form-data'].schema.properties.data
-    update:
-      description: "Document configuration information in JSON string format, see CreateDocumentByFileRequestData schema for details"
 
   - target: $.paths['/datasets/{dataset_id}/document/create-by-file'].post.requestBody.content['multipart/form-data'].schema.properties.data
     update:
@@ -1093,3 +1051,80 @@ actions:
                               description: Metadata value
                             name:
                               description: Metadata name
+
+  - target: $.components.schemas.UploadDocument.properties.data_source.properties.type
+    update:
+      description: |
+        Document source type
+        - upload_file: Upload file
+        - notion_import: Notion import
+        - notion_sync: Notion sync
+        - web_page: Web page
+        - web_site: Website
+        - notion_page: Notion page
+        - github_repository: GitHub repository
+        Required, default: upload_file
+
+  - target: $.components.schemas.UploadDocument.properties.data_source.properties.info_list.items.properties.file_id
+    update:
+      description: "File ID"
+
+  - target: $.components.schemas.DocumentSegment.properties.id
+    update:
+      description: "Segment ID"
+
+  - target: $.components.schemas.DocumentSegment.properties.document_id
+    update:
+      description: "Document ID"
+
+  - target: $.components.schemas.DocumentSegment.properties.content
+    update:
+      description: "Segment content"
+
+  - target: $.components.schemas.DocumentSegment.properties.answer
+    update:
+      description: "Answer (if mode is Q&A)"
+
+  - target: $.components.schemas.DocumentSegment.properties.word_count
+    update:
+      description: "Word count"
+
+  - target: $.components.schemas.DocumentSegment.properties.vector
+    update:
+      description: "Vector data"
+
+  - target: $.components.schemas.DocumentSegment.properties.created_by
+    update:
+      description: "Creator"
+
+  - target: $.components.schemas.DocumentSegment.properties.created_at
+    update:
+      description: "Creation timestamp"
+
+  - target: $.components.schemas.DocumentSegment.properties.updated_by
+    update:
+      description: "Last updated by"
+
+  - target: $.components.schemas.DocumentSegment.properties.updated_at
+    update:
+      description: "Last updated timestamp"
+
+  - target: $.components.schemas.DocumentSegment.properties.status
+    update:
+      description: "Segment status"
+
+  - target: $.components.schemas.DocumentSegment.properties.indexing_at
+    update:
+      description: "Indexing timestamp"
+
+  - target: $.components.schemas.DocumentSegment.properties.completed_at
+    update:
+      description: "Completion timestamp"
+
+  - target: $.components.schemas.DocumentSegment.properties.position
+    update:
+      description: "Position"
+
+  - target: $.components.schemas.ProcessRule.properties.rules.properties.segmentation.properties.chunk_overlap
+    update:
+      description: "Segment overlap"

@@ -19,11 +19,19 @@ gen-client: apply-i18n-overlay-to-openapi-schema update-fern-schema
     ruff format src/
     bash misc/fern_sdk_hotfix_patch.sh
 
-apply-i18n-overlay-to-openapi-schema:
+apply-i18n-overlay-to-openapi-schema: && check-i18n-openapi-schema
     for name in app knowledge_base external_knowledge_base; do \
         for lang in en; do \
             echo "=== $name.$lang.yaml ==="; \
             npx bump overlay schema/$name.zh.yaml schema/overlays/$name.$lang.overlay.yaml > schema/$name.$lang.yaml; \
+        done; \
+    done
+
+
+check-i18n-openapi-schema:
+    for name in app knowledge_base external_knowledge_base; do \
+        for lang in en; do \
+            ./scripts/detect-chinese-char-in-files.py schema/$name.$lang.yaml; \
         done; \
     done
 

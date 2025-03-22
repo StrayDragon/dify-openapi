@@ -260,7 +260,7 @@ class DifyApi:
             User input/question content
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Allows passing values for variables defined by the App
+            Allows passing values for variables defined by the App. The inputs parameter contains multiple key/value pairs, where each key corresponds to a specific variable and each value is the value for that variable. Variables can be file list type. If the variable is a file list type, the corresponding value should be in list format, with each element containing the following: type, transfer_method, etc.
 
         response_mode : typing.Optional[PostChatMessagesRequestResponseMode]
             Response mode:
@@ -378,7 +378,7 @@ class DifyApi:
         Parameters
         ----------
         inputs : typing.Dict[str, typing.Optional[typing.Any]]
-            Workflow input parameters
+            Workflow input parameters. The inputs parameter contains multiple key/value pairs, where each key corresponds to a specific variable and each value is the value for that variable. Variables can be file list type. If the variable is a file list type, the corresponding value should be in list format, with each element containing the following: type, transfer_method, etc.
 
         response_mode : PostWorkflowsRunRequestResponseMode
             Response mode
@@ -1324,7 +1324,7 @@ class AsyncDifyApi:
             User input/question content
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Allows passing values for variables defined by the App
+            Allows passing values for variables defined by the App. The inputs parameter contains multiple key/value pairs, where each key corresponds to a specific variable and each value is the value for that variable. Variables can be file list type. If the variable is a file list type, the corresponding value should be in list format, with each element containing the following: type, transfer_method, etc.
 
         response_mode : typing.Optional[PostChatMessagesRequestResponseMode]
             Response mode:
@@ -1450,7 +1450,7 @@ class AsyncDifyApi:
         Parameters
         ----------
         inputs : typing.Dict[str, typing.Optional[typing.Any]]
-            Workflow input parameters
+            Workflow input parameters. The inputs parameter contains multiple key/value pairs, where each key corresponds to a specific variable and each value is the value for that variable. Variables can be file list type. If the variable is a file list type, the corresponding value should be in list format, with each element containing the following: type, transfer_method, etc.
 
         response_mode : PostWorkflowsRunRequestResponseMode
             Response mode

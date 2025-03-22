@@ -2,29 +2,13 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
-import pydantic
+from .upload_document_data_source import UploadDocumentDataSource
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
+import pydantic
 
 
-class ProcessRuleRulesSubchunkSegmentation(UniversalBaseModel):
-    """
-    Sub-segment configuration
-    """
-
-    separator: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Segmentation identifier
-    """
-
-    max_tokens: typing.Optional[int] = pydantic.Field(default=None)
-    """
-    Maximum length (tokens)
-    """
-
-    chunk_overlap: typing.Optional[int] = pydantic.Field(default=None)
-    """
-    Segment overlap length
-    """
+class UploadDocument(UniversalBaseModel):
+    data_source: typing.Optional[UploadDocumentDataSource] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

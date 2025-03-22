@@ -3,39 +3,29 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
 import pydantic
-from .document_display_status import DocumentDisplayStatus
+from .document_segment_status import DocumentSegmentStatus
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class Document(UniversalBaseModel):
+class DocumentSegment(UniversalBaseModel):
     id: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Segment ID
+    """
+
+    document_id: typing.Optional[str] = pydantic.Field(default=None)
     """
     Document ID
     """
 
-    dataset_id: typing.Optional[str] = pydantic.Field(default=None)
+    content: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Associated knowledge base ID
-    """
-
-    name: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Document name
+    Segment content
     """
 
-    data_source_type: typing.Optional[str] = pydantic.Field(default=None)
+    answer: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Data source type
-    """
-
-    display_status: typing.Optional[DocumentDisplayStatus] = pydantic.Field(default=None)
-    """
-    Display status
-    """
-
-    enabled: typing.Optional[bool] = pydantic.Field(default=None)
-    """
-    Whether enabled
+    Answer (if mode is Q&A)
     """
 
     word_count: typing.Optional[int] = pydantic.Field(default=None)
@@ -43,19 +33,14 @@ class Document(UniversalBaseModel):
     Word count
     """
 
-    segment_count: typing.Optional[int] = pydantic.Field(default=None)
+    vector: typing.Optional[typing.List[float]] = pydantic.Field(default=None)
     """
-    Number of segments
-    """
-
-    created_from: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Created from
+    Vector data
     """
 
     created_by: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Creator ID
+    Creator
     """
 
     created_at: typing.Optional[float] = pydantic.Field(default=None)
@@ -63,24 +48,34 @@ class Document(UniversalBaseModel):
     Creation timestamp
     """
 
+    updated_by: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Last updated by
+    """
+
     updated_at: typing.Optional[float] = pydantic.Field(default=None)
     """
     Last updated timestamp
     """
 
-    archived: typing.Optional[bool] = pydantic.Field(default=None)
+    status: typing.Optional[DocumentSegmentStatus] = pydantic.Field(default=None)
     """
-    Whether archived
-    """
-
-    batch: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Batch number
+    Segment status
     """
 
-    hit_count: typing.Optional[int] = pydantic.Field(default=None)
+    indexing_at: typing.Optional[float] = pydantic.Field(default=None)
     """
-    Hit count
+    Indexing timestamp
+    """
+
+    completed_at: typing.Optional[float] = pydantic.Field(default=None)
+    """
+    Completion timestamp
+    """
+
+    position: typing.Optional[int] = pydantic.Field(default=None)
+    """
+    Position
     """
 
     if IS_PYDANTIC_V2:

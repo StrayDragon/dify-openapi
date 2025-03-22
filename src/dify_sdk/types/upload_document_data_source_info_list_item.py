@@ -6,14 +6,10 @@ import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class DocumentDataSourceInfo(UniversalBaseModel):
+class UploadDocumentDataSourceInfoListItem(UniversalBaseModel):
+    file_id: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Data source information
-    """
-
-    upload_file_id: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Upload file ID
+    File ID
     """
 
     if IS_PYDANTIC_V2:

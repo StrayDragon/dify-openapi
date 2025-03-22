@@ -4,7 +4,7 @@ info:
   description: |
     Dify Knowledge Base API provides a series of interfaces for managing knowledge bases, documents, and retrieval functions.
     All API requests require a knowledge base level API-Key in the Authorization HTTP Header.
-  version: 1.1.0
+  version: 1.1.1
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -219,45 +219,6 @@ components:
           type: number
           format: float
           description: Score threshold
-    DocumentMetadata:
-      type: object
-      description: 'Document metadata, varies based on document type'
-      properties:
-        title:
-          type: string
-          description: Title
-        language:
-          type: string
-          description: Language
-        author:
-          type: string
-          description: Author
-        publisher:
-          type: string
-          description: Publisher
-        publication_date:
-          type: string
-          description: Publication date
-        isbn:
-          type: string
-          description: ISBN number (for book type only)
-        category:
-          type: string
-          description: Category
-        url:
-          type: string
-          description: URL address (for web page type only)
-        topic:
-          type: string
-          description: Topic
-        keywords:
-          type: array
-          items:
-            type: string
-          description: Keywords
-        description:
-          type: string
-          description: Description
     ProcessRule:
       type: object
       required:
@@ -271,25 +232,26 @@ components:
           description: Cleaning and segmentation mode
         rules:
           type: object
-          description: Custom rules (empty for automatic mode)
           properties:
             pre_processing_rules:
               type: array
               items:
                 type: object
+                description: Pre-processing rules list
                 properties:
                   id:
                     type: string
-                    enum:
-                      - remove_extra_spaces
-                      - remove_urls_emails
                     description: Unique identifier for preprocessing rule
                   enabled:
                     type: boolean
                     description: Whether this rule is selected
+                  name:
+                    type: string
+                    description: Rule name
               description: Pre-processing rules
             segmentation:
               type: object
+              description: Segmentation configuration
               properties:
                 separator:
                   type: string
@@ -297,51 +259,55 @@ components:
                 max_tokens:
                   type: integer
                   description: Maximum length (tokens)
-              description: Segmentation configuration
-            parent_mode:
-              type: string
-              enum:
-                - full-doc
-                - paragraph
-              description: Parent segment recall mode
-            subchunk_segmentation:
-              type: object
-              properties:
-                separator:
-                  type: string
-                  description: Segmentation identifier
-                max_tokens:
-                  type: integer
-                  description: Maximum length (tokens)
                 chunk_overlap:
                   type: integer
-                  description: Segment overlap length
-              description: Sub-segment configuration
+                  description: Segment overlap
+          description: Custom rules (empty for automatic mode)
     Document:
       type: object
       properties:
         id:
           type: string
           description: Document ID
-        position:
-          type: integer
-          description: Position
-        data_source_type:
+        dataset_id:
           type: string
-          description: Data source type
-        data_source_info:
-          type: object
-          properties:
-            upload_file_id:
-              type: string
-              description: Upload file ID
-          description: Data source information
-        dataset_process_rule_id:
-          type: string
-          description: Dataset process rule ID
+          description: Associated knowledge base ID
         name:
           type: string
           description: Document name
+        data_source_type:
+          type: string
+          nullable: true
+          description: Data source type
+        display_status:
+          type: string
+          enum:
+            - indexing
+            - index_failed
+            - indexed
+            - cleaning
+            - clean_failed
+            - cleaned
+            - parsing
+            - parse_failed
+            - parsed
+            - splitting
+            - split_failed
+            - splitted
+            - embedding
+            - embedding_failed
+            - embedded
+          description: Display status
+        enabled:
+          type: boolean
+          description: Whether enabled
+        word_count:
+          type: integer
+          description: Word count
+        segment_count:
+          type: integer
+          nullable: true
+          description: Number of segments
         created_from:
           type: string
           description: Created from
@@ -350,44 +316,20 @@ components:
           description: Creator ID
         created_at:
           type: number
-          nullable: true
           description: Creation timestamp
-        tokens:
-          type: integer
-          description: Token count
-        indexing_status:
-          type: string
-          description: Indexing status
-        error:
-          type: string
-          nullable: true
-          description: Error message
-        enabled:
-          type: boolean
-          description: Whether enabled
-        disabled_at:
+        updated_at:
           type: number
-          nullable: true
-          description: Disabled timestamp
-        disabled_by:
-          type: number
-          nullable: true
-          description: Disabled by user ID
+          description: Last updated timestamp
         archived:
           type: boolean
           description: Whether archived
-        display_status:
+        batch:
           type: string
-          description: Display status
-        word_count:
-          type: integer
-          description: Word count
+          nullable: true
+          description: Batch number
         hit_count:
           type: integer
           description: Hit count
-        doc_form:
-          type: string
-          description: Document form
     Segment:
       type: object
       properties:
@@ -501,10 +443,8 @@ components:
       description: |
         Document configuration information in JSON string format, including the following fields:
         - original_document_id: Source document ID (optional), used for re-uploading or modifying document configuration
-        - indexing_technique: Indexing technique (high_quality/economy)
-        - doc_form: Document form (text_model/hierarchical_model/qa_model)
-        - doc_type: Document type
-        - doc_metadata: Document metadata
+        - indexing_technique: Indexing method (high_quality/economy)
+        - doc_form: Indexing content form (text_model/hierarchical_model/qa_model)
         - doc_language: Document language (required for Q&A mode)
         - process_rule: Processing rules
       properties:
@@ -524,24 +464,6 @@ components:
             - hierarchical_model
             - qa_model
           description: Document form
-        doc_type:
-          type: string
-          enum:
-            - book
-            - web_page
-            - paper
-            - social_media_post
-            - wikipedia_entry
-            - personal_document
-            - business_document
-            - im_chat_log
-            - synced_from_notion
-            - synced_from_github
-            - others
-          description: Document type
-        doc_metadata:
-          $ref: '#/components/schemas/DocumentMetadata'
-          description: Document metadata
         doc_language:
           type: string
           description: Document language (required for Q&A mode)
@@ -557,6 +479,97 @@ components:
         embedding_model_provider:
           type: string
           description: Embedding model provider
+    UploadDocument:
+      type: object
+      properties:
+        data_source:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - upload_file
+                - notion_import
+                - notion_sync
+                - web_page
+                - web_site
+                - notion_page
+                - github_repository
+              description: |
+                Document source type
+                - upload_file: Upload file
+                - notion_import: Notion import
+                - notion_sync: Notion sync
+                - web_page: Web page
+                - web_site: Website
+                - notion_page: Notion page
+                - github_repository: GitHub repository
+                Required, default: upload_file
+            info_list:
+              type: array
+              items:
+                type: object
+                properties:
+                  file_id:
+                    type: string
+                    description: File ID
+    DocumentSegment:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Segment ID
+        document_id:
+          type: string
+          description: Document ID
+        content:
+          type: string
+          description: Segment content
+        answer:
+          type: string
+          nullable: true
+          description: Answer (if mode is Q&A)
+        word_count:
+          type: integer
+          description: Word count
+        vector:
+          type: array
+          nullable: true
+          items:
+            type: number
+            format: float
+          description: Vector data
+        created_by:
+          type: string
+          description: Creator
+        created_at:
+          type: number
+          description: Creation timestamp
+        updated_by:
+          type: string
+          description: Last updated by
+        updated_at:
+          type: number
+          description: Last updated timestamp
+        status:
+          type: string
+          enum:
+            - waiting
+            - completed
+            - error
+            - processing
+          description: Segment status
+        indexing_at:
+          type: number
+          nullable: true
+          description: Indexing timestamp
+        completed_at:
+          type: number
+          nullable: true
+          description: Completion timestamp
+        position:
+          type: integer
+          description: Position
   responses:
     Error400:
       description: Request parameter error
@@ -876,9 +889,6 @@ paths:
                                   type: string
                                 name:
                                   type: string
-                                doc_type:
-                                  type: string
-                                  nullable: true
                         score:
                           type: number
                           format: float
@@ -921,24 +931,6 @@ paths:
                 text:
                   type: string
                   description: Document content
-                doc_type:
-                  type: string
-                  enum:
-                    - book
-                    - web_page
-                    - paper
-                    - social_media_post
-                    - wikipedia_entry
-                    - personal_document
-                    - business_document
-                    - im_chat_log
-                    - synced_from_notion
-                    - synced_from_github
-                    - others
-                  description: Document type
-                doc_metadata:
-                  type: object
-                  description: Document metadata
                 indexing_technique:
                   type: string
                   enum:
@@ -1060,24 +1052,22 @@ paths:
                 text:
                   type: string
                   description: Document content
-                doc_type:
+                indexing_technique:
                   type: string
                   enum:
-                    - book
-                    - web_page
-                    - paper
-                    - social_media_post
-                    - wikipedia_entry
-                    - personal_document
-                    - business_document
-                    - im_chat_log
-                    - synced_from_notion
-                    - synced_from_github
-                    - others
-                  description: Document type
-                doc_metadata:
-                  type: object
-                  description: Document metadata
+                    - high_quality
+                    - economy
+                  description: Indexing technique
+                doc_form:
+                  type: string
+                  enum:
+                    - text_model
+                    - hierarchical_model
+                    - qa_model
+                  description: Document form
+                doc_language:
+                  type: string
+                  description: Document language (required for Q&A mode)
                 process_rule:
                   required: true
                   $ref: '#/components/schemas/ProcessRule'

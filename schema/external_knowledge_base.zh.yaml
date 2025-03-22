@@ -4,7 +4,7 @@ info:
   description: |
     此 API 用于连接独立于 Dify 并由开发者维护的知识库, 用户可使用该schema生成server端代码自己实现
     更多详细信息请参考"连接外部知识库"文档 (https://docs.dify.ai/guides/knowledge-base/external-knowledge-api-documentation)。
-  version: 1.1.0
+  version: 1.1.1
 
 servers:
   - url: "{baseUrl}"
@@ -56,6 +56,39 @@ paths:
                       minimum: 0
                       maximum: 1
                       example: 0.5
+                metadata_condition:
+                  type: object
+                  description: 元数据过滤条件
+                  properties:
+                    logical_operator:
+                      type: string
+                      description: 逻辑运算符，可选值为 "and" 或 "or"，默认为 "and"
+                      enum: ["and", "or"]
+                      example: "and"
+                    conditions:
+                      type: array
+                      description: 条件列表
+                      items:
+                        type: object
+                        required:
+                          - name
+                          - comparison_operator
+                        properties:
+                          name:
+                            type: array
+                            items:
+                              type: string
+                            description: 要过滤的元数据名称列表
+                            example: ["category", "tag"]
+                          comparison_operator:
+                            type: string
+                            description: 比较运算符
+                            enum: ["contains", "not contains", "start with", "end with", "is", "is not", "empty", "not empty", "=", "≠", ">", "<", "≥", "≤", "before", "after"]
+                            example: "contains"
+                          value:
+                            type: string
+                            description: 比较值，当运算符为 empty、not empty、null 或 not null 时可省略
+                            example: "AI"
       responses:
         "200":
           description: 成功检索到结果
@@ -92,7 +125,7 @@ paths:
                         metadata:
                           type: object
                           description: 数据源文档的元数据属性及其值
-                          example: "s3://dify/knowledge.txt"
+                          example: {"path": "s3://dify/knowledge.txt", "description": "dify knowledge document"}
         "403":
           description: 访问被拒绝
           content:

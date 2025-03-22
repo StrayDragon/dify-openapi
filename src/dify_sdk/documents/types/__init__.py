@@ -2,7 +2,6 @@
 
 from .create_document_by_file_response import CreateDocumentByFileResponse
 from .create_document_by_text_request_doc_form import CreateDocumentByTextRequestDocForm
-from .create_document_by_text_request_doc_type import CreateDocumentByTextRequestDocType
 from .create_document_by_text_request_indexing_technique import (
     CreateDocumentByTextRequestIndexingTechnique,
 )
@@ -14,13 +13,15 @@ from .get_document_indexing_status_response_data_item import (
 )
 from .get_document_list_response import GetDocumentListResponse
 from .update_document_by_file_response import UpdateDocumentByFileResponse
-from .update_document_by_text_request_doc_type import UpdateDocumentByTextRequestDocType
+from .update_document_by_text_request_doc_form import UpdateDocumentByTextRequestDocForm
+from .update_document_by_text_request_indexing_technique import (
+    UpdateDocumentByTextRequestIndexingTechnique,
+)
 from .update_document_by_text_response import UpdateDocumentByTextResponse
 
 __all__ = [
     "CreateDocumentByFileResponse",
     "CreateDocumentByTextRequestDocForm",
-    "CreateDocumentByTextRequestDocType",
     "CreateDocumentByTextRequestIndexingTechnique",
     "CreateDocumentByTextResponse",
     "DeleteDocumentResponse",
@@ -28,6 +29,7 @@ __all__ = [
     "GetDocumentIndexingStatusResponseDataItem",
     "GetDocumentListResponse",
     "UpdateDocumentByFileResponse",
-    "UpdateDocumentByTextRequestDocType",
+    "UpdateDocumentByTextRequestDocForm",
+    "UpdateDocumentByTextRequestIndexingTechnique",
     "UpdateDocumentByTextResponse",
 ]

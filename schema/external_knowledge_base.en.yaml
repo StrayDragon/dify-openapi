@@ -4,7 +4,7 @@ info:
   description: |
     This API is used to connect to a knowledge base that is independent of Dify and maintained by developers. Users can use this schema to generate server-side code for their own implementation.
     For more details, please refer to "Connecting to an External Knowledge Base" documentation (https://docs.dify.ai/guides/knowledge-base/external-knowledge-api-documentation).
-  version: 1.1.0
+  version: 1.1.1
 servers:
   - url: '{baseUrl}'
     variables:
@@ -54,6 +54,59 @@ paths:
                       maximum: 1
                       example: 0.5
                   description: Knowledge's retrieval parameters
+                metadata_condition:
+                  type: object
+                  description: Original array filtering
+                  properties:
+                    logical_operator:
+                      type: string
+                      description: 'Logical operator, values can be ''and'' or ''or'', default is ''and'''
+                      enum:
+                        - and
+                        - or
+                      example: and
+                    conditions:
+                      type: array
+                      description: List of conditions
+                      items:
+                        type: object
+                        required:
+                          - name
+                          - comparison_operator
+                        properties:
+                          name:
+                            type: array
+                            items:
+                              type: string
+                            description: Names of the metadata to filter
+                            example:
+                              - category
+                              - tag
+                          comparison_operator:
+                            type: string
+                            description: Comparison operator
+                            enum:
+                              - contains
+                              - not contains
+                              - start with
+                              - end with
+                              - is
+                              - is not
+                              - empty
+                              - not empty
+                              - '='
+                              - ≠
+                              - '>'
+                              - <
+                              - ≥
+                              - ≤
+                              - before
+                              - after
+                            example: contains
+                          value:
+                            type: string
+                            description: 'Comparison value, can be omitted when the operator is ''empty'', ''not empty'', ''null'', or ''not null'''
+                            example: AI
       responses:
         '200':
           description: Successfully retrieved results
@@ -90,7 +143,9 @@ paths:
                         metadata:
                           type: object
                           description: Contains metadata attributes and their values for the document in the data source
-                          example: 's3://dify/knowledge.txt'
+                          example:
+                            path: 's3://dify/knowledge.txt'
+                            description: dify knowledge document
         '403':
           description: Access denied
           content:
