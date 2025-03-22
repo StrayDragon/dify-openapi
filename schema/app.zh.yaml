@@ -5,7 +5,7 @@ info:
     Dify API 提供了一系列接口用于文本生成、对话和工作流功能。
     支持文本生成型应用、对话型应用、工作流应用和高级对话型应用。
     所有 API 请求都需要在 Authorization HTTP Header 中包含应用级 API-Key。
-  version: 1.1.1
+  version: 1.1.2
 
 servers:
   - url: https://api.dify.ai/v1
