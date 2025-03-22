@@ -191,12 +191,14 @@ async def test_audio_to_text(app_chat_client: AsyncDifyApi, test_audio_file_path
 async def test_text_to_audio(app_chat_client: AsyncDifyApi):
     """测试文字转语音接口"""
     audio_chunks: list[bytes] = []
-    audio_stream = app_chat_client.text_to_audio(
+    async for chunk in app_chat_client.text_to_audio(
         text="Hi",
         user=LOGIN_USER_ID,
-        request_options=RequestOptions(timeout_in_seconds=30),
-    )
-    async for chunk in audio_stream:
+        request_options=RequestOptions(
+            timeout_in_seconds=30,
+            max_retries=3,
+        ),
+    ):
         audio_chunks.append(chunk)
 
     assert len(audio_chunks) > 0

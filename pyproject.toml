@@ -1,6 +1,6 @@
 [project]
 name = "dify-openapi"
-version = "1.1.1"
+version = "1.1.2"
 description = "a client for testing and validating dify openapi schema"
 readme = "README.md"
 authors = [{ name = "straydragon", email = "straydragonl@foxmail.com" }]
