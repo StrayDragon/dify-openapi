@@ -195,7 +195,7 @@ async def test_text_to_audio(app_chat_client: AsyncDifyApi):
         text="Hi",
         user=LOGIN_USER_ID,
         request_options=RequestOptions(
-            timeout_in_seconds=30,
+            timeout_in_seconds=60,
             max_retries=3,
         ),
     ):
