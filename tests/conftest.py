@@ -1,5 +1,6 @@
 import os
 import warnings
+import httpx
 import pytest
 from typing import AsyncGenerator
 
@@ -23,6 +24,11 @@ async def app_chat_client() -> AsyncGenerator[AsyncDifyApi, None]:
     client = AsyncDifyApi(
         token=os.environ["TEST_DIFY_APP_CHAT_API_KEY"],
         base_url=TEST_DIFY_HOST,
+        httpx_client=httpx.AsyncClient(
+            timeout=60,
+            follow_redirects=True,
+            transport=httpx.AsyncHTTPTransport(retries=3),
+        ),
     )
     yield client
 
@@ -35,6 +41,7 @@ async def app_workflow_client() -> AsyncGenerator[AsyncDifyApi, None]:
     )
     yield client
 
+
 @pytest.fixture()
 async def app_completion_client() -> AsyncGenerator[AsyncDifyApi, None]:
     client = AsyncDifyApi(
@@ -42,7 +49,6 @@ async def app_completion_client() -> AsyncGenerator[AsyncDifyApi, None]:
         base_url=TEST_DIFY_HOST,
     )
     yield client
-
 
 
 @pytest.fixture()

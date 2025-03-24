@@ -181,10 +181,6 @@ async def test_audio_to_text(app_chat_client: AsyncDifyApi, test_audio_file_path
     response = await app_chat_client.audio_to_text(
         file=("test.mp3", test_audio_file_path.read_bytes(), "audio/mp3"),
         user=LOGIN_USER_ID,
-        request_options=RequestOptions(
-            timeout_in_seconds=60,
-            max_retries=3,
-        ),
     )
     assert response is not None
     assert hasattr(response, "text")
@@ -198,10 +194,6 @@ async def test_text_to_audio(app_chat_client: AsyncDifyApi):
     async for chunk in app_chat_client.text_to_audio(
         text="Hi",
         user=LOGIN_USER_ID,
-        request_options=RequestOptions(
-            timeout_in_seconds=60,
-            max_retries=3,
-        ),
     ):
         audio_chunks.append(chunk)
 
