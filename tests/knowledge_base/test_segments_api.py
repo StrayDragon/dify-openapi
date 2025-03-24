@@ -146,11 +146,14 @@ async def test_segments_workflow(
     all_segments_response = await kb_client.segment.get_segments(
         dataset_id=dataset_id,
         document_id=document_id,
+        page=0,
+        limit=1,
     )
     assert all_segments_response is not None
     assert all_segments_response.data is not None
+    assert all_segments_response.has_more
     assert isinstance(all_segments_response.data, list)
-    assert len(all_segments_response.data) > 0
+    assert len(all_segments_response.data) == 1
 
     segment = all_segments_response.data[0]
     segment_id = str(segment.id)

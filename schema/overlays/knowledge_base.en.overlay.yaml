@@ -851,14 +851,6 @@ actions:
     update:
       description: "Document ID"
 
-  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments'].get.parameters[0]
-    update:
-      description: "Knowledge Base ID"
-
-  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments'].get.parameters[1]
-    update:
-      description: "Document ID"
-
   - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}'].delete.parameters[0]
     update:
       description: "Knowledge Base ID"
@@ -939,6 +931,14 @@ actions:
     update:
       description: "Keyword list, optional"
 
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments'].get.parameters[0]
+    update:
+      description: "Knowledge Base ID"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments'].get.parameters[1]
+    update:
+      description: "Document ID"
+
   - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments'].get.parameters[2]
     update:
       description: "Search keyword"
@@ -946,6 +946,14 @@ actions:
   - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments'].get.parameters[3]
     update:
       description: "Segment status"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments'].get.parameters[4]
+    update:
+      description: "Page numbers"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments'].get.parameters[5]
+    update:
+      description: "Items per page"
 
   - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}'].delete.parameters[2]
     update:

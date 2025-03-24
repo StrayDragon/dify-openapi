@@ -36,6 +36,8 @@ class SegmentsClient:
         *,
         keyword: typing.Optional[str] = None,
         status: typing.Optional[typing.Literal["completed"]] = None,
+        page: typing.Optional[int] = None,
+        limit: typing.Optional[int] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GetSegmentsResponse:
         """
@@ -54,6 +56,12 @@ class SegmentsClient:
 
         status : typing.Optional[typing.Literal["completed"]]
             Segment status
+
+        page : typing.Optional[int]
+            Page numbers
+
+        limit : typing.Optional[int]
+            Items per page
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -81,6 +89,8 @@ class SegmentsClient:
             params={
                 "keyword": keyword,
                 "status": status,
+                "page": page,
+                "limit": limit,
             },
             request_options=request_options,
         )
@@ -397,6 +407,8 @@ class AsyncSegmentsClient:
         *,
         keyword: typing.Optional[str] = None,
         status: typing.Optional[typing.Literal["completed"]] = None,
+        page: typing.Optional[int] = None,
+        limit: typing.Optional[int] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GetSegmentsResponse:
         """
@@ -415,6 +427,12 @@ class AsyncSegmentsClient:
 
         status : typing.Optional[typing.Literal["completed"]]
             Segment status
+
+        page : typing.Optional[int]
+            Page numbers
+
+        limit : typing.Optional[int]
+            Items per page
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -450,6 +468,8 @@ class AsyncSegmentsClient:
             params={
                 "keyword": keyword,
                 "status": status,
+                "page": page,
+                "limit": limit,
             },
             request_options=request_options,
         )
