@@ -8,6 +8,7 @@ from dify_sdk.types import (
     PostCompletionMessagesRequestInputs,
     FileInput,
 )
+from dify_sdk_testing import RUNNING_IN_CI
 
 LOGIN_USER_ID = "test123"
 
@@ -188,6 +189,10 @@ async def test_audio_to_text(app_chat_client: AsyncDifyApi, test_audio_file_path
     assert response.text != ""
 
 
+@pytest.mark.skipif(
+    RUNNING_IN_CI,
+    reason="CI中使用官方服务器, 经常报504超时, 影响CI流程, 请使用本地服务测试",
+)
 async def test_text_to_audio(app_chat_client: AsyncDifyApi):
     """测试文字转语音接口"""
     audio_chunks: list[bytes] = []
@@ -202,6 +207,10 @@ async def test_text_to_audio(app_chat_client: AsyncDifyApi):
         assert isinstance(chunk, bytes)
 
 
+@pytest.mark.skipif(
+    RUNNING_IN_CI,
+    reason="CI中使用官方服务器, 经常报504超时, 影响CI流程, 请使用本地服务测试",
+)
 async def test_completion_message(app_completion_client: AsyncDifyApi):
     """测试文本生成接口"""
     response = await app_completion_client.send_message_text_generation_app(

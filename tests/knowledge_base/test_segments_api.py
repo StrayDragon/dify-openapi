@@ -16,13 +16,7 @@ from dify_sdk.segments import (
 )
 from dify_sdk.types.dataset import Dataset
 from dify_sdk.types.document import Document
-from dify_sdk_testing import KnowledgeBaseClient
-
-RUNNING_IN_CI = any(
-    [
-        os.getenv("GITHUB_ACTIONS"),
-    ]
-)
+from dify_sdk_testing import RUNNING_IN_CI, KnowledgeBaseClient
 
 
 @pytest.fixture

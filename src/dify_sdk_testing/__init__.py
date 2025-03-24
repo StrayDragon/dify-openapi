@@ -1,10 +1,18 @@
 import dataclasses
 import asyncio
+import os
 
 from dify_sdk.datasets.client import AsyncDatasetsClient
 from dify_sdk.documents.client import AsyncDocumentsClient
 from dify_sdk.metadata.client import AsyncMetadataClient
 from dify_sdk.segments.client import AsyncSegmentsClient
+
+
+RUNNING_IN_CI = any(
+    [
+        os.getenv("GITHUB_ACTIONS"),
+    ]
+)
 
 
 @dataclasses.dataclass
