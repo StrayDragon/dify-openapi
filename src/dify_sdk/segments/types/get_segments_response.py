@@ -10,6 +10,10 @@ import pydantic
 class GetSegmentsResponse(UniversalBaseModel):
     data: typing.Optional[typing.List[Segment]] = None
     doc_form: typing.Optional[str] = None
+    has_more: typing.Optional[bool] = None
+    limit: typing.Optional[int] = None
+    total: typing.Optional[int] = None
+    page: typing.Optional[int] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
