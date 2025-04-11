@@ -14,43 +14,43 @@
 import os
 import re
 import typer
-from typing import Optional, Tuple
 
 app = typer.Typer()
 
 
-def detect_chinese(file_path: str) -> Tuple[bool, Optional[int], Optional[str]]:
+def detect_chinese(file_path: str) -> list[tuple[bool, int | None, str | None]]:
     chinese_pattern = re.compile(r"[\u4e00-\u9fff\u3400-\u4dbf\u3000-\u303f\uff00-\uffef]")
     comment_pattern = re.compile(r".*#.*")
 
+    results: list[tuple[bool, int | None, str | None]] = []
+
     try:
-        with open(file_path, "r", encoding="utf-8") as file:
+        with open(file_path, encoding="utf-8") as file:
             for line_num, line in enumerate(file, 1):
                 if comment_pattern.match(line):
                     continue
 
                 match = chinese_pattern.search(line)
                 if match:
-                    return True, line_num, match.group(0)
-        return False, None, None
+                    matched = True, line_num, match.group(0)
+                    results.append(matched)
     except UnicodeDecodeError:
         for encoding in ["gbk", "gb2312", "big5"]:
             try:
-                with open(file_path, "r", encoding=encoding) as file:
+                with open(file_path, encoding=encoding) as file:
                     for line_num, line in enumerate(file, 1):
                         if comment_pattern.match(line):
                             continue
 
                         match = chinese_pattern.search(line)
                         if match:
-                            return True, line_num, match.group(0)
-                    return False, None, None
+                            matched = True, line_num, match.group(0)
+                            results.append(matched)
             except UnicodeDecodeError:
                 continue
-        return False, None, None
     except Exception as e:
         typer.echo(f"无法读取文件 {file_path}: {str(e)}")
-        return False, None, None
+    return results
 
 
 @app.command()
@@ -59,10 +59,11 @@ def check(
     recursive: bool = typer.Option(False, "--recursive", "-r", help="如果指定的是目录，是否递归检查子目录"),
 ):
     if os.path.isfile(path):
-        has_chinese, line_num, char = detect_chinese(path)
-        if has_chinese:
-            typer.echo(f"{path}:{line_num} 包含中文字符，第一个中文字符 '{char}'")
-        else:
+        result = detect_chinese(path)
+        for has_chinese, line_num, char in result :
+            if has_chinese:
+                typer.echo(f"{path}:{line_num} 包含中文字符，第一个中文字符 '{char}'")
+        if not result:
             typer.echo(f"{path}: 不包含中文字符")
 
     elif os.path.isdir(path):
@@ -80,11 +81,11 @@ def check(
 
         for file_path in files_to_check:
             total_files += 1
-            has_chinese, line_num, char = detect_chinese(file_path)
+            for has_chinese, line_num, char in detect_chinese(file_path):
 
-            if has_chinese:
-                chinese_files += 1
-                typer.echo(f"{file_path}: 包含中文字符，第一个中文字符 '{char}' 出现在第 {line_num} 行")
+                if has_chinese:
+                    chinese_files += 1
+                    typer.echo(f"{file_path}: 包含中文字符，第一个中文字符 '{char}' 出现在第 {line_num} 行")
 
         typer.echo(f"\n检查了 {total_files} 个文件，其中 {chinese_files} 个文件包含中文字符")
 

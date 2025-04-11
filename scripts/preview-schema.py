@@ -11,7 +11,7 @@ import json
 import yaml
 from pathlib import Path
 import urllib.parse
-from typing import Optional, Dict, Any
+from typing import Any
 
 
 class OpenAPIHandler(http.server.SimpleHTTPRequestHandler):
@@ -58,7 +58,7 @@ class OpenAPIHandler(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(content.encode())
 
-    def send_json_response(self, data: Dict[str, Any]) -> None:
+    def send_json_response(self, data: dict[str, Any]) -> None:
         """发送 JSON 响应"""
         self.send_response(200)
         self.send_header("Content-type", "application/json")
@@ -66,7 +66,7 @@ class OpenAPIHandler(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(json.dumps(data).encode())
 
-    def load_yaml_spec(self, file_path: str) -> Optional[Dict[str, Any]]:
+    def load_yaml_spec(self, file_path: str) -> dict[str, Any] | None:
         """加载 YAML 规范文件"""
         try:
             return yaml.safe_load(Path(file_path).read_text(encoding="utf-8"))
@@ -91,7 +91,7 @@ class OpenAPIHandler(http.server.SimpleHTTPRequestHandler):
         )
         self.send_html_response(content)
 
-    def render_api_page(self, route_info: Dict[str, str]) -> None:
+    def render_api_page(self, route_info: dict[str, str]) -> None:
         """渲染 API 文档页面"""
         content = self.BASE_TEMPLATE.format(
             title=route_info["title"],
