@@ -21,7 +21,7 @@ Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, whic
 - [Knowledge Base - SwaggerUI(English)](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/knowledge_base.en.yaml)
 - [External Knowledge - SwaggerUI(English)](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/external_knowledge_base.en.yaml)
 
-> [!tip]
+> [!note]
 > There are some web UIs that support OpenAPI schema. You can take a look and use them in your way
 > - https://github.com/rapi-doc/RapiDoc
 

@@ -22,7 +22,7 @@
 - [外部知识库 - SwaggerUI](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/external_knowledge_base.zh.yaml)
 
 
-> [!tip]
+> [!note]
 > 有一些支持 OpenAPI 模式的 Web 用户界面。你可以去看看并按你自己的方式使用它们
 > - https://github.com/rapi-doc/RapiDoc
 
