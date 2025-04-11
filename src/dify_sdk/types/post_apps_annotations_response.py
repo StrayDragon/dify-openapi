@@ -6,29 +6,30 @@ import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class GetParametersResponseAnnotationReply(UniversalBaseModel):
+class PostAppsAnnotationsResponse(UniversalBaseModel):
+    id: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Annotation reply settings
-    """
-
-    enabled: typing.Optional[bool] = pydantic.Field(default=None)
-    """
-    Whether annotation reply is enabled
+    Annotation ID
     """
 
-    score_threshold: typing.Optional[float] = pydantic.Field(default=None)
+    question: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Similarity score threshold
-    """
-
-    embedding_model: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Embedding model
+    Question
     """
 
-    embedding_model_provider: typing.Optional[str] = pydantic.Field(default=None)
+    answer: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Embedding model provider
+    Answer
+    """
+
+    hit_count: typing.Optional[int] = pydantic.Field(default=None)
+    """
+    Hit count
+    """
+
+    created_at: typing.Optional[int] = pydantic.Field(default=None)
+    """
+    Creation timestamp
     """
 
     if IS_PYDANTIC_V2:

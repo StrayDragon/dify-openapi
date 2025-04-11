@@ -6,29 +6,20 @@ import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class GetParametersResponseAnnotationReply(UniversalBaseModel):
+class GetAppsAnnotationReplyActionStatusJobIdResponse(UniversalBaseModel):
+    job_id: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Annotation reply settings
-    """
-
-    enabled: typing.Optional[bool] = pydantic.Field(default=None)
-    """
-    Whether annotation reply is enabled
+    Job ID
     """
 
-    score_threshold: typing.Optional[float] = pydantic.Field(default=None)
+    job_status: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Similarity score threshold
-    """
-
-    embedding_model: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Embedding model
+    Job status
     """
 
-    embedding_model_provider: typing.Optional[str] = pydantic.Field(default=None)
+    error_msg: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Embedding model provider
+    Error message
     """
 
     if IS_PYDANTIC_V2:

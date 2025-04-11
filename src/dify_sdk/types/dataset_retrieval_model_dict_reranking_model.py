@@ -6,29 +6,19 @@ import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class GetParametersResponseAnnotationReply(UniversalBaseModel):
+class DatasetRetrievalModelDictRerankingModel(UniversalBaseModel):
     """
-    Annotation reply settings
-    """
-
-    enabled: typing.Optional[bool] = pydantic.Field(default=None)
-    """
-    Whether annotation reply is enabled
+    Reranking model
     """
 
-    score_threshold: typing.Optional[float] = pydantic.Field(default=None)
+    reranking_provider_name: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Similarity score threshold
-    """
-
-    embedding_model: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Embedding model
+    Reranking model provider
     """
 
-    embedding_model_provider: typing.Optional[str] = pydantic.Field(default=None)
+    reranking_model_name: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Embedding model provider
+    Reranking model name
     """
 
     if IS_PYDANTIC_V2:

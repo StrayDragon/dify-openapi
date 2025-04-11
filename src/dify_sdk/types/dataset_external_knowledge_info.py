@@ -6,29 +6,29 @@ import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class GetParametersResponseAnnotationReply(UniversalBaseModel):
+class DatasetExternalKnowledgeInfo(UniversalBaseModel):
     """
-    Annotation reply settings
-    """
-
-    enabled: typing.Optional[bool] = pydantic.Field(default=None)
-    """
-    Whether annotation reply is enabled
+    External knowledge information
     """
 
-    score_threshold: typing.Optional[float] = pydantic.Field(default=None)
+    external_knowledge_id: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Similarity score threshold
-    """
-
-    embedding_model: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Embedding model
+    External knowledge ID
     """
 
-    embedding_model_provider: typing.Optional[str] = pydantic.Field(default=None)
+    external_knowledge_api_id: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Embedding model provider
+    External knowledge API ID
+    """
+
+    external_knowledge_api_name: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    External knowledge API name
+    """
+
+    external_knowledge_api_endpoint: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    External knowledge API endpoint
     """
 
     if IS_PYDANTIC_V2:

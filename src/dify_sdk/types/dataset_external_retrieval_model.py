@@ -6,29 +6,24 @@ import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class GetParametersResponseAnnotationReply(UniversalBaseModel):
+class DatasetExternalRetrievalModel(UniversalBaseModel):
     """
-    Annotation reply settings
+    External retrieval model
     """
 
-    enabled: typing.Optional[bool] = pydantic.Field(default=None)
+    top_k: typing.Optional[int] = pydantic.Field(default=None)
     """
-    Whether annotation reply is enabled
+    Number of results to return
     """
 
     score_threshold: typing.Optional[float] = pydantic.Field(default=None)
     """
-    Similarity score threshold
+    Score threshold
     """
 
-    embedding_model: typing.Optional[str] = pydantic.Field(default=None)
+    score_threshold_enabled: typing.Optional[bool] = pydantic.Field(default=None)
     """
-    Embedding model
-    """
-
-    embedding_model_provider: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Embedding model provider
+    Whether score threshold is enabled
     """
 
     if IS_PYDANTIC_V2:

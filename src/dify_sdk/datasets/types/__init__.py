@@ -5,6 +5,12 @@ from .create_dataset_request_indexing_technique import (
 )
 from .create_dataset_request_permission import CreateDatasetRequestPermission
 from .create_dataset_request_provider import CreateDatasetRequestProvider
+from .post_datasets_dataset_id_request_indexing_technique import (
+    PostDatasetsDatasetIdRequestIndexingTechnique,
+)
+from .post_datasets_dataset_id_request_permission import (
+    PostDatasetsDatasetIdRequestPermission,
+)
 from .retrieve_dataset_request_retrieval_model import (
     RetrieveDatasetRequestRetrievalModel,
 )
@@ -28,6 +34,8 @@ __all__ = [
     "CreateDatasetRequestIndexingTechnique",
     "CreateDatasetRequestPermission",
     "CreateDatasetRequestProvider",
+    "PostDatasetsDatasetIdRequestIndexingTechnique",
+    "PostDatasetsDatasetIdRequestPermission",
     "RetrieveDatasetRequestRetrievalModel",
     "RetrieveDatasetRequestRetrievalModelRerankingModel",
     "RetrieveDatasetRequestRetrievalModelSearchMethod",

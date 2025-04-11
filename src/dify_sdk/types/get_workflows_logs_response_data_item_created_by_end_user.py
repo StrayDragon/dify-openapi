@@ -6,29 +6,29 @@ import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class GetParametersResponseAnnotationReply(UniversalBaseModel):
+class GetWorkflowsLogsResponseDataItemCreatedByEndUser(UniversalBaseModel):
     """
-    Annotation reply settings
-    """
-
-    enabled: typing.Optional[bool] = pydantic.Field(default=None)
-    """
-    Whether annotation reply is enabled
+    User
     """
 
-    score_threshold: typing.Optional[float] = pydantic.Field(default=None)
+    id: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Similarity score threshold
-    """
-
-    embedding_model: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Embedding model
+    Identifier
     """
 
-    embedding_model_provider: typing.Optional[str] = pydantic.Field(default=None)
+    type: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Embedding model provider
+    Type
+    """
+
+    is_anonymous: typing.Optional[bool] = pydantic.Field(default=None)
+    """
+    Whether anonymous
+    """
+
+    session_id: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Session identifier
     """
 
     if IS_PYDANTIC_V2:
