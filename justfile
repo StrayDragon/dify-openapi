@@ -1,6 +1,13 @@
 set dotenv-required
 set dotenv-load
 
+# extra .env.* can be used for local development
+# NOTE: if you using VSCode, you can also set in .vscode/settings.json :
+# {   ...
+#     "python.envFile":"${workspaceFolder}/.env.local"
+# }
+# set dotenv-filename := '.env.local'
+
 GENERATED_DIR := "src"
 
 
