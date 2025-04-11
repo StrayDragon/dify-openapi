@@ -14,7 +14,7 @@ servers:
         default: 'https://api.dify.ai/v1'
         description: Custom API server URL
   - url: 'http://ai.urchinet.lan/v1'
-    description: dify-openapi project API development server
+    description: author of dify-openapi dev server
 security:
   - bearerApiKeyAuth: []
 components:
@@ -954,7 +954,7 @@ paths:
           $ref: '#/components/responses/Error400'
         '403':
           $ref: '#/components/responses/Error403'
-    post:
+    patch:
       summary: Update Knowledge Base Details
       description: Modify details of a specific knowledge base
       tags:

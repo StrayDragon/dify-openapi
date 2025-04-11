@@ -17,7 +17,7 @@ servers:
         description: 自定义 API 服务器 URL
 
   - url: http://ai.urchinet.lan/v1
-    description: dify-openapi 项目 API 开发服务器
+    description: author of dify-openapi dev server
 
 security:
   - bearerApiKeyAuth: []
@@ -906,7 +906,7 @@ paths:
         "403":
           $ref: "#/components/responses/Error403"
 
-    post:
+    patch:
       summary: 修改知识库详情
       description: 修改指定知识库的详细信息
       tags:

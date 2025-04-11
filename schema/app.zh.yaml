@@ -17,6 +17,9 @@ servers:
         default: https://api.dify.ai/v1
         description: 自定义 API 服务器 URL
 
+  - url: http://ai.urchinet.lan/v1
+    description: author of dify-openapi dev server
+
 security:
   - bearerApiKeyAuth: []
 

@@ -19,10 +19,6 @@ actions:
     update:
       description: "Custom API server URL"
 
-  - target: $.servers[2]
-    update:
-      description: "dify-openapi project API development server"
-
   - target: $.components.schemas.Error.properties.code
     update:
       description: "Error code"
@@ -629,40 +625,40 @@ actions:
   - target: $.paths['/datasets/{dataset_id}'].get.responses['200'].description
     update: "Successfully retrieved knowledge base details"
 
-  - target: $.paths['/datasets/{dataset_id}'].post
+  - target: $.paths['/datasets/{dataset_id}'].patch
     update:
       summary: "Update Knowledge Base Details"
       description: "Modify details of a specific knowledge base"
 
-  - target: $.paths['/datasets/{dataset_id}'].post.parameters[0].description
+  - target: $.paths['/datasets/{dataset_id}'].patch.parameters[0].description
     update: "Knowledge Base ID"
 
-  - target: $.paths['/datasets/{dataset_id}'].post.requestBody.content['application/json'].schema.properties.indexing_technique.description
+  - target: $.paths['/datasets/{dataset_id}'].patch.requestBody.content['application/json'].schema.properties.indexing_technique.description
     update: |
       Indexing mode (optional, recommended)
       - high_quality: High quality
       - economy: Economy
 
-  - target: $.paths['/datasets/{dataset_id}'].post.requestBody.content['application/json'].schema.properties.permission.description
+  - target: $.paths['/datasets/{dataset_id}'].patch.requestBody.content['application/json'].schema.properties.permission.description
     update: |
       Permission (optional, default only_me)
       - only_me: Only me
       - all_team_members: All team members
       - partial_members: Partial team members
 
-  - target: $.paths['/datasets/{dataset_id}'].post.requestBody.content['application/json'].schema.properties.embedding_model_provider.description
+  - target: $.paths['/datasets/{dataset_id}'].patch.requestBody.content['application/json'].schema.properties.embedding_model_provider.description
     update: "Embedding model provider (optional), must be configured in the system first, corresponds to the provider field"
 
-  - target: $.paths['/datasets/{dataset_id}'].post.requestBody.content['application/json'].schema.properties.embedding_model.description
+  - target: $.paths['/datasets/{dataset_id}'].patch.requestBody.content['application/json'].schema.properties.embedding_model.description
     update: "Embedding model (optional)"
 
-  - target: $.paths['/datasets/{dataset_id}'].post.requestBody.content['application/json'].schema.properties.retrieval_model.description
+  - target: $.paths['/datasets/{dataset_id}'].patch.requestBody.content['application/json'].schema.properties.retrieval_model.description
     update: "Retrieval model (optional)"
 
-  - target: $.paths['/datasets/{dataset_id}'].post.requestBody.content['application/json'].schema.properties.partial_member_list.description
+  - target: $.paths['/datasets/{dataset_id}'].patch.requestBody.content['application/json'].schema.properties.partial_member_list.description
     update: "Partial team members ID list (optional)"
 
-  - target: $.paths['/datasets/{dataset_id}'].post.responses['200'].description
+  - target: $.paths['/datasets/{dataset_id}'].patch.responses['200'].description
     update: "Successfully updated knowledge base details"
 
   - target: $.paths['/datasets/{dataset_id}'].delete
