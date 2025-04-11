@@ -1,7 +1,10 @@
 name: ci
 
 on:
-  push
+  push:
+    paths:
+      - "src"
+      - "tests"
 
 jobs:
   test:

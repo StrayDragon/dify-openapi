@@ -19,6 +19,7 @@ gen-client: apply-i18n-overlay-to-openapi-schema update-fern-schema
     ruff format src/
     bash misc/fern_sdk_hotfix_patch.sh
 
+# bump from bump-cli using this cmd to global install `npm install -g bump-cli`
 apply-i18n-overlay-to-openapi-schema: && check-i18n-openapi-schema
     for name in app knowledge_base external_knowledge_base; do \
         for lang in en; do \

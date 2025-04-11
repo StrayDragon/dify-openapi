@@ -26,8 +26,9 @@ Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, whic
 > [!tip]
 > This indicates that the API has passed at least one test case request. If you find any API errors, feel free to submit an issue or PR!
 
-- Knowledge Base: [OpenAPI Schema(中文)](./schema/knowledge_base.zh.yaml) | [OpenAPI Schema(English)](./schema/knowledge_base.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.1.3/web/app/(commonLayout)/datasets/template)
+- Knowledge Base: [OpenAPI Schema(中文)](./schema/knowledge_base.zh.yaml) | [OpenAPI Schema(English)](./schema/knowledge_base.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.2.0/web/app/(commonLayout)/datasets/template)
   - [x] POST /datasets - Create empty knowledge base
+  - [x] POST /datasets/{dataset_id} - Update knowledge base
   - [x] GET /datasets/{dataset_id}/documents - Get document list
   - [x] DELETE /datasets/{dataset_id}/documents/{document_id} - Delete document
   - [x] POST /datasets/{dataset_id}/document/create-by-text - Create document by text
@@ -47,10 +48,13 @@ Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, whic
   - [x] POST /datasets/{dataset_id}/metadata/built-in/{action} - Enable/disable built-in metadata
   - [x] POST /datasets/{dataset_id}/documents/metadata - Update document metadata
 
-- Chat Application (Aggregated): [OpenAPI Schema(中文)](./schema/app.zh.yaml) | [OpenAPI Schema(English)](./schema/app.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.1.3/web/app/components/develop/template)
+- Chat Application (Aggregated): [OpenAPI Schema(中文)](./schema/app.zh.yaml) | [OpenAPI Schema(English)](./schema/app.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.2.0/web/app/components/develop/template)
   - [x] POST /completion-messages - Send message (text generation application)
   - [x] POST /chat-messages - Send conversation message (conversation application)
   - [x] POST /workflows/run - Execute workflow (workflow application)
+  - [x] GET /workflows/run/{workflow_run_id} - Get workflow execution status
+  - [x] POST /workflows/tasks/{task_id}/stop - Stop response
+  - [x] GET /workflows/logs - Get workflow logs
   - [x] POST /files/upload - Upload file
   - [x] POST /messages/{message_id}/feedbacks - Message feedback
   - [x] POST /conversations/{conversation_id}/name - Rename conversation
@@ -60,8 +64,14 @@ Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, whic
   - [x] GET /parameters - Get application parameters
   - [x] POST /audio-to-text - Speech to text
   - [x] POST /text-to-audio - Text to speech
+  - [x] GET /apps/annotations - Get annotation list
+  - [x] POST /apps/annotations - Create annotation
+  - [x] PUT /apps/annotations/{annotation_id} - Update annotation
+  - [x] DELETE /apps/annotations/{annotation_id} - Delete annotation
+  - [x] POST /apps/annotation-reply/{action} - Initialize annotation reply settings
+  - [x] GET /apps/annotation-reply/{action}/status/{job_id} - Check annotation reply settings status
 
-- External Knowledge: [OpenAPI Schema(中文)](./schema/external_knowledge_base.zh.yaml) | [OpenAPI Schema(English)](./schema/external_knowledge_base.en.yaml) | [Official Documentation Source](https://docs.dify.ai/guides/knowledge-base/external-knowledge-api-documentation)
+- External Knowledge: [OpenAPI Schema(中文)](./schema/external_knowledge_base.zh.yaml) | [OpenAPI Schema(English)](./schema/external_knowledge_base.en.yaml) | [Official Documentation Source](https://docs.dify.ai/v1.2.0/guides/knowledge-base/external-knowledge-api-documentation)
   - [ ] POST /retrieval - Retrieve knowledge content
 
 ## Project Structure
