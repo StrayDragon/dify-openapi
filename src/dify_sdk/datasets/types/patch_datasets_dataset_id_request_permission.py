@@ -2,6 +2,6 @@
 
 import typing
 
-PostDatasetsDatasetIdRequestPermission = typing.Union[
+PatchDatasetsDatasetIdRequestPermission = typing.Union[
     typing.Literal["only_me", "all_team_members", "partial_members"], typing.Any
 ]

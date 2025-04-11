@@ -18,11 +18,11 @@ from ..types.dataset import Dataset
 from ..errors.conflict_error import ConflictError
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.forbidden_error import ForbiddenError
-from .types.post_datasets_dataset_id_request_indexing_technique import (
-    PostDatasetsDatasetIdRequestIndexingTechnique,
+from .types.patch_datasets_dataset_id_request_indexing_technique import (
+    PatchDatasetsDatasetIdRequestIndexingTechnique,
 )
-from .types.post_datasets_dataset_id_request_permission import (
-    PostDatasetsDatasetIdRequestPermission,
+from .types.patch_datasets_dataset_id_request_permission import (
+    PatchDatasetsDatasetIdRequestPermission,
 )
 from .types.retrieve_dataset_request_retrieval_model import (
     RetrieveDatasetRequestRetrievalModel,
@@ -295,119 +295,6 @@ class DatasetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update_knowledge_base_details(
-        self,
-        dataset_id: str,
-        *,
-        indexing_technique: typing.Optional[PostDatasetsDatasetIdRequestIndexingTechnique] = OMIT,
-        permission: typing.Optional[PostDatasetsDatasetIdRequestPermission] = OMIT,
-        embedding_model_provider: typing.Optional[str] = OMIT,
-        embedding_model: typing.Optional[str] = OMIT,
-        retrieval_model: typing.Optional[str] = OMIT,
-        partial_member_list: typing.Optional[typing.Sequence[str]] = OMIT,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> Dataset:
-        """
-        Modify details of a specific knowledge base
-
-        Parameters
-        ----------
-        dataset_id : str
-            Knowledge Base ID
-
-        indexing_technique : typing.Optional[PostDatasetsDatasetIdRequestIndexingTechnique]
-            Indexing mode (optional, recommended)
-            - high_quality: High quality
-            - economy: Economy
-
-        permission : typing.Optional[PostDatasetsDatasetIdRequestPermission]
-            Permission (optional, default only_me)
-            - only_me: Only me
-            - all_team_members: All team members
-            - partial_members: Partial team members
-
-        embedding_model_provider : typing.Optional[str]
-            Embedding model provider (optional), must be configured in the system first, corresponds to the provider field
-
-        embedding_model : typing.Optional[str]
-            Embedding model (optional)
-
-        retrieval_model : typing.Optional[str]
-            Retrieval model (optional)
-
-        partial_member_list : typing.Optional[typing.Sequence[str]]
-            Partial team members ID list (optional)
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        Dataset
-            Successfully updated knowledge base details
-
-        Examples
-        --------
-        from dify import DifyApi
-
-        client = DifyApi(
-            token="YOUR_TOKEN",
-        )
-        client.datasets.update_knowledge_base_details(
-            dataset_id="dataset_id",
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"datasets/{jsonable_encoder(dataset_id)}",
-            method="POST",
-            json={
-                "indexing_technique": indexing_technique,
-                "permission": permission,
-                "embedding_model_provider": embedding_model_provider,
-                "embedding_model": embedding_model,
-                "retrieval_model": retrieval_model,
-                "partial_member_list": partial_member_list,
-            },
-            headers={
-                "content-type": "application/json",
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    Dataset,
-                    parse_obj_as(
-                        type_=Dataset,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        Error,
-                        parse_obj_as(
-                            type_=Error,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 403:
-                raise ForbiddenError(
-                    typing.cast(
-                        Error,
-                        parse_obj_as(
-                            type_=Error,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
     def delete_dataset(
         self,
         dataset_id: str,
@@ -448,6 +335,119 @@ class DatasetsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def update_knowledge_base_details(
+        self,
+        dataset_id: str,
+        *,
+        indexing_technique: typing.Optional[PatchDatasetsDatasetIdRequestIndexingTechnique] = OMIT,
+        permission: typing.Optional[PatchDatasetsDatasetIdRequestPermission] = OMIT,
+        embedding_model_provider: typing.Optional[str] = OMIT,
+        embedding_model: typing.Optional[str] = OMIT,
+        retrieval_model: typing.Optional[str] = OMIT,
+        partial_member_list: typing.Optional[typing.Sequence[str]] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Dataset:
+        """
+        Modify details of a specific knowledge base
+
+        Parameters
+        ----------
+        dataset_id : str
+            Knowledge Base ID
+
+        indexing_technique : typing.Optional[PatchDatasetsDatasetIdRequestIndexingTechnique]
+            Indexing mode (optional, recommended)
+            - high_quality: High quality
+            - economy: Economy
+
+        permission : typing.Optional[PatchDatasetsDatasetIdRequestPermission]
+            Permission (optional, default only_me)
+            - only_me: Only me
+            - all_team_members: All team members
+            - partial_members: Partial team members
+
+        embedding_model_provider : typing.Optional[str]
+            Embedding model provider (optional), must be configured in the system first, corresponds to the provider field
+
+        embedding_model : typing.Optional[str]
+            Embedding model (optional)
+
+        retrieval_model : typing.Optional[str]
+            Retrieval model (optional)
+
+        partial_member_list : typing.Optional[typing.Sequence[str]]
+            Partial team members ID list (optional)
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        Dataset
+            Successfully updated knowledge base details
+
+        Examples
+        --------
+        from dify import DifyApi
+
+        client = DifyApi(
+            token="YOUR_TOKEN",
+        )
+        client.datasets.update_knowledge_base_details(
+            dataset_id="dataset_id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(dataset_id)}",
+            method="PATCH",
+            json={
+                "indexing_technique": indexing_technique,
+                "permission": permission,
+                "embedding_model_provider": embedding_model_provider,
+                "embedding_model": embedding_model,
+                "retrieval_model": retrieval_model,
+                "partial_member_list": partial_member_list,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    Dataset,
+                    parse_obj_as(
+                        type_=Dataset,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
@@ -856,127 +856,6 @@ class AsyncDatasetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update_knowledge_base_details(
-        self,
-        dataset_id: str,
-        *,
-        indexing_technique: typing.Optional[PostDatasetsDatasetIdRequestIndexingTechnique] = OMIT,
-        permission: typing.Optional[PostDatasetsDatasetIdRequestPermission] = OMIT,
-        embedding_model_provider: typing.Optional[str] = OMIT,
-        embedding_model: typing.Optional[str] = OMIT,
-        retrieval_model: typing.Optional[str] = OMIT,
-        partial_member_list: typing.Optional[typing.Sequence[str]] = OMIT,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> Dataset:
-        """
-        Modify details of a specific knowledge base
-
-        Parameters
-        ----------
-        dataset_id : str
-            Knowledge Base ID
-
-        indexing_technique : typing.Optional[PostDatasetsDatasetIdRequestIndexingTechnique]
-            Indexing mode (optional, recommended)
-            - high_quality: High quality
-            - economy: Economy
-
-        permission : typing.Optional[PostDatasetsDatasetIdRequestPermission]
-            Permission (optional, default only_me)
-            - only_me: Only me
-            - all_team_members: All team members
-            - partial_members: Partial team members
-
-        embedding_model_provider : typing.Optional[str]
-            Embedding model provider (optional), must be configured in the system first, corresponds to the provider field
-
-        embedding_model : typing.Optional[str]
-            Embedding model (optional)
-
-        retrieval_model : typing.Optional[str]
-            Retrieval model (optional)
-
-        partial_member_list : typing.Optional[typing.Sequence[str]]
-            Partial team members ID list (optional)
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        Dataset
-            Successfully updated knowledge base details
-
-        Examples
-        --------
-        import asyncio
-
-        from dify import AsyncDifyApi
-
-        client = AsyncDifyApi(
-            token="YOUR_TOKEN",
-        )
-
-
-        async def main() -> None:
-            await client.datasets.update_knowledge_base_details(
-                dataset_id="dataset_id",
-            )
-
-
-        asyncio.run(main())
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"datasets/{jsonable_encoder(dataset_id)}",
-            method="POST",
-            json={
-                "indexing_technique": indexing_technique,
-                "permission": permission,
-                "embedding_model_provider": embedding_model_provider,
-                "embedding_model": embedding_model,
-                "retrieval_model": retrieval_model,
-                "partial_member_list": partial_member_list,
-            },
-            headers={
-                "content-type": "application/json",
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    Dataset,
-                    parse_obj_as(
-                        type_=Dataset,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        Error,
-                        parse_obj_as(
-                            type_=Error,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 403:
-                raise ForbiddenError(
-                    typing.cast(
-                        Error,
-                        parse_obj_as(
-                            type_=Error,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
     async def delete_dataset(
         self,
         dataset_id: str,
@@ -1025,6 +904,127 @@ class AsyncDatasetsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def update_knowledge_base_details(
+        self,
+        dataset_id: str,
+        *,
+        indexing_technique: typing.Optional[PatchDatasetsDatasetIdRequestIndexingTechnique] = OMIT,
+        permission: typing.Optional[PatchDatasetsDatasetIdRequestPermission] = OMIT,
+        embedding_model_provider: typing.Optional[str] = OMIT,
+        embedding_model: typing.Optional[str] = OMIT,
+        retrieval_model: typing.Optional[str] = OMIT,
+        partial_member_list: typing.Optional[typing.Sequence[str]] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Dataset:
+        """
+        Modify details of a specific knowledge base
+
+        Parameters
+        ----------
+        dataset_id : str
+            Knowledge Base ID
+
+        indexing_technique : typing.Optional[PatchDatasetsDatasetIdRequestIndexingTechnique]
+            Indexing mode (optional, recommended)
+            - high_quality: High quality
+            - economy: Economy
+
+        permission : typing.Optional[PatchDatasetsDatasetIdRequestPermission]
+            Permission (optional, default only_me)
+            - only_me: Only me
+            - all_team_members: All team members
+            - partial_members: Partial team members
+
+        embedding_model_provider : typing.Optional[str]
+            Embedding model provider (optional), must be configured in the system first, corresponds to the provider field
+
+        embedding_model : typing.Optional[str]
+            Embedding model (optional)
+
+        retrieval_model : typing.Optional[str]
+            Retrieval model (optional)
+
+        partial_member_list : typing.Optional[typing.Sequence[str]]
+            Partial team members ID list (optional)
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        Dataset
+            Successfully updated knowledge base details
+
+        Examples
+        --------
+        import asyncio
+
+        from dify import AsyncDifyApi
+
+        client = AsyncDifyApi(
+            token="YOUR_TOKEN",
+        )
+
+
+        async def main() -> None:
+            await client.datasets.update_knowledge_base_details(
+                dataset_id="dataset_id",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(dataset_id)}",
+            method="PATCH",
+            json={
+                "indexing_technique": indexing_technique,
+                "permission": permission,
+                "embedding_model_provider": embedding_model_provider,
+                "embedding_model": embedding_model,
+                "retrieval_model": retrieval_model,
+                "partial_member_list": partial_member_list,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    Dataset,
+                    parse_obj_as(
+                        type_=Dataset,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
