@@ -4,7 +4,7 @@ info:
   description: |
     Dify 知识库 API 提供了一系列接口用于管理知识库、文档和检索功能。
     所有 API 请求都需要在 Authorization HTTP Header 中包含知识库级 API-Key。
-  version: 1.1.3
+  version: 1.2.0
 
 servers:
   - url: https://api.dify.ai/v1
@@ -109,6 +109,87 @@ components:
           type: boolean
           nullable: true
           description: Embedding 是否可用
+        retrieval_model_dict:
+          type: object
+          description: 检索模型配置
+          properties:
+            search_method:
+              type: string
+              description: 检索方法
+            reranking_enable:
+              type: boolean
+              description: 是否启用重排序
+            reranking_mode:
+              type: string
+              nullable: true
+              description: 重排序模式
+            reranking_model:
+              type: object
+              description: 重排序模型
+              properties:
+                reranking_provider_name:
+                  type: string
+                  description: 重排序模型提供商
+                reranking_model_name:
+                  type: string
+                  description: 重排序模型名称
+            weights:
+              type: number
+              nullable: true
+              description: 权重
+            top_k:
+              type: integer
+              description: 返回结果数量
+            score_threshold_enabled:
+              type: boolean
+              description: 是否启用分数阈值
+            score_threshold:
+              type: number
+              nullable: true
+              description: 分数阈值
+        tags:
+          type: array
+          description: 标签列表
+          items:
+            type: string
+        doc_form:
+          type: string
+          nullable: true
+          description: 文档形式
+        external_knowledge_info:
+          type: object
+          description: 外部知识库信息
+          properties:
+            external_knowledge_id:
+              type: string
+              nullable: true
+              description: 外部知识库ID
+            external_knowledge_api_id:
+              type: string
+              nullable: true
+              description: 外部知识库API ID
+            external_knowledge_api_name:
+              type: string
+              nullable: true
+              description: 外部知识库API名称
+            external_knowledge_api_endpoint:
+              type: string
+              nullable: true
+              description: 外部知识库API端点
+        external_retrieval_model:
+          type: object
+          description: 外部检索模型
+          properties:
+            top_k:
+              type: integer
+              description: 返回结果数量
+            score_threshold:
+              type: number
+              description: 分数阈值
+            score_threshold_enabled:
+              type: boolean
+              nullable: true
+              description: 是否启用分数阈值
 
     DatasetList:
       type: object
@@ -365,6 +446,135 @@ components:
         stopped_at:
           type: number
           nullable: true
+
+    ChildChunk:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 子分段ID
+        segment_id:
+          type: string
+          description: 父分段ID
+        content:
+          type: string
+          description: 子分段内容
+        word_count:
+          type: integer
+          description: 字数统计
+        tokens:
+          type: integer
+          description: token数量
+        index_node_id:
+          type: string
+          description: 索引节点ID
+        index_node_hash:
+          type: string
+          description: 索引节点哈希
+        status:
+          type: string
+          description: 状态
+        created_by:
+          type: string
+          description: 创建者
+        created_at:
+          type: number
+          description: 创建时间戳
+        indexing_at:
+          type: number
+          description: 索引时间戳
+        completed_at:
+          type: number
+          description: 完成时间戳
+        error:
+          type: string
+          nullable: true
+          description: 错误信息
+        stopped_at:
+          type: number
+          nullable: true
+          description: 停止时间戳
+
+    EmbeddingModel:
+      type: object
+      properties:
+        provider:
+          type: string
+          description: 模型提供商
+        label:
+          type: object
+          properties:
+            zh_Hans:
+              type: string
+              description: 中文标签
+            en_US:
+              type: string
+              description: 英文标签
+        icon_small:
+          type: object
+          properties:
+            zh_Hans:
+              type: string
+              description: 中文小图标
+            en_US:
+              type: string
+              description: 英文小图标
+        icon_large:
+          type: object
+          properties:
+            zh_Hans:
+              type: string
+              description: 中文大图标
+            en_US:
+              type: string
+              description: 英文大图标
+        status:
+          type: string
+          description: 状态
+        models:
+          type: array
+          description: 模型列表
+          items:
+            type: object
+            properties:
+              model:
+                type: string
+                description: 模型名称
+              label:
+                type: object
+                properties:
+                  zh_Hans:
+                    type: string
+                    description: 中文标签
+                  en_US:
+                    type: string
+                    description: 英文标签
+              model_type:
+                type: string
+                description: 模型类型
+              features:
+                type: object
+                nullable: true
+                description: 特性
+              fetch_from:
+                type: string
+                description: 获取来源
+              model_properties:
+                type: object
+                description: 模型属性
+                properties:
+                  context_size:
+                    type: integer
+                    description: 上下文大小
+              deprecated:
+                type: boolean
+                description: 是否已弃用
+              status:
+                type: string
+                description: 状态
+              load_balancing_enabled:
+                type: boolean
+                description: 是否启用负载均衡
 
     UploadFile:
       type: object
@@ -672,6 +882,90 @@ paths:
           $ref: "#/components/responses/Error400"
 
   /datasets/{dataset_id}:
+    get:
+      summary: 查看知识库详情
+      description: 获取指定知识库的详细信息
+      tags:
+        - Datasets
+      parameters:
+        - name: dataset_id
+          in: path
+          description: 知识库 ID
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 成功获取知识库详情
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dataset"
+        "400":
+          $ref: "#/components/responses/Error400"
+        "403":
+          $ref: "#/components/responses/Error403"
+
+    post:
+      summary: 修改知识库详情
+      description: 修改指定知识库的详细信息
+      tags:
+        - Datasets
+      parameters:
+        - name: dataset_id
+          in: path
+          description: 知识库 ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                indexing_technique:
+                  type: string
+                  enum: [high_quality, economy]
+                  description: |
+                    索引模式（选填，建议填写）
+                    - high_quality: 高质量
+                    - economy: 经济
+                permission:
+                  type: string
+                  enum: [only_me, all_team_members, partial_members]
+                  description: |
+                    权限（选填，默认 only_me）
+                    - only_me: 仅自己
+                    - all_team_members: 所有团队成员
+                    - partial_members: 部分团队成员
+                embedding_model_provider:
+                  type: string
+                  description: 嵌入模型提供商（选填）, 必须先在系统内设定好接入的模型，对应的是provider字段
+                embedding_model:
+                  type: string
+                  description: 嵌入模型（选填）
+                retrieval_model:
+                  type: string
+                  description: 检索模型（选填）
+                partial_member_list:
+                  type: array
+                  description: 部分团队成员 ID 列表（选填）
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: 成功修改知识库详情
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dataset"
+        "400":
+          $ref: "#/components/responses/Error400"
+        "403":
+          $ref: "#/components/responses/Error403"
+
     delete:
       summary: 删除知识库
       description: 删除指定的知识库
@@ -1413,6 +1707,235 @@ paths:
         "400":
           $ref: "#/components/responses/Error400"
 
+  /datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks:
+    post:
+      summary: 新增文档子分段
+      description: 为指定分段新增子分段
+      tags:
+        - Segments
+      parameters:
+        - name: dataset_id
+          in: path
+          description: 知识库 ID
+          required: true
+          schema:
+            type: string
+        - name: document_id
+          in: path
+          description: 文档 ID
+          required: true
+          schema:
+            type: string
+        - name: segment_id
+          in: path
+          description: 分段 ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - content
+              properties:
+                content:
+                  type: string
+                  description: 子分段内容
+      responses:
+        "200":
+          description: 成功创建子分段
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/ChildChunk"
+        "400":
+          $ref: "#/components/responses/Error400"
+        "403":
+          $ref: "#/components/responses/Error403"
+
+    get:
+      summary: 查询文档子分段
+      description: 获取指定分段的所有子分段
+      tags:
+        - Segments
+      parameters:
+        - name: dataset_id
+          in: path
+          description: 知识库 ID
+          required: true
+          schema:
+            type: string
+        - name: document_id
+          in: path
+          description: 文档 ID
+          required: true
+          schema:
+            type: string
+        - name: segment_id
+          in: path
+          description: 分段 ID
+          required: true
+          schema:
+            type: string
+        - name: keyword
+          in: query
+          description: 搜索关键词（选填）
+          required: false
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: 页码（选填，默认1）
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: 每页数量（选填，默认20，最大100）
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: 成功获取子分段列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ChildChunk"
+                  total:
+                    type: integer
+                    description: 总记录数
+                  total_pages:
+                    type: integer
+                    description: 总页数
+                  page:
+                    type: integer
+                    description: 当前页码
+                  limit:
+                    type: integer
+                    description: 每页数量
+        "400":
+          $ref: "#/components/responses/Error400"
+
+  /datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks/{child_chunk_id}:
+    delete:
+      summary: 删除文档子分段
+      description: 删除指定的文档子分段
+      tags:
+        - Segments
+      parameters:
+        - name: dataset_id
+          in: path
+          description: 知识库 ID
+          required: true
+          schema:
+            type: string
+        - name: document_id
+          in: path
+          description: 文档 ID
+          required: true
+          schema:
+            type: string
+        - name: segment_id
+          in: path
+          description: 分段 ID
+          required: true
+          schema:
+            type: string
+        - name: child_chunk_id
+          in: path
+          description: 子分段 ID
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 成功删除子分段
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    enum: [success]
+        "400":
+          $ref: "#/components/responses/Error400"
+        "403":
+          $ref: "#/components/responses/Error403"
+
+    patch:
+      summary: 更新文档子分段
+      description: 更新指定的文档子分段
+      tags:
+        - Segments
+      parameters:
+        - name: dataset_id
+          in: path
+          description: 知识库 ID
+          required: true
+          schema:
+            type: string
+        - name: document_id
+          in: path
+          description: 文档 ID
+          required: true
+          schema:
+            type: string
+        - name: segment_id
+          in: path
+          description: 分段 ID
+          required: true
+          schema:
+            type: string
+        - name: child_chunk_id
+          in: path
+          description: 子分段 ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - content
+              properties:
+                content:
+                  type: string
+                  description: 子分段内容
+      responses:
+        "200":
+          description: 成功更新子分段
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/ChildChunk"
+        "400":
+          $ref: "#/components/responses/Error400"
+        "403":
+          $ref: "#/components/responses/Error403"
+
   /datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}:
     delete:
       summary: 删除文档分段
@@ -1635,6 +2158,27 @@ paths:
                           type: integer
                   built_in_field_enabled:
                     type: boolean
+
+  /workspaces/current/models/model-types/text-embedding:
+    get:
+      summary: 获取嵌入模型列表
+      description: 获取当前工作空间可用的嵌入模型列表
+      tags:
+        - Models
+      responses:
+        "200":
+          description: 成功获取嵌入模型列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/EmbeddingModel"
+        "400":
+          $ref: "#/components/responses/Error400"
 
   /datasets/{dataset_id}/metadata/{metadata_id}:
     patch:
