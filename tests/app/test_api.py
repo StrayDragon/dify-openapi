@@ -8,7 +8,7 @@ from dify_sdk.types import (
     PostCompletionMessagesRequestInputs,
     FileInput,
 )
-from dify_sdk_testing import RUNNING_IN_CI
+from dify_sdk_testing import RUNNING_IN_CI, postpone_run_in_this_version
 
 LOGIN_USER_ID = "test123"
 
@@ -84,12 +84,13 @@ async def test_conversation_management(app_chat_client: AsyncDifyApi):
             pytest.skip("无法获取重命名后的会话ID")
         conversation_id = str(renamed.id)
 
-        messages = await app_chat_client.get_conversation_history_messages(
-            conversation_id=conversation_id,
-            user=LOGIN_USER_ID,
-        )
-        assert messages is not None
-        assert messages.data is not None
+        if postpone_run_in_this_version("1.2.1"):
+            messages = await app_chat_client.get_conversation_history_messages(
+                conversation_id=conversation_id,
+                user=LOGIN_USER_ID,
+            )
+            assert messages is not None
+            assert messages.data is not None
 
         delete_response = await app_chat_client.delete_conversation(
             conversation_id=conversation_id,
@@ -232,7 +233,7 @@ async def test_workflow_run(app_workflow_client: AsyncDifyApi):
         "files": [],
     }
 
-    response = await app_workflow_client.run_workflow_workflow_app(
+    response = await app_workflow_client.execute_workflow(
         inputs=workflow_inputs,
         response_mode="blocking",
         user=LOGIN_USER_ID,

@@ -62,4 +62,5 @@ async def kb_client() -> AsyncGenerator[KnowledgeBaseClient, None]:
         document=client.documents,
         segment=client.segments,
         metadata=client.metadata,
+        models=client.models,
     )
