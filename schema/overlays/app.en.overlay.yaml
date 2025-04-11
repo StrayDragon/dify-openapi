@@ -299,6 +299,9 @@ actions:
   - target: $.components.responses.Error400.description
     update: "Request error"
 
+  - target: $.components.responses.Error401.description
+    update: "Non authorized or authentication failed"
+
   - target: $.components.responses.Error404.description
     update: "Resource not found"
 
@@ -603,6 +606,22 @@ actions:
     update:
       description: "Annotation reply settings"
 
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply.properties.enabled
+    update:
+      description: "Whether annotation reply is enabled"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply.properties.score_threshold
+    update:
+      description: "Similarity score threshold"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply.properties.embedding_model
+    update:
+      description: "Embedding model"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply.properties.embedding_model_provider
+    update:
+      description: "Embedding model provider"
+
   - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form
     update:
       description: "User input form configuration"
@@ -614,3 +633,387 @@ actions:
   - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.system_parameters
     update:
       description: "System parameters"
+
+  - target: $.paths['/apps/annotations'].get
+    update:
+      summary: "Get Annotation List"
+      description: "Get the list of annotations for the application"
+
+  - target: $.paths['/apps/annotations'].get.parameters[0].description
+    update: "Page number"
+
+  - target: $.paths['/apps/annotations'].get.parameters[1].description
+    update: "Items per page"
+
+  - target: $.paths['/apps/annotations'].get.responses['200'].description
+    update: "Successfully retrieved annotation list"
+
+  - target: $.paths['/apps/annotations'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.id.description
+    update: "Annotation ID"
+
+  - target: $.paths['/apps/annotations'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.question.description
+    update: "Question"
+
+  - target: $.paths['/apps/annotations'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.answer.description
+    update: "Answer"
+
+  - target: $.paths['/apps/annotations'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.hit_count.description
+    update: "Hit count"
+
+  - target: $.paths['/apps/annotations'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.created_at.description
+    update: "Creation timestamp"
+
+  - target: $.paths['/apps/annotations'].get.responses['200'].content['application/json'].schema.properties.has_more.description
+    update: "Whether there is more data"
+
+  - target: $.paths['/apps/annotations'].get.responses['200'].content['application/json'].schema.properties.limit.description
+    update: "Items per page"
+
+  - target: $.paths['/apps/annotations'].get.responses['200'].content['application/json'].schema.properties.total.description
+    update: "Total record count"
+
+  - target: $.paths['/apps/annotations'].get.responses['200'].content['application/json'].schema.properties.page.description
+    update: "Current page number"
+
+  - target: $.paths['/apps/annotations'].post
+    update:
+      summary: "Create Annotation"
+      description: "Create a new annotation"
+
+  - target: $.paths['/apps/annotations'].post.requestBody.content['application/json'].schema.properties.question.description
+    update: "Question"
+
+  - target: $.paths['/apps/annotations'].post.requestBody.content['application/json'].schema.properties.answer.description
+    update: "Answer"
+
+  - target: $.paths['/apps/annotations'].post.responses['200'].description
+    update: "Successfully created annotation"
+
+  - target: $.paths['/apps/annotations'].post.responses['200'].content['application/json'].schema.properties.id.description
+    update: "Annotation ID"
+
+  - target: $.paths['/apps/annotations'].post.responses['200'].content['application/json'].schema.properties.question.description
+    update: "Question"
+
+  - target: $.paths['/apps/annotations'].post.responses['200'].content['application/json'].schema.properties.answer.description
+    update: "Answer"
+
+  - target: $.paths['/apps/annotations'].post.responses['200'].content['application/json'].schema.properties.hit_count.description
+    update: "Hit count"
+
+  - target: $.paths['/apps/annotations'].post.responses['200'].content['application/json'].schema.properties.created_at.description
+    update: "Creation timestamp"
+
+  - target: $.paths['/apps/annotations/{annotation_id}'].put
+    update:
+      summary: "Update Annotation"
+      description: "Update a specific annotation"
+
+  - target: $.paths['/apps/annotations/{annotation_id}'].put.parameters[0].description
+    update: "Annotation ID"
+
+  - target: $.paths['/apps/annotations/{annotation_id}'].put.requestBody.content['application/json'].schema.properties.question.description
+    update: "Question"
+
+  - target: $.paths['/apps/annotations/{annotation_id}'].put.requestBody.content['application/json'].schema.properties.answer.description
+    update: "Answer"
+
+  - target: $.paths['/apps/annotations/{annotation_id}'].put.responses['200'].description
+    update: "Successfully updated annotation"
+
+  - target: $.paths['/apps/annotations/{annotation_id}'].put.responses['200'].content['application/json'].schema.properties.id.description
+    update: "Annotation ID"
+
+  - target: $.paths['/apps/annotations/{annotation_id}'].put.responses['200'].content['application/json'].schema.properties.question.description
+    update: "Question"
+
+  - target: $.paths['/apps/annotations/{annotation_id}'].put.responses['200'].content['application/json'].schema.properties.answer.description
+    update: "Answer"
+
+  - target: $.paths['/apps/annotations/{annotation_id}'].put.responses['200'].content['application/json'].schema.properties.hit_count.description
+    update: "Hit count"
+
+  - target: $.paths['/apps/annotations/{annotation_id}'].put.responses['200'].content['application/json'].schema.properties.created_at.description
+    update: "Creation timestamp"
+
+  - target: $.paths['/apps/annotations/{annotation_id}'].delete
+    update:
+      summary: "Delete Annotation"
+      description: "Delete a specific annotation"
+
+  - target: $.paths['/apps/annotations/{annotation_id}'].delete.parameters[0].description
+    update: "Annotation ID"
+
+  - target: $.paths['/apps/annotations/{annotation_id}'].delete.responses['200'].description
+    update: "Successfully deleted annotation"
+
+  - target: $.paths['/apps/annotation-reply/{action}'].post
+    update:
+      summary: "Initialize Annotation Reply Settings"
+      description: "Enable or disable annotation reply functionality"
+
+  - target: $.paths['/apps/annotation-reply/{action}'].post.parameters[0].description
+    update: "Action, can only be 'enable' or 'disable'"
+
+  - target: $.paths['/apps/annotation-reply/{action}'].post.requestBody.content['application/json'].schema.properties.embedding_model_provider.description
+    update: "Specified embedding model provider, must be configured in the system first, corresponds to the provider field"
+
+  - target: $.paths['/apps/annotation-reply/{action}'].post.requestBody.content['application/json'].schema.properties.embedding_model.description
+    update: "Specified embedding model, corresponds to the model field"
+
+  - target: $.paths['/apps/annotation-reply/{action}'].post.requestBody.content['application/json'].schema.properties.score_threshold.description
+    update: "Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply"
+
+  - target: $.paths['/apps/annotation-reply/{action}'].post.responses['200'].description
+    update: "Successfully enabled or disabled annotation reply"
+
+  - target: $.paths['/apps/annotation-reply/{action}'].post.responses['200'].content['application/json'].schema.properties.job_id.description
+    update: "Job ID"
+
+  - target: $.paths['/apps/annotation-reply/{action}'].post.responses['200'].content['application/json'].schema.properties.job_status.description
+    update: "Job status"
+
+  - target: $.paths['/apps/annotation-reply/{action}/status/{job_id}'].get
+    update:
+      summary: "Check Annotation Reply Settings Status"
+      description: "Query the status of annotation reply initialization task"
+
+  - target: $.paths['/apps/annotation-reply/{action}/status/{job_id}'].get.parameters[0].description
+    update: "Action, can only be 'enable' or 'disable', and must be consistent with the action in the annotation reply initialization interface"
+
+  - target: $.paths['/apps/annotation-reply/{action}/status/{job_id}'].get.parameters[1].description
+    update: "Job ID, returned from the annotation reply initialization interface"
+
+  - target: $.paths['/apps/annotation-reply/{action}/status/{job_id}'].get.responses['200'].description
+    update: "Successfully retrieved job status"
+
+  - target: $.paths['/apps/annotation-reply/{action}/status/{job_id}'].get.responses['200'].content['application/json'].schema.properties.job_id.description
+    update: "Job ID"
+
+  - target: $.paths['/apps/annotation-reply/{action}/status/{job_id}'].get.responses['200'].content['application/json'].schema.properties.job_status.description
+    update: "Job status"
+
+  - target: $.paths['/apps/annotation-reply/{action}/status/{job_id}'].get.responses['200'].content['application/json'].schema.properties.error_msg.description
+    update: "Error message"
+
+  - target: $.paths['/workflows/run'].post
+    update:
+      summary: "Execute Workflow"
+      description: "Execute a workflow. Cannot be executed if there is no published workflow."
+
+  - target: $.paths['/workflows/run'].post.requestBody.content['application/json'].schema.properties.inputs.description
+    update: "Workflow input parameters"
+
+  - target: $.paths['/workflows/run'].post.requestBody.content['application/json'].schema.properties.response_mode.description
+    update: "Response mode"
+
+  - target: $.paths['/workflows/run'].post.requestBody.content['application/json'].schema.properties.user.description
+    update: "User identifier"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get
+    update:
+      summary: "Get Workflow Execution Status"
+      description: "Get the current execution result of a workflow task based on the workflow execution ID"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get.parameters[0].description
+    update: "Workflow run ID, can be obtained from the streaming response chunks"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get.responses['200'].description
+    update: "Successfully retrieved workflow execution status"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get.responses['200'].content['application/json'].schema.properties.id.description
+    update: "Workflow execution ID"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get.responses['200'].content['application/json'].schema.properties.workflow_id.description
+    update: "Associated Workflow ID"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get.responses['200'].content['application/json'].schema.properties.status.description
+    update: "Execution status"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get.responses['200'].content['application/json'].schema.properties.inputs.description
+    update: "Task input content"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get.responses['200'].content['application/json'].schema.properties.outputs.description
+    update: "Task output content"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get.responses['200'].content['application/json'].schema.properties.error.description
+    update: "Error reason"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get.responses['200'].content['application/json'].schema.properties.total_steps.description
+    update: "Total steps executed in the task"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get.responses['200'].content['application/json'].schema.properties.total_tokens.description
+    update: "Total tokens used in the task"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get.responses['200'].content['application/json'].schema.properties.created_at.description
+    update: "Task start time"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get.responses['200'].content['application/json'].schema.properties.finished_at.description
+    update: "Task end time"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get.responses['200'].content['application/json'].schema.properties.elapsed_time.description
+    update: "Time elapsed (seconds)"
+
+  - target: $.paths['/workflows/tasks/{task_id}/stop'].post
+    update:
+      summary: "Stop Response"
+      description: "Only supports streaming mode"
+
+  - target: $.paths['/workflows/tasks/{task_id}/stop'].post.parameters[0].description
+    update: "Task ID, can be obtained from the streaming response chunks"
+
+  - target: $.paths['/workflows/tasks/{task_id}/stop'].post.requestBody.content['application/json'].schema.properties.user.description
+    update: "User identifier, must be consistent with the user passed in the message sending interface"
+
+  - target: $.paths['/workflows/tasks/{task_id}/stop'].post.responses['200'].description
+    update: "Successfully stopped the response"
+
+  - target: $.paths['/workflows/tasks/{task_id}/stop'].post.responses['200'].content['application/json'].schema.properties.result.description
+    update: "Fixed return value 'success'"
+
+  - target: $.paths['/workflows/logs'].get
+    update:
+      summary: "Get Workflow Logs"
+      description: "Return workflow logs in reverse order"
+
+  - target: $.paths['/workflows/logs'].get.parameters[0].description
+    update: "Keyword"
+
+  - target: $.paths['/workflows/logs'].get.parameters[1].description
+    update: "Execution status: succeeded/failed/stopped"
+
+  - target: $.paths['/workflows/logs'].get.parameters[2].description
+    update: "Current page number, default 1"
+
+  - target: $.paths['/workflows/logs'].get.parameters[3].description
+    update: "Items per page, default 20"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].description
+    update: "Successfully retrieved workflow logs"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.page.description
+    update: "Current page number"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.limit.description
+    update: "Items per page"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.total.description
+    update: "Total number of records"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.has_more.description
+    update: "Whether there is more data"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.description
+    update: "Data for the current page"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.id.description
+    update: "Identifier"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.workflow_run.description
+    update: "Workflow execution log"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.workflow_run.properties.id.description
+    update: "Identifier"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.workflow_run.properties.version.description
+    update: "Version"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.workflow_run.properties.status.description
+    update: "Execution status"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.workflow_run.properties.error.description
+    update: "Error"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.workflow_run.properties.elapsed_time.description
+    update: "Time elapsed, in seconds"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.workflow_run.properties.total_tokens.description
+    update: "Number of tokens consumed"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.workflow_run.properties.total_steps.description
+    update: "Number of execution steps"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.workflow_run.properties.created_at.description
+    update: "Start time"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.workflow_run.properties.finished_at.description
+    update: "End time"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.created_from.description
+    update: "Source"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.created_by_role.description
+    update: "Role"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.created_by_account.description
+    update: "Account"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.created_by_end_user.description
+    update: "User"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.created_by_end_user.properties.id.description
+    update: "Identifier"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.created_by_end_user.properties.type.description
+    update: "Type"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.created_by_end_user.properties.is_anonymous.description
+    update: "Whether anonymous"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.created_by_end_user.properties.session_id.description
+    update: "Session identifier"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.created_at.description
+    update: "Creation time"
+
+  - target: $.paths['/messages/{message_id}/suggested'].get
+    update:
+      summary: "Get Suggested Questions"
+      description: "Get suggested questions for the next round"
+
+  - target: $.paths['/messages/{message_id}/suggested'].get.parameters[0].description
+    update: "Message ID"
+
+  - target: $.paths['/messages/{message_id}/suggested'].get.parameters[1].description
+    update: "User identifier, defined by the developer, must be unique within the application"
+
+  - target: $.paths['/messages/{message_id}/suggested'].get.responses['200'].description
+    update: "Successfully retrieved suggested questions"
+
+  - target: $.paths['/messages/{message_id}/suggested'].get.responses['200'].content['application/json'].schema.properties.result.description
+    update: "Fixed return value 'success'"
+
+  - target: $.paths['/messages/{message_id}/suggested'].get.responses['200'].content['application/json'].schema.properties.data.description
+    update: "List of suggested questions"
+
+  - target: $.paths['/meta'].get
+    update:
+      summary: "Get App Meta Information"
+      description: "Used to get tool icons"
+
+  - target: $.paths['/meta'].get.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/meta'].get.responses['200'].content['application/json'].schema.properties.tool_icons.description
+    update: "Tool icons"
+
+  - target: $.paths['/meta'].get.responses['200'].content['application/json'].schema.properties.tool_icons.additionalProperties.oneOf[0].properties.background.description
+    update: "Background color in hex format"
+
+  - target: $.paths['/meta'].get.responses['200'].content['application/json'].schema.properties.tool_icons.additionalProperties.oneOf[0].properties.content.description
+    update: "Emoji"
+
+  - target: $.paths['/meta'].get.responses['200'].content['application/json'].schema.properties.tool_icons.additionalProperties.oneOf[1].description
+    update: "Icon URL"
+
+  - target: $.responses.Error400.description
+    update: "Bad Request"
+
+  - target: $.responses.Error401.description
+    update: "Unauthorized or Authentication Failed"
+
+  - target: $.responses.Error404.description
+    update: "Resource Not Found"
+
+  - target: $.responses.Error500.description
+    update: "Internal Server Error"

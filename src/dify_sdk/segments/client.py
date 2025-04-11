@@ -16,6 +16,18 @@ from .types.create_segments_request_segments_item import (
 from .types.create_segments_response import CreateSegmentsResponse
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..errors.forbidden_error import ForbiddenError
+from .types.get_datasets_dataset_id_documents_document_id_segments_segment_id_child_chunks_response import (
+    GetDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse,
+)
+from .types.post_datasets_dataset_id_documents_document_id_segments_segment_id_child_chunks_response import (
+    PostDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse,
+)
+from .types.delete_datasets_dataset_id_documents_document_id_segments_segment_id_child_chunks_child_chunk_id_response import (
+    DeleteDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse,
+)
+from .types.patch_datasets_dataset_id_documents_document_id_segments_segment_id_child_chunks_child_chunk_id_response import (
+    PatchDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse,
+)
 from .types.update_segment_request_segment import UpdateSegmentRequestSegment
 from .types.update_segment_response import UpdateSegmentResponse
 from .types.delete_segment_response import DeleteSegmentResponse
@@ -187,6 +199,375 @@ class SegmentsClient:
                     CreateSegmentsResponse,
                     parse_obj_as(
                         type_=CreateSegmentsResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def query_document_child_segments(
+        self,
+        dataset_id: str,
+        document_id: str,
+        segment_id: str,
+        *,
+        keyword: typing.Optional[str] = None,
+        page: typing.Optional[int] = None,
+        limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse:
+        """
+        Get all child segments of a specified segment
+
+        Parameters
+        ----------
+        dataset_id : str
+            Knowledge Base ID
+
+        document_id : str
+            Document ID
+
+        segment_id : str
+            Segment ID
+
+        keyword : typing.Optional[str]
+            Search keyword (optional)
+
+        page : typing.Optional[int]
+            Page number (optional, default 1)
+
+        limit : typing.Optional[int]
+            Items per page (optional, default 20, max 100)
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse
+            Successfully retrieved child segment list
+
+        Examples
+        --------
+        from dify import DifyApi
+
+        client = DifyApi(
+            token="YOUR_TOKEN",
+        )
+        client.segments.query_document_child_segments(
+            dataset_id="dataset_id",
+            document_id="document_id",
+            segment_id="segment_id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(dataset_id)}/documents/{jsonable_encoder(document_id)}/segments/{jsonable_encoder(segment_id)}/child_chunks",
+            method="GET",
+            params={
+                "keyword": keyword,
+                "page": page,
+                "limit": limit,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    GetDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse,
+                    parse_obj_as(
+                        type_=GetDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def create_document_child_segment(
+        self,
+        dataset_id: str,
+        document_id: str,
+        segment_id: str,
+        *,
+        content: str,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> PostDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse:
+        """
+        Add a new child segment to a specified segment
+
+        Parameters
+        ----------
+        dataset_id : str
+            Knowledge Base ID
+
+        document_id : str
+            Document ID
+
+        segment_id : str
+            Segment ID
+
+        content : str
+            Child segment content
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        PostDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse
+            Successfully created child segment
+
+        Examples
+        --------
+        from dify import DifyApi
+
+        client = DifyApi(
+            token="YOUR_TOKEN",
+        )
+        client.segments.create_document_child_segment(
+            dataset_id="dataset_id",
+            document_id="document_id",
+            segment_id="segment_id",
+            content="content",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(dataset_id)}/documents/{jsonable_encoder(document_id)}/segments/{jsonable_encoder(segment_id)}/child_chunks",
+            method="POST",
+            json={
+                "content": content,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    PostDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse,
+                    parse_obj_as(
+                        type_=PostDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def delete_document_child_segment(
+        self,
+        dataset_id: str,
+        document_id: str,
+        segment_id: str,
+        child_chunk_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> DeleteDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse:
+        """
+        Delete a specified document child segment
+
+        Parameters
+        ----------
+        dataset_id : str
+            Knowledge Base ID
+
+        document_id : str
+            Document ID
+
+        segment_id : str
+            Segment ID
+
+        child_chunk_id : str
+            Child Segment ID
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        DeleteDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse
+            Successfully deleted child segment
+
+        Examples
+        --------
+        from dify import DifyApi
+
+        client = DifyApi(
+            token="YOUR_TOKEN",
+        )
+        client.segments.delete_document_child_segment(
+            dataset_id="dataset_id",
+            document_id="document_id",
+            segment_id="segment_id",
+            child_chunk_id="child_chunk_id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(dataset_id)}/documents/{jsonable_encoder(document_id)}/segments/{jsonable_encoder(segment_id)}/child_chunks/{jsonable_encoder(child_chunk_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    DeleteDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse,
+                    parse_obj_as(
+                        type_=DeleteDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def update_document_child_segment(
+        self,
+        dataset_id: str,
+        document_id: str,
+        segment_id: str,
+        child_chunk_id: str,
+        *,
+        content: str,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> PatchDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse:
+        """
+        Update a specified document child segment
+
+        Parameters
+        ----------
+        dataset_id : str
+            Knowledge Base ID
+
+        document_id : str
+            Document ID
+
+        segment_id : str
+            Segment ID
+
+        child_chunk_id : str
+            Child Segment ID
+
+        content : str
+            Child segment content
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        PatchDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse
+            Successfully updated child segment
+
+        Examples
+        --------
+        from dify import DifyApi
+
+        client = DifyApi(
+            token="YOUR_TOKEN",
+        )
+        client.segments.update_document_child_segment(
+            dataset_id="dataset_id",
+            document_id="document_id",
+            segment_id="segment_id",
+            child_chunk_id="child_chunk_id",
+            content="content",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(dataset_id)}/documents/{jsonable_encoder(document_id)}/segments/{jsonable_encoder(segment_id)}/child_chunks/{jsonable_encoder(child_chunk_id)}",
+            method="PATCH",
+            json={
+                "content": content,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    PatchDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse,
+                    parse_obj_as(
+                        type_=PatchDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -574,6 +955,407 @@ class AsyncSegmentsClient:
                     CreateSegmentsResponse,
                     parse_obj_as(
                         type_=CreateSegmentsResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def query_document_child_segments(
+        self,
+        dataset_id: str,
+        document_id: str,
+        segment_id: str,
+        *,
+        keyword: typing.Optional[str] = None,
+        page: typing.Optional[int] = None,
+        limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse:
+        """
+        Get all child segments of a specified segment
+
+        Parameters
+        ----------
+        dataset_id : str
+            Knowledge Base ID
+
+        document_id : str
+            Document ID
+
+        segment_id : str
+            Segment ID
+
+        keyword : typing.Optional[str]
+            Search keyword (optional)
+
+        page : typing.Optional[int]
+            Page number (optional, default 1)
+
+        limit : typing.Optional[int]
+            Items per page (optional, default 20, max 100)
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse
+            Successfully retrieved child segment list
+
+        Examples
+        --------
+        import asyncio
+
+        from dify import AsyncDifyApi
+
+        client = AsyncDifyApi(
+            token="YOUR_TOKEN",
+        )
+
+
+        async def main() -> None:
+            await client.segments.query_document_child_segments(
+                dataset_id="dataset_id",
+                document_id="document_id",
+                segment_id="segment_id",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(dataset_id)}/documents/{jsonable_encoder(document_id)}/segments/{jsonable_encoder(segment_id)}/child_chunks",
+            method="GET",
+            params={
+                "keyword": keyword,
+                "page": page,
+                "limit": limit,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    GetDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse,
+                    parse_obj_as(
+                        type_=GetDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def create_document_child_segment(
+        self,
+        dataset_id: str,
+        document_id: str,
+        segment_id: str,
+        *,
+        content: str,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> PostDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse:
+        """
+        Add a new child segment to a specified segment
+
+        Parameters
+        ----------
+        dataset_id : str
+            Knowledge Base ID
+
+        document_id : str
+            Document ID
+
+        segment_id : str
+            Segment ID
+
+        content : str
+            Child segment content
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        PostDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse
+            Successfully created child segment
+
+        Examples
+        --------
+        import asyncio
+
+        from dify import AsyncDifyApi
+
+        client = AsyncDifyApi(
+            token="YOUR_TOKEN",
+        )
+
+
+        async def main() -> None:
+            await client.segments.create_document_child_segment(
+                dataset_id="dataset_id",
+                document_id="document_id",
+                segment_id="segment_id",
+                content="content",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(dataset_id)}/documents/{jsonable_encoder(document_id)}/segments/{jsonable_encoder(segment_id)}/child_chunks",
+            method="POST",
+            json={
+                "content": content,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    PostDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse,
+                    parse_obj_as(
+                        type_=PostDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def delete_document_child_segment(
+        self,
+        dataset_id: str,
+        document_id: str,
+        segment_id: str,
+        child_chunk_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> DeleteDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse:
+        """
+        Delete a specified document child segment
+
+        Parameters
+        ----------
+        dataset_id : str
+            Knowledge Base ID
+
+        document_id : str
+            Document ID
+
+        segment_id : str
+            Segment ID
+
+        child_chunk_id : str
+            Child Segment ID
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        DeleteDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse
+            Successfully deleted child segment
+
+        Examples
+        --------
+        import asyncio
+
+        from dify import AsyncDifyApi
+
+        client = AsyncDifyApi(
+            token="YOUR_TOKEN",
+        )
+
+
+        async def main() -> None:
+            await client.segments.delete_document_child_segment(
+                dataset_id="dataset_id",
+                document_id="document_id",
+                segment_id="segment_id",
+                child_chunk_id="child_chunk_id",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(dataset_id)}/documents/{jsonable_encoder(document_id)}/segments/{jsonable_encoder(segment_id)}/child_chunks/{jsonable_encoder(child_chunk_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    DeleteDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse,
+                    parse_obj_as(
+                        type_=DeleteDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def update_document_child_segment(
+        self,
+        dataset_id: str,
+        document_id: str,
+        segment_id: str,
+        child_chunk_id: str,
+        *,
+        content: str,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> PatchDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse:
+        """
+        Update a specified document child segment
+
+        Parameters
+        ----------
+        dataset_id : str
+            Knowledge Base ID
+
+        document_id : str
+            Document ID
+
+        segment_id : str
+            Segment ID
+
+        child_chunk_id : str
+            Child Segment ID
+
+        content : str
+            Child segment content
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        PatchDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse
+            Successfully updated child segment
+
+        Examples
+        --------
+        import asyncio
+
+        from dify import AsyncDifyApi
+
+        client = AsyncDifyApi(
+            token="YOUR_TOKEN",
+        )
+
+
+        async def main() -> None:
+            await client.segments.update_document_child_segment(
+                dataset_id="dataset_id",
+                document_id="document_id",
+                segment_id="segment_id",
+                child_chunk_id="child_chunk_id",
+                content="content",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(dataset_id)}/documents/{jsonable_encoder(document_id)}/segments/{jsonable_encoder(segment_id)}/child_chunks/{jsonable_encoder(child_chunk_id)}",
+            method="PATCH",
+            json={
+                "content": content,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    PatchDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse,
+                    parse_obj_as(
+                        type_=PatchDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

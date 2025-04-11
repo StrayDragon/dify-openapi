@@ -2,8 +2,8 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
-from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class GetParametersResponseAnnotationReply(UniversalBaseModel):
@@ -11,7 +11,25 @@ class GetParametersResponseAnnotationReply(UniversalBaseModel):
     Annotation reply settings
     """
 
-    enabled: typing.Optional[bool] = None
+    enabled: typing.Optional[bool] = pydantic.Field(default=None)
+    """
+    Whether annotation reply is enabled
+    """
+
+    score_threshold: typing.Optional[float] = pydantic.Field(default=None)
+    """
+    Similarity score threshold
+    """
+
+    embedding_model: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Embedding model
+    """
+
+    embedding_model_provider: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Embedding model provider
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

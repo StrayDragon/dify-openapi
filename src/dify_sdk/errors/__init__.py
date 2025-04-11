@@ -7,6 +7,7 @@ from .forbidden_error import ForbiddenError
 from .internal_server_error import InternalServerError
 from .not_found_error import NotFoundError
 from .service_unavailable_error import ServiceUnavailableError
+from .unauthorized_error import UnauthorizedError
 from .unsupported_media_type_error import UnsupportedMediaTypeError
 
 __all__ = [
@@ -17,5 +18,6 @@ __all__ = [
     "InternalServerError",
     "NotFoundError",
     "ServiceUnavailableError",
+    "UnauthorizedError",
     "UnsupportedMediaTypeError",
 ]

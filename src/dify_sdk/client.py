@@ -8,6 +8,7 @@ from .datasets.client import DatasetsClient
 from .documents.client import DocumentsClient
 from .segments.client import SegmentsClient
 from .metadata.client import MetadataClient
+from .models.client import ModelsClient
 from .types.post_completion_messages_request_inputs import (
     PostCompletionMessagesRequestInputs,
 )
@@ -49,14 +50,48 @@ from .types.get_messages_response import GetMessagesResponse
 from .types.post_messages_message_id_feedbacks_response import (
     PostMessagesMessageIdFeedbacksResponse,
 )
+from .types.get_messages_message_id_suggested_response import (
+    GetMessagesMessageIdSuggestedResponse,
+)
 from .types.post_audio_to_text_response import PostAudioToTextResponse
 from .types.get_info_response import GetInfoResponse
 from .types.get_parameters_response import GetParametersResponse
+from .types.get_meta_response import GetMetaResponse
+from .types.get_apps_annotations_response import GetAppsAnnotationsResponse
+from .types.post_apps_annotations_response import PostAppsAnnotationsResponse
+from .types.put_apps_annotations_annotation_id_response import (
+    PutAppsAnnotationsAnnotationIdResponse,
+)
+from .types.delete_apps_annotations_annotation_id_response import (
+    DeleteAppsAnnotationsAnnotationIdResponse,
+)
+from .types.post_apps_annotation_reply_action_request_action import (
+    PostAppsAnnotationReplyActionRequestAction,
+)
+from .types.post_apps_annotation_reply_action_response import (
+    PostAppsAnnotationReplyActionResponse,
+)
+from .types.get_apps_annotation_reply_action_status_job_id_request_action import (
+    GetAppsAnnotationReplyActionStatusJobIdRequestAction,
+)
+from .types.get_apps_annotation_reply_action_status_job_id_response import (
+    GetAppsAnnotationReplyActionStatusJobIdResponse,
+)
+from .types.get_workflows_run_workflow_run_id_response import (
+    GetWorkflowsRunWorkflowRunIdResponse,
+)
+from .errors.unauthorized_error import UnauthorizedError
+from .types.post_workflows_tasks_task_id_stop_response import (
+    PostWorkflowsTasksTaskIdStopResponse,
+)
+from .types.get_workflows_logs_request_status import GetWorkflowsLogsRequestStatus
+from .types.get_workflows_logs_response import GetWorkflowsLogsResponse
 from .core.client_wrapper import AsyncClientWrapper
 from .datasets.client import AsyncDatasetsClient
 from .documents.client import AsyncDocumentsClient
 from .segments.client import AsyncSegmentsClient
 from .metadata.client import AsyncMetadataClient
+from .models.client import AsyncModelsClient
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -124,6 +159,7 @@ class DifyApi:
         self.documents = DocumentsClient(client_wrapper=self._client_wrapper)
         self.segments = SegmentsClient(client_wrapper=self._client_wrapper)
         self.metadata = MetadataClient(client_wrapper=self._client_wrapper)
+        self.models = ModelsClient(client_wrapper=self._client_wrapper)
 
     def send_message_text_generation_app(
         self,
@@ -363,7 +399,7 @@ class DifyApi:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def run_workflow_workflow_app(
+    def execute_workflow(
         self,
         *,
         inputs: typing.Dict[str, typing.Optional[typing.Any]],
@@ -373,12 +409,12 @@ class DifyApi:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowMessage:
         """
-        Execute workflow; cannot be executed without a published workflow
+        Execute a workflow. Cannot be executed if there is no published workflow.
 
         Parameters
         ----------
         inputs : typing.Dict[str, typing.Optional[typing.Any]]
-            Workflow input parameters. The inputs parameter contains multiple key/value pairs, where each key corresponds to a specific variable and each value is the value for that variable. Variables can be file list type. If the variable is a file list type, the corresponding value should be in list format, with each element containing the following: type, transfer_method, etc.
+            Workflow input parameters
 
         response_mode : PostWorkflowsRunRequestResponseMode
             Response mode
@@ -403,7 +439,7 @@ class DifyApi:
         client = DifyApi(
             token="YOUR_TOKEN",
         )
-        client.run_workflow_workflow_app(
+        client.execute_workflow(
             inputs={"key": "value"},
             response_mode="streaming",
             user="user",
@@ -920,6 +956,66 @@ class DifyApi:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    def get_suggested_questions(
+        self,
+        message_id: str,
+        *,
+        user: str,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetMessagesMessageIdSuggestedResponse:
+        """
+        Get suggested questions for the next round
+
+        Parameters
+        ----------
+        message_id : str
+            Message ID
+
+        user : str
+            User identifier, defined by the developer, must be unique within the application
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetMessagesMessageIdSuggestedResponse
+            Successfully retrieved suggested questions
+
+        Examples
+        --------
+        from dify import DifyApi
+
+        client = DifyApi(
+            token="YOUR_TOKEN",
+        )
+        client.get_suggested_questions(
+            message_id="message_id",
+            user="user",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"messages/{jsonable_encoder(message_id)}/suggested",
+            method="GET",
+            params={
+                "user": user,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    GetMessagesMessageIdSuggestedResponse,
+                    parse_obj_as(
+                        type_=GetMessagesMessageIdSuggestedResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
     def audio_to_text(
         self,
         *,
@@ -1117,6 +1213,727 @@ class DifyApi:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    def get_app_meta_information(self, *, request_options: typing.Optional[RequestOptions] = None) -> GetMetaResponse:
+        """
+        Used to get tool icons
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetMetaResponse
+            Successful response
+
+        Examples
+        --------
+        from dify import DifyApi
+
+        client = DifyApi(
+            token="YOUR_TOKEN",
+        )
+        client.get_app_meta_information()
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "meta",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    GetMetaResponse,
+                    parse_obj_as(
+                        type_=GetMetaResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def get_annotation_list(
+        self,
+        *,
+        page: typing.Optional[int] = None,
+        limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetAppsAnnotationsResponse:
+        """
+        Get the list of annotations for the application
+
+        Parameters
+        ----------
+        page : typing.Optional[int]
+            Page number
+
+        limit : typing.Optional[int]
+            Items per page
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetAppsAnnotationsResponse
+            Successfully retrieved annotation list
+
+        Examples
+        --------
+        from dify import DifyApi
+
+        client = DifyApi(
+            token="YOUR_TOKEN",
+        )
+        client.get_annotation_list()
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "apps/annotations",
+            method="GET",
+            params={
+                "page": page,
+                "limit": limit,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    GetAppsAnnotationsResponse,
+                    parse_obj_as(
+                        type_=GetAppsAnnotationsResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def create_annotation(
+        self,
+        *,
+        question: str,
+        answer: str,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> PostAppsAnnotationsResponse:
+        """
+        Create a new annotation
+
+        Parameters
+        ----------
+        question : str
+            Question
+
+        answer : str
+            Answer
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        PostAppsAnnotationsResponse
+            Successfully created annotation
+
+        Examples
+        --------
+        from dify import DifyApi
+
+        client = DifyApi(
+            token="YOUR_TOKEN",
+        )
+        client.create_annotation(
+            question="question",
+            answer="answer",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "apps/annotations",
+            method="POST",
+            json={
+                "question": question,
+                "answer": answer,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    PostAppsAnnotationsResponse,
+                    parse_obj_as(
+                        type_=PostAppsAnnotationsResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def update_annotation(
+        self,
+        annotation_id: str,
+        *,
+        question: str,
+        answer: str,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> PutAppsAnnotationsAnnotationIdResponse:
+        """
+        Update a specific annotation
+
+        Parameters
+        ----------
+        annotation_id : str
+            Annotation ID
+
+        question : str
+            Question
+
+        answer : str
+            Answer
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        PutAppsAnnotationsAnnotationIdResponse
+            Successfully updated annotation
+
+        Examples
+        --------
+        from dify import DifyApi
+
+        client = DifyApi(
+            token="YOUR_TOKEN",
+        )
+        client.update_annotation(
+            annotation_id="annotation_id",
+            question="question",
+            answer="answer",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"apps/annotations/{jsonable_encoder(annotation_id)}",
+            method="PUT",
+            json={
+                "question": question,
+                "answer": answer,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    PutAppsAnnotationsAnnotationIdResponse,
+                    parse_obj_as(
+                        type_=PutAppsAnnotationsAnnotationIdResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def delete_annotation(
+        self,
+        annotation_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> DeleteAppsAnnotationsAnnotationIdResponse:
+        """
+        Delete a specific annotation
+
+        Parameters
+        ----------
+        annotation_id : str
+            Annotation ID
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        DeleteAppsAnnotationsAnnotationIdResponse
+            Successfully deleted annotation
+
+        Examples
+        --------
+        from dify import DifyApi
+
+        client = DifyApi(
+            token="YOUR_TOKEN",
+        )
+        client.delete_annotation(
+            annotation_id="annotation_id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"apps/annotations/{jsonable_encoder(annotation_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    DeleteAppsAnnotationsAnnotationIdResponse,
+                    parse_obj_as(
+                        type_=DeleteAppsAnnotationsAnnotationIdResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def initialize_annotation_reply_settings(
+        self,
+        action: PostAppsAnnotationReplyActionRequestAction,
+        *,
+        embedding_model_provider: typing.Optional[str] = OMIT,
+        embedding_model: typing.Optional[str] = OMIT,
+        score_threshold: typing.Optional[float] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> PostAppsAnnotationReplyActionResponse:
+        """
+        Enable or disable annotation reply functionality
+
+        Parameters
+        ----------
+        action : PostAppsAnnotationReplyActionRequestAction
+            Action, can only be 'enable' or 'disable'
+
+        embedding_model_provider : typing.Optional[str]
+            Specified embedding model provider, must be configured in the system first, corresponds to the provider field
+
+        embedding_model : typing.Optional[str]
+            Specified embedding model, corresponds to the model field
+
+        score_threshold : typing.Optional[float]
+            Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        PostAppsAnnotationReplyActionResponse
+            Successfully enabled or disabled annotation reply
+
+        Examples
+        --------
+        from dify import DifyApi
+
+        client = DifyApi(
+            token="YOUR_TOKEN",
+        )
+        client.initialize_annotation_reply_settings(
+            action="enable",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"apps/annotation-reply/{jsonable_encoder(action)}",
+            method="POST",
+            json={
+                "embedding_model_provider": embedding_model_provider,
+                "embedding_model": embedding_model,
+                "score_threshold": score_threshold,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    PostAppsAnnotationReplyActionResponse,
+                    parse_obj_as(
+                        type_=PostAppsAnnotationReplyActionResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def check_annotation_reply_settings_status(
+        self,
+        action: GetAppsAnnotationReplyActionStatusJobIdRequestAction,
+        job_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetAppsAnnotationReplyActionStatusJobIdResponse:
+        """
+        Query the status of annotation reply initialization task
+
+        Parameters
+        ----------
+        action : GetAppsAnnotationReplyActionStatusJobIdRequestAction
+            Action, can only be 'enable' or 'disable', and must be consistent with the action in the annotation reply initialization interface
+
+        job_id : str
+            Job ID, returned from the annotation reply initialization interface
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetAppsAnnotationReplyActionStatusJobIdResponse
+            Successfully retrieved job status
+
+        Examples
+        --------
+        from dify import DifyApi
+
+        client = DifyApi(
+            token="YOUR_TOKEN",
+        )
+        client.check_annotation_reply_settings_status(
+            action="enable",
+            job_id="job_id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"apps/annotation-reply/{jsonable_encoder(action)}/status/{jsonable_encoder(job_id)}",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    GetAppsAnnotationReplyActionStatusJobIdResponse,
+                    parse_obj_as(
+                        type_=GetAppsAnnotationReplyActionStatusJobIdResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def get_workflow_execution_status(
+        self,
+        workflow_run_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetWorkflowsRunWorkflowRunIdResponse:
+        """
+        Get the current execution result of a workflow task based on the workflow execution ID
+
+        Parameters
+        ----------
+        workflow_run_id : str
+            Workflow run ID, can be obtained from the streaming response chunks
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetWorkflowsRunWorkflowRunIdResponse
+            Successfully retrieved workflow execution status
+
+        Examples
+        --------
+        from dify import DifyApi
+
+        client = DifyApi(
+            token="YOUR_TOKEN",
+        )
+        client.get_workflow_execution_status(
+            workflow_run_id="workflow_run_id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"workflows/run/{jsonable_encoder(workflow_run_id)}",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    GetWorkflowsRunWorkflowRunIdResponse,
+                    parse_obj_as(
+                        type_=GetWorkflowsRunWorkflowRunIdResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 500:
+                raise InternalServerError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def stop_response(
+        self,
+        task_id: str,
+        *,
+        user: str,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> PostWorkflowsTasksTaskIdStopResponse:
+        """
+        Only supports streaming mode
+
+        Parameters
+        ----------
+        task_id : str
+            Task ID, can be obtained from the streaming response chunks
+
+        user : str
+            User identifier, must be consistent with the user passed in the message sending interface
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        PostWorkflowsTasksTaskIdStopResponse
+            Successfully stopped the response
+
+        Examples
+        --------
+        from dify import DifyApi
+
+        client = DifyApi(
+            token="YOUR_TOKEN",
+        )
+        client.stop_response(
+            task_id="task_id",
+            user="user",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"workflows/tasks/{jsonable_encoder(task_id)}/stop",
+            method="POST",
+            json={
+                "user": user,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    PostWorkflowsTasksTaskIdStopResponse,
+                    parse_obj_as(
+                        type_=PostWorkflowsTasksTaskIdStopResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 500:
+                raise InternalServerError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def get_workflow_logs(
+        self,
+        *,
+        keyword: typing.Optional[str] = None,
+        status: typing.Optional[GetWorkflowsLogsRequestStatus] = None,
+        page: typing.Optional[int] = None,
+        limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetWorkflowsLogsResponse:
+        """
+        Return workflow logs in reverse order
+
+        Parameters
+        ----------
+        keyword : typing.Optional[str]
+            Keyword
+
+        status : typing.Optional[GetWorkflowsLogsRequestStatus]
+            Execution status: succeeded/failed/stopped
+
+        page : typing.Optional[int]
+            Current page number, default 1
+
+        limit : typing.Optional[int]
+            Items per page, default 20
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetWorkflowsLogsResponse
+            Successfully retrieved workflow logs
+
+        Examples
+        --------
+        from dify import DifyApi
+
+        client = DifyApi(
+            token="YOUR_TOKEN",
+        )
+        client.get_workflow_logs()
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "workflows/logs",
+            method="GET",
+            params={
+                "keyword": keyword,
+                "status": status,
+                "page": page,
+                "limit": limit,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    GetWorkflowsLogsResponse,
+                    parse_obj_as(
+                        type_=GetWorkflowsLogsResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 500:
+                raise InternalServerError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
 
 class AsyncDifyApi:
     """
@@ -1180,6 +1997,7 @@ class AsyncDifyApi:
         self.documents = AsyncDocumentsClient(client_wrapper=self._client_wrapper)
         self.segments = AsyncSegmentsClient(client_wrapper=self._client_wrapper)
         self.metadata = AsyncMetadataClient(client_wrapper=self._client_wrapper)
+        self.models = AsyncModelsClient(client_wrapper=self._client_wrapper)
 
     async def send_message_text_generation_app(
         self,
@@ -1435,7 +2253,7 @@ class AsyncDifyApi:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def run_workflow_workflow_app(
+    async def execute_workflow(
         self,
         *,
         inputs: typing.Dict[str, typing.Optional[typing.Any]],
@@ -1445,12 +2263,12 @@ class AsyncDifyApi:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowMessage:
         """
-        Execute workflow; cannot be executed without a published workflow
+        Execute a workflow. Cannot be executed if there is no published workflow.
 
         Parameters
         ----------
         inputs : typing.Dict[str, typing.Optional[typing.Any]]
-            Workflow input parameters. The inputs parameter contains multiple key/value pairs, where each key corresponds to a specific variable and each value is the value for that variable. Variables can be file list type. If the variable is a file list type, the corresponding value should be in list format, with each element containing the following: type, transfer_method, etc.
+            Workflow input parameters
 
         response_mode : PostWorkflowsRunRequestResponseMode
             Response mode
@@ -1480,7 +2298,7 @@ class AsyncDifyApi:
 
 
         async def main() -> None:
-            await client.run_workflow_workflow_app(
+            await client.execute_workflow(
                 inputs={"key": "value"},
                 response_mode="streaming",
                 user="user",
@@ -2048,6 +2866,74 @@ class AsyncDifyApi:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    async def get_suggested_questions(
+        self,
+        message_id: str,
+        *,
+        user: str,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetMessagesMessageIdSuggestedResponse:
+        """
+        Get suggested questions for the next round
+
+        Parameters
+        ----------
+        message_id : str
+            Message ID
+
+        user : str
+            User identifier, defined by the developer, must be unique within the application
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetMessagesMessageIdSuggestedResponse
+            Successfully retrieved suggested questions
+
+        Examples
+        --------
+        import asyncio
+
+        from dify import AsyncDifyApi
+
+        client = AsyncDifyApi(
+            token="YOUR_TOKEN",
+        )
+
+
+        async def main() -> None:
+            await client.get_suggested_questions(
+                message_id="message_id",
+                user="user",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"messages/{jsonable_encoder(message_id)}/suggested",
+            method="GET",
+            params={
+                "user": user,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    GetMessagesMessageIdSuggestedResponse,
+                    parse_obj_as(
+                        type_=GetMessagesMessageIdSuggestedResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
     async def audio_to_text(
         self,
         *,
@@ -2263,6 +3149,809 @@ class AsyncDifyApi:
                         type_=GetParametersResponse,  # type: ignore
                         object_=_response.json(),
                     ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def get_app_meta_information(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> GetMetaResponse:
+        """
+        Used to get tool icons
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetMetaResponse
+            Successful response
+
+        Examples
+        --------
+        import asyncio
+
+        from dify import AsyncDifyApi
+
+        client = AsyncDifyApi(
+            token="YOUR_TOKEN",
+        )
+
+
+        async def main() -> None:
+            await client.get_app_meta_information()
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "meta",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    GetMetaResponse,
+                    parse_obj_as(
+                        type_=GetMetaResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def get_annotation_list(
+        self,
+        *,
+        page: typing.Optional[int] = None,
+        limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetAppsAnnotationsResponse:
+        """
+        Get the list of annotations for the application
+
+        Parameters
+        ----------
+        page : typing.Optional[int]
+            Page number
+
+        limit : typing.Optional[int]
+            Items per page
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetAppsAnnotationsResponse
+            Successfully retrieved annotation list
+
+        Examples
+        --------
+        import asyncio
+
+        from dify import AsyncDifyApi
+
+        client = AsyncDifyApi(
+            token="YOUR_TOKEN",
+        )
+
+
+        async def main() -> None:
+            await client.get_annotation_list()
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "apps/annotations",
+            method="GET",
+            params={
+                "page": page,
+                "limit": limit,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    GetAppsAnnotationsResponse,
+                    parse_obj_as(
+                        type_=GetAppsAnnotationsResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def create_annotation(
+        self,
+        *,
+        question: str,
+        answer: str,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> PostAppsAnnotationsResponse:
+        """
+        Create a new annotation
+
+        Parameters
+        ----------
+        question : str
+            Question
+
+        answer : str
+            Answer
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        PostAppsAnnotationsResponse
+            Successfully created annotation
+
+        Examples
+        --------
+        import asyncio
+
+        from dify import AsyncDifyApi
+
+        client = AsyncDifyApi(
+            token="YOUR_TOKEN",
+        )
+
+
+        async def main() -> None:
+            await client.create_annotation(
+                question="question",
+                answer="answer",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "apps/annotations",
+            method="POST",
+            json={
+                "question": question,
+                "answer": answer,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    PostAppsAnnotationsResponse,
+                    parse_obj_as(
+                        type_=PostAppsAnnotationsResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def update_annotation(
+        self,
+        annotation_id: str,
+        *,
+        question: str,
+        answer: str,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> PutAppsAnnotationsAnnotationIdResponse:
+        """
+        Update a specific annotation
+
+        Parameters
+        ----------
+        annotation_id : str
+            Annotation ID
+
+        question : str
+            Question
+
+        answer : str
+            Answer
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        PutAppsAnnotationsAnnotationIdResponse
+            Successfully updated annotation
+
+        Examples
+        --------
+        import asyncio
+
+        from dify import AsyncDifyApi
+
+        client = AsyncDifyApi(
+            token="YOUR_TOKEN",
+        )
+
+
+        async def main() -> None:
+            await client.update_annotation(
+                annotation_id="annotation_id",
+                question="question",
+                answer="answer",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"apps/annotations/{jsonable_encoder(annotation_id)}",
+            method="PUT",
+            json={
+                "question": question,
+                "answer": answer,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    PutAppsAnnotationsAnnotationIdResponse,
+                    parse_obj_as(
+                        type_=PutAppsAnnotationsAnnotationIdResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def delete_annotation(
+        self,
+        annotation_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> DeleteAppsAnnotationsAnnotationIdResponse:
+        """
+        Delete a specific annotation
+
+        Parameters
+        ----------
+        annotation_id : str
+            Annotation ID
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        DeleteAppsAnnotationsAnnotationIdResponse
+            Successfully deleted annotation
+
+        Examples
+        --------
+        import asyncio
+
+        from dify import AsyncDifyApi
+
+        client = AsyncDifyApi(
+            token="YOUR_TOKEN",
+        )
+
+
+        async def main() -> None:
+            await client.delete_annotation(
+                annotation_id="annotation_id",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"apps/annotations/{jsonable_encoder(annotation_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    DeleteAppsAnnotationsAnnotationIdResponse,
+                    parse_obj_as(
+                        type_=DeleteAppsAnnotationsAnnotationIdResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def initialize_annotation_reply_settings(
+        self,
+        action: PostAppsAnnotationReplyActionRequestAction,
+        *,
+        embedding_model_provider: typing.Optional[str] = OMIT,
+        embedding_model: typing.Optional[str] = OMIT,
+        score_threshold: typing.Optional[float] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> PostAppsAnnotationReplyActionResponse:
+        """
+        Enable or disable annotation reply functionality
+
+        Parameters
+        ----------
+        action : PostAppsAnnotationReplyActionRequestAction
+            Action, can only be 'enable' or 'disable'
+
+        embedding_model_provider : typing.Optional[str]
+            Specified embedding model provider, must be configured in the system first, corresponds to the provider field
+
+        embedding_model : typing.Optional[str]
+            Specified embedding model, corresponds to the model field
+
+        score_threshold : typing.Optional[float]
+            Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        PostAppsAnnotationReplyActionResponse
+            Successfully enabled or disabled annotation reply
+
+        Examples
+        --------
+        import asyncio
+
+        from dify import AsyncDifyApi
+
+        client = AsyncDifyApi(
+            token="YOUR_TOKEN",
+        )
+
+
+        async def main() -> None:
+            await client.initialize_annotation_reply_settings(
+                action="enable",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"apps/annotation-reply/{jsonable_encoder(action)}",
+            method="POST",
+            json={
+                "embedding_model_provider": embedding_model_provider,
+                "embedding_model": embedding_model,
+                "score_threshold": score_threshold,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    PostAppsAnnotationReplyActionResponse,
+                    parse_obj_as(
+                        type_=PostAppsAnnotationReplyActionResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def check_annotation_reply_settings_status(
+        self,
+        action: GetAppsAnnotationReplyActionStatusJobIdRequestAction,
+        job_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetAppsAnnotationReplyActionStatusJobIdResponse:
+        """
+        Query the status of annotation reply initialization task
+
+        Parameters
+        ----------
+        action : GetAppsAnnotationReplyActionStatusJobIdRequestAction
+            Action, can only be 'enable' or 'disable', and must be consistent with the action in the annotation reply initialization interface
+
+        job_id : str
+            Job ID, returned from the annotation reply initialization interface
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetAppsAnnotationReplyActionStatusJobIdResponse
+            Successfully retrieved job status
+
+        Examples
+        --------
+        import asyncio
+
+        from dify import AsyncDifyApi
+
+        client = AsyncDifyApi(
+            token="YOUR_TOKEN",
+        )
+
+
+        async def main() -> None:
+            await client.check_annotation_reply_settings_status(
+                action="enable",
+                job_id="job_id",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"apps/annotation-reply/{jsonable_encoder(action)}/status/{jsonable_encoder(job_id)}",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    GetAppsAnnotationReplyActionStatusJobIdResponse,
+                    parse_obj_as(
+                        type_=GetAppsAnnotationReplyActionStatusJobIdResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def get_workflow_execution_status(
+        self,
+        workflow_run_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetWorkflowsRunWorkflowRunIdResponse:
+        """
+        Get the current execution result of a workflow task based on the workflow execution ID
+
+        Parameters
+        ----------
+        workflow_run_id : str
+            Workflow run ID, can be obtained from the streaming response chunks
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetWorkflowsRunWorkflowRunIdResponse
+            Successfully retrieved workflow execution status
+
+        Examples
+        --------
+        import asyncio
+
+        from dify import AsyncDifyApi
+
+        client = AsyncDifyApi(
+            token="YOUR_TOKEN",
+        )
+
+
+        async def main() -> None:
+            await client.get_workflow_execution_status(
+                workflow_run_id="workflow_run_id",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"workflows/run/{jsonable_encoder(workflow_run_id)}",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    GetWorkflowsRunWorkflowRunIdResponse,
+                    parse_obj_as(
+                        type_=GetWorkflowsRunWorkflowRunIdResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 500:
+                raise InternalServerError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def stop_response(
+        self,
+        task_id: str,
+        *,
+        user: str,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> PostWorkflowsTasksTaskIdStopResponse:
+        """
+        Only supports streaming mode
+
+        Parameters
+        ----------
+        task_id : str
+            Task ID, can be obtained from the streaming response chunks
+
+        user : str
+            User identifier, must be consistent with the user passed in the message sending interface
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        PostWorkflowsTasksTaskIdStopResponse
+            Successfully stopped the response
+
+        Examples
+        --------
+        import asyncio
+
+        from dify import AsyncDifyApi
+
+        client = AsyncDifyApi(
+            token="YOUR_TOKEN",
+        )
+
+
+        async def main() -> None:
+            await client.stop_response(
+                task_id="task_id",
+                user="user",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"workflows/tasks/{jsonable_encoder(task_id)}/stop",
+            method="POST",
+            json={
+                "user": user,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    PostWorkflowsTasksTaskIdStopResponse,
+                    parse_obj_as(
+                        type_=PostWorkflowsTasksTaskIdStopResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 500:
+                raise InternalServerError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def get_workflow_logs(
+        self,
+        *,
+        keyword: typing.Optional[str] = None,
+        status: typing.Optional[GetWorkflowsLogsRequestStatus] = None,
+        page: typing.Optional[int] = None,
+        limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetWorkflowsLogsResponse:
+        """
+        Return workflow logs in reverse order
+
+        Parameters
+        ----------
+        keyword : typing.Optional[str]
+            Keyword
+
+        status : typing.Optional[GetWorkflowsLogsRequestStatus]
+            Execution status: succeeded/failed/stopped
+
+        page : typing.Optional[int]
+            Current page number, default 1
+
+        limit : typing.Optional[int]
+            Items per page, default 20
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetWorkflowsLogsResponse
+            Successfully retrieved workflow logs
+
+        Examples
+        --------
+        import asyncio
+
+        from dify import AsyncDifyApi
+
+        client = AsyncDifyApi(
+            token="YOUR_TOKEN",
+        )
+
+
+        async def main() -> None:
+            await client.get_workflow_logs()
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "workflows/logs",
+            method="GET",
+            params={
+                "keyword": keyword,
+                "status": status,
+                "page": page,
+                "limit": limit,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    GetWorkflowsLogsResponse,
+                    parse_obj_as(
+                        type_=GetWorkflowsLogsResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 500:
+                raise InternalServerError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
                 )
             _response_json = _response.json()
         except JSONDecodeError:

@@ -19,10 +19,6 @@ actions:
     update:
       description: "Custom API server URL"
 
-  - target: $.servers[2]
-    update:
-      description: "dify-openapi project API development server"
-
   - target: $.components.schemas.Error.properties.code
     update:
       description: "Error code"
@@ -102,6 +98,94 @@ actions:
   - target: $.components.schemas.Dataset.properties.embedding_available
     update:
       description: "Whether embedding is available"
+
+  - target: $.components.schemas.Dataset.properties.retrieval_model_dict
+    update:
+      description: "Retrieval model configuration"
+
+  - target: $.components.schemas.Dataset.properties.retrieval_model_dict.properties.search_method
+    update:
+      description: "Search method"
+
+  - target: $.components.schemas.Dataset.properties.retrieval_model_dict.properties.reranking_enable
+    update:
+      description: "Whether reranking is enabled"
+
+  - target: $.components.schemas.Dataset.properties.retrieval_model_dict.properties.reranking_mode
+    update:
+      description: "Reranking mode"
+
+  - target: $.components.schemas.Dataset.properties.retrieval_model_dict.properties.reranking_model
+    update:
+      description: "Reranking model"
+
+  - target: $.components.schemas.Dataset.properties.retrieval_model_dict.properties.reranking_model.properties.reranking_provider_name
+    update:
+      description: "Reranking model provider"
+
+  - target: $.components.schemas.Dataset.properties.retrieval_model_dict.properties.reranking_model.properties.reranking_model_name
+    update:
+      description: "Reranking model name"
+
+  - target: $.components.schemas.Dataset.properties.retrieval_model_dict.properties.weights
+    update:
+      description: "Weights"
+
+  - target: $.components.schemas.Dataset.properties.retrieval_model_dict.properties.top_k
+    update:
+      description: "Number of results to return"
+
+  - target: $.components.schemas.Dataset.properties.retrieval_model_dict.properties.score_threshold_enabled
+    update:
+      description: "Whether score threshold is enabled"
+
+  - target: $.components.schemas.Dataset.properties.retrieval_model_dict.properties.score_threshold
+    update:
+      description: "Score threshold"
+
+  - target: $.components.schemas.Dataset.properties.tags
+    update:
+      description: "Tags list"
+
+  - target: $.components.schemas.Dataset.properties.doc_form
+    update:
+      description: "Document form"
+
+  - target: $.components.schemas.Dataset.properties.external_knowledge_info
+    update:
+      description: "External knowledge information"
+
+  - target: $.components.schemas.Dataset.properties.external_knowledge_info.properties.external_knowledge_id
+    update:
+      description: "External knowledge ID"
+
+  - target: $.components.schemas.Dataset.properties.external_knowledge_info.properties.external_knowledge_api_id
+    update:
+      description: "External knowledge API ID"
+
+  - target: $.components.schemas.Dataset.properties.external_knowledge_info.properties.external_knowledge_api_name
+    update:
+      description: "External knowledge API name"
+
+  - target: $.components.schemas.Dataset.properties.external_knowledge_info.properties.external_knowledge_api_endpoint
+    update:
+      description: "External knowledge API endpoint"
+
+  - target: $.components.schemas.Dataset.properties.external_retrieval_model
+    update:
+      description: "External retrieval model"
+
+  - target: $.components.schemas.Dataset.properties.external_retrieval_model.properties.top_k
+    update:
+      description: "Number of results to return"
+
+  - target: $.components.schemas.Dataset.properties.external_retrieval_model.properties.score_threshold
+    update:
+      description: "Score threshold"
+
+  - target: $.components.schemas.Dataset.properties.external_retrieval_model.properties.score_threshold_enabled
+    update:
+      description: "Whether score threshold is enabled"
 
   - target: $.components.schemas.DatasetList.properties.has_more
     update:
@@ -530,6 +614,53 @@ actions:
       summary: "Get Knowledge Base List"
       description: "Get a list of all knowledge bases"
 
+  - target: $.paths['/datasets/{dataset_id}'].get
+    update:
+      summary: "View Knowledge Base Details"
+      description: "Get detailed information about a specific knowledge base"
+
+  - target: $.paths['/datasets/{dataset_id}'].get.parameters[0].description
+    update: "Knowledge Base ID"
+
+  - target: $.paths['/datasets/{dataset_id}'].get.responses['200'].description
+    update: "Successfully retrieved knowledge base details"
+
+  - target: $.paths['/datasets/{dataset_id}'].patch
+    update:
+      summary: "Update Knowledge Base Details"
+      description: "Modify details of a specific knowledge base"
+
+  - target: $.paths['/datasets/{dataset_id}'].patch.parameters[0].description
+    update: "Knowledge Base ID"
+
+  - target: $.paths['/datasets/{dataset_id}'].patch.requestBody.content['application/json'].schema.properties.indexing_technique.description
+    update: |
+      Indexing mode (optional, recommended)
+      - high_quality: High quality
+      - economy: Economy
+
+  - target: $.paths['/datasets/{dataset_id}'].patch.requestBody.content['application/json'].schema.properties.permission.description
+    update: |
+      Permission (optional, default only_me)
+      - only_me: Only me
+      - all_team_members: All team members
+      - partial_members: Partial team members
+
+  - target: $.paths['/datasets/{dataset_id}'].patch.requestBody.content['application/json'].schema.properties.embedding_model_provider.description
+    update: "Embedding model provider (optional), must be configured in the system first, corresponds to the provider field"
+
+  - target: $.paths['/datasets/{dataset_id}'].patch.requestBody.content['application/json'].schema.properties.embedding_model.description
+    update: "Embedding model (optional)"
+
+  - target: $.paths['/datasets/{dataset_id}'].patch.requestBody.content['application/json'].schema.properties.retrieval_model.description
+    update: "Retrieval model (optional)"
+
+  - target: $.paths['/datasets/{dataset_id}'].patch.requestBody.content['application/json'].schema.properties.partial_member_list.description
+    update: "Partial team members ID list (optional)"
+
+  - target: $.paths['/datasets/{dataset_id}'].patch.responses['200'].description
+    update: "Successfully updated knowledge base details"
+
   - target: $.paths['/datasets/{dataset_id}'].delete
     update:
       summary: "Delete Knowledge Base"
@@ -589,6 +720,107 @@ actions:
     update:
       summary: "Delete Document Segment"
       description: "Delete specified document segment"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks'].post
+    update:
+      summary: "Create Document Child Segment"
+      description: "Add a new child segment to a specified segment"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks'].post.parameters[0].description
+    update: "Knowledge Base ID"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks'].post.parameters[1].description
+    update: "Document ID"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks'].post.parameters[2].description
+    update: "Segment ID"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks'].post.requestBody.content['application/json'].schema.properties.content.description
+    update: "Child segment content"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks'].post.responses['200'].description
+    update: "Successfully created child segment"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks'].get
+    update:
+      summary: "Query Document Child Segments"
+      description: "Get all child segments of a specified segment"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks'].get.parameters[0].description
+    update: "Knowledge Base ID"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks'].get.parameters[1].description
+    update: "Document ID"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks'].get.parameters[2].description
+    update: "Segment ID"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks'].get.parameters[3].description
+    update: "Search keyword (optional)"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks'].get.parameters[4].description
+    update: "Page number (optional, default 1)"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks'].get.parameters[5].description
+    update: "Items per page (optional, default 20, max 100)"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks'].get.responses['200'].description
+    update: "Successfully retrieved child segment list"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks'].get.responses['200'].content['application/json'].schema.properties.total.description
+    update: "Total record count"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks'].get.responses['200'].content['application/json'].schema.properties.total_pages.description
+    update: "Total pages"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks'].get.responses['200'].content['application/json'].schema.properties.page.description
+    update: "Current page number"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks'].get.responses['200'].content['application/json'].schema.properties.limit.description
+    update: "Items per page"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks/{child_chunk_id}'].delete
+    update:
+      summary: "Delete Document Child Segment"
+      description: "Delete a specified document child segment"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks/{child_chunk_id}'].delete.responses['200'].description
+    update: "Successfully deleted child segment"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks/{child_chunk_id}'].delete.parameters[0].description
+    update: "Knowledge Base ID"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks/{child_chunk_id}'].delete.parameters[1].description
+    update: "Document ID"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks/{child_chunk_id}'].delete.parameters[2].description
+    update: "Segment ID"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks/{child_chunk_id}'].delete.parameters[3].description
+    update: "Child Segment ID"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks/{child_chunk_id}'].patch
+    update:
+      summary: "Update Document Child Segment"
+      description: "Update a specified document child segment"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks/{child_chunk_id}'].patch.responses['200'].description
+    update: "Successfully updated child segment"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks/{child_chunk_id}'].patch.parameters[0].description
+    update: "Knowledge Base ID"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks/{child_chunk_id}'].patch.parameters[1].description
+    update: "Document ID"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks/{child_chunk_id}'].patch.parameters[2].description
+    update: "Segment ID"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks/{child_chunk_id}'].patch.parameters[3].description
+    update: "Child Segment ID"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks/{child_chunk_id}'].patch.requestBody.content['application/json'].schema.properties.content.description
+    update: "Child segment content"
 
   - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}'].post
     update:
@@ -1136,3 +1368,163 @@ actions:
   - target: $.components.schemas.ProcessRule.properties.rules.properties.segmentation.properties.chunk_overlap
     update:
       description: "Segment overlap"
+
+  - target: $.paths['/workspaces/current/models/model-types/text-embedding'].get
+    update:
+      summary: "Get Embedding Model List"
+      description: "Get a list of available embedding models for the current workspace"
+      responses:
+        '200':
+          description: "Successfully retrieved embedding model list"
+
+  - target: $.components.schemas.ChildChunk.properties.id
+    update:
+      description: "Child segment ID"
+
+  - target: $.components.schemas.ChildChunk.properties.segment_id
+    update:
+      description: "Parent segment ID"
+
+  - target: $.components.schemas.ChildChunk.properties.content
+    update:
+      description: "Child segment content"
+
+  - target: $.components.schemas.ChildChunk.properties.word_count
+    update:
+      description: "Word count"
+
+  - target: $.components.schemas.ChildChunk.properties.tokens
+    update:
+      description: "Token count"
+
+  - target: $.components.schemas.ChildChunk.properties.index_node_id
+    update:
+      description: "Index node ID"
+
+  - target: $.components.schemas.ChildChunk.properties.index_node_hash
+    update:
+      description: "Index node hash"
+
+  - target: $.components.schemas.ChildChunk.properties.status
+    update:
+      description: "Status"
+
+  - target: $.components.schemas.ChildChunk.properties.created_by
+    update:
+      description: "Creator"
+
+  - target: $.components.schemas.ChildChunk.properties.created_at
+    update:
+      description: "Creation timestamp"
+
+  - target: $.components.schemas.ChildChunk.properties.indexing_at
+    update:
+      description: "Indexing timestamp"
+
+  - target: $.components.schemas.ChildChunk.properties.completed_at
+    update:
+      description: "Completion timestamp"
+
+  - target: $.components.schemas.ChildChunk.properties.error
+    update:
+      description: "Error message"
+
+  - target: $.components.schemas.ChildChunk.properties.stopped_at
+    update:
+      description: "Stop timestamp"
+
+  - target: $.components.schemas.EmbeddingModel.properties.provider
+    update:
+      description: "Model provider"
+
+  - target: $.components.schemas.EmbeddingModel.properties.label
+    update:
+      description: "Model label"
+
+  - target: $.components.schemas.EmbeddingModel.properties.label.properties.zh_Hans
+    update:
+      description: "Chinese label"
+
+  - target: $.components.schemas.EmbeddingModel.properties.label.properties.en_US
+    update:
+      description: "English label"
+
+  - target: $.components.schemas.EmbeddingModel.properties.icon_small
+    update:
+      description: "Small icon"
+
+  - target: $.components.schemas.EmbeddingModel.properties.icon_small.properties.zh_Hans
+    update:
+      description: "Chinese small icon"
+
+  - target: $.components.schemas.EmbeddingModel.properties.icon_small.properties.en_US
+    update:
+      description: "English small icon"
+
+  - target: $.components.schemas.EmbeddingModel.properties.icon_large
+    update:
+      description: "Large icon"
+
+  - target: $.components.schemas.EmbeddingModel.properties.icon_large.properties.zh_Hans
+    update:
+      description: "Chinese large icon"
+
+  - target: $.components.schemas.EmbeddingModel.properties.icon_large.properties.en_US
+    update:
+      description: "English large icon"
+
+  - target: $.components.schemas.EmbeddingModel.properties.status
+    update:
+      description: "Status"
+
+  - target: $.components.schemas.EmbeddingModel.properties.models
+    update:
+      description: "Model list"
+
+  - target: $.components.schemas.EmbeddingModel.properties.models.items.properties.model
+    update:
+      description: "Model name"
+
+  - target: $.components.schemas.EmbeddingModel.properties.models.items.properties.label
+    update:
+      description: "Model label"
+
+  - target: $.components.schemas.EmbeddingModel.properties.models.items.properties.label.properties.zh_Hans
+    update:
+      description: "Chinese label"
+
+  - target: $.components.schemas.EmbeddingModel.properties.models.items.properties.label.properties.en_US
+    update:
+      description: "English label"
+
+  - target: $.components.schemas.EmbeddingModel.properties.models.items.properties.model_type
+    update:
+      description: "Model type"
+
+  - target: $.components.schemas.EmbeddingModel.properties.models.items.properties.features
+    update:
+      description: "Features"
+
+  - target: $.components.schemas.EmbeddingModel.properties.models.items.properties.fetch_from
+    update:
+      description: "Fetch source"
+
+  - target: $.components.schemas.EmbeddingModel.properties.models.items.properties.model_properties
+    update:
+      description: "Model properties"
+
+  - target: $.components.schemas.EmbeddingModel.properties.models.items.properties.model_properties.properties.context_size
+    update:
+      description: "Context size"
+
+  - target: $.components.schemas.EmbeddingModel.properties.models.items.properties.deprecated
+    update:
+      description: "Whether deprecated"
+
+  - target: $.components.schemas.EmbeddingModel.properties.models.items.properties.status
+    update:
+      description: "Status"
+
+  - target: $.components.schemas.EmbeddingModel.properties.models.items.properties.load_balancing_enabled
+    update:
+      description: "Whether load balancing is enabled"

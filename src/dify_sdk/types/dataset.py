@@ -6,6 +6,9 @@ import pydantic
 from .dataset_provider import DatasetProvider
 from .dataset_permission import DatasetPermission
 from .dataset_indexing_technique import DatasetIndexingTechnique
+from .dataset_retrieval_model_dict import DatasetRetrievalModelDict
+from .dataset_external_knowledge_info import DatasetExternalKnowledgeInfo
+from .dataset_external_retrieval_model import DatasetExternalRetrievalModel
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
@@ -93,6 +96,31 @@ class Dataset(UniversalBaseModel):
     embedding_available: typing.Optional[bool] = pydantic.Field(default=None)
     """
     Whether embedding is available
+    """
+
+    retrieval_model_dict: typing.Optional[DatasetRetrievalModelDict] = pydantic.Field(default=None)
+    """
+    Retrieval model configuration
+    """
+
+    tags: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    """
+    Tags list
+    """
+
+    doc_form: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Document form
+    """
+
+    external_knowledge_info: typing.Optional[DatasetExternalKnowledgeInfo] = pydantic.Field(default=None)
+    """
+    External knowledge information
+    """
+
+    external_retrieval_model: typing.Optional[DatasetExternalRetrievalModel] = pydantic.Field(default=None)
+    """
+    External retrieval model
     """
 
     if IS_PYDANTIC_V2:

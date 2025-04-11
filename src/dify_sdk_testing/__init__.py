@@ -1,11 +1,28 @@
 import dataclasses
 import asyncio
 import os
+import importlib.metadata
+from packaging.version import Version
 
 from dify_sdk.datasets.client import AsyncDatasetsClient
 from dify_sdk.documents.client import AsyncDocumentsClient
 from dify_sdk.metadata.client import AsyncMetadataClient
+from dify_sdk.models.client import AsyncModelsClient
 from dify_sdk.segments.client import AsyncSegmentsClient
+
+
+PROJECT_NAME = "dify-openapi"
+PROJECT_VERSION = importlib.metadata.version(PROJECT_NAME)
+
+
+def postpone_run_in_this_version(target_version: str) -> bool:
+    if not need_skip_run_until_this_version(target_version):
+        raise Exception("This version need run this logic or remove this check!")
+    return False
+
+
+def need_skip_run_until_this_version(target_version: str) -> bool:
+    return Version(target_version) > Version(PROJECT_VERSION)
 
 
 RUNNING_IN_CI = any(
@@ -21,6 +38,7 @@ class KnowledgeBaseClient:
     document: AsyncDocumentsClient
     segment: AsyncSegmentsClient
     metadata: AsyncMetadataClient
+    models: AsyncModelsClient
 
 
 async def wait_for_document_indexing_completed(

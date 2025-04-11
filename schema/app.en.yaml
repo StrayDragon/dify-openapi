@@ -5,7 +5,7 @@ info:
     Dify API provides a series of interfaces for text generation, conversation, and workflow functionality.
     It supports text generation applications, conversational applications, workflow applications, and advanced conversational applications.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
-  version: 1.1.3
+  version: 1.2.0
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -14,6 +14,8 @@ servers:
       api_url:
         default: 'https://api.dify.ai/v1'
         description: Custom API server URL
+  - url: 'http://ai.urchinet.lan/v1'
+    description: author of dify-openapi dev server
 security:
   - bearerApiKeyAuth: []
 components:
@@ -21,6 +23,31 @@ components:
     bearerApiKeyAuth:
       type: http
       scheme: bearer
+  responses:
+    Error400:
+      description: Request error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error401:
+      description: Non authorized or authentication failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error404:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error500:
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   schemas:
     Error:
       type: object
@@ -320,25 +347,6 @@ components:
         upload_file_id:
           type: string
           description: Upload file ID
-  responses:
-    Error400:
-      description: Request error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Error404:
-      description: Resource not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Error500:
-      description: Server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
 paths:
   /completion-messages:
     post:
@@ -453,8 +461,8 @@ paths:
           $ref: '#/components/responses/Error500'
   /workflows/run:
     post:
-      summary: Run Workflow (Workflow App)
-      description: Execute workflow; cannot be executed without a published workflow
+      summary: Execute Workflow
+      description: Execute a workflow. Cannot be executed if there is no published workflow.
       requestBody:
         required: true
         content:
@@ -468,7 +476,7 @@ paths:
               properties:
                 inputs:
                   type: object
-                  description: 'Workflow input parameters. The inputs parameter contains multiple key/value pairs, where each key corresponds to a specific variable and each value is the value for that variable. Variables can be file list type. If the variable is a file list type, the corresponding value should be in list format, with each element containing the following: type, transfer_method, etc.'
+                  description: Workflow input parameters
                 response_mode:
                   type: string
                   enum:
@@ -754,6 +762,39 @@ paths:
                     type: string
                     enum:
                       - success
+  '/messages/{message_id}/suggested':
+    get:
+      summary: Get Suggested Questions
+      description: Get suggested questions for the next round
+      parameters:
+        - name: message_id
+          in: path
+          description: Message ID
+          required: true
+          schema:
+            type: string
+        - name: user
+          in: query
+          description: 'User identifier, defined by the developer, must be unique within the application'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved suggested questions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    description: Fixed return value 'success'
+                  data:
+                    type: array
+                    description: List of suggested questions
+                    items:
+                      type: string
   /audio-to-text:
     post:
       summary: Audio to Text
@@ -872,10 +913,20 @@ paths:
                     description: Citation and attribution settings
                   annotation_reply:
                     type: object
+                    description: Annotation reply settings
                     properties:
                       enabled:
                         type: boolean
-                    description: Annotation reply settings
+                        description: Whether annotation reply is enabled
+                      score_threshold:
+                        type: number
+                        description: Similarity score threshold
+                      embedding_model:
+                        type: string
+                        description: Embedding model
+                      embedding_model_provider:
+                        type: string
+                        description: Embedding model provider
                   user_input_form:
                     type: array
                     items:
@@ -887,4 +938,530 @@ paths:
                   system_parameters:
                     type: object
                     description: System parameters
+  /meta:
+    get:
+      summary: Get App Meta Information
+      description: Used to get tool icons
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tool_icons:
+                    type: object
+                    description: Tool icons
+                    additionalProperties:
+                      oneOf:
+                        - type: object
+                          properties:
+                            background:
+                              type: string
+                              description: Background color in hex format
+                            content:
+                              type: string
+                              description: Emoji
+                        - type: string
+                          description: Icon URL
+  /apps/annotations:
+    get:
+      summary: Get Annotation List
+      description: Get the list of annotations for the application
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Items per page
+          required: false
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Successfully retrieved annotation list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Annotation ID
+                        question:
+                          type: string
+                          description: Question
+                        answer:
+                          type: string
+                          description: Answer
+                        hit_count:
+                          type: integer
+                          description: Hit count
+                        created_at:
+                          type: integer
+                          description: Creation timestamp
+                  has_more:
+                    type: boolean
+                    description: Whether there is more data
+                  limit:
+                    type: integer
+                    description: Items per page
+                  total:
+                    type: integer
+                    description: Total record count
+                  page:
+                    type: integer
+                    description: Current page number
+    post:
+      summary: Create Annotation
+      description: Create a new annotation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - question
+                - answer
+              properties:
+                question:
+                  type: string
+                  description: Question
+                answer:
+                  type: string
+                  description: Answer
+      responses:
+        '200':
+          description: Successfully created annotation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Annotation ID
+                  question:
+                    type: string
+                    description: Question
+                  answer:
+                    type: string
+                    description: Answer
+                  hit_count:
+                    type: integer
+                    description: Hit count
+                  created_at:
+                    type: integer
+                    description: Creation timestamp
+  '/apps/annotations/{annotation_id}':
+    put:
+      summary: Update Annotation
+      description: Update a specific annotation
+      parameters:
+        - name: annotation_id
+          in: path
+          description: Annotation ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - question
+                - answer
+              properties:
+                question:
+                  type: string
+                  description: Question
+                answer:
+                  type: string
+                  description: Answer
+      responses:
+        '200':
+          description: Successfully updated annotation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Annotation ID
+                  question:
+                    type: string
+                    description: Question
+                  answer:
+                    type: string
+                    description: Answer
+                  hit_count:
+                    type: integer
+                    description: Hit count
+                  created_at:
+                    type: integer
+                    description: Creation timestamp
+    delete:
+      summary: Delete Annotation
+      description: Delete a specific annotation
+      parameters:
+        - name: annotation_id
+          in: path
+          description: Annotation ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully deleted annotation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    enum:
+                      - success
+  '/apps/annotation-reply/{action}':
+    post:
+      summary: Initialize Annotation Reply Settings
+      description: Enable or disable annotation reply functionality
+      parameters:
+        - name: action
+          in: path
+          description: 'Action, can only be ''enable'' or ''disable'''
+          required: true
+          schema:
+            type: string
+            enum:
+              - enable
+              - disable
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                embedding_model_provider:
+                  type: string
+                  description: 'Specified embedding model provider, must be configured in the system first, corresponds to the provider field'
+                embedding_model:
+                  type: string
+                  description: 'Specified embedding model, corresponds to the model field'
+                score_threshold:
+                  type: number
+                  description: 'Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply'
+      responses:
+        '200':
+          description: Successfully enabled or disabled annotation reply
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  job_id:
+                    type: string
+                    description: Job ID
+                  job_status:
+                    type: string
+                    description: Job status
+  '/apps/annotation-reply/{action}/status/{job_id}':
+    get:
+      summary: Check Annotation Reply Settings Status
+      description: Query the status of annotation reply initialization task
+      parameters:
+        - name: action
+          in: path
+          description: 'Action, can only be ''enable'' or ''disable'', and must be consistent with the action in the annotation reply initialization interface'
+          required: true
+          schema:
+            type: string
+            enum:
+              - enable
+              - disable
+        - name: job_id
+          in: path
+          description: 'Job ID, returned from the annotation reply initialization interface'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved job status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  job_id:
+                    type: string
+                    description: Job ID
+                  job_status:
+                    type: string
+                    description: Job status
+                  error_msg:
+                    type: string
+                    description: Error message
+  '/workflows/run/{workflow_run_id}':
+    get:
+      summary: Get Workflow Execution Status
+      description: Get the current execution result of a workflow task based on the workflow execution ID
+      parameters:
+        - name: workflow_run_id
+          in: path
+          description: 'Workflow run ID, can be obtained from the streaming response chunks'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved workflow execution status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Workflow execution ID
+                  workflow_id:
+                    type: string
+                    description: Associated Workflow ID
+                  status:
+                    type: string
+                    enum:
+                      - running
+                      - succeeded
+                      - failed
+                      - stopped
+                    description: Execution status
+                  inputs:
+                    type: string
+                    description: Task input content
+                  outputs:
+                    type: string
+                    description: Task output content
+                  error:
+                    type: string
+                    description: Error reason
+                  total_steps:
+                    type: integer
+                    description: Total steps executed in the task
+                  total_tokens:
+                    type: integer
+                    description: Total tokens used in the task
+                  created_at:
+                    type: integer
+                    description: Task start time
+                  finished_at:
+                    type: integer
+                    description: Task end time
+                  elapsed_time:
+                    type: number
+                    format: float
+                    description: Time elapsed (seconds)
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+  '/workflows/tasks/{task_id}/stop':
+    post:
+      summary: Stop Response
+      description: Only supports streaming mode
+      parameters:
+        - name: task_id
+          in: path
+          description: 'Task ID, can be obtained from the streaming response chunks'
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user
+              properties:
+                user:
+                  type: string
+                  description: 'User identifier, must be consistent with the user passed in the message sending interface'
+      responses:
+        '200':
+          description: Successfully stopped the response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    description: Fixed return value 'success'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+  /workflows/logs:
+    get:
+      summary: Get Workflow Logs
+      description: Return workflow logs in reverse order
+      parameters:
+        - name: keyword
+          in: query
+          description: Keyword
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: 'Execution status: succeeded/failed/stopped'
+          required: false
+          schema:
+            type: string
+            enum:
+              - succeeded
+              - failed
+              - stopped
+        - name: page
+          in: query
+          description: 'Current page number, default 1'
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: 'Items per page, default 20'
+          required: false
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Successfully retrieved workflow logs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  page:
+                    type: integer
+                    description: Current page number
+                  limit:
+                    type: integer
+                    description: Items per page
+                  total:
+                    type: integer
+                    description: Total number of records
+                  has_more:
+                    type: boolean
+                    description: Whether there is more data
+                  data:
+                    type: array
+                    description: Data for the current page
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Identifier
+                        workflow_run:
+                          type: object
+                          description: Workflow execution log
+                          properties:
+                            id:
+                              type: string
+                              description: Identifier
+                            version:
+                              type: string
+                              description: Version
+                            status:
+                              type: string
+                              enum:
+                                - running
+                                - succeeded
+                                - failed
+                                - stopped
+                              description: Execution status
+                            error:
+                              type: string
+                              description: Error
+                            elapsed_time:
+                              type: number
+                              format: float
+                              description: 'Time elapsed, in seconds'
+                            total_tokens:
+                              type: integer
+                              description: Number of tokens consumed
+                            total_steps:
+                              type: integer
+                              description: Number of execution steps
+                            created_at:
+                              type: integer
+                              description: Start time
+                            finished_at:
+                              type: integer
+                              description: End time
+                        created_from:
+                          type: string
+                          description: Source
+                        created_by_role:
+                          type: string
+                          description: Role
+                        created_by_account:
+                          type: string
+                          description: Account
+                        created_by_end_user:
+                          type: object
+                          description: User
+                          properties:
+                            id:
+                              type: string
+                              description: Identifier
+                            type:
+                              type: string
+                              description: Type
+                            is_anonymous:
+                              type: boolean
+                              description: Whether anonymous
+                            session_id:
+                              type: string
+                              description: Session identifier
+                        created_at:
+                          type: integer
+                          description: Creation time
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
 

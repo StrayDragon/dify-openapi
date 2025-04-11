@@ -3,8 +3,12 @@
 from .types import (
     CreateSegmentsRequestSegmentsItem,
     CreateSegmentsResponse,
+    DeleteDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse,
     DeleteSegmentResponse,
+    GetDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse,
     GetSegmentsResponse,
+    PatchDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse,
+    PostDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse,
     UpdateSegmentRequestSegment,
     UpdateSegmentResponse,
 )
@@ -12,8 +16,12 @@ from .types import (
 __all__ = [
     "CreateSegmentsRequestSegmentsItem",
     "CreateSegmentsResponse",
+    "DeleteDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse",
     "DeleteSegmentResponse",
+    "GetDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse",
     "GetSegmentsResponse",
+    "PatchDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse",
+    "PostDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse",
     "UpdateSegmentRequestSegment",
     "UpdateSegmentResponse",
 ]
