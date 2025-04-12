@@ -1,10 +1,11 @@
 openapi: 3.0.0
 info:
-  title: Dify API
+  title: Dify API - 对话型应用
   description: |
-    Dify API 提供了一系列接口用于文本生成、对话和工作流功能。
-    支持文本生成型应用、对话型应用、工作流应用和高级对话型应用。
+    Dify API 提供了一系列接口用于对话功能。
+    支持对话型应用。
     所有 API 请求都需要在 Authorization HTTP Header 中包含应用级 API-Key。
+    官方原始文档见: https://github.com/langgenius/dify/blob/1.2.0/web/app/components/develop/template/template_chat.zh.mdx
   version: 1.2.0
 
 servers:
@@ -163,18 +164,6 @@ components:
               items:
                 $ref: "#/components/schemas/RetrieverResource"
 
-    CompletionMessage:
-      allOf:
-        - $ref: "#/components/schemas/BaseMessage"
-        - type: object
-          properties:
-            mode:
-              type: string
-              description: App 模式，固定为 completion
-            answer:
-              type: string
-              description: 完整回复内容
-
     ChatMessage:
       allOf:
         - $ref: "#/components/schemas/BaseMessage"
@@ -190,49 +179,48 @@ components:
               type: string
               description: 完整回复内容
 
-    WorkflowMessage:
+    Conversation:
       type: object
       properties:
-        workflow_run_id:
+        id:
           type: string
-          description: workflow 执行 ID
-        task_id:
+          description: 会话 ID
+        name:
           type: string
-          description: 任务 ID
-        data:
+          description: 会话名称
+        inputs:
           type: object
-          properties:
-            id:
-              type: string
-              description: workflow 执行 ID
-            workflow_id:
-              type: string
-              description: 关联 Workflow ID
-            status:
-              type: string
-              enum: [running, succeeded, failed, stopped]
-              description: 执行状态
-            outputs:
-              type: object
-              description: 输出内容
-            error:
-              type: string
-              description: 错误原因
-            elapsed_time:
-              type: number
-              description: 耗时(s)
-            total_tokens:
-              type: integer
-              description: 总使用 tokens
-            total_steps:
-              type: integer
-              description: 总步数
-            created_at:
-              type: integer
-              description: 开始时间
-            finished_at:
-              type: integer
-              description: 结束时间
+          description: 用户输入参数
+        status:
+          type: string
+          description: 会话状态
+        introduction:
+          type: string
+          description: 开场白
+        created_at:
+          type: integer
+          description: 创建时间
+        updated_at:
+          type: integer
+          description: 更新时间
+
+    FileInput:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [document, image, audio, video, custom]
+          description: 文件类型
+        transfer_method:
+          type: string
+          enum: [remote_url, local_file]
+          description: 传递方式
+        url:
+          type: string
+          description: 远程URL
+        upload_file_id:
+          type: string
+          description: 上传文件ID
 
     StreamEvent:
       type: object
@@ -316,104 +304,16 @@ components:
           type: integer
           description: 上传时间
 
-    Conversation:
-      type: object
-      properties:
-        id:
-          type: string
-          description: 会话 ID
-        name:
-          type: string
-          description: 会话名称
-        inputs:
-          type: object
-          description: 用户输入参数
-        status:
-          type: string
-          description: 会话状态
-        introduction:
-          type: string
-          description: 开场白
-        created_at:
-          type: integer
-          description: 创建时间
-        updated_at:
-          type: integer
-          description: 更新时间
-
-    FileInput:
-      type: object
-      properties:
-        type:
-          type: string
-          enum: [document, image, audio, video, custom]
-          description: 文件类型
-        transfer_method:
-          type: string
-          enum: [remote_url, local_file]
-          description: 传递方式
-        url:
-          type: string
-          description: 远程URL
-        upload_file_id:
-          type: string
-          description: 上传文件ID
+tags:
+  - name: Chat
+    description: 对话型应用相关操作
 
 paths:
-  /completion-messages:
-    post:
-      summary: 发送消息(文本生成型应用)
-      description: 发送请求给文本生成型应用
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - inputs
-              properties:
-                inputs:
-                  type: object
-                  properties:
-                    query:
-                      type: string
-                      description: 用户输入的文本内容
-                  required:
-                    - query
-                response_mode:
-                  type: string
-                  enum: [streaming, blocking]
-                  description: |
-                    响应模式:
-                    - streaming: 流式模式（推荐），基于 SSE 实现类似打字机输出
-                    - blocking: 阻塞模式，等待执行完毕后返回结果
-                user:
-                  type: string
-                  description: 用户标识
-                files:
-                  type: array
-                  items:
-                    $ref: "#/components/schemas/FileInput"
-      responses:
-        "200":
-          description: 成功响应
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CompletionMessage"
-            text/event-stream:
-              schema:
-                $ref: "#/components/schemas/StreamEvent"
-        "400":
-          $ref: "#/components/responses/Error400"
-        "404":
-          $ref: "#/components/responses/Error404"
-        "500":
-          $ref: "#/components/responses/Error500"
-
   /chat-messages:
     post:
+      tags:
+        - Chat
+      operationId: sendChatMessageByAppChat
       summary: 发送对话消息(对话型应用)
       description: 创建会话消息
       requestBody:
@@ -469,10 +369,67 @@ paths:
         "500":
           $ref: "#/components/responses/Error500"
 
-  /workflows/run:
-    post:
-      summary: 执行工作流(工作流应用)
-      description: 执行 workflow，没有已发布的 workflow，不可执行
+  /conversations:
+    get:
+      tags:
+        - Chat
+      operationId: getConversationListByAppChat
+      summary: 获取会话列表
+      description: 获取当前用户的会话列表
+      parameters:
+        - name: user
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: last_id
+          in: query
+          schema:
+            type: string
+          description: 当前页最后一条记录的ID
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+          description: 每页记录数
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            enum: [created_at, -created_at, updated_at, -updated_at]
+            default: -updated_at
+          description: 排序字段
+      responses:
+        "200":
+          description: 成功响应
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Conversation"
+                  has_more:
+                    type: boolean
+                  limit:
+                    type: integer
+
+  /conversations/{conversation_id}:
+    delete:
+      tags:
+        - Chat
+      operationId: deleteConversationByAppChat
+      summary: 删除会话
+      parameters:
+        - name: conversation_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 会话ID
       requestBody:
         required: true
         content:
@@ -480,43 +437,191 @@ paths:
             schema:
               type: object
               required:
-                - inputs
-                - response_mode
                 - user
               properties:
-                inputs:
-                  type: object
-                  description: 工作流输入参数
-                response_mode:
-                  type: string
-                  enum: [streaming, blocking]
-                  description: 响应模式
                 user:
                   type: string
                   description: 用户标识
-                files:
-                  type: array
-                  items:
-                    $ref: "#/components/schemas/FileInput"
       responses:
         "200":
           description: 成功响应
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/WorkflowMessage"
-            text/event-stream:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    enum: [success]
+
+  /conversations/{conversation_id}/name:
+    post:
+      tags:
+        - Chat
+      operationId: renameConversationByAppChat
+      summary: 会话重命名
+      parameters:
+        - name: conversation_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user
+              properties:
+                name:
+                  type: string
+                  description: 新名称
+                auto_generate:
+                  type: boolean
+                  default: false
+                  description: 是否自动生成
+                user:
+                  type: string
+                  description: 用户标识
+      responses:
+        "200":
+          description: 成功响应
+          content:
+            application/json:
               schema:
-                $ref: "#/components/schemas/StreamEvent"
-        "400":
-          $ref: "#/components/responses/Error400"
-        "404":
-          $ref: "#/components/responses/Error404"
-        "500":
-          $ref: "#/components/responses/Error500"
+                $ref: "#/components/schemas/Conversation"
+
+  /messages:
+    get:
+      tags:
+        - Chat
+      operationId: getConversationMessagesByAppChat
+      summary: 获取会话历史消息
+      parameters:
+        - name: conversation_id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: user
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: first_id
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: 成功响应
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ChatMessage"
+                  has_more:
+                    type: boolean
+                  limit:
+                    type: integer
+
+  /messages/{message_id}/feedbacks:
+    post:
+      tags:
+        - Chat
+      operationId: sendMessageFeedbackByAppChat
+      summary: 消息反馈
+      parameters:
+        - name: message_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - rating
+                - user
+              properties:
+                rating:
+                  type: string
+                  enum: [like, dislike, null]
+                  description: 反馈类型
+                user:
+                  type: string
+                  description: 用户标识
+                content:
+                  type: string
+                  description: 反馈内容
+      responses:
+        "200":
+          description: 成功响应
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    enum: [success]
+
+  /messages/{message_id}/suggested:
+    get:
+      tags:
+        - Chat
+      operationId: getSuggestedQuestionsByAppChat
+      summary: 获取下一轮建议问题列表
+      description: 获取下一轮建议问题列表
+      parameters:
+        - name: message_id
+          in: path
+          description: Message ID
+          required: true
+          schema:
+            type: string
+        - name: user
+          in: query
+          description: 用户标识，由开发者定义规则，需保证用户标识在应用内唯一。
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功获取建议问题列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    description: 固定返回 success
+                  data:
+                    type: array
+                    description: 建议问题列表
+                    items:
+                      type: string
 
   /files/upload:
     post:
+      tags:
+        - Chat
+      operationId: uploadFileByAppChat
       summary: 上传文件
       description: |
         上传文件并在发送消息时使用。
@@ -566,297 +671,11 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /conversations:
-    get:
-      summary: 获取会话列表
-      description: 获取当前用户的会话列表
-      parameters:
-        - name: user
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: last_id
-          in: query
-          schema:
-            type: string
-          description: 当前页最后一条记录的ID
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            default: 20
-          description: 每页记录数
-        - name: sort_by
-          in: query
-          schema:
-            type: string
-            enum: [created_at, -created_at, updated_at, -updated_at]
-            default: -updated_at
-          description: 排序字段
-      responses:
-        "200":
-          description: 成功响应
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Conversation"
-                  has_more:
-                    type: boolean
-                  limit:
-                    type: integer
-
-  /conversations/{conversation_id}:
-    delete:
-      summary: 删除会话
-      parameters:
-        - name: conversation_id
-          in: path
-          required: true
-          schema:
-            type: string
-          description: 会话ID
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - user
-              properties:
-                user:
-                  type: string
-                  description: 用户标识
-      responses:
-        "200":
-          description: 成功响应
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    enum: [success]
-
-  /conversations/{conversation_id}/name:
-    post:
-      summary: 会话重命名
-      parameters:
-        - name: conversation_id
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - user
-              properties:
-                name:
-                  type: string
-                  description: 新名称
-                auto_generate:
-                  type: boolean
-                  default: false
-                  description: 是否自动生成
-                user:
-                  type: string
-                  description: 用户标识
-      responses:
-        "200":
-          description: 成功响应
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Conversation"
-
-  /messages:
-    get:
-      summary: 获取会话历史消息
-      parameters:
-        - name: conversation_id
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: user
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: first_id
-          in: query
-          schema:
-            type: string
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            default: 20
-      responses:
-        "200":
-          description: 成功响应
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/ChatMessage"
-                  has_more:
-                    type: boolean
-                  limit:
-                    type: integer
-
-  /messages/{message_id}/feedbacks:
-    post:
-      summary: 消息反馈
-      parameters:
-        - name: message_id
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - rating
-                - user
-              properties:
-                rating:
-                  type: string
-                  enum: [like, dislike, null]
-                  description: 反馈类型
-                user:
-                  type: string
-                  description: 用户标识
-                content:
-                  type: string
-                  description: 反馈内容
-      responses:
-        "200":
-          description: 成功响应
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    enum: [success]
-
-  /messages/{message_id}/suggested:
-    get:
-      summary: 获取下一轮建议问题列表
-      description: 获取下一轮建议问题列表
-      parameters:
-        - name: message_id
-          in: path
-          description: Message ID
-          required: true
-          schema:
-            type: string
-        - name: user
-          in: query
-          description: 用户标识，由开发者定义规则，需保证用户标识在应用内唯一。
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: 成功获取建议问题列表
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    description: 固定返回 success
-                  data:
-                    type: array
-                    description: 建议问题列表
-                    items:
-                      type: string
-
-  /audio-to-text:
-    post:
-      summary: 语音转文字
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                file:
-                  type: string
-                  format: binary
-                  description: 语音文件
-                  maxLength: 15728640 # 15MB
-                user:
-                  type: string
-                  description: 用户标识
-                  example: "user123"
-      responses:
-        "200":
-          description: 成功响应
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  text:
-                    type: string
-                    description: 转换后的文本
-
-  /text-to-audio:
-    post:
-      summary: 文字转语音
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                message_id:
-                  type: string
-                  description: 消息ID
-                text:
-                  type: string
-                  description: 待转换文本
-                user:
-                  type: string
-                  description: 用户标识
-      responses:
-        "200":
-          description: 成功响应
-          content:
-            audio/mpeg:
-              schema:
-                type: string
-                format: binary
-
   /info:
     get:
+      tags:
+        - Chat
+      operationId: getApplicationInfoByAppChat
       summary: 获取应用基本信息
       responses:
         "200":
@@ -878,8 +697,118 @@ paths:
                       type: string
                     description: 应用标签
 
+  /chat-messages/{task_id}/stop:
+    post:
+      tags:
+        - Chat
+      operationId: stopChatResponseByAppChat
+      summary: 停止响应
+      description: 仅支持流式模式
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 任务 ID，可在流式返回 Chunk 中获取
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user
+              properties:
+                user:
+                  type: string
+                  description: 用户标识，必须和发送消息接口传入 user 保持一致
+      responses:
+        '200':
+          description: 成功响应
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    enum: [success]
+                    description: 固定返回 success
+
+  /audio-to-text:
+    post:
+      tags:
+        - Chat
+      operationId: convertAudioToTextByAppChat
+      summary: 语音转文字
+      description: 语音转文字
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: 语音文件
+                user:
+                  type: string
+                  description: 用户标识
+              required:
+                - file
+      responses:
+        '200':
+          description: 成功响应
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  text:
+                    type: string
+                    description: 转换后的文本
+
+  /text-to-audio:
+    post:
+      tags:
+        - Chat
+      operationId: convertTextToAudioByAppChat
+      summary: 文字转语音
+      description: 文字转语音
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message_id:
+                  type: string
+                  description: Dify 生成的文本消息ID，后台会通过 message_id 查找相应的内容直接合成语音信息。如果同时传 message_id 和 text，优先使用 message_id
+                text:
+                  type: string
+                  description: 语音生成内容。如果没有传 message_id 的话，则会使用这个字段的内容
+                user:
+                  type: string
+                  description: 用户标识，由开发者定义规则，需保证用户标识在应用内唯一
+      responses:
+        '200':
+          description: 成功响应
+          content:
+            audio/wav:
+              schema:
+                type: string
+                format: binary
+                description: 音频文件
+
   /parameters:
     get:
+      tags:
+        - Chat
+      operationId: getApplicationParametersByAppChat
       summary: 获取应用参数
       responses:
         "200":
@@ -915,22 +844,6 @@ paths:
                       enabled:
                         type: boolean
                     description: 引用和归属设置
-                  annotation_reply:
-                    type: object
-                    description: 标注回复配置
-                    properties:
-                      enabled:
-                        type: boolean
-                        description: 是否启用标注回复
-                      score_threshold:
-                        type: number
-                        description: 相似度阈值
-                      embedding_model:
-                        type: string
-                        description: 嵌入模型
-                      embedding_model_provider:
-                        type: string
-                        description: 嵌入模型提供商
                   user_input_form:
                     type: array
                     items:
@@ -945,6 +858,9 @@ paths:
 
   /meta:
     get:
+      tags:
+        - Chat
+      operationId: getAppMetaInfoByAppChat
       summary: 获取应用Meta信息
       description: 用于获取工具icon
       responses:
@@ -973,6 +889,9 @@ paths:
 
   /apps/annotations:
     get:
+      tags:
+        - Chat
+      operationId: getAnnotationsListByAppChat
       summary: 获取标注列表
       description: 获取应用的标注列表
       parameters:
@@ -1032,6 +951,9 @@ paths:
                     description: 当前页码
 
     post:
+      tags:
+        - Chat
+      operationId: createAnnotationByAppChat
       summary: 创建标注
       description: 创建新的标注
       requestBody:
@@ -1076,6 +998,9 @@ paths:
 
   /apps/annotations/{annotation_id}:
     put:
+      tags:
+        - Chat
+      operationId: updateAnnotationByAppChat
       summary: 更新标注
       description: 更新指定的标注
       parameters:
@@ -1126,6 +1051,9 @@ paths:
                     description: 创建时间戳
 
     delete:
+      tags:
+        - Chat
+      operationId: deleteAnnotationByAppChat
       summary: 删除标注
       description: 删除指定的标注
       parameters:
@@ -1149,6 +1077,9 @@ paths:
 
   /apps/annotation-reply/{action}:
     post:
+      tags:
+        - Chat
+      operationId: configureAnnotationReplyByAppChat
       summary: 标注回复初始设置
       description: 启用或禁用标注回复功能
       parameters:
@@ -1192,6 +1123,9 @@ paths:
 
   /apps/annotation-reply/{action}/status/{job_id}:
     get:
+      tags:
+        - Chat
+      operationId: getAnnotationReplyStatusByAppChat
       summary: 查询标注回复初始设置任务状态
       description: 查询标注回复初始设置任务的执行状态
       parameters:
@@ -1225,240 +1159,3 @@ paths:
                   error_msg:
                     type: string
                     description: 错误信息
-
-  /workflows/run/{workflow_run_id}:
-    get:
-      summary: 获取workflow执行情况
-      description: 根据 workflow 执行 ID 获取 workflow 任务当前执行结果
-      parameters:
-        - name: workflow_run_id
-          in: path
-          description: workflow_run_id，可在流式返回 Chunk 中获取
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: 成功获取workflow执行情况
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    description: workflow 执行 ID
-                  workflow_id:
-                    type: string
-                    description: 关联的 Workflow ID
-                  status:
-                    type: string
-                    enum: [running, succeeded, failed, stopped]
-                    description: 执行状态
-                  inputs:
-                    type: string
-                    description: 任务输入内容
-                  outputs:
-                    type: string
-                    description: 任务输出内容
-                  error:
-                    type: string
-                    description: 错误原因
-                  total_steps:
-                    type: integer
-                    description: 任务执行总步数
-                  total_tokens:
-                    type: integer
-                    description: 任务执行总 tokens
-                  created_at:
-                    type: integer
-                    description: 任务开始时间
-                  finished_at:
-                    type: integer
-                    description: 任务结束时间
-                  elapsed_time:
-                    type: number
-                    format: float
-                    description: 耗时(s)
-        '400':
-          $ref: "#/components/responses/Error400"
-        '401':
-          $ref: "#/components/responses/Error401"
-        '404':
-          $ref: "#/components/responses/Error404"
-        '500':
-          $ref: "#/components/responses/Error500"
-
-  /workflows/tasks/{task_id}/stop:
-    post:
-      summary: 停止响应
-      description: 仅支持流式模式
-      parameters:
-        - name: task_id
-          in: path
-          description: 任务 ID，可在流式返回 Chunk 中获取
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - user
-              properties:
-                user:
-                  type: string
-                  description: 用户标识，用于定义终端用户的身份，必须和发送消息接口传入 user 保持一致
-      responses:
-        '200':
-          description: 成功停止响应
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    description: 固定返回 "success"
-        '400':
-          $ref: "#/components/responses/Error400"
-        '401':
-          $ref: "#/components/responses/Error401"
-        '404':
-          $ref: "#/components/responses/Error404"
-        '500':
-          $ref: "#/components/responses/Error500"
-
-  /workflows/logs:
-    get:
-      summary: 获取 workflow 日志
-      description: 倒序返回workflow日志
-      parameters:
-        - name: keyword
-          in: query
-          description: 关键字
-          required: false
-          schema:
-            type: string
-        - name: status
-          in: query
-          description: 执行状态 succeeded/failed/stopped
-          required: false
-          schema:
-            type: string
-            enum: [succeeded, failed, stopped]
-        - name: page
-          in: query
-          description: 当前页码, 默认1
-          required: false
-          schema:
-            type: integer
-            default: 1
-        - name: limit
-          in: query
-          description: 每页条数, 默认20
-          required: false
-          schema:
-            type: integer
-            default: 20
-      responses:
-        '200':
-          description: 成功获取workflow日志
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  page:
-                    type: integer
-                    description: 当前页码
-                  limit:
-                    type: integer
-                    description: 每页条数
-                  total:
-                    type: integer
-                    description: 总条数
-                  has_more:
-                    type: boolean
-                    description: 是否还有更多数据
-                  data:
-                    type: array
-                    description: 当前页码的数据
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                          description: 标识
-                        workflow_run:
-                          type: object
-                          description: Workflow 执行日志
-                          properties:
-                            id:
-                              type: string
-                              description: 标识
-                            version:
-                              type: string
-                              description: 版本
-                            status:
-                              type: string
-                              enum: [running, succeeded, failed, stopped]
-                              description: 执行状态
-                            error:
-                              type: string
-                              description: 错误
-                            elapsed_time:
-                              type: number
-                              format: float
-                              description: 耗时，单位秒
-                            total_tokens:
-                              type: integer
-                              description: 消耗的token数量
-                            total_steps:
-                              type: integer
-                              description: 执行步骤长度
-                            created_at:
-                              type: integer
-                              description: 开始时间
-                            finished_at:
-                              type: integer
-                              description: 结束时间
-                        created_from:
-                          type: string
-                          description: 来源
-                        created_by_role:
-                          type: string
-                          description: 角色
-                        created_by_account:
-                          type: string
-                          description: 帐号
-                        created_by_end_user:
-                          type: object
-                          description: 用户
-                          properties:
-                            id:
-                              type: string
-                              description: 标识
-                            type:
-                              type: string
-                              description: 类型
-                            is_anonymous:
-                              type: boolean
-                              description: 是否匿名
-                            session_id:
-                              type: string
-                              description: 会话标识
-                        created_at:
-                          type: integer
-                          description: 创建时间
-        '400':
-          $ref: "#/components/responses/Error400"
-        '401':
-          $ref: "#/components/responses/Error401"
-        '404':
-          $ref: "#/components/responses/Error404"
-        '500':
-          $ref: "#/components/responses/Error500"

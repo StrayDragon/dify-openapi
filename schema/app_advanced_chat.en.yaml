@@ -1,10 +1,11 @@
 openapi: 3.0.0
 info:
-  title: Dify API
+  title: Dify API - Advanced Chat Application
   description: |
-    Dify API provides a series of interfaces for text generation, conversation, and workflow functionality.
-    It supports text generation applications, conversational applications, workflow applications, and advanced conversational applications.
+    Dify API provides a series of interfaces for advanced conversation functionality.
+    It supports advanced conversational applications.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
+    official raw document: https://github.com/langgenius/dify/blob/1.2.0/web/app/components/develop/template/template_advanced_chat.en.mdx
   version: 1.2.0
 servers:
   - url: 'https://api.dify.ai/v1'
@@ -149,17 +150,6 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/RetrieverResource'
-    CompletionMessage:
-      allOf:
-        - $ref: '#/components/schemas/BaseMessage'
-        - type: object
-          properties:
-            mode:
-              type: string
-              description: 'App mode, fixed as completion'
-            answer:
-              type: string
-              description: Complete response content
     ChatMessage:
       allOf:
         - $ref: '#/components/schemas/BaseMessage'
@@ -174,53 +164,6 @@ components:
             answer:
               type: string
               description: Complete response content
-    WorkflowMessage:
-      type: object
-      properties:
-        workflow_run_id:
-          type: string
-          description: Workflow execution ID
-        task_id:
-          type: string
-          description: Task ID
-        data:
-          type: object
-          properties:
-            id:
-              type: string
-              description: Workflow execution ID
-            workflow_id:
-              type: string
-              description: Associated Workflow ID
-            status:
-              type: string
-              enum:
-                - running
-                - succeeded
-                - failed
-                - stopped
-              description: Execution status
-            outputs:
-              type: object
-              description: Output content
-            error:
-              type: string
-              description: Error reason
-            elapsed_time:
-              type: number
-              description: Elapsed time (s)
-            total_tokens:
-              type: integer
-              description: Total tokens used
-            total_steps:
-              type: integer
-              description: Total steps
-            created_at:
-              type: integer
-              description: Start time
-            finished_at:
-              type: integer
-              description: End time
     StreamEvent:
       type: object
       properties:
@@ -299,30 +242,6 @@ components:
         created_at:
           type: integer
           description: Upload time
-    Conversation:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Conversation ID
-        name:
-          type: string
-          description: Conversation name
-        inputs:
-          type: object
-          description: User input parameters
-        status:
-          type: string
-          description: Conversation status
-        introduction:
-          type: string
-          description: Opening statement
-        created_at:
-          type: integer
-          description: Creation time
-        updated_at:
-          type: integer
-          description: Update time
     FileInput:
       type: object
       properties:
@@ -347,63 +266,16 @@ components:
         upload_file_id:
           type: string
           description: Upload file ID
+tags:
+  - name: AdvancedChat
+    description: Advanced Chat Application Operations
 paths:
-  /completion-messages:
-    post:
-      summary: Send Message (Text Generation App)
-      description: Send request to text generation application
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - inputs
-              properties:
-                inputs:
-                  type: object
-                  properties:
-                    query:
-                      type: string
-                      description: User input text content
-                  required:
-                    - query
-                response_mode:
-                  type: string
-                  enum:
-                    - streaming
-                    - blocking
-                  description: |
-                    Response mode:
-                    - streaming: Streaming mode (recommended), implements typewriter-like output based on SSE
-                    - blocking: Blocking mode, returns result after execution is complete
-                user:
-                  type: string
-                  description: User identifier
-                files:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/FileInput'
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CompletionMessage'
-            text/event-stream:
-              schema:
-                $ref: '#/components/schemas/StreamEvent'
-        '400':
-          $ref: '#/components/responses/Error400'
-        '404':
-          $ref: '#/components/responses/Error404'
-        '500':
-          $ref: '#/components/responses/Error500'
   /chat-messages:
     post:
-      summary: Send Chat Message (Conversational App)
+      tags:
+        - AdvancedChat
+      operationId: sendChatMessageByAppAdvancedChat
+      summary: Send Chat Message (Advanced Chat App)
       description: Create conversation message
       requestBody:
         required: true
@@ -459,10 +331,20 @@ paths:
           $ref: '#/components/responses/Error404'
         '500':
           $ref: '#/components/responses/Error500'
-  /workflows/run:
+  '/chat-messages/{task_id}/stop':
     post:
-      summary: Execute Workflow
-      description: Execute a workflow. Cannot be executed if there is no published workflow.
+      tags:
+        - AdvancedChat
+      operationId: stopChatResponseByAppAdvancedChat
+      summary: Stop Response
+      description: Only supports streaming mode
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 'Task ID, can be obtained from the streaming response chunks'
       requestBody:
         required: true
         content:
@@ -470,44 +352,29 @@ paths:
             schema:
               type: object
               required:
-                - inputs
-                - response_mode
                 - user
               properties:
-                inputs:
-                  type: object
-                  description: Workflow input parameters
-                response_mode:
-                  type: string
-                  enum:
-                    - streaming
-                    - blocking
-                  description: Response mode
                 user:
                   type: string
-                  description: User identifier
-                files:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/FileInput'
+                  description: 'User identifier, must be consistent with the user passed in the message sending interface'
       responses:
         '200':
-          description: Successful response
+          description: Successfully stopped the response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WorkflowMessage'
-            text/event-stream:
-              schema:
-                $ref: '#/components/schemas/StreamEvent'
-        '400':
-          $ref: '#/components/responses/Error400'
-        '404':
-          $ref: '#/components/responses/Error404'
-        '500':
-          $ref: '#/components/responses/Error500'
+                type: object
+                properties:
+                  result:
+                    type: string
+                    enum:
+                      - success
+                    description: Fixed return value 'success'
   /files/upload:
     post:
+      tags:
+        - AdvancedChat
+      operationId: uploadFileByAppAdvancedChat
       summary: Upload File
       description: |
         Upload files for use when sending messages.
@@ -556,247 +423,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /conversations:
-    get:
-      summary: Get Conversation List
-      description: Get conversation list for current user
-      parameters:
-        - name: user
-          in: query
-          required: true
-          schema:
-            type: string
-          description: User identifier
-        - name: last_id
-          in: query
-          schema:
-            type: string
-          description: ID of the last record on current page
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            default: 20
-          description: Records per page
-        - name: sort_by
-          in: query
-          schema:
-            type: string
-            enum:
-              - created_at
-              - '-created_at'
-              - updated_at
-              - '-updated_at'
-            default: '-updated_at'
-          description: Sort field
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Conversation'
-                  has_more:
-                    type: boolean
-                  limit:
-                    type: integer
-  '/conversations/{conversation_id}':
-    delete:
-      summary: Delete Conversation
-      parameters:
-        - name: conversation_id
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Conversation ID
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - user
-              properties:
-                user:
-                  type: string
-                  description: User identifier
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    enum:
-                      - success
-  '/conversations/{conversation_id}/name':
-    post:
-      summary: Rename Conversation
-      parameters:
-        - name: conversation_id
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - user
-              properties:
-                name:
-                  type: string
-                  description: New name
-                auto_generate:
-                  type: boolean
-                  default: false
-                  description: Whether to automatically generate
-                user:
-                  type: string
-                  description: User identifier
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Conversation'
-  /messages:
-    get:
-      summary: Get Conversation History Messages
-      parameters:
-        - name: conversation_id
-          in: query
-          required: true
-          schema:
-            type: string
-          description: Conversation ID
-        - name: user
-          in: query
-          required: true
-          schema:
-            type: string
-          description: User identifier
-        - name: first_id
-          in: query
-          schema:
-            type: string
-          description: First message ID
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            default: 20
-          description: Limit
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ChatMessage'
-                  has_more:
-                    type: boolean
-                  limit:
-                    type: integer
-  '/messages/{message_id}/feedbacks':
-    post:
-      summary: Message Feedback
-      parameters:
-        - name: message_id
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Message ID
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - rating
-                - user
-              properties:
-                rating:
-                  type: string
-                  enum:
-                    - like
-                    - dislike
-                    - null
-                  description: Feedback type
-                user:
-                  type: string
-                  description: User identifier
-                content:
-                  type: string
-                  description: Feedback content
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    enum:
-                      - success
-  '/messages/{message_id}/suggested':
-    get:
-      summary: Get Suggested Questions
-      description: Get suggested questions for the next round
-      parameters:
-        - name: message_id
-          in: path
-          description: Message ID
-          required: true
-          schema:
-            type: string
-        - name: user
-          in: query
-          description: 'User identifier, defined by the developer, must be unique within the application'
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Successfully retrieved suggested questions
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    description: Fixed return value 'success'
-                  data:
-                    type: array
-                    description: List of suggested questions
-                    items:
-                      type: string
   /audio-to-text:
     post:
+      tags:
+        - AdvancedChat
+      operationId: convertAudioToTextByAppAdvancedChat
       summary: Audio to Text
       requestBody:
         required: true
@@ -827,6 +458,9 @@ paths:
                     description: Converted text
   /text-to-audio:
     post:
+      tags:
+        - AdvancedChat
+      operationId: convertTextToAudioByAppAdvancedChat
       summary: Text to Audio
       requestBody:
         required: true
@@ -854,6 +488,9 @@ paths:
                 format: binary
   /info:
     get:
+      tags:
+        - AdvancedChat
+      operationId: getApplicationInfoByAppAdvancedChat
       summary: Get Application Basic Information
       responses:
         '200':
@@ -876,6 +513,9 @@ paths:
                     description: Application tags
   /parameters:
     get:
+      tags:
+        - AdvancedChat
+      operationId: getApplicationParametersByAppAdvancedChat
       summary: Get Application Parameters
       responses:
         '200':
@@ -940,6 +580,9 @@ paths:
                     description: System parameters
   /meta:
     get:
+      tags:
+        - AdvancedChat
+      operationId: getAppMetaInfoByAppAdvancedChat
       summary: Get App Meta Information
       description: Used to get tool icons
       responses:
@@ -967,6 +610,9 @@ paths:
                           description: Icon URL
   /apps/annotations:
     get:
+      tags:
+        - AdvancedChat
+      operationId: getAnnotationsListByAppAdvancedChat
       summary: Get Annotation List
       description: Get the list of annotations for the application
       parameters:
@@ -1025,6 +671,9 @@ paths:
                     type: integer
                     description: Current page number
     post:
+      tags:
+        - AdvancedChat
+      operationId: createAnnotationByAppAdvancedChat
       summary: Create Annotation
       description: Create a new annotation
       requestBody:
@@ -1068,6 +717,9 @@ paths:
                     description: Creation timestamp
   '/apps/annotations/{annotation_id}':
     put:
+      tags:
+        - AdvancedChat
+      operationId: updateAnnotationByAppAdvancedChat
       summary: Update Annotation
       description: Update a specific annotation
       parameters:
@@ -1117,6 +769,9 @@ paths:
                     type: integer
                     description: Creation timestamp
     delete:
+      tags:
+        - AdvancedChat
+      operationId: deleteAnnotationByAppAdvancedChat
       summary: Delete Annotation
       description: Delete a specific annotation
       parameters:
@@ -1140,6 +795,9 @@ paths:
                       - success
   '/apps/annotation-reply/{action}':
     post:
+      tags:
+        - AdvancedChat
+      operationId: configureAnnotationReplyByAppAdvancedChat
       summary: Initialize Annotation Reply Settings
       description: Enable or disable annotation reply functionality
       parameters:
@@ -1184,6 +842,9 @@ paths:
                     description: Job status
   '/apps/annotation-reply/{action}/status/{job_id}':
     get:
+      tags:
+        - AdvancedChat
+      operationId: getAnnotationReplyStatusByAppAdvancedChat
       summary: Check Annotation Reply Settings Status
       description: Query the status of annotation reply initialization task
       parameters:
@@ -1219,249 +880,4 @@ paths:
                   error_msg:
                     type: string
                     description: Error message
-  '/workflows/run/{workflow_run_id}':
-    get:
-      summary: Get Workflow Execution Status
-      description: Get the current execution result of a workflow task based on the workflow execution ID
-      parameters:
-        - name: workflow_run_id
-          in: path
-          description: 'Workflow run ID, can be obtained from the streaming response chunks'
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Successfully retrieved workflow execution status
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    description: Workflow execution ID
-                  workflow_id:
-                    type: string
-                    description: Associated Workflow ID
-                  status:
-                    type: string
-                    enum:
-                      - running
-                      - succeeded
-                      - failed
-                      - stopped
-                    description: Execution status
-                  inputs:
-                    type: string
-                    description: Task input content
-                  outputs:
-                    type: string
-                    description: Task output content
-                  error:
-                    type: string
-                    description: Error reason
-                  total_steps:
-                    type: integer
-                    description: Total steps executed in the task
-                  total_tokens:
-                    type: integer
-                    description: Total tokens used in the task
-                  created_at:
-                    type: integer
-                    description: Task start time
-                  finished_at:
-                    type: integer
-                    description: Task end time
-                  elapsed_time:
-                    type: number
-                    format: float
-                    description: Time elapsed (seconds)
-        '400':
-          $ref: '#/components/responses/Error400'
-        '401':
-          $ref: '#/components/responses/Error401'
-        '404':
-          $ref: '#/components/responses/Error404'
-        '500':
-          $ref: '#/components/responses/Error500'
-  '/workflows/tasks/{task_id}/stop':
-    post:
-      summary: Stop Response
-      description: Only supports streaming mode
-      parameters:
-        - name: task_id
-          in: path
-          description: 'Task ID, can be obtained from the streaming response chunks'
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - user
-              properties:
-                user:
-                  type: string
-                  description: 'User identifier, must be consistent with the user passed in the message sending interface'
-      responses:
-        '200':
-          description: Successfully stopped the response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    description: Fixed return value 'success'
-        '400':
-          $ref: '#/components/responses/Error400'
-        '401':
-          $ref: '#/components/responses/Error401'
-        '404':
-          $ref: '#/components/responses/Error404'
-        '500':
-          $ref: '#/components/responses/Error500'
-  /workflows/logs:
-    get:
-      summary: Get Workflow Logs
-      description: Return workflow logs in reverse order
-      parameters:
-        - name: keyword
-          in: query
-          description: Keyword
-          required: false
-          schema:
-            type: string
-        - name: status
-          in: query
-          description: 'Execution status: succeeded/failed/stopped'
-          required: false
-          schema:
-            type: string
-            enum:
-              - succeeded
-              - failed
-              - stopped
-        - name: page
-          in: query
-          description: 'Current page number, default 1'
-          required: false
-          schema:
-            type: integer
-            default: 1
-        - name: limit
-          in: query
-          description: 'Items per page, default 20'
-          required: false
-          schema:
-            type: integer
-            default: 20
-      responses:
-        '200':
-          description: Successfully retrieved workflow logs
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  page:
-                    type: integer
-                    description: Current page number
-                  limit:
-                    type: integer
-                    description: Items per page
-                  total:
-                    type: integer
-                    description: Total number of records
-                  has_more:
-                    type: boolean
-                    description: Whether there is more data
-                  data:
-                    type: array
-                    description: Data for the current page
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                          description: Identifier
-                        workflow_run:
-                          type: object
-                          description: Workflow execution log
-                          properties:
-                            id:
-                              type: string
-                              description: Identifier
-                            version:
-                              type: string
-                              description: Version
-                            status:
-                              type: string
-                              enum:
-                                - running
-                                - succeeded
-                                - failed
-                                - stopped
-                              description: Execution status
-                            error:
-                              type: string
-                              description: Error
-                            elapsed_time:
-                              type: number
-                              format: float
-                              description: 'Time elapsed, in seconds'
-                            total_tokens:
-                              type: integer
-                              description: Number of tokens consumed
-                            total_steps:
-                              type: integer
-                              description: Number of execution steps
-                            created_at:
-                              type: integer
-                              description: Start time
-                            finished_at:
-                              type: integer
-                              description: End time
-                        created_from:
-                          type: string
-                          description: Source
-                        created_by_role:
-                          type: string
-                          description: Role
-                        created_by_account:
-                          type: string
-                          description: Account
-                        created_by_end_user:
-                          type: object
-                          description: User
-                          properties:
-                            id:
-                              type: string
-                              description: Identifier
-                            type:
-                              type: string
-                              description: Type
-                            is_anonymous:
-                              type: boolean
-                              description: Whether anonymous
-                            session_id:
-                              type: string
-                              description: Session identifier
-                        created_at:
-                          type: integer
-                          description: Creation time
-        '400':
-          $ref: '#/components/responses/Error400'
-        '401':
-          $ref: '#/components/responses/Error401'
-        '404':
-          $ref: '#/components/responses/Error404'
-        '500':
-          $ref: '#/components/responses/Error500'
 

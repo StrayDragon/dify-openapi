@@ -1,0 +1,560 @@
+openapi: 3.0.0
+info:
+  title: Dify API - Workflow Application
+  description: |
+    Dify API provides a series of interfaces for workflow functionality.
+    It supports workflow applications.
+    All API requests require an application-level API-Key in the Authorization HTTP Header.
+    official raw document: https://github.com/langgenius/dify/blob/1.2.0/web/app/components/develop/template/template_workflow.en.mdx
+  version: 1.2.0
+servers:
+  - url: 'https://api.dify.ai/v1'
+    description: Dify API Server
+  - url: '{api_url}'
+    variables:
+      api_url:
+        default: 'https://api.dify.ai/v1'
+        description: Custom API server URL
+  - url: 'http://ai.urchinet.lan/v1'
+    description: author of dify-openapi dev server
+security:
+  - bearerApiKeyAuth: []
+components:
+  securitySchemes:
+    bearerApiKeyAuth:
+      type: http
+      scheme: bearer
+  responses:
+    Error400:
+      description: Request error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error401:
+      description: Non authorized or authentication failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error404:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error500:
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code
+        status:
+          type: integer
+          description: HTTP status code
+        message:
+          type: string
+          description: Error message description
+      required:
+        - code
+        - status
+        - message
+    Usage:
+      type: object
+      properties:
+        prompt_tokens:
+          type: integer
+          description: Number of tokens used for prompts
+        completion_tokens:
+          type: integer
+          description: Number of tokens used for completion
+        total_tokens:
+          type: integer
+          description: Total number of tokens used
+        prompt_unit_price:
+          type: string
+          description: Unit price for prompts
+        prompt_price_unit:
+          type: string
+          description: Price unit for prompts
+        prompt_price:
+          type: string
+          description: Total price for prompts
+        completion_unit_price:
+          type: string
+          description: Unit price for completion
+        completion_price_unit:
+          type: string
+          description: Price unit for completion
+        completion_price:
+          type: string
+          description: Total price for completion
+        total_price:
+          type: string
+          description: Total price
+        currency:
+          type: string
+          description: Currency unit
+        latency:
+          type: number
+          description: Latency time
+    RetrieverResource:
+      type: object
+      properties:
+        position:
+          type: integer
+          description: Position
+        dataset_id:
+          type: string
+          description: Dataset ID
+        dataset_name:
+          type: string
+          description: Dataset name
+        document_id:
+          type: string
+          description: Document ID
+        document_name:
+          type: string
+          description: Document name
+        segment_id:
+          type: string
+          description: Segment ID
+        score:
+          type: number
+          description: Relevance score
+        content:
+          type: string
+          description: Content
+    WorkflowMessage:
+      type: object
+      properties:
+        workflow_run_id:
+          type: string
+          description: Workflow execution ID
+        task_id:
+          type: string
+          description: Task ID
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              description: Workflow execution ID
+            workflow_id:
+              type: string
+              description: Associated Workflow ID
+            status:
+              type: string
+              enum:
+                - running
+                - succeeded
+                - failed
+                - stopped
+              description: Execution status
+            outputs:
+              type: object
+              description: Output content
+            error:
+              type: string
+              description: Error reason
+            elapsed_time:
+              type: number
+              description: Elapsed time (s)
+            total_tokens:
+              type: integer
+              description: Total tokens used
+            total_steps:
+              type: integer
+              description: Total steps
+            created_at:
+              type: integer
+              description: Start time
+            finished_at:
+              type: integer
+              description: End time
+    StreamEvent:
+      type: object
+      properties:
+        event:
+          type: string
+          enum:
+            - message
+            - message_end
+            - tts_message
+            - tts_message_end
+            - message_replace
+            - error
+            - ping
+            - workflow_started
+            - node_started
+            - node_finished
+            - workflow_finished
+            - agent_message
+            - agent_thought
+            - message_file
+          description: Event type
+        task_id:
+          type: string
+          description: Task ID
+        message_id:
+          type: string
+          description: Unique message ID
+        conversation_id:
+          type: string
+          description: Conversation ID
+        workflow_run_id:
+          type: string
+          description: Workflow execution ID
+        answer:
+          type: string
+          description: Response content
+        audio:
+          type: string
+          description: Voice synthesis audio data (base64 encoded)
+        data:
+          type: object
+          description: Event related data
+        metadata:
+          type: object
+          properties:
+            usage:
+              $ref: '#/components/schemas/Usage'
+            retriever_resources:
+              type: array
+              items:
+                $ref: '#/components/schemas/RetrieverResource'
+        created_at:
+          type: integer
+          description: Creation timestamp
+    FileInput:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - document
+            - image
+            - audio
+            - video
+            - custom
+          description: File type
+        transfer_method:
+          type: string
+          enum:
+            - remote_url
+            - local_file
+          description: Transfer method
+        url:
+          type: string
+          description: Remote URL
+        upload_file_id:
+          type: string
+          description: Upload file ID
+tags:
+  - name: Workflow
+    description: Workflow Application Operations
+paths:
+  /workflows/run:
+    post:
+      tags:
+        - Workflow
+      operationId: runWorkflow
+      summary: Execute Workflow
+      description: Execute a workflow. Cannot be executed if there is no published workflow.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - inputs
+                - response_mode
+                - user
+              properties:
+                inputs:
+                  type: object
+                  description: Workflow input parameters
+                response_mode:
+                  type: string
+                  enum:
+                    - streaming
+                    - blocking
+                  description: Response mode
+                user:
+                  type: string
+                  description: User identifier
+                files:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/FileInput'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowMessage'
+            text/event-stream:
+              schema:
+                $ref: '#/components/schemas/StreamEvent'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+  '/workflows/run/{workflow_run_id}':
+    get:
+      tags:
+        - Workflow
+      operationId: getWorkflowExecutionStatus
+      summary: Get Workflow Execution Status
+      description: Get the current execution result of a workflow task based on the workflow execution ID
+      parameters:
+        - name: workflow_run_id
+          in: path
+          description: 'Workflow run ID, can be obtained from the streaming response chunks'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved workflow execution status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Workflow execution ID
+                  workflow_id:
+                    type: string
+                    description: Associated Workflow ID
+                  status:
+                    type: string
+                    enum:
+                      - running
+                      - succeeded
+                      - failed
+                      - stopped
+                    description: Execution status
+                  inputs:
+                    type: string
+                    description: Task input content
+                  outputs:
+                    type: string
+                    description: Task output content
+                  error:
+                    type: string
+                    description: Error reason
+                  total_steps:
+                    type: integer
+                    description: Total steps executed in the task
+                  total_tokens:
+                    type: integer
+                    description: Total tokens used in the task
+                  created_at:
+                    type: integer
+                    description: Task start time
+                  finished_at:
+                    type: integer
+                    description: Task end time
+                  elapsed_time:
+                    type: number
+                    format: float
+                    description: Time elapsed (seconds)
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+  '/workflows/tasks/{task_id}/stop':
+    post:
+      tags:
+        - Workflow
+      operationId: stopWorkflow
+      summary: Stop Response
+      description: Only supports streaming mode
+      parameters:
+        - name: task_id
+          in: path
+          description: 'Task ID, can be obtained from the streaming response chunks'
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user
+              properties:
+                user:
+                  type: string
+                  description: 'User identifier, must be consistent with the user passed in the message sending interface'
+      responses:
+        '200':
+          description: Successfully stopped the response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    description: Fixed return value 'success'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+  /workflows/logs:
+    get:
+      tags:
+        - Workflow
+      operationId: getWorkflowLogs
+      summary: Get Workflow Logs
+      description: Return workflow logs in reverse order
+      parameters:
+        - name: keyword
+          in: query
+          description: Keyword
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: 'Execution status: succeeded/failed/stopped'
+          required: false
+          schema:
+            type: string
+            enum:
+              - succeeded
+              - failed
+              - stopped
+        - name: page
+          in: query
+          description: 'Current page number, default 1'
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: 'Items per page, default 20'
+          required: false
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Successfully retrieved workflow logs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  page:
+                    type: integer
+                    description: Current page number
+                  limit:
+                    type: integer
+                    description: Items per page
+                  total:
+                    type: integer
+                    description: Total number of records
+                  has_more:
+                    type: boolean
+                    description: Whether there is more data
+                  data:
+                    type: array
+                    description: Data for the current page
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Identifier
+                        workflow_run:
+                          type: object
+                          description: Workflow execution log
+                          properties:
+                            id:
+                              type: string
+                              description: Identifier
+                            version:
+                              type: string
+                              description: Version
+                            status:
+                              type: string
+                              enum:
+                                - running
+                                - succeeded
+                                - failed
+                                - stopped
+                              description: Execution status
+                            error:
+                              type: string
+                              description: Error
+                            elapsed_time:
+                              type: number
+                              format: float
+                              description: 'Time elapsed, in seconds'
+                            total_tokens:
+                              type: integer
+                              description: Number of tokens consumed
+                            total_steps:
+                              type: integer
+                              description: Number of execution steps
+                            created_at:
+                              type: integer
+                              description: Start time
+                            finished_at:
+                              type: integer
+                              description: End time
+                        created_from:
+                          type: string
+                          description: Source
+                        created_by_role:
+                          type: string
+                          description: Role
+                        created_by_account:
+                          type: string
+                          description: Account
+                        created_by_end_user:
+                          type: object
+                          description: User
+                          properties:
+                            id:
+                              type: string
+                              description: Identifier
+                            type:
+                              type: string
+                              description: Type
+                            is_anonymous:
+                              type: boolean
+                              description: Whether anonymous
+                            session_id:
+                              type: string
+                              description: Session identifier
+                        created_at:
+                          type: integer
+                          description: Creation time
+

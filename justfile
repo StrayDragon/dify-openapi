@@ -18,17 +18,14 @@ help:
     @echo "`just -l`"
 
 
-update-fern-schema:
-    cp schema/app.en.yaml schema/knowledge_base.en.yaml fern/openapi/
-
-gen-client: apply-i18n-overlay-to-openapi-schema update-fern-schema
+gen-client: apply-i18n-overlay-to-openapi-schema
     fern generate --local
     ruff format src/
     bash misc/fern_sdk_hotfix_patch.sh
 
 # bump from bump-cli using this cmd to global install `npm install -g bump-cli`
 apply-i18n-overlay-to-openapi-schema: && check-i18n-openapi-schema
-    for name in app knowledge_base external_knowledge_base; do \
+    for name in app_generation app_chat app_advanced_chat app_workflow knowledge_base external_knowledge_base; do \
         for lang in en; do \
             echo "=== $name.$lang.yaml ==="; \
             npx bump overlay schema/$name.zh.yaml schema/overlays/$name.$lang.overlay.yaml > schema/$name.$lang.yaml; \
@@ -37,7 +34,7 @@ apply-i18n-overlay-to-openapi-schema: && check-i18n-openapi-schema
 
 
 check-i18n-openapi-schema:
-    for name in app knowledge_base external_knowledge_base; do \
+    for name in app_generation app_chat app_advanced_chat app_workflow knowledge_base external_knowledge_base; do \
         for lang in en; do \
             ./scripts/detect-chinese-char-in-files.py schema/$name.$lang.yaml; \
         done; \
