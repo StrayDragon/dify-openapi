@@ -1,0 +1,353 @@
+overlay: 1.0.0
+info:
+  title: "English translation overlay for Dify API - Workflow Application"
+  version: "1.0.0"
+extends: ../app_workflow.zh.yaml
+actions:
+  - target: $.tags[0].description
+    update: "Workflow Application Operations"
+  - target: $.info
+    update:
+      title: "Dify API - Workflow Application"
+      description: |
+        Dify API provides a series of interfaces for workflow functionality.
+        It supports workflow applications.
+        All API requests require an application-level API-Key in the Authorization HTTP Header.
+        official raw document: https://github.com/langgenius/dify/blob/1.2.0/web/app/components/develop/template/template_workflow.en.mdx
+
+  - target: $.servers[0]
+    update:
+      description: "Dify API Server"
+
+  - target: $.servers[1].variables.api_url
+    update:
+      description: "Custom API server URL"
+
+  - target: $.components.responses.Error400.description
+    update: "Request error"
+
+  - target: $.components.responses.Error401.description
+    update: "Non authorized or authentication failed"
+
+  - target: $.components.responses.Error404.description
+    update: "Resource not found"
+
+  - target: $.components.responses.Error500.description
+    update: "Server error"
+
+  - target: $.components.schemas.Error.properties.code.description
+    update: "Error code"
+
+  - target: $.components.schemas.Error.properties.status.description
+    update: "HTTP status code"
+
+  - target: $.components.schemas.Error.properties.message.description
+    update: "Error message description"
+
+  - target: $.components.schemas.Usage.properties.prompt_tokens.description
+    update: "Number of tokens used for prompts"
+
+  - target: $.components.schemas.Usage.properties.completion_tokens.description
+    update: "Number of tokens used for completion"
+
+  - target: $.components.schemas.Usage.properties.total_tokens.description
+    update: "Total number of tokens used"
+
+  - target: $.components.schemas.Usage.properties.prompt_unit_price.description
+    update: "Unit price for prompts"
+
+  - target: $.components.schemas.Usage.properties.prompt_price_unit.description
+    update: "Price unit for prompts"
+
+  - target: $.components.schemas.Usage.properties.prompt_price.description
+    update: "Total price for prompts"
+
+  - target: $.components.schemas.Usage.properties.completion_unit_price.description
+    update: "Unit price for completion"
+
+  - target: $.components.schemas.Usage.properties.completion_price_unit.description
+    update: "Price unit for completion"
+
+  - target: $.components.schemas.Usage.properties.completion_price.description
+    update: "Total price for completion"
+
+  - target: $.components.schemas.Usage.properties.total_price.description
+    update: "Total price"
+
+  - target: $.components.schemas.Usage.properties.currency.description
+    update: "Currency unit"
+
+  - target: $.components.schemas.Usage.properties.latency.description
+    update: "Latency time"
+
+  - target: $.components.schemas.RetrieverResource.properties.position.description
+    update: "Position"
+
+  - target: $.components.schemas.RetrieverResource.properties.dataset_id.description
+    update: "Dataset ID"
+
+  - target: $.components.schemas.RetrieverResource.properties.dataset_name.description
+    update: "Dataset name"
+
+  - target: $.components.schemas.RetrieverResource.properties.document_id.description
+    update: "Document ID"
+
+  - target: $.components.schemas.RetrieverResource.properties.document_name.description
+    update: "Document name"
+
+  - target: $.components.schemas.RetrieverResource.properties.segment_id.description
+    update: "Segment ID"
+
+  - target: $.components.schemas.RetrieverResource.properties.score.description
+    update: "Relevance score"
+
+  - target: $.components.schemas.RetrieverResource.properties.content.description
+    update: "Content"
+
+  - target: $.components.schemas.WorkflowMessage.properties.workflow_run_id.description
+    update: "Workflow execution ID"
+
+  - target: $.components.schemas.WorkflowMessage.properties.task_id.description
+    update: "Task ID"
+
+  - target: $.components.schemas.WorkflowMessage.properties.data.properties.id.description
+    update: "Workflow execution ID"
+
+  - target: $.components.schemas.WorkflowMessage.properties.data.properties.workflow_id.description
+    update: "Associated Workflow ID"
+
+  - target: $.components.schemas.WorkflowMessage.properties.data.properties.status.description
+    update: "Execution status"
+
+  - target: $.components.schemas.WorkflowMessage.properties.data.properties.outputs.description
+    update: "Output content"
+
+  - target: $.components.schemas.WorkflowMessage.properties.data.properties.error.description
+    update: "Error reason"
+
+  - target: $.components.schemas.WorkflowMessage.properties.data.properties.elapsed_time.description
+    update: "Elapsed time (s)"
+
+  - target: $.components.schemas.WorkflowMessage.properties.data.properties.total_tokens.description
+    update: "Total tokens used"
+
+  - target: $.components.schemas.WorkflowMessage.properties.data.properties.total_steps.description
+    update: "Total steps"
+
+  - target: $.components.schemas.WorkflowMessage.properties.data.properties.created_at.description
+    update: "Start time"
+
+  - target: $.components.schemas.WorkflowMessage.properties.data.properties.finished_at.description
+    update: "End time"
+
+  - target: $.components.schemas.StreamEvent.properties.event.description
+    update: "Event type"
+
+  - target: $.components.schemas.StreamEvent.properties.task_id.description
+    update: "Task ID"
+
+  - target: $.components.schemas.StreamEvent.properties.message_id.description
+    update: "Unique message ID"
+
+  - target: $.components.schemas.StreamEvent.properties.conversation_id.description
+    update: "Conversation ID"
+
+  - target: $.components.schemas.StreamEvent.properties.workflow_run_id.description
+    update: "Workflow execution ID"
+
+  - target: $.components.schemas.StreamEvent.properties.answer.description
+    update: "Response content"
+
+  - target: $.components.schemas.StreamEvent.properties.audio.description
+    update: "Voice synthesis audio data (base64 encoded)"
+
+  - target: $.components.schemas.StreamEvent.properties.data.description
+    update: "Event related data"
+
+  - target: $.components.schemas.StreamEvent.properties.created_at.description
+    update: "Creation timestamp"
+
+  - target: $.components.schemas.FileInput.properties.type.description
+    update: "File type"
+
+  - target: $.components.schemas.FileInput.properties.transfer_method.description
+    update: "Transfer method"
+
+  - target: $.components.schemas.FileInput.properties.url.description
+    update: "Remote URL"
+
+  - target: $.components.schemas.FileInput.properties.upload_file_id.description
+    update: "Upload file ID"
+
+  - target: $.paths['/workflows/run'].post
+    update:
+      summary: "Execute Workflow"
+      description: "Execute a workflow. Cannot be executed if there is no published workflow."
+
+  - target: $.paths['/workflows/run'].post.requestBody.content['application/json'].schema.properties.inputs.description
+    update: "Workflow input parameters"
+
+  - target: $.paths['/workflows/run'].post.requestBody.content['application/json'].schema.properties.response_mode.description
+    update: "Response mode"
+
+  - target: $.paths['/workflows/run'].post.requestBody.content['application/json'].schema.properties.user.description
+    update: "User identifier"
+
+  - target: $.paths['/workflows/run'].post.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get
+    update:
+      summary: "Get Workflow Execution Status"
+      description: "Get the current execution result of a workflow task based on the workflow execution ID"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get.parameters[0].description
+    update: "Workflow run ID, can be obtained from the streaming response chunks"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get.responses['200'].description
+    update: "Successfully retrieved workflow execution status"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get.responses['200'].content['application/json'].schema.properties.id.description
+    update: "Workflow execution ID"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get.responses['200'].content['application/json'].schema.properties.workflow_id.description
+    update: "Associated Workflow ID"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get.responses['200'].content['application/json'].schema.properties.status.description
+    update: "Execution status"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get.responses['200'].content['application/json'].schema.properties.inputs.description
+    update: "Task input content"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get.responses['200'].content['application/json'].schema.properties.outputs.description
+    update: "Task output content"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get.responses['200'].content['application/json'].schema.properties.error.description
+    update: "Error reason"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get.responses['200'].content['application/json'].schema.properties.total_steps.description
+    update: "Total steps executed in the task"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get.responses['200'].content['application/json'].schema.properties.total_tokens.description
+    update: "Total tokens used in the task"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get.responses['200'].content['application/json'].schema.properties.created_at.description
+    update: "Task start time"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get.responses['200'].content['application/json'].schema.properties.finished_at.description
+    update: "Task end time"
+
+  - target: $.paths['/workflows/run/{workflow_run_id}'].get.responses['200'].content['application/json'].schema.properties.elapsed_time.description
+    update: "Time elapsed (seconds)"
+
+  - target: $.paths['/workflows/tasks/{task_id}/stop'].post
+    update:
+      summary: "Stop Response"
+      description: "Only supports streaming mode"
+
+  - target: $.paths['/workflows/tasks/{task_id}/stop'].post.parameters[0].description
+    update: "Task ID, can be obtained from the streaming response chunks"
+
+  - target: $.paths['/workflows/tasks/{task_id}/stop'].post.requestBody.content['application/json'].schema.properties.user.description
+    update: "User identifier, must be consistent with the user passed in the message sending interface"
+
+  - target: $.paths['/workflows/tasks/{task_id}/stop'].post.responses['200'].description
+    update: "Successfully stopped the response"
+
+  - target: $.paths['/workflows/tasks/{task_id}/stop'].post.responses['200'].content['application/json'].schema.properties.result.description
+    update: "Fixed return value 'success'"
+
+  - target: $.paths['/workflows/logs'].get
+    update:
+      summary: "Get Workflow Logs"
+      description: "Return workflow logs in reverse order"
+
+  - target: $.paths['/workflows/logs'].get.parameters[0].description
+    update: "Keyword"
+
+  - target: $.paths['/workflows/logs'].get.parameters[1].description
+    update: "Execution status: succeeded/failed/stopped"
+
+  - target: $.paths['/workflows/logs'].get.parameters[2].description
+    update: "Current page number, default 1"
+
+  - target: $.paths['/workflows/logs'].get.parameters[3].description
+    update: "Items per page, default 20"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].description
+    update: "Successfully retrieved workflow logs"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.page.description
+    update: "Current page number"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.limit.description
+    update: "Items per page"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.total.description
+    update: "Total number of records"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.has_more.description
+    update: "Whether there is more data"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.description
+    update: "Data for the current page"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.id.description
+    update: "Identifier"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.workflow_run.description
+    update: "Workflow execution log"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.workflow_run.properties.id.description
+    update: "Identifier"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.workflow_run.properties.version.description
+    update: "Version"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.workflow_run.properties.status.description
+    update: "Execution status"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.workflow_run.properties.error.description
+    update: "Error"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.workflow_run.properties.elapsed_time.description
+    update: "Time elapsed, in seconds"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.workflow_run.properties.total_tokens.description
+    update: "Number of tokens consumed"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.workflow_run.properties.total_steps.description
+    update: "Number of execution steps"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.workflow_run.properties.created_at.description
+    update: "Start time"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.workflow_run.properties.finished_at.description
+    update: "End time"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.created_from.description
+    update: "Source"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.created_by_role.description
+    update: "Role"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.created_by_account.description
+    update: "Account"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.created_by_end_user.description
+    update: "User"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.created_by_end_user.properties.id.description
+    update: "Identifier"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.created_by_end_user.properties.type.description
+    update: "Type"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.created_by_end_user.properties.is_anonymous.description
+    update: "Whether anonymous"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.created_by_end_user.properties.session_id.description
+    update: "Session identifier"
+
+  - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.created_at.description
+    update: "Creation time"

@@ -5,7 +5,7 @@
 import pytest
 from typing import Any
 
-from dify_sdk.client import AsyncDifyApi
+from dify_sdk.workflow.client import AsyncWorkflowClient
 from dify_sdk_testing import RUNNING_IN_CI
 
 LOGIN_USER_ID = "test123"
@@ -15,7 +15,7 @@ LOGIN_USER_ID = "test123"
     RUNNING_IN_CI,
     reason="CI中使用官方服务器, 经常报504超时, 影响CI流程, 请使用本地服务测试",
 )
-async def test_workflow_execution_and_status(app_workflow_client: AsyncDifyApi):
+async def test_workflow_execution_and_status(app_workflow_client: AsyncWorkflowClient):
     """测试工作流执行和状态查询"""
     # 1. 执行工作流
     workflow_inputs: dict[str, Any] = {
@@ -24,7 +24,7 @@ async def test_workflow_execution_and_status(app_workflow_client: AsyncDifyApi):
         "files": [],
     }
 
-    response = await app_workflow_client.execute_workflow(
+    response = await app_workflow_client.run_workflow(
         inputs=workflow_inputs,
         response_mode="blocking",
         user=LOGIN_USER_ID,
@@ -56,7 +56,7 @@ async def test_workflow_execution_and_status(app_workflow_client: AsyncDifyApi):
     assert hasattr(status_response, "total_tokens")
 
 
-async def test_workflow_logs(app_workflow_client: AsyncDifyApi):
+async def test_workflow_logs(app_workflow_client: AsyncWorkflowClient):
     """测试获取工作流日志"""
     # 获取工作流日志
     logs_response = await app_workflow_client.get_workflow_logs(

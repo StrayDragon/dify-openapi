@@ -24,12 +24,6 @@ from .dataset_retrieval_model_dict import DatasetRetrievalModelDict
 from .dataset_retrieval_model_dict_reranking_model import (
     DatasetRetrievalModelDictRerankingModel,
 )
-from .delete_apps_annotations_annotation_id_response import (
-    DeleteAppsAnnotationsAnnotationIdResponse,
-)
-from .delete_conversations_conversation_id_response import (
-    DeleteConversationsConversationIdResponse,
-)
 from .document import Document
 from .document_display_status import DocumentDisplayStatus
 from .document_segment import DocumentSegment
@@ -47,79 +41,6 @@ from .error import Error
 from .file_input import FileInput
 from .file_input_transfer_method import FileInputTransferMethod
 from .file_input_type import FileInputType
-from .get_apps_annotation_reply_action_status_job_id_request_action import (
-    GetAppsAnnotationReplyActionStatusJobIdRequestAction,
-)
-from .get_apps_annotation_reply_action_status_job_id_response import (
-    GetAppsAnnotationReplyActionStatusJobIdResponse,
-)
-from .get_apps_annotations_response import GetAppsAnnotationsResponse
-from .get_apps_annotations_response_data_item import GetAppsAnnotationsResponseDataItem
-from .get_conversations_request_sort_by import GetConversationsRequestSortBy
-from .get_conversations_response import GetConversationsResponse
-from .get_info_response import GetInfoResponse
-from .get_messages_message_id_suggested_response import (
-    GetMessagesMessageIdSuggestedResponse,
-)
-from .get_messages_response import GetMessagesResponse
-from .get_meta_response import GetMetaResponse
-from .get_meta_response_tool_icons_value import GetMetaResponseToolIconsValue
-from .get_meta_response_tool_icons_value_background import (
-    GetMetaResponseToolIconsValueBackground,
-)
-from .get_parameters_response import GetParametersResponse
-from .get_parameters_response_annotation_reply import (
-    GetParametersResponseAnnotationReply,
-)
-from .get_parameters_response_retriever_resource import (
-    GetParametersResponseRetrieverResource,
-)
-from .get_parameters_response_speech_to_text import GetParametersResponseSpeechToText
-from .get_parameters_response_suggested_questions_after_answer import (
-    GetParametersResponseSuggestedQuestionsAfterAnswer,
-)
-from .get_workflows_logs_request_status import GetWorkflowsLogsRequestStatus
-from .get_workflows_logs_response import GetWorkflowsLogsResponse
-from .get_workflows_logs_response_data_item import GetWorkflowsLogsResponseDataItem
-from .get_workflows_logs_response_data_item_created_by_end_user import (
-    GetWorkflowsLogsResponseDataItemCreatedByEndUser,
-)
-from .get_workflows_logs_response_data_item_workflow_run import (
-    GetWorkflowsLogsResponseDataItemWorkflowRun,
-)
-from .get_workflows_logs_response_data_item_workflow_run_status import (
-    GetWorkflowsLogsResponseDataItemWorkflowRunStatus,
-)
-from .get_workflows_run_workflow_run_id_response import (
-    GetWorkflowsRunWorkflowRunIdResponse,
-)
-from .get_workflows_run_workflow_run_id_response_status import (
-    GetWorkflowsRunWorkflowRunIdResponseStatus,
-)
-from .post_apps_annotation_reply_action_request_action import (
-    PostAppsAnnotationReplyActionRequestAction,
-)
-from .post_apps_annotation_reply_action_response import (
-    PostAppsAnnotationReplyActionResponse,
-)
-from .post_apps_annotations_response import PostAppsAnnotationsResponse
-from .post_audio_to_text_response import PostAudioToTextResponse
-from .post_chat_messages_request_response_mode import (
-    PostChatMessagesRequestResponseMode,
-)
-from .post_completion_messages_request_inputs import PostCompletionMessagesRequestInputs
-from .post_completion_messages_request_response_mode import (
-    PostCompletionMessagesRequestResponseMode,
-)
-from .post_messages_message_id_feedbacks_response import (
-    PostMessagesMessageIdFeedbacksResponse,
-)
-from .post_workflows_run_request_response_mode import (
-    PostWorkflowsRunRequestResponseMode,
-)
-from .post_workflows_tasks_task_id_stop_response import (
-    PostWorkflowsTasksTaskIdStopResponse,
-)
 from .process_rule import ProcessRule
 from .process_rule_mode import ProcessRuleMode
 from .process_rule_rules import ProcessRuleRules
@@ -127,9 +48,6 @@ from .process_rule_rules_pre_processing_rules_item import (
     ProcessRuleRulesPreProcessingRulesItem,
 )
 from .process_rule_rules_segmentation import ProcessRuleRulesSegmentation
-from .put_apps_annotations_annotation_id_response import (
-    PutAppsAnnotationsAnnotationIdResponse,
-)
 from .retrieval_model import RetrievalModel
 from .retrieval_model_reranking_model import RetrievalModelRerankingModel
 from .retrieval_model_search_method import RetrievalModelSearchMethod
@@ -170,8 +88,6 @@ __all__ = [
     "DatasetProvider",
     "DatasetRetrievalModelDict",
     "DatasetRetrievalModelDictRerankingModel",
-    "DeleteAppsAnnotationsAnnotationIdResponse",
-    "DeleteConversationsConversationIdResponse",
     "Document",
     "DocumentDisplayStatus",
     "DocumentSegment",
@@ -187,47 +103,11 @@ __all__ = [
     "FileInput",
     "FileInputTransferMethod",
     "FileInputType",
-    "GetAppsAnnotationReplyActionStatusJobIdRequestAction",
-    "GetAppsAnnotationReplyActionStatusJobIdResponse",
-    "GetAppsAnnotationsResponse",
-    "GetAppsAnnotationsResponseDataItem",
-    "GetConversationsRequestSortBy",
-    "GetConversationsResponse",
-    "GetInfoResponse",
-    "GetMessagesMessageIdSuggestedResponse",
-    "GetMessagesResponse",
-    "GetMetaResponse",
-    "GetMetaResponseToolIconsValue",
-    "GetMetaResponseToolIconsValueBackground",
-    "GetParametersResponse",
-    "GetParametersResponseAnnotationReply",
-    "GetParametersResponseRetrieverResource",
-    "GetParametersResponseSpeechToText",
-    "GetParametersResponseSuggestedQuestionsAfterAnswer",
-    "GetWorkflowsLogsRequestStatus",
-    "GetWorkflowsLogsResponse",
-    "GetWorkflowsLogsResponseDataItem",
-    "GetWorkflowsLogsResponseDataItemCreatedByEndUser",
-    "GetWorkflowsLogsResponseDataItemWorkflowRun",
-    "GetWorkflowsLogsResponseDataItemWorkflowRunStatus",
-    "GetWorkflowsRunWorkflowRunIdResponse",
-    "GetWorkflowsRunWorkflowRunIdResponseStatus",
-    "PostAppsAnnotationReplyActionRequestAction",
-    "PostAppsAnnotationReplyActionResponse",
-    "PostAppsAnnotationsResponse",
-    "PostAudioToTextResponse",
-    "PostChatMessagesRequestResponseMode",
-    "PostCompletionMessagesRequestInputs",
-    "PostCompletionMessagesRequestResponseMode",
-    "PostMessagesMessageIdFeedbacksResponse",
-    "PostWorkflowsRunRequestResponseMode",
-    "PostWorkflowsTasksTaskIdStopResponse",
     "ProcessRule",
     "ProcessRuleMode",
     "ProcessRuleRules",
     "ProcessRuleRulesPreProcessingRulesItem",
     "ProcessRuleRulesSegmentation",
-    "PutAppsAnnotationsAnnotationIdResponse",
     "RetrievalModel",
     "RetrievalModelRerankingModel",
     "RetrievalModelSearchMethod",

@@ -12,5 +12,8 @@ groups:
 
 api:
   specs:
-    - openapi: openapi/app.en.yaml
-    - openapi: openapi/knowledge_base.en.yaml
+    - openapi: ../schema/app_generation.en.yaml
+    - openapi: ../schema/app_advanced_chat.en.yaml
+    - openapi: ../schema/app_chat.en.yaml
+    - openapi: ../schema/app_workflow.en.yaml
+    - openapi: ../schema/knowledge_base.en.yaml

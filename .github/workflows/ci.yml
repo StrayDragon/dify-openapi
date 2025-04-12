@@ -2,9 +2,8 @@ name: ci
 
 on:
   push:
-    paths:
-      - "src"
-      - "tests"
+    paths-ignore:
+      - "**/README*.md"
 
 jobs:
   test:

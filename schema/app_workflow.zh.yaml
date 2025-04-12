@@ -1,0 +1,557 @@
+openapi: 3.0.0
+info:
+  title: Dify API - 工作流应用
+  description: |
+    Dify API 提供了一系列接口用于工作流功能。
+    支持工作流应用。
+    所有 API 请求都需要在 Authorization HTTP Header 中包含应用级 API-Key。
+    官方原始文档见: https://github.com/langgenius/dify/blob/1.2.0/web/app/components/develop/template/template_workflow.zh.mdx
+  version: 1.2.0
+
+servers:
+  - url: https://api.dify.ai/v1
+    description: Dify API 服务器
+
+  - url: "{api_url}"
+    variables:
+      api_url:
+        default: https://api.dify.ai/v1
+        description: 自定义 API 服务器 URL
+
+  - url: http://ai.urchinet.lan/v1
+    description: author of dify-openapi dev server
+
+security:
+  - bearerApiKeyAuth: []
+
+components:
+  securitySchemes:
+    bearerApiKeyAuth:
+      type: http
+      scheme: bearer
+
+  responses:
+    Error400:
+      description: 请求错误
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    Error401:
+      description: 未授权或授权失败
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    Error404:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    Error500:
+      description: 服务器错误
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 错误代码
+        status:
+          type: integer
+          description: HTTP 状态码
+        message:
+          type: string
+          description: 错误信息描述
+      required:
+        - code
+        - status
+        - message
+
+    Usage:
+      type: object
+      properties:
+        prompt_tokens:
+          type: integer
+          description: 提示词使用的 token 数量
+        completion_tokens:
+          type: integer
+          description: 补全使用的 token 数量
+        total_tokens:
+          type: integer
+          description: 总共使用的 token 数量
+        prompt_unit_price:
+          type: string
+          description: 提示词单价
+        prompt_price_unit:
+          type: string
+          description: 提示词价格单位
+        prompt_price:
+          type: string
+          description: 提示词总价
+        completion_unit_price:
+          type: string
+          description: 补全单价
+        completion_price_unit:
+          type: string
+          description: 补全价格单位
+        completion_price:
+          type: string
+          description: 补全总价
+        total_price:
+          type: string
+          description: 总价格
+        currency:
+          type: string
+          description: 货币单位
+        latency:
+          type: number
+          description: 延迟时间
+
+    RetrieverResource:
+      type: object
+      properties:
+        position:
+          type: integer
+          description: 位置
+        dataset_id:
+          type: string
+          description: 数据集ID
+        dataset_name:
+          type: string
+          description: 数据集名称
+        document_id:
+          type: string
+          description: 文档ID
+        document_name:
+          type: string
+          description: 文档名称
+        segment_id:
+          type: string
+          description: 分段ID
+        score:
+          type: number
+          description: 相关度分数
+        content:
+          type: string
+          description: 内容
+
+    WorkflowMessage:
+      type: object
+      properties:
+        workflow_run_id:
+          type: string
+          description: workflow 执行 ID
+        task_id:
+          type: string
+          description: 任务 ID
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              description: workflow 执行 ID
+            workflow_id:
+              type: string
+              description: 关联 Workflow ID
+            status:
+              type: string
+              enum: [running, succeeded, failed, stopped]
+              description: 执行状态
+            outputs:
+              type: object
+              description: 输出内容
+            error:
+              type: string
+              description: 错误原因
+            elapsed_time:
+              type: number
+              description: 耗时(s)
+            total_tokens:
+              type: integer
+              description: 总使用 tokens
+            total_steps:
+              type: integer
+              description: 总步数
+            created_at:
+              type: integer
+              description: 开始时间
+            finished_at:
+              type: integer
+              description: 结束时间
+
+    StreamEvent:
+      type: object
+      properties:
+        event:
+          type: string
+          enum:
+            [
+              message,
+              message_end,
+              tts_message,
+              tts_message_end,
+              message_replace,
+              error,
+              ping,
+              workflow_started,
+              node_started,
+              node_finished,
+              workflow_finished,
+              agent_message,
+              agent_thought,
+              message_file,
+            ]
+          description: 事件类型
+        task_id:
+          type: string
+          description: 任务 ID
+        message_id:
+          type: string
+          description: 消息唯一 ID
+        conversation_id:
+          type: string
+          description: 会话 ID
+        workflow_run_id:
+          type: string
+          description: workflow 执行 ID
+        answer:
+          type: string
+          description: 回复内容
+        audio:
+          type: string
+          description: 语音合成音频数据（base64编码）
+        data:
+          type: object
+          description: 事件相关数据
+        metadata:
+          type: object
+          properties:
+            usage:
+              $ref: "#/components/schemas/Usage"
+            retriever_resources:
+              type: array
+              items:
+                $ref: "#/components/schemas/RetrieverResource"
+        created_at:
+          type: integer
+          description: 创建时间戳
+
+    FileInput:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [document, image, audio, video, custom]
+          description: 文件类型
+        transfer_method:
+          type: string
+          enum: [remote_url, local_file]
+          description: 传递方式
+        url:
+          type: string
+          description: 远程URL
+        upload_file_id:
+          type: string
+          description: 上传文件ID
+
+tags:
+  - name: Workflow
+    description: 工作流应用相关操作
+
+paths:
+  /workflows/run:
+    post:
+      tags:
+        - Workflow
+      operationId: runWorkflow
+      summary: 执行工作流(工作流应用)
+      description: 执行 workflow，没有已发布的 workflow，不可执行
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - inputs
+                - response_mode
+                - user
+              properties:
+                inputs:
+                  type: object
+                  description: 工作流输入参数
+                response_mode:
+                  type: string
+                  enum: [streaming, blocking]
+                  description: 响应模式
+                user:
+                  type: string
+                  description: 用户标识
+                files:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/FileInput"
+      responses:
+        "200":
+          description: 成功响应
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowMessage"
+            text/event-stream:
+              schema:
+                $ref: "#/components/schemas/StreamEvent"
+        "400":
+          $ref: "#/components/responses/Error400"
+        "404":
+          $ref: "#/components/responses/Error404"
+        "500":
+          $ref: "#/components/responses/Error500"
+
+  /workflows/run/{workflow_run_id}:
+    get:
+      tags:
+        - Workflow
+      operationId: getWorkflowExecutionStatus
+      summary: 获取workflow执行情况
+      description: 根据 workflow 执行 ID 获取 workflow 任务当前执行结果
+      parameters:
+        - name: workflow_run_id
+          in: path
+          description: workflow_run_id，可在流式返回 Chunk 中获取
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功获取workflow执行情况
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: workflow 执行 ID
+                  workflow_id:
+                    type: string
+                    description: 关联的 Workflow ID
+                  status:
+                    type: string
+                    enum: [running, succeeded, failed, stopped]
+                    description: 执行状态
+                  inputs:
+                    type: string
+                    description: 任务输入内容
+                  outputs:
+                    type: string
+                    description: 任务输出内容
+                  error:
+                    type: string
+                    description: 错误原因
+                  total_steps:
+                    type: integer
+                    description: 任务执行总步数
+                  total_tokens:
+                    type: integer
+                    description: 任务执行总 tokens
+                  created_at:
+                    type: integer
+                    description: 任务开始时间
+                  finished_at:
+                    type: integer
+                    description: 任务结束时间
+                  elapsed_time:
+                    type: number
+                    format: float
+                    description: 耗时(s)
+        '400':
+          $ref: "#/components/responses/Error400"
+        '401':
+          $ref: "#/components/responses/Error401"
+        '404':
+          $ref: "#/components/responses/Error404"
+        '500':
+          $ref: "#/components/responses/Error500"
+
+  /workflows/tasks/{task_id}/stop:
+    post:
+      tags:
+        - Workflow
+      operationId: stopWorkflow
+      summary: 停止响应
+      description: 仅支持流式模式
+      parameters:
+        - name: task_id
+          in: path
+          description: 任务 ID，可在流式返回 Chunk 中获取
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user
+              properties:
+                user:
+                  type: string
+                  description: 用户标识，用于定义终端用户的身份，必须和发送消息接口传入 user 保持一致
+      responses:
+        '200':
+          description: 成功停止响应
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    description: 固定返回 "success"
+        '400':
+          $ref: "#/components/responses/Error400"
+        '401':
+          $ref: "#/components/responses/Error401"
+        '404':
+          $ref: "#/components/responses/Error404"
+        '500':
+          $ref: "#/components/responses/Error500"
+
+  /workflows/logs:
+    get:
+      tags:
+        - Workflow
+      operationId: getWorkflowLogs
+      summary: 获取 workflow 日志
+      description: 倒序返回workflow日志
+      parameters:
+        - name: keyword
+          in: query
+          description: 关键字
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: 执行状态 succeeded/failed/stopped
+          required: false
+          schema:
+            type: string
+            enum: [succeeded, failed, stopped]
+        - name: page
+          in: query
+          description: 当前页码, 默认1
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: 每页条数, 默认20
+          required: false
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: 成功获取workflow日志
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  page:
+                    type: integer
+                    description: 当前页码
+                  limit:
+                    type: integer
+                    description: 每页条数
+                  total:
+                    type: integer
+                    description: 总条数
+                  has_more:
+                    type: boolean
+                    description: 是否还有更多数据
+                  data:
+                    type: array
+                    description: 当前页码的数据
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: 标识
+                        workflow_run:
+                          type: object
+                          description: Workflow 执行日志
+                          properties:
+                            id:
+                              type: string
+                              description: 标识
+                            version:
+                              type: string
+                              description: 版本
+                            status:
+                              type: string
+                              enum: [running, succeeded, failed, stopped]
+                              description: 执行状态
+                            error:
+                              type: string
+                              description: 错误
+                            elapsed_time:
+                              type: number
+                              format: float
+                              description: 耗时，单位秒
+                            total_tokens:
+                              type: integer
+                              description: 消耗的token数量
+                            total_steps:
+                              type: integer
+                              description: 执行步骤长度
+                            created_at:
+                              type: integer
+                              description: 开始时间
+                            finished_at:
+                              type: integer
+                              description: 结束时间
+                        created_from:
+                          type: string
+                          description: 来源
+                        created_by_role:
+                          type: string
+                          description: 角色
+                        created_by_account:
+                          type: string
+                          description: 帐号
+                        created_by_end_user:
+                          type: object
+                          description: 用户
+                          properties:
+                            id:
+                              type: string
+                              description: 标识
+                            type:
+                              type: string
+                              description: 类型
+                            is_anonymous:
+                              type: boolean
+                              description: 是否匿名
+                            session_id:
+                              type: string
+                              description: 会话标识
+                        created_at:
+                          type: integer
+                          description: 创建时间

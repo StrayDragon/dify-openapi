@@ -1,0 +1,892 @@
+openapi: 3.0.0
+info:
+  title: Dify API - 文本生成型应用
+  description: |
+    Dify API 提供了一系列接口用于文本生成功能。
+    支持文本生成型应用。
+    所有 API 请求都需要在 Authorization HTTP Header 中包含应用级 API-Key。
+    官方原始文档见: https://github.com/langgenius/dify/blob/1.2.0/web/app/components/develop/template/template.zh.mdx
+  version: 1.2.0
+
+servers:
+  - url: https://api.dify.ai/v1
+    description: Dify API 服务器
+
+  - url: "{api_url}"
+    variables:
+      api_url:
+        default: https://api.dify.ai/v1
+        description: 自定义 API 服务器 URL
+
+  - url: http://ai.urchinet.lan/v1
+    description: author of dify-openapi dev server
+
+security:
+  - bearerApiKeyAuth: []
+
+components:
+  securitySchemes:
+    bearerApiKeyAuth:
+      type: http
+      scheme: bearer
+
+  responses:
+    Error400:
+      description: 请求错误
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    Error401:
+      description: 未授权或授权失败
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    Error404:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    Error500:
+      description: 服务器错误
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 错误代码
+        status:
+          type: integer
+          description: HTTP 状态码
+        message:
+          type: string
+          description: 错误信息描述
+      required:
+        - code
+        - status
+        - message
+
+    Usage:
+      type: object
+      properties:
+        prompt_tokens:
+          type: integer
+          description: 提示词使用的 token 数量
+        completion_tokens:
+          type: integer
+          description: 补全使用的 token 数量
+        total_tokens:
+          type: integer
+          description: 总共使用的 token 数量
+        prompt_unit_price:
+          type: string
+          description: 提示词单价
+        prompt_price_unit:
+          type: string
+          description: 提示词价格单位
+        prompt_price:
+          type: string
+          description: 提示词总价
+        completion_unit_price:
+          type: string
+          description: 补全单价
+        completion_price_unit:
+          type: string
+          description: 补全价格单位
+        completion_price:
+          type: string
+          description: 补全总价
+        total_price:
+          type: string
+          description: 总价格
+        currency:
+          type: string
+          description: 货币单位
+        latency:
+          type: number
+          description: 延迟时间
+
+    RetrieverResource:
+      type: object
+      properties:
+        position:
+          type: integer
+          description: 位置
+        dataset_id:
+          type: string
+          description: 数据集ID
+        dataset_name:
+          type: string
+          description: 数据集名称
+        document_id:
+          type: string
+          description: 文档ID
+        document_name:
+          type: string
+          description: 文档名称
+        segment_id:
+          type: string
+          description: 分段ID
+        score:
+          type: number
+          description: 相关度分数
+        content:
+          type: string
+          description: 内容
+
+    BaseMessage:
+      type: object
+      properties:
+        message_id:
+          type: string
+          description: 消息唯一 ID
+        created_at:
+          type: integer
+          description: 消息创建时间戳
+        metadata:
+          type: object
+          properties:
+            usage:
+              $ref: "#/components/schemas/Usage"
+            retriever_resources:
+              type: array
+              items:
+                $ref: "#/components/schemas/RetrieverResource"
+
+    CompletionMessage:
+      allOf:
+        - $ref: "#/components/schemas/BaseMessage"
+        - type: object
+          properties:
+            mode:
+              type: string
+              description: App 模式，固定为 completion
+            answer:
+              type: string
+              description: 完整回复内容
+
+    FileInput:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [document, image, audio, video, custom]
+          description: 文件类型
+        transfer_method:
+          type: string
+          enum: [remote_url, local_file]
+          description: 传递方式
+        url:
+          type: string
+          description: 远程URL
+        upload_file_id:
+          type: string
+          description: 上传文件ID
+
+    StreamEvent:
+      type: object
+      properties:
+        event:
+          type: string
+          enum:
+            [
+              message,
+              message_end,
+              tts_message,
+              tts_message_end,
+              message_replace,
+              error,
+              ping,
+              workflow_started,
+              node_started,
+              node_finished,
+              workflow_finished,
+              agent_message,
+              agent_thought,
+              message_file,
+            ]
+          description: 事件类型
+        task_id:
+          type: string
+          description: 任务 ID
+        message_id:
+          type: string
+          description: 消息唯一 ID
+        conversation_id:
+          type: string
+          description: 会话 ID
+        workflow_run_id:
+          type: string
+          description: workflow 执行 ID
+        answer:
+          type: string
+          description: 回复内容
+        audio:
+          type: string
+          description: 语音合成音频数据（base64编码）
+        data:
+          type: object
+          description: 事件相关数据
+        metadata:
+          type: object
+          properties:
+            usage:
+              $ref: "#/components/schemas/Usage"
+            retriever_resources:
+              type: array
+              items:
+                $ref: "#/components/schemas/RetrieverResource"
+        created_at:
+          type: integer
+          description: 创建时间戳
+
+    UploadedFile:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 文件 ID
+        name:
+          type: string
+          description: 文件名
+        size:
+          type: integer
+          description: 文件大小（byte）
+        extension:
+          type: string
+          description: 文件后缀
+        mime_type:
+          type: string
+          description: 文件 mime-type
+        created_by:
+          type: string
+          description: 上传人 ID
+        created_at:
+          type: integer
+          description: 上传时间
+
+tags:
+  - name: Generation
+    description: 文本生成型应用相关操作
+
+paths:
+  /completion-messages:
+    post:
+      tags:
+        - Generation
+      operationId: sendCompletionMessageByAppGeneration
+      summary: 发送消息(文本生成型应用)
+      description: 发送请求给文本生成型应用
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - inputs
+              properties:
+                inputs:
+                  type: object
+                  properties:
+                    query:
+                      type: string
+                      description: 用户输入的文本内容
+                  required:
+                    - query
+                response_mode:
+                  type: string
+                  enum: [streaming, blocking]
+                  description: |
+                    响应模式:
+                    - streaming: 流式模式（推荐），基于 SSE 实现类似打字机输出
+                    - blocking: 阻塞模式，等待执行完毕后返回结果
+                user:
+                  type: string
+                  description: 用户标识
+                files:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/FileInput"
+      responses:
+        "200":
+          description: 成功响应
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompletionMessage"
+            text/event-stream:
+              schema:
+                $ref: "#/components/schemas/StreamEvent"
+        "400":
+          $ref: "#/components/responses/Error400"
+        "404":
+          $ref: "#/components/responses/Error404"
+        "500":
+          $ref: "#/components/responses/Error500"
+
+  /files/upload:
+    post:
+      tags:
+        - Generation
+      operationId: uploadFileByAppGeneration
+      summary: 上传文件
+      description: |
+        上传文件并在发送消息时使用。
+        支持的文件类型取决于应用类型和配置。
+        上传的文件仅供当前终端用户使用。
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: 要上传的文件
+                user:
+                  type: string
+                  description: 用户标识
+              required:
+                - file
+      responses:
+        "200":
+          description: 成功响应
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadedFile"
+        "400":
+          $ref: "#/components/responses/Error400"
+        "413":
+          description: 文件太大
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "415":
+          description: 不支持的文件类型
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "503":
+          description: 存储服务错误
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /info:
+    get:
+      tags:
+        - Generation
+      operationId: getApplicationInfoByAppGeneration
+      summary: 获取应用基本信息
+      responses:
+        "200":
+          description: 成功响应
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: 应用名称
+                  description:
+                    type: string
+                    description: 应用描述
+                  tags:
+                    type: array
+                    items:
+                      type: string
+                    description: 应用标签
+
+  /parameters:
+    get:
+      tags:
+        - Generation
+      operationId: getApplicationParametersByAppGeneration
+      summary: 获取应用参数
+      responses:
+        "200":
+          description: 成功响应
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  opening_statement:
+                    type: string
+                    description: 开场白
+                  suggested_questions:
+                    type: array
+                    items:
+                      type: string
+                    description: 开场推荐问题列表
+                  suggested_questions_after_answer:
+                    type: object
+                    properties:
+                      enabled:
+                        type: boolean
+                    description: 回答后推荐问题设置
+                  speech_to_text:
+                    type: object
+                    properties:
+                      enabled:
+                        type: boolean
+                    description: 语音转文本设置
+                  retriever_resource:
+                    type: object
+                    properties:
+                      enabled:
+                        type: boolean
+                    description: 引用和归属设置
+                  user_input_form:
+                    type: array
+                    items:
+                      type: object
+                    description: 用户输入表单配置
+                  file_upload:
+                    type: object
+                    description: 文件上传配置
+                  system_parameters:
+                    type: object
+                    description: 系统参数
+
+  /completion-messages/{task_id}/stop:
+    post:
+      tags:
+        - Generation
+      operationId: stopCompletionResponseByAppGeneration
+      summary: 停止响应
+      description: 仅支持流式模式
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 任务 ID，可在流式返回 Chunk 中获取
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user
+              properties:
+                user:
+                  type: string
+                  description: 用户标识，必须和发送消息接口传入 user 保持一致
+      responses:
+        '200':
+          description: 成功响应
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    enum: [success]
+                    description: 固定返回 success
+
+  /messages/{message_id}/feedbacks:
+    post:
+      tags:
+        - Generation
+      operationId: sendMessageFeedbackByAppGeneration
+      summary: 消息反馈（点赞）
+      description: 消息终端用户反馈、点赞，方便应用开发者优化输出预期
+      parameters:
+        - name: message_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 消息 ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - rating
+                - user
+              properties:
+                rating:
+                  type: string
+                  enum: [like, dislike, null]
+                  description: 点赞 like, 点踩 dislike, 撤销点赞 null
+                user:
+                  type: string
+                  description: 用户标识，由开发者定义规则，需保证用户标识在应用内唯一
+                content:
+                  type: string
+                  description: 消息反馈的具体信息
+      responses:
+        '200':
+          description: 成功响应
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    enum: [success]
+                    description: 固定返回 success
+
+  /text-to-audio:
+    post:
+      tags:
+        - Generation
+      operationId: convertTextToAudioByAppGeneration
+      summary: 文字转语音
+      description: 文字转语音
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message_id:
+                  type: string
+                  description: Dify 生成的文本消息ID，后台会通过 message_id 查找相应的内容直接合成语音信息。如果同时传 message_id 和 text，优先使用 message_id
+                text:
+                  type: string
+                  description: 语音生成内容。如果没有传 message_id 的话，则会使用这个字段的内容
+                user:
+                  type: string
+                  description: 用户标识，由开发者定义规则，需保证用户标识在应用内唯一
+      responses:
+        '200':
+          description: 成功响应
+          content:
+            audio/wav:
+              schema:
+                type: string
+                format: binary
+                description: 音频文件
+
+  /apps/annotations:
+    get:
+      tags:
+        - Generation
+      operationId: getAnnotationsListByAppGeneration
+      summary: 获取标注列表
+      description: 获取应用的标注列表
+      parameters:
+        - name: page
+          in: query
+          description: 页码
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: 每页数量
+          required: false
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: 成功获取标注列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: 标注ID
+                        question:
+                          type: string
+                          description: 问题
+                        answer:
+                          type: string
+                          description: 答案
+                        hit_count:
+                          type: integer
+                          description: 命中次数
+                        created_at:
+                          type: integer
+                          description: 创建时间戳
+                  has_more:
+                    type: boolean
+                    description: 是否有更多数据
+                  limit:
+                    type: integer
+                    description: 每页数量
+                  total:
+                    type: integer
+                    description: 总记录数
+                  page:
+                    type: integer
+                    description: 当前页码
+
+    post:
+      tags:
+        - Generation
+      operationId: createAnnotationByAppGeneration
+      summary: 创建标注
+      description: 创建新的标注
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - question
+                - answer
+              properties:
+                question:
+                  type: string
+                  description: 问题
+                answer:
+                  type: string
+                  description: 答案
+      responses:
+        "200":
+          description: 成功创建标注
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: 标注ID
+                  question:
+                    type: string
+                    description: 问题
+                  answer:
+                    type: string
+                    description: 答案
+                  hit_count:
+                    type: integer
+                    description: 命中次数
+                  created_at:
+                    type: integer
+                    description: 创建时间戳
+
+  /apps/annotations/{annotation_id}:
+    put:
+      tags:
+        - Generation
+      operationId: updateAnnotationByAppGeneration
+      summary: 更新标注
+      description: 更新指定的标注
+      parameters:
+        - name: annotation_id
+          in: path
+          description: 标注ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - question
+                - answer
+              properties:
+                question:
+                  type: string
+                  description: 问题
+                answer:
+                  type: string
+                  description: 答案
+      responses:
+        "200":
+          description: 成功更新标注
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: 标注ID
+                  question:
+                    type: string
+                    description: 问题
+                  answer:
+                    type: string
+                    description: 答案
+                  hit_count:
+                    type: integer
+                    description: 命中次数
+                  created_at:
+                    type: integer
+                    description: 创建时间戳
+
+    delete:
+      tags:
+        - Generation
+      operationId: deleteAnnotationByAppGeneration
+      summary: 删除标注
+      description: 删除指定的标注
+      parameters:
+        - name: annotation_id
+          in: path
+          description: 标注ID
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 成功删除标注
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    enum: [success]
+
+  /apps/annotation-reply/{action}:
+    post:
+      tags:
+        - Generation
+      operationId: configureAnnotationReplyByAppGeneration
+      summary: 标注回复初始设置
+      description: 启用或禁用标注回复功能
+      parameters:
+        - name: action
+          in: path
+          description: 动作，只能是 'enable' 或 'disable'
+          required: true
+          schema:
+            type: string
+            enum: [enable, disable]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                embedding_model_provider:
+                  type: string
+                  description: 指定的嵌入模型提供商, 必须先在系统内设定好接入的模型，对应的是provider字段
+                embedding_model:
+                  type: string
+                  description: 指定的嵌入模型，对应的是model字段
+                score_threshold:
+                  type: number
+                  description: 相似度阈值，当相似度大于该阈值时，系统会自动回复，否则不回复
+      responses:
+        "200":
+          description: 成功启用或禁用标注回复
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  job_id:
+                    type: string
+                    description: 任务ID
+                  job_status:
+                    type: string
+                    description: 任务状态
+
+  /apps/annotation-reply/{action}/status/{job_id}:
+    get:
+      tags:
+        - Generation
+      operationId: getAnnotationReplyStatusByAppGeneration
+      summary: 查询标注回复初始设置任务状态
+      description: 查询标注回复初始设置任务的执行状态
+      parameters:
+        - name: action
+          in: path
+          description: 动作，只能是 'enable' 或 'disable'，并且必须和标注回复初始设置接口的动作一致
+          required: true
+          schema:
+            type: string
+            enum: [enable, disable]
+        - name: job_id
+          in: path
+          description: 任务ID，从标注回复初始设置接口返回的job_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 成功获取任务状态
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  job_id:
+                    type: string
+                    description: 任务ID
+                  job_status:
+                    type: string
+                    description: 任务状态
+                  error_msg:
+                    type: string
+                    description: 错误信息
+
+  /meta:
+    get:
+      tags:
+        - Generation
+      operationId: getAppMetaInfoByAppGeneration
+      summary: 获取应用Meta信息
+      description: 用于获取工具icon
+      responses:
+        '200':
+          description: 成功响应
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tool_icons:
+                    type: object
+                    description: 工具图标
+                    additionalProperties:
+                      oneOf:
+                        - type: object
+                          properties:
+                            background:
+                              type: string
+                              description: hex格式的背景色
+                            content:
+                              type: string
+                              description: emoji
+                        - type: string
+                          description: 图标URL

@@ -1,0 +1,558 @@
+overlay: 1.0.0
+info:
+  title: "English translation overlay for Dify API - Advanced Chat Application"
+  version: "1.0.0"
+extends: ../app_advanced_chat.zh.yaml
+actions:
+  - target: $.tags[0].description
+    update: "Advanced Chat Application Operations"
+  - target: $.info
+    update:
+      title: "Dify API - Advanced Chat Application"
+      description: |
+        Dify API provides a series of interfaces for advanced conversation functionality.
+        It supports advanced conversational applications.
+        All API requests require an application-level API-Key in the Authorization HTTP Header.
+        official raw document: https://github.com/langgenius/dify/blob/1.2.0/web/app/components/develop/template/template_advanced_chat.en.mdx
+
+  - target: $.servers[0]
+    update:
+      description: "Dify API Server"
+
+  - target: $.servers[1].variables.api_url
+    update:
+      description: "Custom API server URL"
+
+  - target: $.components.responses.Error400.description
+    update: "Request error"
+
+  - target: $.components.responses.Error401.description
+    update: "Non authorized or authentication failed"
+
+  - target: $.components.responses.Error404.description
+    update: "Resource not found"
+
+  - target: $.components.responses.Error500.description
+    update: "Server error"
+
+  - target: $.components.schemas.Error.properties.code.description
+    update: "Error code"
+
+  - target: $.components.schemas.Error.properties.status.description
+    update: "HTTP status code"
+
+  - target: $.components.schemas.Error.properties.message.description
+    update: "Error message description"
+
+  - target: $.components.schemas.Usage.properties.prompt_tokens.description
+    update: "Number of tokens used for prompts"
+
+  - target: $.components.schemas.Usage.properties.completion_tokens.description
+    update: "Number of tokens used for completion"
+
+  - target: $.components.schemas.Usage.properties.total_tokens.description
+    update: "Total number of tokens used"
+
+  - target: $.components.schemas.Usage.properties.prompt_unit_price.description
+    update: "Unit price for prompts"
+
+  - target: $.components.schemas.Usage.properties.prompt_price_unit.description
+    update: "Price unit for prompts"
+
+  - target: $.components.schemas.Usage.properties.prompt_price.description
+    update: "Total price for prompts"
+
+  - target: $.components.schemas.Usage.properties.completion_unit_price.description
+    update: "Unit price for completion"
+
+  - target: $.components.schemas.Usage.properties.completion_price_unit.description
+    update: "Price unit for completion"
+
+  - target: $.components.schemas.Usage.properties.completion_price.description
+    update: "Total price for completion"
+
+  - target: $.components.schemas.Usage.properties.total_price.description
+    update: "Total price"
+
+  - target: $.components.schemas.Usage.properties.currency.description
+    update: "Currency unit"
+
+  - target: $.components.schemas.Usage.properties.latency.description
+    update: "Latency time"
+
+  - target: $.components.schemas.RetrieverResource.properties.position.description
+    update: "Position"
+
+  - target: $.components.schemas.RetrieverResource.properties.dataset_id.description
+    update: "Dataset ID"
+
+  - target: $.components.schemas.RetrieverResource.properties.dataset_name.description
+    update: "Dataset name"
+
+  - target: $.components.schemas.RetrieverResource.properties.document_id.description
+    update: "Document ID"
+
+  - target: $.components.schemas.RetrieverResource.properties.document_name.description
+    update: "Document name"
+
+  - target: $.components.schemas.RetrieverResource.properties.segment_id.description
+    update: "Segment ID"
+
+  - target: $.components.schemas.RetrieverResource.properties.score.description
+    update: "Relevance score"
+
+  - target: $.components.schemas.RetrieverResource.properties.content.description
+    update: "Content"
+
+  - target: $.components.schemas.BaseMessage.properties.message_id.description
+    update: "Unique message ID"
+
+  - target: $.components.schemas.BaseMessage.properties.created_at.description
+    update: "Message creation timestamp"
+
+  - target: $.components.schemas.ChatMessage.allOf[1].properties.conversation_id.description
+    update: "Conversation ID"
+
+  - target: $.components.schemas.ChatMessage.allOf[1].properties.mode.description
+    update: "App mode, fixed as chat"
+
+  - target: $.components.schemas.ChatMessage.allOf[1].properties.answer.description
+    update: "Complete response content"
+
+  - target: $.components.schemas.StreamEvent.properties.event.description
+    update: "Event type"
+
+  - target: $.components.schemas.StreamEvent.properties.task_id.description
+    update: "Task ID"
+
+  - target: $.components.schemas.StreamEvent.properties.message_id.description
+    update: "Unique message ID"
+
+  - target: $.components.schemas.StreamEvent.properties.conversation_id.description
+    update: "Conversation ID"
+
+  - target: $.components.schemas.StreamEvent.properties.workflow_run_id.description
+    update: "Workflow execution ID"
+
+  - target: $.components.schemas.StreamEvent.properties.answer.description
+    update: "Response content"
+
+  - target: $.components.schemas.StreamEvent.properties.audio.description
+    update: "Voice synthesis audio data (base64 encoded)"
+
+  - target: $.components.schemas.StreamEvent.properties.data.description
+    update: "Event related data"
+
+  - target: $.components.schemas.StreamEvent.properties.created_at.description
+    update: "Creation timestamp"
+
+  - target: $.components.schemas.UploadedFile.properties.id.description
+    update: "File ID"
+
+  - target: $.components.schemas.UploadedFile.properties.name.description
+    update: "File name"
+
+  - target: $.components.schemas.UploadedFile.properties.size.description
+    update: "File size (bytes)"
+
+  - target: $.components.schemas.UploadedFile.properties.extension.description
+    update: "File extension"
+
+  - target: $.components.schemas.UploadedFile.properties.mime_type.description
+    update: "File mime-type"
+
+  - target: $.components.schemas.UploadedFile.properties.created_by.description
+    update: "Uploader ID"
+
+  - target: $.components.schemas.UploadedFile.properties.created_at.description
+    update: "Upload time"
+
+  - target: $.components.schemas.FileInput.properties.type.description
+    update: "File type"
+
+  - target: $.components.schemas.FileInput.properties.transfer_method.description
+    update: "Transfer method"
+
+  - target: $.components.schemas.FileInput.properties.url.description
+    update: "Remote URL"
+
+  - target: $.components.schemas.FileInput.properties.upload_file_id.description
+    update: "Upload file ID"
+
+  - target: $.paths['/chat-messages'].post
+    update:
+      summary: "Send Chat Message (Advanced Chat App)"
+      description: "Create conversation message"
+
+  - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.query
+    update:
+      description: "User input/question content"
+
+  - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.inputs
+    update:
+      description: "Allows passing values for variables defined by the App. The inputs parameter contains multiple key/value pairs, where each key corresponds to a specific variable and each value is the value for that variable. Variables can be file list type. If the variable is a file list type, the corresponding value should be in list format, with each element containing the following: type, transfer_method, etc."
+
+  - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.response_mode
+    update:
+      description: |
+        Response mode:
+        - streaming: Streaming mode (recommended), implements typewriter-like output based on SSE
+        - blocking: Blocking mode, returns result after execution is complete
+
+  - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.user
+    update:
+      description: "User identifier"
+
+  - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.conversation_id
+    update:
+      description: "Conversation ID"
+
+  - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.auto_generate_name
+    update:
+      description: "Whether to automatically generate title"
+
+  - target: $.paths['/chat-messages'].post.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/chat-messages/{task_id}/stop'].post
+    update:
+      summary: "Stop Response"
+      description: "Only supports streaming mode"
+
+  - target: $.paths['/chat-messages/{task_id}/stop'].post.parameters[0].description
+    update: "Task ID, can be obtained from the streaming response chunks"
+
+  - target: $.paths['/chat-messages/{task_id}/stop'].post.requestBody.content['application/json'].schema.properties.user.description
+    update: "User identifier, must be consistent with the user passed in the message sending interface"
+
+  - target: $.paths['/chat-messages/{task_id}/stop'].post.responses['200'].description
+    update: "Successfully stopped the response"
+
+  - target: $.paths['/chat-messages/{task_id}/stop'].post.responses['200'].content['application/json'].schema.properties.result.description
+    update: "Fixed return value 'success'"
+
+  - target: $.paths['/files/upload'].post
+    update:
+      summary: "Upload File"
+      description: |
+        Upload files for use when sending messages.
+        Supported file types depend on application type and configuration.
+        Uploaded files are only available to the current end user.
+
+  - target: $.paths['/files/upload'].post.requestBody.content['multipart/form-data'].schema.properties.file
+    update:
+      description: "File to upload"
+
+  - target: $.paths['/files/upload'].post.requestBody.content['multipart/form-data'].schema.properties.user
+    update:
+      description: "User identifier"
+
+  - target: $.paths['/files/upload'].post.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/files/upload'].post.responses['413'].description
+    update: "File too large"
+
+  - target: $.paths['/files/upload'].post.responses['415'].description
+    update: "Unsupported file type"
+
+  - target: $.paths['/files/upload'].post.responses['503'].description
+    update: "Storage service error"
+
+  - target: $.paths['/audio-to-text'].post
+    update:
+      summary: "Audio to Text"
+
+  - target: $.paths['/audio-to-text'].post.requestBody.content['multipart/form-data'].schema.properties.file
+    update:
+      description: "Audio file"
+
+  - target: $.paths['/audio-to-text'].post.requestBody.content['multipart/form-data'].schema.properties.user
+    update:
+      description: "User identifier"
+
+  - target: $.paths['/audio-to-text'].post.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/audio-to-text'].post.responses['200'].content['application/json'].schema.properties.text
+    update:
+      description: "Converted text"
+
+  - target: $.paths['/text-to-audio'].post
+    update:
+      summary: "Text to Audio"
+
+  - target: $.paths['/text-to-audio'].post.requestBody.content['application/json'].schema.properties.message_id
+    update:
+      description: "Message ID"
+
+  - target: $.paths['/text-to-audio'].post.requestBody.content['application/json'].schema.properties.text
+    update:
+      description: "Text to convert"
+
+  - target: $.paths['/text-to-audio'].post.requestBody.content['application/json'].schema.properties.user
+    update:
+      description: "User identifier"
+
+  - target: $.paths['/text-to-audio'].post.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/info'].get
+    update:
+      summary: "Get Application Basic Information"
+
+  - target: $.paths['/info'].get.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/info'].get.responses['200'].content['application/json'].schema.properties.name
+    update:
+      description: "Application name"
+
+  - target: $.paths['/info'].get.responses['200'].content['application/json'].schema.properties.description
+    update:
+      description: "Application description"
+
+  - target: $.paths['/info'].get.responses['200'].content['application/json'].schema.properties.tags
+    update:
+      description: "Application tags"
+
+  - target: $.paths['/parameters'].get
+    update:
+      summary: "Get Application Parameters"
+
+  - target: $.paths['/parameters'].get.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.opening_statement
+    update:
+      description: "Opening statement"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.suggested_questions
+    update:
+      description: "List of suggested opening questions"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.suggested_questions_after_answer
+    update:
+      description: "Settings for suggested questions after answer"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.speech_to_text
+    update:
+      description: "Audio to text settings"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.retriever_resource
+    update:
+      description: "Citation and attribution settings"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply
+    update:
+      description: "Annotation reply settings"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply.properties.enabled
+    update:
+      description: "Whether annotation reply is enabled"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply.properties.score_threshold
+    update:
+      description: "Similarity score threshold"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply.properties.embedding_model
+    update:
+      description: "Embedding model"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply.properties.embedding_model_provider
+    update:
+      description: "Embedding model provider"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form
+    update:
+      description: "User input form configuration"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload
+    update:
+      description: "File upload configuration"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.system_parameters
+    update:
+      description: "System parameters"
+
+  - target: $.paths['/meta'].get
+    update:
+      summary: "Get App Meta Information"
+      description: "Used to get tool icons"
+
+  - target: $.paths['/meta'].get.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/meta'].get.responses['200'].content['application/json'].schema.properties.tool_icons.description
+    update: "Tool icons"
+
+  - target: $.paths['/meta'].get.responses['200'].content['application/json'].schema.properties.tool_icons.additionalProperties.oneOf[0].properties.background.description
+    update: "Background color in hex format"
+
+  - target: $.paths['/meta'].get.responses['200'].content['application/json'].schema.properties.tool_icons.additionalProperties.oneOf[0].properties.content.description
+    update: "Emoji"
+
+  - target: $.paths['/meta'].get.responses['200'].content['application/json'].schema.properties.tool_icons.additionalProperties.oneOf[1].description
+    update: "Icon URL"
+
+  - target: $.paths['/apps/annotations'].get
+    update:
+      summary: "Get Annotation List"
+      description: "Get the list of annotations for the application"
+
+  - target: $.paths['/apps/annotations'].get.parameters[0].description
+    update: "Page number"
+
+  - target: $.paths['/apps/annotations'].get.parameters[1].description
+    update: "Items per page"
+
+  - target: $.paths['/apps/annotations'].get.responses['200'].description
+    update: "Successfully retrieved annotation list"
+
+  - target: $.paths['/apps/annotations'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.id.description
+    update: "Annotation ID"
+
+  - target: $.paths['/apps/annotations'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.question.description
+    update: "Question"
+
+  - target: $.paths['/apps/annotations'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.answer.description
+    update: "Answer"
+
+  - target: $.paths['/apps/annotations'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.hit_count.description
+    update: "Hit count"
+
+  - target: $.paths['/apps/annotations'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.created_at.description
+    update: "Creation timestamp"
+
+  - target: $.paths['/apps/annotations'].get.responses['200'].content['application/json'].schema.properties.has_more.description
+    update: "Whether there is more data"
+
+  - target: $.paths['/apps/annotations'].get.responses['200'].content['application/json'].schema.properties.limit.description
+    update: "Items per page"
+
+  - target: $.paths['/apps/annotations'].get.responses['200'].content['application/json'].schema.properties.total.description
+    update: "Total record count"
+
+  - target: $.paths['/apps/annotations'].get.responses['200'].content['application/json'].schema.properties.page.description
+    update: "Current page number"
+
+  - target: $.paths['/apps/annotations'].post
+    update:
+      summary: "Create Annotation"
+      description: "Create a new annotation"
+
+  - target: $.paths['/apps/annotations'].post.requestBody.content['application/json'].schema.properties.question.description
+    update: "Question"
+
+  - target: $.paths['/apps/annotations'].post.requestBody.content['application/json'].schema.properties.answer.description
+    update: "Answer"
+
+  - target: $.paths['/apps/annotations'].post.responses['200'].description
+    update: "Successfully created annotation"
+
+  - target: $.paths['/apps/annotations'].post.responses['200'].content['application/json'].schema.properties.id.description
+    update: "Annotation ID"
+
+  - target: $.paths['/apps/annotations'].post.responses['200'].content['application/json'].schema.properties.question.description
+    update: "Question"
+
+  - target: $.paths['/apps/annotations'].post.responses['200'].content['application/json'].schema.properties.answer.description
+    update: "Answer"
+
+  - target: $.paths['/apps/annotations'].post.responses['200'].content['application/json'].schema.properties.hit_count.description
+    update: "Hit count"
+
+  - target: $.paths['/apps/annotations'].post.responses['200'].content['application/json'].schema.properties.created_at.description
+    update: "Creation timestamp"
+
+  - target: $.paths['/apps/annotations/{annotation_id}'].put
+    update:
+      summary: "Update Annotation"
+      description: "Update a specific annotation"
+
+  - target: $.paths['/apps/annotations/{annotation_id}'].put.parameters[0].description
+    update: "Annotation ID"
+
+  - target: $.paths['/apps/annotations/{annotation_id}'].put.requestBody.content['application/json'].schema.properties.question.description
+    update: "Question"
+
+  - target: $.paths['/apps/annotations/{annotation_id}'].put.requestBody.content['application/json'].schema.properties.answer.description
+    update: "Answer"
+
+  - target: $.paths['/apps/annotations/{annotation_id}'].put.responses['200'].description
+    update: "Successfully updated annotation"
+
+  - target: $.paths['/apps/annotations/{annotation_id}'].put.responses['200'].content['application/json'].schema.properties.id.description
+    update: "Annotation ID"
+
+  - target: $.paths['/apps/annotations/{annotation_id}'].put.responses['200'].content['application/json'].schema.properties.question.description
+    update: "Question"
+
+  - target: $.paths['/apps/annotations/{annotation_id}'].put.responses['200'].content['application/json'].schema.properties.answer.description
+    update: "Answer"
+
+  - target: $.paths['/apps/annotations/{annotation_id}'].put.responses['200'].content['application/json'].schema.properties.hit_count.description
+    update: "Hit count"
+
+  - target: $.paths['/apps/annotations/{annotation_id}'].put.responses['200'].content['application/json'].schema.properties.created_at.description
+    update: "Creation timestamp"
+
+  - target: $.paths['/apps/annotations/{annotation_id}'].delete
+    update:
+      summary: "Delete Annotation"
+      description: "Delete a specific annotation"
+
+  - target: $.paths['/apps/annotations/{annotation_id}'].delete.parameters[0].description
+    update: "Annotation ID"
+
+  - target: $.paths['/apps/annotations/{annotation_id}'].delete.responses['200'].description
+    update: "Successfully deleted annotation"
+
+  - target: $.paths['/apps/annotation-reply/{action}'].post
+    update:
+      summary: "Initialize Annotation Reply Settings"
+      description: "Enable or disable annotation reply functionality"
+
+  - target: $.paths['/apps/annotation-reply/{action}'].post.parameters[0].description
+    update: "Action, can only be 'enable' or 'disable'"
+
+  - target: $.paths['/apps/annotation-reply/{action}'].post.requestBody.content['application/json'].schema.properties.embedding_model_provider.description
+    update: "Specified embedding model provider, must be configured in the system first, corresponds to the provider field"
+
+  - target: $.paths['/apps/annotation-reply/{action}'].post.requestBody.content['application/json'].schema.properties.embedding_model.description
+    update: "Specified embedding model, corresponds to the model field"
+
+  - target: $.paths['/apps/annotation-reply/{action}'].post.requestBody.content['application/json'].schema.properties.score_threshold.description
+    update: "Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply"
+
+  - target: $.paths['/apps/annotation-reply/{action}'].post.responses['200'].description
+    update: "Successfully enabled or disabled annotation reply"
+
+  - target: $.paths['/apps/annotation-reply/{action}'].post.responses['200'].content['application/json'].schema.properties.job_id.description
+    update: "Job ID"
+
+  - target: $.paths['/apps/annotation-reply/{action}'].post.responses['200'].content['application/json'].schema.properties.job_status.description
+    update: "Job status"
+
+  - target: $.paths['/apps/annotation-reply/{action}/status/{job_id}'].get
+    update:
+      summary: "Check Annotation Reply Settings Status"
+      description: "Query the status of annotation reply initialization task"
+
+  - target: $.paths['/apps/annotation-reply/{action}/status/{job_id}'].get.parameters[0].description
+    update: "Action, can only be 'enable' or 'disable', and must be consistent with the action in the annotation reply initialization interface"
+
+  - target: $.paths['/apps/annotation-reply/{action}/status/{job_id}'].get.parameters[1].description
+    update: "Job ID, returned from the annotation reply initialization interface"
+
+  - target: $.paths['/apps/annotation-reply/{action}/status/{job_id}'].get.responses['200'].description
+    update: "Successfully retrieved job status"
+
+  - target: $.paths['/apps/annotation-reply/{action}/status/{job_id}'].get.responses['200'].content['application/json'].schema.properties.job_id.description
+    update: "Job ID"
+
+  - target: $.paths['/apps/annotation-reply/{action}/status/{job_id}'].get.responses['200'].content['application/json'].schema.properties.job_status.description
+    update: "Job status"
+
+  - target: $.paths['/apps/annotation-reply/{action}/status/{job_id}'].get.responses['200'].content['application/json'].schema.properties.error_msg.description
+    update: "Error message"
