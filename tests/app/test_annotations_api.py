@@ -4,7 +4,7 @@
 
 import pytest
 
-from dify_sdk.client import AsyncDifyApi
+from dify_sdk.chat.client import AsyncChatClient
 from dify_sdk_testing import RUNNING_IN_CI
 
 
@@ -12,13 +12,13 @@ from dify_sdk_testing import RUNNING_IN_CI
     RUNNING_IN_CI,
     reason="这个测试中有些功能需要付费账号才能使用(CI中使用官方服务器, 测试账号受限), 请使用本地服务测试",
 )
-async def test_annotations_workflow(app_chat_client: AsyncDifyApi):
+async def test_annotations_workflow(app_chat_client: AsyncChatClient):
     """测试标注相关的完整工作流程"""
     # 1. 创建标注
     question = "什么是Dify?"
     answer = "Dify是一个开源的LLMOps平台，可以帮助开发者快速构建AI应用。"
 
-    create_response = await app_chat_client.create_annotation(
+    create_response = await app_chat_client.create_annotation_by_app_chat(
         question=question,
         answer=answer,
     )
@@ -33,7 +33,7 @@ async def test_annotations_workflow(app_chat_client: AsyncDifyApi):
     annotation_id = str(create_response.id)
 
     # 2. 获取标注列表
-    list_response = await app_chat_client.get_annotation_list(
+    list_response = await app_chat_client.get_annotations_list_by_app_chat(
         page=1,
         limit=20,
     )
@@ -48,7 +48,7 @@ async def test_annotations_workflow(app_chat_client: AsyncDifyApi):
     # 这里我们只测试创建和删除功能
 
     # 4. 再次获取标注列表
-    list_response = await app_chat_client.get_annotation_list(
+    list_response = await app_chat_client.get_annotations_list_by_app_chat(
         page=1,
         limit=20,
     )
@@ -57,7 +57,7 @@ async def test_annotations_workflow(app_chat_client: AsyncDifyApi):
     assert list_response.data is not None
 
     # 5. 删除标注
-    delete_response = await app_chat_client.delete_annotation(
+    delete_response = await app_chat_client.delete_annotation_by_app_chat(
         annotation_id=annotation_id,
     )
 
@@ -65,7 +65,7 @@ async def test_annotations_workflow(app_chat_client: AsyncDifyApi):
     assert delete_response.result == "success"
 
     # 6. 再次获取标注列表，验证删除成功
-    list_response = await app_chat_client.get_annotation_list(
+    list_response = await app_chat_client.get_annotations_list_by_app_chat(
         page=1,
         limit=20,
     )
@@ -79,7 +79,7 @@ async def test_annotations_workflow(app_chat_client: AsyncDifyApi):
     RUNNING_IN_CI,
     reason="这个测试中有些功能需要付费账号才能使用(CI中使用官方服务器, 测试账号受限), 请使用本地服务测试",
 )
-async def test_annotation_reply_settings(app_chat_client: AsyncDifyApi):
+async def test_annotation_reply_settings(app_chat_client: AsyncChatClient):
     """测试标注回复设置相关功能"""
     # 1. 启用标注回复功能
     # 注意：根据API错误提示，参数名应为 embedding_provider_name 而非 embedding_model_provider
