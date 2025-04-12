@@ -1,12 +1,14 @@
 import pytest
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from dify_sdk.chat.client import AsyncChatClient
 from dify_sdk.generation.client import AsyncGenerationClient
 from dify_sdk.workflow.client import AsyncWorkflowClient
 from dify_sdk.core.request_options import RequestOptions
-from dify_sdk.generation.types.send_completion_message_by_app_generation_request_inputs import SendCompletionMessageByAppGenerationRequestInputs
+from dify_sdk.generation.types.send_completion_message_by_app_generation_request_inputs import (
+    SendCompletionMessageByAppGenerationRequestInputs,
+)
 from dify_sdk.types.file_input import FileInput
 from dify_sdk_testing import RUNNING_IN_CI, postpone_run_in_this_version
 
@@ -35,7 +37,7 @@ async def test_get_app_info_error_handling(app_chat_client: AsyncChatClient):
     app_chat_client._client_wrapper._base_url = original_host  # type: ignore
 
 
-async def test_chat_messages(app_chat_client: AsyncChatClient) -> Optional[str]:
+async def test_chat_messages(app_chat_client: AsyncChatClient) -> str | None:
     """测试对话消息接口"""
     response = await app_chat_client.send_chat_message_by_app_chat(
         query="ping",
@@ -122,7 +124,7 @@ def test_audio_file_path() -> Path:
     return Path("tests/data/app/audio.mp3")
 
 
-async def test_file_upload(app_chat_client: AsyncChatClient, test_file_path: Path) -> Optional[str]:
+async def test_file_upload(app_chat_client: AsyncChatClient, test_file_path: Path) -> str | None:
     """测试文件上传接口"""
     response = await app_chat_client.upload_file_by_app_chat(
         file=("test.txt", test_file_path.read_bytes(), "text/plain"),

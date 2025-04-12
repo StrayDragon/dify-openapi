@@ -2,7 +2,7 @@ import os
 import warnings
 import httpx
 import pytest
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 from dify_sdk.client import AsyncDifyApi
 from dify_sdk.chat.client import AsyncChatClient
@@ -23,7 +23,7 @@ def warning_info() -> None:
 
 
 @pytest.fixture()
-async def app_chat_client() -> AsyncGenerator[AsyncChatClient, None]:
+async def app_chat_client() -> AsyncGenerator[AsyncChatClient]:
     client = AsyncDifyApi(
         token=os.environ["TEST_DIFY_APP_CHAT_API_KEY"],
         base_url=TEST_DIFY_HOST,
@@ -37,7 +37,7 @@ async def app_chat_client() -> AsyncGenerator[AsyncChatClient, None]:
 
 
 @pytest.fixture()
-async def app_workflow_client() -> AsyncGenerator[AsyncWorkflowClient, None]:
+async def app_workflow_client() -> AsyncGenerator[AsyncWorkflowClient]:
     client = AsyncDifyApi(
         token=os.environ["TEST_DIFY_APP_WORKFLOW_API_KEY"],
         base_url=TEST_DIFY_HOST,
@@ -46,7 +46,7 @@ async def app_workflow_client() -> AsyncGenerator[AsyncWorkflowClient, None]:
 
 
 @pytest.fixture()
-async def app_completion_client() -> AsyncGenerator[AsyncGenerationClient, None]:
+async def app_completion_client() -> AsyncGenerator[AsyncGenerationClient]:
     client = AsyncDifyApi(
         token=os.environ["TEST_DIFY_APP_COMPLETION_API_KEY"],
         base_url=TEST_DIFY_HOST,
@@ -55,7 +55,7 @@ async def app_completion_client() -> AsyncGenerator[AsyncGenerationClient, None]
 
 
 @pytest.fixture()
-async def kb_client() -> AsyncGenerator[KnowledgeBaseClient, None]:
+async def kb_client() -> AsyncGenerator[KnowledgeBaseClient]:
     client = AsyncDifyApi(
         token=os.environ["TEST_DIFY_KNOWLEDGE_BASE_API_KEY"],
         base_url=TEST_DIFY_HOST,
