@@ -17,7 +17,13 @@ Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, whic
 
 ## Swagger UI Preview online
 
-- [Chat Application (Aggregated) - SwaggerUI(English)](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/app.en.yaml)
+### Application APIs
+- [Chat Application - SwaggerUI(English)](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/app_chat.en.yaml)
+- [Advanced Chat Application - SwaggerUI(English)](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/app_advanced_chat.en.yaml)
+- [Text Generation Application - SwaggerUI(English)](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/app_generation.en.yaml)
+- [Workflow Application - SwaggerUI(English)](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/app_workflow.en.yaml)
+
+### Knowledge Base APIs
 - [Knowledge Base - SwaggerUI(English)](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/knowledge_base.en.yaml)
 - [External Knowledge - SwaggerUI(English)](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/external_knowledge_base.en.yaml)
 
@@ -52,13 +58,8 @@ Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, whic
   - [x] POST /datasets/{dataset_id}/metadata/built-in/{action} - Enable/disable built-in metadata
   - [x] POST /datasets/{dataset_id}/documents/metadata - Update document metadata
 
-- Chat Application (Aggregated): [OpenAPI Schema(中文)](./schema/app.zh.yaml) | [OpenAPI Schema(English)](./schema/app.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.2.0/web/app/components/develop/template)
-  - [x] POST /completion-messages - Send message (text generation application)
-  - [x] POST /chat-messages - Send conversation message (conversation application)
-  - [x] POST /workflows/run - Execute workflow (workflow application)
-  - [x] GET /workflows/run/{workflow_run_id} - Get workflow execution status
-  - [x] POST /workflows/tasks/{task_id}/stop - Stop response
-  - [x] GET /workflows/logs - Get workflow logs
+- Chat Application: [OpenAPI Schema(中文)](./schema/app_chat.zh.yaml) | [OpenAPI Schema(English)](./schema/app_chat.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.2.0/web/app/components/develop/template)
+  - [x] POST /chat-messages - Send conversation message
   - [x] POST /files/upload - Upload file
   - [x] POST /messages/{message_id}/feedbacks - Message feedback
   - [x] POST /conversations/{conversation_id}/name - Rename conversation
@@ -66,6 +67,8 @@ Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, whic
   - [x] GET /messages - Get conversation history messages
   - [x] GET /info - Get application basic information
   - [x] GET /parameters - Get application parameters
+
+- Advanced Chat Application: [OpenAPI Schema(中文)](./schema/app_advanced_chat.zh.yaml) | [OpenAPI Schema(English)](./schema/app_advanced_chat.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.2.0/web/app/components/develop/template)
   - [x] POST /audio-to-text - Speech to text
   - [x] POST /text-to-audio - Text to speech
   - [x] GET /apps/annotations - Get annotation list
@@ -74,6 +77,15 @@ Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, whic
   - [x] DELETE /apps/annotations/{annotation_id} - Delete annotation
   - [x] POST /apps/annotation-reply/{action} - Initialize annotation reply settings
   - [x] GET /apps/annotation-reply/{action}/status/{job_id} - Check annotation reply settings status
+
+- Text Generation Application: [OpenAPI Schema(中文)](./schema/app_generation.zh.yaml) | [OpenAPI Schema(English)](./schema/app_generation.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.2.0/web/app/components/develop/template)
+  - [x] POST /completion-messages - Send message
+
+- Workflow Application: [OpenAPI Schema(中文)](./schema/app_workflow.zh.yaml) | [OpenAPI Schema(English)](./schema/app_workflow.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.2.0/web/app/components/develop/template)
+  - [x] POST /workflows/run - Execute workflow
+  - [x] GET /workflows/run/{workflow_run_id} - Get workflow execution status
+  - [x] POST /workflows/tasks/{task_id}/stop - Stop response
+  - [x] GET /workflows/logs - Get workflow logs
 
 - External Knowledge: [OpenAPI Schema(中文)](./schema/external_knowledge_base.zh.yaml) | [OpenAPI Schema(English)](./schema/external_knowledge_base.en.yaml) | [Official Documentation Source](https://docs.dify.ai/v1.2.0/guides/knowledge-base/external-knowledge-api-documentation)
   - [ ] POST /retrieval - Retrieve knowledge content
@@ -132,7 +144,7 @@ just test
 
 #### Maintaining Multilingual Support
 
-1. Add a language overlay file, e.g., `./schema/overlays/app.en.overlay.yaml`
+1. Add a language overlay file, e.g., `./schema/overlays/app_chat.en.overlay.yaml`
 2. Run `just apply-i18n-overlay-to-openapi-schema` to generate the corresponding language schema (if it is a new language, please check if it is handled in [justfile](./justfile))
 3. Run `just run-openapi-ui` to preview API documentation
 4. Submit PR

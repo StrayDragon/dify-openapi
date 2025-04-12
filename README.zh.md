@@ -17,7 +17,13 @@
 
 ## Swagger UI 在线查看
 
-- [聊天应用(聚合) - SwaggerUI](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/app.zh.yaml)
+### 应用 API
+- [聊天应用 - SwaggerUI](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/app_chat.zh.yaml)
+- [高级聊天应用 - SwaggerUI](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/app_advanced_chat.zh.yaml)
+- [文本生成应用 - SwaggerUI](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/app_generation.zh.yaml)
+- [工作流应用 - SwaggerUI](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/app_workflow.zh.yaml)
+
+### 知识库 API
 - [知识库 - SwaggerUI](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/knowledge_base.zh.yaml)
 - [外部知识库 - SwaggerUI](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/StrayDragon/dify-openapi/refs/heads/main/schema/external_knowledge_base.zh.yaml)
 
@@ -54,13 +60,8 @@
   - [x] POST /datasets/{dataset_id}/metadata/built-in/{action} - 启用/禁用内置元数据
   - [x] POST /datasets/{dataset_id}/documents/metadata - 更新文档元数据
 
-- 聊天应用(聚合): [OpenAPI Schema(中文)](./schema/app.zh.yaml) | [OpenAPI Schema(English)](./schema/app.en.yaml) | [官方文档源码](https://github.com/langgenius/dify/tree/1.2.0/web/app/components/develop/template)
-  - [x] POST /completion-messages - 发送消息(文本生成型应用)
-  - [x] POST /chat-messages - 发送对话消息(对话型应用)
-  - [x] POST /workflows/run - 执行工作流(工作流应用)
-  - [x] GET /workflows/run/{workflow_run_id} - 获取工作流执行状态
-  - [x] POST /workflows/tasks/{task_id}/stop - 停止响应
-  - [x] GET /workflows/logs - 获取工作流日志
+- 聊天应用: [OpenAPI Schema(中文)](./schema/app_chat.zh.yaml) | [OpenAPI Schema(English)](./schema/app_chat.en.yaml) | [官方文档源码](https://github.com/langgenius/dify/tree/1.2.0/web/app/components/develop/template)
+  - [x] POST /chat-messages - 发送对话消息
   - [x] POST /files/upload - 上传文件
   - [x] POST /messages/{message_id}/feedbacks - 消息反馈
   - [x] POST /conversations/{conversation_id}/name - 会话重命名
@@ -68,6 +69,8 @@
   - [x] GET /messages - 获取会话历史消息
   - [x] GET /info - 获取应用基本信息
   - [x] GET /parameters - 获取应用参数
+
+- 高级聊天应用: [OpenAPI Schema(中文)](./schema/app_advanced_chat.zh.yaml) | [OpenAPI Schema(English)](./schema/app_advanced_chat.en.yaml) | [官方文档源码](https://github.com/langgenius/dify/tree/1.2.0/web/app/components/develop/template)
   - [x] POST /audio-to-text - 语音转文字
   - [x] POST /text-to-audio - 文字转语音
   - [x] GET /apps/annotations - 获取标注列表
@@ -76,6 +79,15 @@
   - [x] DELETE /apps/annotations/{annotation_id} - 删除标注
   - [x] POST /apps/annotation-reply/{action} - 初始化标注回复设置
   - [x] GET /apps/annotation-reply/{action}/status/{job_id} - 检查标注回复设置状态
+
+- 文本生成应用: [OpenAPI Schema(中文)](./schema/app_generation.zh.yaml) | [OpenAPI Schema(English)](./schema/app_generation.en.yaml) | [官方文档源码](https://github.com/langgenius/dify/tree/1.2.0/web/app/components/develop/template)
+  - [x] POST /completion-messages - 发送消息
+
+- 工作流应用: [OpenAPI Schema(中文)](./schema/app_workflow.zh.yaml) | [OpenAPI Schema(English)](./schema/app_workflow.en.yaml) | [官方文档源码](https://github.com/langgenius/dify/tree/1.2.0/web/app/components/develop/template)
+  - [x] POST /workflows/run - 执行工作流
+  - [x] GET /workflows/run/{workflow_run_id} - 获取工作流执行状态
+  - [x] POST /workflows/tasks/{task_id}/stop - 停止响应
+  - [x] GET /workflows/logs - 获取工作流日志
 
 - 外部知识库: [OpenAPI Schema(中文)](./schema/external_knowledge_base.zh.yaml) | [OpenAPI Schema(English)](./schema/external_knowledge_base.en.yaml) | [官方文档源码](https://docs.dify.ai/v1.2.0/guides/knowledge-base/external-knowledge-api-documentation)
   - [ ] POST /retrieval - 检索知识内容
@@ -134,7 +146,7 @@ just test
 
 #### 维护多语言支持
 
-1. 新增/修改语言的 overlay 文件, 例如 `./schema/overlays/app.en.overlay.yaml`
+1. 新增/修改语言的 overlay 文件, 例如 `./schema/overlays/app_chat.en.overlay.yaml`
 2. 运行 `just apply-i18n-overlay-to-openapi-schema` 生成对应语言的schema (如果是新的语言, 请检查 [justfile](./justfile) 中是否处理了对应的名字)
 3. 运行 `just run-openapi-ui` 预览 API 文档
 4. 提交 PR
