@@ -1,7 +1,7 @@
 overlay: 1.0.0
 info:
   title: "English translation overlay for Dify External Knowledge API"
-  version: "1.0.0"
+  version: "1.2.0"
 extends: ../external_knowledge_base.zh.yaml
 actions:
   - target: $.info
@@ -9,7 +9,7 @@ actions:
       title: "Dify External Knowledge API"
       description: |
         This API is used to connect to a knowledge base that is independent of Dify and maintained by developers. Users can use this schema to generate server-side code for their own implementation.
-        For more details, please refer to "Connecting to an External Knowledge Base" documentation (https://docs.dify.ai/guides/knowledge-base/external-knowledge-api-documentation).
+        For more details, please refer to "External Knowledge API" documentation (https://docs.dify.ai/guides/knowledge-base/external-knowledge-api-documentation).
 
   - target: $.servers[0].variables.baseUrl
     update:
