@@ -247,9 +247,31 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/RetrieverResource"
+            annotation_reply:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: 标注ID
+                account:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: 账户ID
+                    name:
+                      type: string
+                      description: 账户名称
+              description: 标注回复信息
         created_at:
           type: integer
           description: 创建时间戳
+        status:
+          type: integer
+          description: HTTP 状态码
+        code:
+          type: string
+          description: 错误码
 
     UploadedFile:
       type: object
@@ -456,6 +478,22 @@ paths:
                       enabled:
                         type: boolean
                     description: 引用和归属设置
+                  annotation_reply:
+                    type: object
+                    properties:
+                      enabled:
+                        type: boolean
+                        description: 是否启用标注回复
+                      score_threshold:
+                        type: number
+                        description: 相似度阈值
+                      embedding_model:
+                        type: string
+                        description: 嵌入模型
+                      embedding_model_provider:
+                        type: string
+                        description: 嵌入模型提供商
+                    description: 标记回复设置
                   user_input_form:
                     type: array
                     items:

@@ -152,8 +152,26 @@ actions:
   - target: $.components.schemas.StreamEvent.properties.data.description
     update: "Event related data"
 
+  - target: $.components.schemas.StreamEvent.properties.metadata.properties.annotation_reply.description
+    update: "Annotation reply information"
+
+  - target: $.components.schemas.StreamEvent.properties.metadata.properties.annotation_reply.properties.id.description
+    update: "Annotation ID"
+
+  - target: $.components.schemas.StreamEvent.properties.metadata.properties.annotation_reply.properties.account.properties.id.description
+    update: "Account ID"
+
+  - target: $.components.schemas.StreamEvent.properties.metadata.properties.annotation_reply.properties.account.properties.name.description
+    update: "Account name"
+
   - target: $.components.schemas.StreamEvent.properties.created_at.description
     update: "Creation timestamp"
+
+  - target: $.components.schemas.StreamEvent.properties.status.description
+    update: "HTTP status code"
+
+  - target: $.components.schemas.StreamEvent.properties.code.description
+    update: "Error code"
 
   - target: $.components.schemas.UploadedFile.properties.id.description
     update: "File ID"
@@ -272,6 +290,22 @@ actions:
   - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.retriever_resource
     update:
       description: "Citation and attribution settings"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply
+    update:
+      description: "Annotation reply settings"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply.properties.enabled.description
+    update: "Whether annotation reply is enabled"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply.properties.score_threshold.description
+    update: "Similarity threshold"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply.properties.embedding_model.description
+    update: "Embedding model"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply.properties.embedding_model_provider.description
+    update: "Embedding model provider"
 
   - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form
     update:
