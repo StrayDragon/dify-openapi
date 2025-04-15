@@ -11,8 +11,9 @@ actions:
       title: "Dify API - Workflow Application"
       description: |
         Dify API provides a series of interfaces for workflow functionality.
-        It supports workflow applications.
+        Workflow applications have no session support and are suitable for translation/article writing/summarization AI, etc.
         All API requests require an application-level API-Key in the Authorization HTTP Header.
+        It is strongly recommended that developers store the API-Key on the backend rather than sharing or storing it on the client to prevent API-Key leakage and financial loss.
         official raw document: https://github.com/langgenius/dify/blob/1.2.0/web/app/components/develop/template/template_workflow.en.mdx
 
   - target: $.servers[0]
@@ -141,7 +142,15 @@ actions:
     update: "End time"
 
   - target: $.components.schemas.StreamEvent.properties.event.description
-    update: "Event type"
+    update: |
+      Event type, including the following types:
+      - `event: workflow_started` workflow execution starts
+      - `event: node_started` node execution starts
+      - `event: node_finished` node execution ends, success or failure with different statuses in the same event
+      - `event: workflow_finished` workflow execution ends, success or failure with different statuses in the same event
+      - `event: tts_message` TTS audio stream event, i.e., speech synthesis output. The content is an audio block in Mp3 format, encoded as a base64 string, which can be directly decoded when playing. (Only present when auto-play is enabled)
+      - `event: tts_message_end` TTS audio stream end event, receiving this event indicates the end of the audio stream return.
+      - `event: ping` ping event every 10s, keeps the connection alive.
 
   - target: $.components.schemas.StreamEvent.properties.task_id.description
     update: "Task ID"
@@ -164,6 +173,72 @@ actions:
   - target: $.components.schemas.StreamEvent.properties.data.description
     update: "Event related data"
 
+  - target: $.components.schemas.StreamEvent.properties.data.properties.id.description
+    update: "Workflow execution ID or node execution ID"
+
+  - target: $.components.schemas.StreamEvent.properties.data.properties.workflow_id.description
+    update: "Associated Workflow ID"
+
+  - target: $.components.schemas.StreamEvent.properties.data.properties.node_id.description
+    update: "Node ID"
+
+  - target: $.components.schemas.StreamEvent.properties.data.properties.node_type.description
+    update: "Node type"
+
+  - target: $.components.schemas.StreamEvent.properties.data.properties.title.description
+    update: "Node name"
+
+  - target: $.components.schemas.StreamEvent.properties.data.properties.index.description
+    update: "Execution sequence number, used to display Tracing Node order"
+
+  - target: $.components.schemas.StreamEvent.properties.data.properties.predecessor_node_id.description
+    update: "Predecessor node ID, used to display execution path on canvas"
+
+  - target: $.components.schemas.StreamEvent.properties.data.properties.inputs.description
+    update: "All predecessor node variable content used in the node"
+
+  - target: $.components.schemas.StreamEvent.properties.data.properties.process_data.description
+    update: "Node process data"
+
+  - target: $.components.schemas.StreamEvent.properties.data.properties.outputs.description
+    update: "Output content"
+
+  - target: $.components.schemas.StreamEvent.properties.data.properties.status.description
+    update: "Execution status"
+
+  - target: $.components.schemas.StreamEvent.properties.data.properties.error.description
+    update: "Error reason"
+
+  - target: $.components.schemas.StreamEvent.properties.data.properties.elapsed_time.description
+    update: "Elapsed time (s)"
+
+  - target: $.components.schemas.StreamEvent.properties.data.properties.execution_metadata.description
+    update: "Metadata"
+
+  - target: $.components.schemas.StreamEvent.properties.data.properties.execution_metadata.properties.total_tokens.description
+    update: "Total tokens used"
+
+  - target: $.components.schemas.StreamEvent.properties.data.properties.execution_metadata.properties.total_price.description
+    update: "Total price"
+
+  - target: $.components.schemas.StreamEvent.properties.data.properties.execution_metadata.properties.currency.description
+    update: "Currency, such as USD / RMB"
+
+  - target: $.components.schemas.StreamEvent.properties.data.properties.sequence_number.description
+    update: "Auto-incrementing sequence number, starting from 1 within the App"
+
+  - target: $.components.schemas.StreamEvent.properties.data.properties.total_steps.description
+    update: "Total steps"
+
+  - target: $.components.schemas.StreamEvent.properties.data.properties.total_tokens.description
+    update: "Total tokens used"
+
+  - target: $.components.schemas.StreamEvent.properties.data.properties.created_at.description
+    update: "Start time"
+
+  - target: $.components.schemas.StreamEvent.properties.data.properties.finished_at.description
+    update: "End time"
+
   - target: $.components.schemas.StreamEvent.properties.created_at.description
     update: "Creation timestamp"
 
@@ -185,16 +260,40 @@ actions:
       description: "Execute a workflow. Cannot be executed if there is no published workflow."
 
   - target: $.paths['/workflows/run'].post.requestBody.content['application/json'].schema.properties.inputs.description
-    update: "Workflow input parameters"
+    update: |
+      Allows passing values for variables defined in the App.
+      The inputs parameter contains multiple key/value pairs, where each key corresponds to a specific variable and each value is the specific value for that variable. Variables can be of file list type.
+      File list type variables are suitable for passing files combined with text understanding to answer questions, only available when the model supports parsing capabilities for that type of file. If the variable is a file list type, the value corresponding to the variable should be in list format, where each element should include the following:
+        - `type` (string) Supported types:
+          - `document` Specific types include: 'TXT', 'MD', 'MARKDOWN', 'PDF', 'HTML', 'XLSX', 'XLS', 'DOCX', 'CSV', 'EML', 'MSG', 'PPTX', 'PPT', 'XML', 'EPUB'
+          - `image` Specific types include: 'JPG', 'JPEG', 'PNG', 'GIF', 'WEBP', 'SVG'
+          - `audio` Specific types include: 'MP3', 'M4A', 'WAV', 'WEBM', 'AMR'
+          - `video` Specific types include: 'MP4', 'MOV', 'MPEG', 'MPGA'
+          - `custom` Specific types include: other file types
+        - `transfer_method` (string) Transfer method, `remote_url` image address / `local_file` uploaded file
+        - `url` (string) Image address (only when the transfer method is `remote_url`)
+        - `upload_file_id` (string) Upload file ID (only when the transfer method is `local_file`)
 
   - target: $.paths['/workflows/run'].post.requestBody.content['application/json'].schema.properties.response_mode.description
-    update: "Response mode"
+    update: |
+      Response mode, supports:
+      - `streaming` Streaming mode (recommended). Implements streaming return similar to typewriter output based on SSE (Server-Sent Events).
+      - `blocking` Blocking mode, waits for execution to complete before returning results. (Requests may be interrupted if the process is lengthy).
+      Due to Cloudflare limitations, requests will be interrupted after 100 seconds of timeout with no response.
 
   - target: $.paths['/workflows/run'].post.requestBody.content['application/json'].schema.properties.user.description
-    update: "User identifier"
+    update: |
+      User identifier, used to define the identity of the end user, for easy retrieval and statistics.
+      Rules defined by the developer, the user identifier must be unique within the application.
 
   - target: $.paths['/workflows/run'].post.responses['200'].description
     update: "Successful response"
+
+  - target: $.paths['/workflows/run'].post.responses['200'].content['application/json'].description
+    update: "When `response_mode` is `blocking`, returns a CompletionResponse object."
+
+  - target: $.paths['/workflows/run'].post.responses['200'].content['text/event-stream'].description
+    update: "When `response_mode` is `streaming`, returns a stream of ChunkCompletionResponse objects."
 
   - target: $.paths['/workflows/run/{workflow_run_id}'].get
     update:
@@ -351,3 +450,153 @@ actions:
 
   - target: $.paths['/workflows/logs'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.created_at.description
     update: "Creation time"
+
+  - target: $.paths['/files/upload'].post
+    update:
+      summary: "Upload File"
+      description: "Upload a file to use when sending messages, enabling multimodal understanding. Supports any format supported by your workflow. Uploaded files are only available to the current end user."
+
+  - target: $.paths['/files/upload'].post.requestBody.content['multipart/form-data'].schema.properties.file.description
+    update: "File to upload"
+
+  - target: $.paths['/files/upload'].post.requestBody.content['multipart/form-data'].schema.properties.user.description
+    update: "User identifier, used to define the identity of the end user, must be consistent with the user passed in the message sending interface"
+
+  - target: $.paths['/files/upload'].post.responses['201'].description
+    update: "File uploaded successfully"
+
+  - target: $.paths['/files/upload'].post.responses['201'].content['application/json'].schema.properties.id.description
+    update: "ID"
+
+  - target: $.paths['/files/upload'].post.responses['201'].content['application/json'].schema.properties.name.description
+    update: "File name"
+
+  - target: $.paths['/files/upload'].post.responses['201'].content['application/json'].schema.properties.size.description
+    update: "File size (bytes)"
+
+  - target: $.paths['/files/upload'].post.responses['201'].content['application/json'].schema.properties.extension.description
+    update: "File extension"
+
+  - target: $.paths['/files/upload'].post.responses['201'].content['application/json'].schema.properties.mime_type.description
+    update: "File mime-type"
+
+  - target: $.paths['/files/upload'].post.responses['201'].content['application/json'].schema.properties.created_by.description
+    update: "Uploader ID"
+
+  - target: $.paths['/files/upload'].post.responses['201'].content['application/json'].schema.properties.created_at.description
+    update: "Upload time"
+
+  - target: $.paths['/files/upload'].post.responses['413'].description
+    update: "File too large"
+
+  - target: $.paths['/files/upload'].post.responses['415'].description
+    update: "Unsupported file type"
+
+  - target: $.paths['/files/upload'].post.responses['503'].description
+    update: "Storage service error"
+
+  - target: $.paths['/info'].get
+    update:
+      summary: "Get Application Basic Information"
+      description: "Used to get basic information about the application"
+
+  - target: $.paths['/info'].get.responses['200'].description
+    update: "Successfully retrieved application information"
+
+  - target: $.paths['/info'].get.responses['200'].content['application/json'].schema.properties.name.description
+    update: "Application name"
+
+  - target: $.paths['/info'].get.responses['200'].content['application/json'].schema.properties.description.description
+    update: "Application description"
+
+  - target: $.paths['/info'].get.responses['200'].content['application/json'].schema.properties.tags.description
+    update: "Application tags"
+
+  - target: $.paths['/parameters'].get
+    update:
+      summary: "Get Application Parameters"
+      description: "Used at the beginning of page entry to get feature switches, input parameter names, types, and default values"
+
+  - target: $.paths['/parameters'].get.responses['200'].description
+    update: "Successfully retrieved application parameters"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.description
+    update: "User input form configuration"
+
+  - target: "$.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.properties['text-input'].description"
+    update: "Text input control"
+
+  - target: "$.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.properties['text-input'].properties.label.description"
+    update: "Control display label name"
+
+  - target: "$.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.properties['text-input'].properties.variable.description"
+    update: "Control ID"
+
+  - target: "$.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.properties['text-input'].properties.required.description"
+    update: "Whether required"
+
+  - target: "$.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.properties['text-input'].properties.default.description"
+    update: "Default value"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.properties.paragraph.description
+    update: "Paragraph text input control"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.properties.paragraph.properties.label.description
+    update: "Control display label name"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.properties.paragraph.properties.variable.description
+    update: "Control ID"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.properties.paragraph.properties.required.description
+    update: "Whether required"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.properties.paragraph.properties.default.description
+    update: "Default value"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.properties.select.description
+    update: "Dropdown control"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.properties.select.properties.label.description
+    update: "Control display label name"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.properties.select.properties.variable.description
+    update: "Control ID"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.properties.select.properties.required.description
+    update: "Whether required"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.properties.select.properties.default.description
+    update: "Default value"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.properties.select.properties.options.description
+    update: "Option values"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.description
+    update: "File upload configuration"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.image.description
+    update: "Image settings"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.image.properties.enabled.description
+    update: "Whether enabled"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.image.properties.number_limits.description
+    update: "Image quantity limit, default 3"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.image.properties.transfer_methods.description
+    update: "Transfer method list"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.system_parameters.description
+    update: "System parameters"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.system_parameters.properties.file_size_limit.description
+    update: "Document upload size limit (MB)"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.system_parameters.properties.image_file_size_limit.description
+    update: "Image file upload size limit (MB)"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.system_parameters.properties.audio_file_size_limit.description
+    update: "Audio file upload size limit (MB)"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.system_parameters.properties.video_file_size_limit.description
+    update: "Video file upload size limit (MB)"
