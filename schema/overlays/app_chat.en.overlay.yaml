@@ -156,7 +156,7 @@ actions:
     update: "Event type"
 
   - target: $.components.schemas.StreamEvent.properties.task_id.description
-    update: "Task ID"
+    update: "Task ID for request tracking and stopping responses"
 
   - target: $.components.schemas.StreamEvent.properties.message_id.description
     update: "Unique message ID"
@@ -178,6 +178,36 @@ actions:
 
   - target: $.components.schemas.StreamEvent.properties.created_at.description
     update: "Creation timestamp"
+
+  - target: $.components.schemas.StreamEvent.properties.id.description
+    update: "Unique ID"
+
+  - target: $.components.schemas.StreamEvent.properties.position.description
+    update: "Position of agent_thought in the message"
+
+  - target: $.components.schemas.StreamEvent.properties.thought.description
+    update: "Agent's thinking content"
+
+  - target: $.components.schemas.StreamEvent.properties.observation.description
+    update: "Return result of tool call"
+
+  - target: $.components.schemas.StreamEvent.properties.tool.description
+    update: "List of tools used, multiple tools separated by ;"
+
+  - target: $.components.schemas.StreamEvent.properties.tool_input.description
+    update: "Tool input, JSON format string"
+
+  - target: $.components.schemas.StreamEvent.properties.message_files.description
+    update: "File IDs associated with the current agent_thought"
+
+  - target: $.components.schemas.StreamEvent.properties.type.description
+    update: "File type"
+
+  - target: $.components.schemas.StreamEvent.properties.belongs_to.description
+    update: "File ownership, user or assistant"
+
+  - target: $.components.schemas.StreamEvent.properties.url.description
+    update: "File access URL"
 
   - target: $.components.schemas.UploadedFile.properties.id.description
     update: "File ID"
@@ -211,29 +241,52 @@ actions:
 
   - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.inputs
     update:
-      description: "Allows passing values for variables defined by the App. The inputs parameter contains multiple key/value pairs, where each key corresponds to a specific variable and each value is the value for that variable. Variables can be file list type. If the variable is a file list type, the corresponding value should be in list format, with each element containing the following: type, transfer_method, etc."
+      description: "Allows passing values for variables defined by the App. The inputs parameter contains multiple key/value pairs, where each key corresponds to a specific variable and each value is the value for that variable. Default {}"
 
   - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.response_mode
     update:
       description: |
         Response mode:
         - streaming: Streaming mode (recommended), implements typewriter-like output based on SSE
-        - blocking: Blocking mode, returns result after execution is complete
+        - blocking: Blocking mode, returns result after execution is complete (request may be interrupted if the process is too long)
+        Note: Blocking mode is not allowed in Agent mode
 
   - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.user
     update:
-      description: "User identifier"
+      description: "User identifier for defining end user identity, facilitating retrieval and statistics. Defined by developer rules, must be unique within the application."
 
   - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.conversation_id
     update:
-      description: "Conversation ID"
+      description: "(Optional) Conversation ID. Required when continuing a conversation based on previous chat history, must pass the conversation_id from previous messages"
+
+  - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.files
+    update:
+      description: "Uploaded files"
+
+  - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.files.items.properties.type.description
+    update: "Supported type: image (currently only supports image formats)"
+
+  - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.files.items.properties.transfer_method.description
+    update: "Transfer method"
+
+  - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.files.items.properties.url.description
+    update: "Image URL (only when transfer_method is remote_url)"
+
+  - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.files.items.properties.upload_file_id.description
+    update: "Upload file ID (only when transfer_method is local_file)"
 
   - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.auto_generate_name
     update:
-      description: "Whether to automatically generate title"
+      description: "(Optional) Whether to automatically generate title, default is true. If set to false, you can call the conversation rename interface and set auto_generate to true to generate a title asynchronously."
 
   - target: $.paths['/chat-messages'].post.responses['200'].description
     update: "Successful response"
+
+  - target: $.paths['/chat-messages'].post.responses['200'].content['application/json'].schema.description
+    update: "When response_mode is blocking, returns a ChatCompletionResponse object"
+
+  - target: $.paths['/chat-messages'].post.responses['200'].content['text/event-stream'].schema.description
+    update: "When response_mode is streaming, returns a ChunkChatCompletionResponse object stream sequence"
 
   - target: $.paths['/conversations'].get
     update:
