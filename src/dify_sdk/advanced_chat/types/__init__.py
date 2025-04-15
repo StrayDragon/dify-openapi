@@ -15,6 +15,9 @@ from .create_annotation_by_app_advanced_chat_response import (
 from .delete_annotation_by_app_advanced_chat_response import (
     DeleteAnnotationByAppAdvancedChatResponse,
 )
+from .delete_conversation_by_app_advanced_chat_response import (
+    DeleteConversationByAppAdvancedChatResponse,
+)
 from .get_annotation_reply_status_by_app_advanced_chat_request_action import (
     GetAnnotationReplyStatusByAppAdvancedChatRequestAction,
 )
@@ -54,8 +57,44 @@ from .get_application_parameters_by_app_advanced_chat_response_speech_to_text im
 from .get_application_parameters_by_app_advanced_chat_response_suggested_questions_after_answer import (
     GetApplicationParametersByAppAdvancedChatResponseSuggestedQuestionsAfterAnswer,
 )
+from .get_conversation_messages_by_app_advanced_chat_response import (
+    GetConversationMessagesByAppAdvancedChatResponse,
+)
+from .get_conversation_messages_by_app_advanced_chat_response_data_item import (
+    GetConversationMessagesByAppAdvancedChatResponseDataItem,
+)
+from .get_conversation_messages_by_app_advanced_chat_response_data_item_feedback import (
+    GetConversationMessagesByAppAdvancedChatResponseDataItemFeedback,
+)
+from .get_conversation_messages_by_app_advanced_chat_response_data_item_feedback_rating import (
+    GetConversationMessagesByAppAdvancedChatResponseDataItemFeedbackRating,
+)
+from .get_conversation_messages_by_app_advanced_chat_response_data_item_message_files_item import (
+    GetConversationMessagesByAppAdvancedChatResponseDataItemMessageFilesItem,
+)
+from .get_conversation_messages_by_app_advanced_chat_response_data_item_message_files_item_belongs_to import (
+    GetConversationMessagesByAppAdvancedChatResponseDataItemMessageFilesItemBelongsTo,
+)
+from .get_conversations_by_app_advanced_chat_request_sort_by import (
+    GetConversationsByAppAdvancedChatRequestSortBy,
+)
+from .get_conversations_by_app_advanced_chat_response import (
+    GetConversationsByAppAdvancedChatResponse,
+)
+from .get_conversations_by_app_advanced_chat_response_data_item import (
+    GetConversationsByAppAdvancedChatResponseDataItem,
+)
+from .get_suggested_questions_by_app_advanced_chat_response import (
+    GetSuggestedQuestionsByAppAdvancedChatResponse,
+)
+from .rename_conversation_by_app_advanced_chat_response import (
+    RenameConversationByAppAdvancedChatResponse,
+)
 from .send_chat_message_by_app_advanced_chat_request_response_mode import (
     SendChatMessageByAppAdvancedChatRequestResponseMode,
+)
+from .send_message_feedback_by_app_advanced_chat_response import (
+    SendMessageFeedbackByAppAdvancedChatResponse,
 )
 from .stop_chat_response_by_app_advanced_chat_response import (
     StopChatResponseByAppAdvancedChatResponse,
@@ -70,6 +109,7 @@ __all__ = [
     "ConvertAudioToTextByAppAdvancedChatResponse",
     "CreateAnnotationByAppAdvancedChatResponse",
     "DeleteAnnotationByAppAdvancedChatResponse",
+    "DeleteConversationByAppAdvancedChatResponse",
     "GetAnnotationReplyStatusByAppAdvancedChatRequestAction",
     "GetAnnotationReplyStatusByAppAdvancedChatResponse",
     "GetAnnotationsListByAppAdvancedChatResponse",
@@ -83,7 +123,19 @@ __all__ = [
     "GetApplicationParametersByAppAdvancedChatResponseRetrieverResource",
     "GetApplicationParametersByAppAdvancedChatResponseSpeechToText",
     "GetApplicationParametersByAppAdvancedChatResponseSuggestedQuestionsAfterAnswer",
+    "GetConversationMessagesByAppAdvancedChatResponse",
+    "GetConversationMessagesByAppAdvancedChatResponseDataItem",
+    "GetConversationMessagesByAppAdvancedChatResponseDataItemFeedback",
+    "GetConversationMessagesByAppAdvancedChatResponseDataItemFeedbackRating",
+    "GetConversationMessagesByAppAdvancedChatResponseDataItemMessageFilesItem",
+    "GetConversationMessagesByAppAdvancedChatResponseDataItemMessageFilesItemBelongsTo",
+    "GetConversationsByAppAdvancedChatRequestSortBy",
+    "GetConversationsByAppAdvancedChatResponse",
+    "GetConversationsByAppAdvancedChatResponseDataItem",
+    "GetSuggestedQuestionsByAppAdvancedChatResponse",
+    "RenameConversationByAppAdvancedChatResponse",
     "SendChatMessageByAppAdvancedChatRequestResponseMode",
+    "SendMessageFeedbackByAppAdvancedChatResponse",
     "StopChatResponseByAppAdvancedChatResponse",
     "UpdateAnnotationByAppAdvancedChatResponse",
 ]

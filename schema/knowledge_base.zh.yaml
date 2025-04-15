@@ -925,6 +925,9 @@ paths:
             schema:
               type: object
               properties:
+                name:
+                  type: string
+                  description: 知识库名称（选填）
                 indexing_technique:
                   type: string
                   enum: [high_quality, economy]

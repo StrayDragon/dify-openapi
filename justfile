@@ -17,6 +17,8 @@ default: help
 help:
     @echo "`just -l`"
 
+print-llm-prompt:
+	uv run scripts/prompt-generater.py
 
 gen-client: apply-i18n-overlay-to-openapi-schema
     fern generate --local

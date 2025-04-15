@@ -973,6 +973,9 @@ paths:
             schema:
               type: object
               properties:
+                name:
+                  type: string
+                  description: Knowledge Base name (optional)
                 indexing_technique:
                   type: string
                   enum:

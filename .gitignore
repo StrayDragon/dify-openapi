@@ -5,6 +5,7 @@
 **/.openapi-generator/
 **/.openapi-generator-ignore
 .env.*
+!.env.example
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

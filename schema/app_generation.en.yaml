@@ -236,9 +236,31 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/RetrieverResource'
+            annotation_reply:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: Annotation ID
+                account:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: Account ID
+                    name:
+                      type: string
+                      description: Account name
+              description: Annotation reply information
         created_at:
           type: integer
           description: Creation timestamp
+        status:
+          type: integer
+          description: HTTP status code
+        code:
+          type: string
+          description: Error code
     UploadedFile:
       type: object
       properties:
@@ -441,6 +463,22 @@ paths:
                       enabled:
                         type: boolean
                     description: Citation and attribution settings
+                  annotation_reply:
+                    type: object
+                    properties:
+                      enabled:
+                        type: boolean
+                        description: Whether annotation reply is enabled
+                      score_threshold:
+                        type: number
+                        description: Similarity threshold
+                      embedding_model:
+                        type: string
+                        description: Embedding model
+                      embedding_model_provider:
+                        type: string
+                        description: Embedding model provider
+                    description: Annotation reply settings
                   user_input_form:
                     type: array
                     items:

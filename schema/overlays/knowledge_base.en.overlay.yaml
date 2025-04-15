@@ -633,6 +633,9 @@ actions:
   - target: $.paths['/datasets/{dataset_id}'].patch.parameters[0].description
     update: "Knowledge Base ID"
 
+  - target: $.paths['/datasets/{dataset_id}'].patch.requestBody.content['application/json'].schema.properties.name.description
+    update: "Knowledge Base name (optional)"
+
   - target: $.paths['/datasets/{dataset_id}'].patch.requestBody.content['application/json'].schema.properties.indexing_technique.description
     update: |
       Indexing mode (optional, recommended)

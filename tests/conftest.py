@@ -6,6 +6,7 @@ from collections.abc import AsyncGenerator
 
 from dify_sdk.client import AsyncDifyApi
 from dify_sdk.chat.client import AsyncChatClient
+from dify_sdk.advanced_chat.client import AsyncAdvancedChatClient
 from dify_sdk.workflow.client import AsyncWorkflowClient
 from dify_sdk.generation.client import AsyncGenerationClient
 from dify_sdk_testing import KnowledgeBaseClient
@@ -34,6 +35,19 @@ async def app_chat_client() -> AsyncGenerator[AsyncChatClient]:
         ),
     )
     yield client.chat
+
+@pytest.fixture()
+async def app_advanced_chat_client() -> AsyncGenerator[AsyncAdvancedChatClient]:
+    client = AsyncDifyApi(
+        token=os.environ["TEST_DIFY_APP_ADVANCED_CHAT_API_KEY"],
+        base_url=TEST_DIFY_HOST,
+        httpx_client=httpx.AsyncClient(
+            timeout=60,
+            follow_redirects=True,
+            transport=httpx.AsyncHTTPTransport(retries=3),
+        ),
+    )
+    yield client.advanced_chat
 
 
 @pytest.fixture()

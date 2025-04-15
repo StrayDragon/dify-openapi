@@ -4,6 +4,7 @@ from ..core.pydantic_utilities import UniversalBaseModel
 import typing
 from .stream_event_event import StreamEventEvent
 import pydantic
+from .stream_event_data import StreamEventData
 from .stream_event_metadata import StreamEventMetadata
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
@@ -11,7 +12,14 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 class StreamEvent(UniversalBaseModel):
     event: typing.Optional[StreamEventEvent] = pydantic.Field(default=None)
     """
-    Event type
+    Event type, including the following types:
+    - `event: workflow_started` workflow execution starts
+    - `event: node_started` node execution starts
+    - `event: node_finished` node execution ends, success or failure with different statuses in the same event
+    - `event: workflow_finished` workflow execution ends, success or failure with different statuses in the same event
+    - `event: tts_message` TTS audio stream event, i.e., speech synthesis output. The content is an audio block in Mp3 format, encoded as a base64 string, which can be directly decoded when playing. (Only present when auto-play is enabled)
+    - `event: tts_message_end` TTS audio stream end event, receiving this event indicates the end of the audio stream return.
+    - `event: ping` ping event every 10s, keeps the connection alive.
     """
 
     task_id: typing.Optional[str] = pydantic.Field(default=None)
@@ -44,7 +52,7 @@ class StreamEvent(UniversalBaseModel):
     Voice synthesis audio data (base64 encoded)
     """
 
-    data: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
+    data: typing.Optional[StreamEventData] = pydantic.Field(default=None)
     """
     Event related data
     """

@@ -5,7 +5,9 @@ from ..core.client_wrapper import SyncClientWrapper
 from .types.send_chat_message_by_app_chat_request_response_mode import (
     SendChatMessageByAppChatRequestResponseMode,
 )
-from ..types.file_input import FileInput
+from .types.send_chat_message_by_app_chat_request_files_item import (
+    SendChatMessageByAppChatRequestFilesItem,
+)
 from ..core.request_options import RequestOptions
 from ..types.chat_message import ChatMessage
 from ..core.serialization import convert_and_respect_annotation_metadata
@@ -98,7 +100,7 @@ class ChatClient:
         response_mode: typing.Optional[SendChatMessageByAppChatRequestResponseMode] = OMIT,
         user: typing.Optional[str] = OMIT,
         conversation_id: typing.Optional[str] = OMIT,
-        files: typing.Optional[typing.Sequence[FileInput]] = OMIT,
+        files: typing.Optional[typing.Sequence[SendChatMessageByAppChatRequestFilesItem]] = OMIT,
         auto_generate_name: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ChatMessage:
@@ -111,23 +113,25 @@ class ChatClient:
             User input/question content
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Allows passing values for variables defined by the App. The inputs parameter contains multiple key/value pairs, where each key corresponds to a specific variable and each value is the value for that variable. Variables can be file list type. If the variable is a file list type, the corresponding value should be in list format, with each element containing the following: type, transfer_method, etc.
+            Allows passing values for variables defined by the App. The inputs parameter contains multiple key/value pairs, where each key corresponds to a specific variable and each value is the value for that variable. Default {}
 
         response_mode : typing.Optional[SendChatMessageByAppChatRequestResponseMode]
             Response mode:
             - streaming: Streaming mode (recommended), implements typewriter-like output based on SSE
-            - blocking: Blocking mode, returns result after execution is complete
+            - blocking: Blocking mode, returns result after execution is complete (request may be interrupted if the process is too long)
+            Note: Blocking mode is not allowed in Agent mode
 
         user : typing.Optional[str]
-            User identifier
+            User identifier for defining end user identity, facilitating retrieval and statistics. Defined by developer rules, must be unique within the application.
 
         conversation_id : typing.Optional[str]
-            Conversation ID
+            (Optional) Conversation ID. Required when continuing a conversation based on previous chat history, must pass the conversation_id from previous messages
 
-        files : typing.Optional[typing.Sequence[FileInput]]
+        files : typing.Optional[typing.Sequence[SendChatMessageByAppChatRequestFilesItem]]
+            Uploaded files
 
         auto_generate_name : typing.Optional[bool]
-            Whether to automatically generate title
+            (Optional) Whether to automatically generate title, default is true. If set to false, you can call the conversation rename interface and set auto_generate to true to generate a title asynchronously.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -159,7 +163,7 @@ class ChatClient:
                 "conversation_id": conversation_id,
                 "files": convert_and_respect_annotation_metadata(
                     object_=files,
-                    annotation=typing.Sequence[FileInput],
+                    annotation=typing.Sequence[SendChatMessageByAppChatRequestFilesItem],
                     direction="write",
                 ),
                 "auto_generate_name": auto_generate_name,
@@ -1419,7 +1423,7 @@ class AsyncChatClient:
         response_mode: typing.Optional[SendChatMessageByAppChatRequestResponseMode] = OMIT,
         user: typing.Optional[str] = OMIT,
         conversation_id: typing.Optional[str] = OMIT,
-        files: typing.Optional[typing.Sequence[FileInput]] = OMIT,
+        files: typing.Optional[typing.Sequence[SendChatMessageByAppChatRequestFilesItem]] = OMIT,
         auto_generate_name: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ChatMessage:
@@ -1432,23 +1436,25 @@ class AsyncChatClient:
             User input/question content
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Allows passing values for variables defined by the App. The inputs parameter contains multiple key/value pairs, where each key corresponds to a specific variable and each value is the value for that variable. Variables can be file list type. If the variable is a file list type, the corresponding value should be in list format, with each element containing the following: type, transfer_method, etc.
+            Allows passing values for variables defined by the App. The inputs parameter contains multiple key/value pairs, where each key corresponds to a specific variable and each value is the value for that variable. Default {}
 
         response_mode : typing.Optional[SendChatMessageByAppChatRequestResponseMode]
             Response mode:
             - streaming: Streaming mode (recommended), implements typewriter-like output based on SSE
-            - blocking: Blocking mode, returns result after execution is complete
+            - blocking: Blocking mode, returns result after execution is complete (request may be interrupted if the process is too long)
+            Note: Blocking mode is not allowed in Agent mode
 
         user : typing.Optional[str]
-            User identifier
+            User identifier for defining end user identity, facilitating retrieval and statistics. Defined by developer rules, must be unique within the application.
 
         conversation_id : typing.Optional[str]
-            Conversation ID
+            (Optional) Conversation ID. Required when continuing a conversation based on previous chat history, must pass the conversation_id from previous messages
 
-        files : typing.Optional[typing.Sequence[FileInput]]
+        files : typing.Optional[typing.Sequence[SendChatMessageByAppChatRequestFilesItem]]
+            Uploaded files
 
         auto_generate_name : typing.Optional[bool]
-            Whether to automatically generate title
+            (Optional) Whether to automatically generate title, default is true. If set to false, you can call the conversation rename interface and set auto_generate to true to generate a title asynchronously.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1488,7 +1494,7 @@ class AsyncChatClient:
                 "conversation_id": conversation_id,
                 "files": convert_and_respect_annotation_metadata(
                     object_=files,
-                    annotation=typing.Sequence[FileInput],
+                    annotation=typing.Sequence[SendChatMessageByAppChatRequestFilesItem],
                     direction="write",
                 ),
                 "auto_generate_name": auto_generate_name,

@@ -3,8 +3,9 @@ info:
   title: Dify API - 工作流应用
   description: |
     Dify API 提供了一系列接口用于工作流功能。
-    支持工作流应用。
+    Workflow 应用无会话支持，适合用于翻译/文章写作/总结 AI 等等。
     所有 API 请求都需要在 Authorization HTTP Header 中包含应用级 API-Key。
+    强烈建议开发者把 API-Key 放在后端存储，而非分享或者放在客户端存储，以免 API-Key 泄露，导致财产损失。
     官方原始文档见: https://github.com/langgenius/dify/blob/1.2.0/web/app/components/develop/template/template_workflow.zh.mdx
   version: 1.2.0
 
@@ -196,22 +197,23 @@ components:
           type: string
           enum:
             [
-              message,
-              message_end,
-              tts_message,
-              tts_message_end,
-              message_replace,
-              error,
-              ping,
               workflow_started,
               node_started,
               node_finished,
               workflow_finished,
-              agent_message,
-              agent_thought,
-              message_file,
+              tts_message,
+              tts_message_end,
+              ping,
             ]
-          description: 事件类型
+          description: |
+            事件类型，包含以下类型：
+            - `event: workflow_started` workflow 开始执行
+            - `event: node_started` node 开始执行
+            - `event: node_finished` node 执行结束，成功失败同一事件中不同状态
+            - `event: workflow_finished` workflow 执行结束，成功失败同一事件中不同状态
+            - `event: tts_message` TTS 音频流事件，即：语音合成输出。内容是Mp3格式的音频块，使用 base64 编码后的字符串，播放的时候直接解码即可。(开启自动播放才有此消息)
+            - `event: tts_message_end` TTS 音频流结束事件，收到这个事件表示音频流返回结束。
+            - `event: ping` 每 10s 一次的 ping 事件，保持连接存活。
         task_id:
           type: string
           description: 任务 ID
@@ -233,6 +235,75 @@ components:
         data:
           type: object
           description: 事件相关数据
+          properties:
+            id:
+              type: string
+              description: workflow 执行 ID 或 node 执行 ID
+            workflow_id:
+              type: string
+              description: 关联 Workflow ID
+            node_id:
+              type: string
+              description: 节点 ID
+            node_type:
+              type: string
+              description: 节点类型
+            title:
+              type: string
+              description: 节点名称
+            index:
+              type: integer
+              description: 执行序号，用于展示 Tracing Node 顺序
+            predecessor_node_id:
+              type: string
+              description: 前置节点 ID，用于画布展示执行路径
+            inputs:
+              type: object
+              description: 节点中所有使用到的前置节点变量内容
+            process_data:
+              type: object
+              description: 节点过程数据
+            outputs:
+              type: object
+              description: 输出内容
+            status:
+              type: string
+              enum: [running, succeeded, failed, stopped]
+              description: 执行状态
+            error:
+              type: string
+              description: 错误原因
+            elapsed_time:
+              type: number
+              description: 耗时(s)
+            execution_metadata:
+              type: object
+              description: 元数据
+              properties:
+                total_tokens:
+                  type: integer
+                  description: 总使用 tokens
+                total_price:
+                  type: number
+                  description: 总费用
+                currency:
+                  type: string
+                  description: 货币，如 USD / RMB
+            sequence_number:
+              type: integer
+              description: 自增序号，App 内自增，从 1 开始
+            total_steps:
+              type: integer
+              description: 总步数
+            total_tokens:
+              type: integer
+              description: 总使用 tokens
+            created_at:
+              type: integer
+              description: 开始时间
+            finished_at:
+              type: integer
+              description: 结束时间
         metadata:
           type: object
           properties:
@@ -274,7 +345,7 @@ paths:
       tags:
         - Workflow
       operationId: runWorkflow
-      summary: 执行工作流(工作流应用)
+      summary: 执行工作流
       description: 执行 workflow，没有已发布的 workflow，不可执行
       requestBody:
         required: true
@@ -289,18 +360,33 @@ paths:
               properties:
                 inputs:
                   type: object
-                  description: 工作流输入参数
+                  description: |
+                    允许传入 App 定义的各变量值。
+                    inputs 参数包含了多组键值对（Key/Value pairs），每组的键对应一个特定变量，每组的值则是该变量的具体值。变量可以是文件列表类型。
+                    文件列表类型变量适用于传入文件结合文本理解并回答问题，仅当模型支持该类型文件解析能力时可用。如果该变量是文件列表类型，该变量对应的值应是列表格式，其中每个元素应包含以下内容：
+                      - `type` (string) 支持类型：
+                        - `document` 具体类型包含：'TXT', 'MD', 'MARKDOWN', 'PDF', 'HTML', 'XLSX', 'XLS', 'DOCX', 'CSV', 'EML', 'MSG', 'PPTX', 'PPT', 'XML', 'EPUB'
+                        - `image` 具体类型包含：'JPG', 'JPEG', 'PNG', 'GIF', 'WEBP', 'SVG'
+                        - `audio` 具体类型包含：'MP3', 'M4A', 'WAV', 'WEBM', 'AMR'
+                        - `video` 具体类型包含：'MP4', 'MOV', 'MPEG', 'MPGA'
+                        - `custom` 具体类型包含：其他文件类型
+                      - `transfer_method` (string) 传递方式，`remote_url` 图片地址 / `local_file` 上传文件
+                      - `url` (string) 图片地址（仅当传递方式为 `remote_url` 时）
+                      - `upload_file_id` (string)  上传文件 ID（仅当传递方式为 `local_file` 时）
                 response_mode:
                   type: string
                   enum: [streaming, blocking]
-                  description: 响应模式
+                  description: |
+                    返回响应模式，支持：
+                    - `streaming` 流式模式（推荐）。基于 SSE（Server-Sent Events）实现类似打字机输出方式的流式返回。
+                    - `blocking` 阻塞模式，等待执行完毕后返回结果。（请求若流程较长可能会被中断）。
+                    由于 Cloudflare 限制，请求会在 100 秒超时无返回后中断。
                 user:
                   type: string
-                  description: 用户标识
-                files:
-                  type: array
-                  items:
-                    $ref: "#/components/schemas/FileInput"
+                  description: |
+                    用户标识，用于定义终端用户的身份，方便检索、统计。
+                    由开发者定义规则，需保证用户标识在应用内唯一。
+
       responses:
         "200":
           description: 成功响应
@@ -308,9 +394,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WorkflowMessage"
+              description: 当 `response_mode` 为 `blocking` 时，返回 CompletionResponse object。
             text/event-stream:
               schema:
                 $ref: "#/components/schemas/StreamEvent"
+              description: 当 `response_mode` 为 `streaming`时，返回 ChunkCompletionResponse object 流式序列。
         "400":
           $ref: "#/components/responses/Error400"
         "404":
@@ -555,3 +643,245 @@ paths:
                         created_at:
                           type: integer
                           description: 创建时间
+        '400':
+          $ref: "#/components/responses/Error400"
+        '401':
+          $ref: "#/components/responses/Error401"
+        '404':
+          $ref: "#/components/responses/Error404"
+        '500':
+          $ref: "#/components/responses/Error500"
+
+  /files/upload:
+    post:
+      tags:
+        - Workflow
+      operationId: uploadFile
+      summary: 上传文件
+      description: 上传文件并在发送消息时使用，可实现图文多模态理解。支持您的工作流程所支持的任何格式。上传的文件仅供当前终端用户使用。
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+                - user
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: 要上传的文件
+                user:
+                  type: string
+                  description: 用户标识，用于定义终端用户的身份，必须和发送消息接口传入 user 保持一致
+      responses:
+        '201':
+          description: 成功上传文件
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    description: ID
+                  name:
+                    type: string
+                    description: 文件名
+                  size:
+                    type: integer
+                    description: 文件大小（byte）
+                  extension:
+                    type: string
+                    description: 文件后缀
+                  mime_type:
+                    type: string
+                    description: 文件 mime-type
+                  created_by:
+                    type: string
+                    format: uuid
+                    description: 上传人 ID
+                  created_at:
+                    type: integer
+                    description: 上传时间
+        '400':
+          $ref: "#/components/responses/Error400"
+        '401':
+          $ref: "#/components/responses/Error401"
+        '413':
+          description: 文件太大
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '415':
+          description: 不支持的文件类型
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '500':
+          $ref: "#/components/responses/Error500"
+        '503':
+          description: 存储服务错误
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /info:
+    get:
+      tags:
+        - Workflow
+      operationId: getAppInfo
+      summary: 获取应用基本信息
+      description: 用于获取应用的基本信息
+      responses:
+        '200':
+          description: 成功获取应用信息
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: 应用名称
+                  description:
+                    type: string
+                    description: 应用描述
+                  tags:
+                    type: array
+                    items:
+                      type: string
+                    description: 应用标签
+        '400':
+          $ref: "#/components/responses/Error400"
+        '401':
+          $ref: "#/components/responses/Error401"
+        '404':
+          $ref: "#/components/responses/Error404"
+        '500':
+          $ref: "#/components/responses/Error500"
+
+  /parameters:
+    get:
+      tags:
+        - Workflow
+      operationId: getAppParameters
+      summary: 获取应用参数
+      description: 用于进入页面一开始，获取功能开关、输入参数名称、类型及默认值等使用
+      responses:
+        '200':
+          description: 成功获取应用参数
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_input_form:
+                    type: array
+                    description: 用户输入表单配置
+                    items:
+                      type: object
+                      properties:
+                        text-input:
+                          type: object
+                          description: 文本输入控件
+                          properties:
+                            label:
+                              type: string
+                              description: 控件展示标签名
+                            variable:
+                              type: string
+                              description: 控件 ID
+                            required:
+                              type: boolean
+                              description: 是否必填
+                            default:
+                              type: string
+                              description: 默认值
+                        paragraph:
+                          type: object
+                          description: 段落文本输入控件
+                          properties:
+                            label:
+                              type: string
+                              description: 控件展示标签名
+                            variable:
+                              type: string
+                              description: 控件 ID
+                            required:
+                              type: boolean
+                              description: 是否必填
+                            default:
+                              type: string
+                              description: 默认值
+                        select:
+                          type: object
+                          description: 下拉控件
+                          properties:
+                            label:
+                              type: string
+                              description: 控件展示标签名
+                            variable:
+                              type: string
+                              description: 控件 ID
+                            required:
+                              type: boolean
+                              description: 是否必填
+                            default:
+                              type: string
+                              description: 默认值
+                            options:
+                              type: array
+                              items:
+                                type: string
+                              description: 选项值
+                  file_upload:
+                    type: object
+                    description: 文件上传配置
+                    properties:
+                      image:
+                        type: object
+                        description: 图片设置
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: 是否开启
+                          number_limits:
+                            type: integer
+                            description: 图片数量限制，默认 3
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum: [remote_url, local_file]
+                            description: 传递方式列表
+                  system_parameters:
+                    type: object
+                    description: 系统参数
+                    properties:
+                      file_size_limit:
+                        type: integer
+                        description: 文档上传大小限制 (MB)
+                      image_file_size_limit:
+                        type: integer
+                        description: 图片文件上传大小限制（MB）
+                      audio_file_size_limit:
+                        type: integer
+                        description: 音频文件上传大小限制 (MB)
+                      video_file_size_limit:
+                        type: integer
+                        description: 视频文件上传大小限制 (MB)
+        '400':
+          $ref: "#/components/responses/Error400"
+        '401':
+          $ref: "#/components/responses/Error401"
+        '404':
+          $ref: "#/components/responses/Error404"
+        '500':
+          $ref: "#/components/responses/Error500"

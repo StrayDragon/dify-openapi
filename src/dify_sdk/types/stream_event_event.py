@@ -4,20 +4,13 @@ import typing
 
 StreamEventEvent = typing.Union[
     typing.Literal[
-        "message",
-        "message_end",
-        "tts_message",
-        "tts_message_end",
-        "message_replace",
-        "error",
-        "ping",
         "workflow_started",
         "node_started",
         "node_finished",
         "workflow_finished",
-        "agent_message",
-        "agent_thought",
-        "message_file",
+        "tts_message",
+        "tts_message_end",
+        "ping",
     ],
     typing.Any,
 ]

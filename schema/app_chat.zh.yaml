@@ -247,7 +247,7 @@ components:
           description: 事件类型
         task_id:
           type: string
-          description: 任务 ID
+          description: 任务 ID，用于请求跟踪和停止响应接口
         message_id:
           type: string
           description: 消息唯一 ID
@@ -278,6 +278,38 @@ components:
         created_at:
           type: integer
           description: 创建时间戳
+        id:
+          type: string
+          description: 唯一ID
+        position:
+          type: integer
+          description: agent_thought在消息中的位置
+        thought:
+          type: string
+          description: agent的思考内容
+        observation:
+          type: string
+          description: 工具调用的返回结果
+        tool:
+          type: string
+          description: 使用的工具列表，以 ; 分割多个工具
+        tool_input:
+          type: string
+          description: 工具的输入，JSON格式的字符串
+        message_files:
+          type: array
+          items:
+            type: string
+          description: 当前agent_thought关联的文件ID
+        type:
+          type: string
+          description: 文件类型
+        belongs_to:
+          type: string
+          description: 文件归属，user或assistant
+        url:
+          type: string
+          description: 文件访问地址
 
     UploadedFile:
       type: object
@@ -330,27 +362,44 @@ paths:
                   description: 用户输入/提问内容
                 inputs:
                   type: object
-                  description: 允许传入 App 定义的各变量值。inputs 参数包含了多组键值对（Key/Value pairs），每组的键对应一个特定变量，每组的值则是该变量的具体值。变量可以是文件列表类型。如果该变量是文件列表类型，该变量对应的值应是列表格式，其中每个元素应包含以下内容：type、transfer_method等属性。
+                  description: 允许传入 App 定义的各变量值。inputs 参数包含了多组键值对（Key/Value pairs），每组的键对应一个特定变量，每组的值则是该变量的具体值。默认 {}
                 response_mode:
                   type: string
                   enum: [streaming, blocking]
                   description: |
                     响应模式:
                     - streaming: 流式模式（推荐），基于 SSE 实现类似打字机输出
-                    - blocking: 阻塞模式，等待执行完毕后返回结果
+                    - blocking: 阻塞模式，等待执行完毕后返回结果（请求若流程较长可能会被中断）
+                    注：Agent模式下不允许blocking
                 user:
                   type: string
-                  description: 用户标识
+                  description: 用户标识，用于定义终端用户的身份，方便检索、统计。由开发者定义规则，需保证用户标识在应用内唯一。
                 conversation_id:
                   type: string
-                  description: 会话 ID
+                  description: （选填）会话 ID，需要基于之前的聊天记录继续对话，必须传之前消息的 conversation_id
                 files:
                   type: array
                   items:
-                    $ref: "#/components/schemas/FileInput"
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum: [image]
+                        description: 支持类型：图片 image（目前仅支持图片格式）
+                      transfer_method:
+                        type: string
+                        enum: [remote_url, local_file]
+                        description: 传递方式
+                      url:
+                        type: string
+                        description: 图片地址（仅当传递方式为 remote_url 时）
+                      upload_file_id:
+                        type: string
+                        description: 上传文件 ID（仅当传递方式为 local_file 时）
+                  description: 上传的文件
                 auto_generate_name:
                   type: boolean
-                  description: 是否自动生成标题
+                  description: （选填）自动生成标题，默认 true。若设置为 false，则可通过调用会话重命名接口并设置 auto_generate 为 true 实现异步生成标题。
                   default: true
       responses:
         "200":
@@ -359,9 +408,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ChatMessage"
+                description: 当 response_mode 为 blocking 时，返回 ChatCompletionResponse object
             text/event-stream:
               schema:
                 $ref: "#/components/schemas/StreamEvent"
+                description: 当 response_mode 为 streaming 时，返回 ChunkChatCompletionResponse object 流式序列
         "400":
           $ref: "#/components/responses/Error400"
         "404":

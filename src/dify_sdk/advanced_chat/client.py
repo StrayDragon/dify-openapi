@@ -34,6 +34,27 @@ from .types.get_application_info_by_app_advanced_chat_response import (
 from .types.get_application_parameters_by_app_advanced_chat_response import (
     GetApplicationParametersByAppAdvancedChatResponse,
 )
+from .types.send_message_feedback_by_app_advanced_chat_response import (
+    SendMessageFeedbackByAppAdvancedChatResponse,
+)
+from .types.get_suggested_questions_by_app_advanced_chat_response import (
+    GetSuggestedQuestionsByAppAdvancedChatResponse,
+)
+from .types.get_conversation_messages_by_app_advanced_chat_response import (
+    GetConversationMessagesByAppAdvancedChatResponse,
+)
+from .types.get_conversations_by_app_advanced_chat_request_sort_by import (
+    GetConversationsByAppAdvancedChatRequestSortBy,
+)
+from .types.get_conversations_by_app_advanced_chat_response import (
+    GetConversationsByAppAdvancedChatResponse,
+)
+from .types.delete_conversation_by_app_advanced_chat_response import (
+    DeleteConversationByAppAdvancedChatResponse,
+)
+from .types.rename_conversation_by_app_advanced_chat_response import (
+    RenameConversationByAppAdvancedChatResponse,
+)
 from .types.get_app_meta_info_by_app_advanced_chat_response import (
     GetAppMetaInfoByAppAdvancedChatResponse,
 )
@@ -106,9 +127,10 @@ class AdvancedChatClient:
             Conversation ID
 
         files : typing.Optional[typing.Sequence[FileInput]]
+            File list, suitable for combining files with text understanding to answer questions, only available when the model supports Vision capabilities.
 
         auto_generate_name : typing.Optional[bool]
-            Whether to automatically generate title
+            (Optional) Automatically generate title, default `true`. If set to `false`, you can call the conversation rename interface and set `auto_generate` to `true` to generate a title asynchronously.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -551,6 +573,422 @@ class AdvancedChatClient:
                     GetApplicationParametersByAppAdvancedChatResponse,
                     parse_obj_as(
                         type_=GetApplicationParametersByAppAdvancedChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def send_message_feedback_by_app_advanced_chat(
+        self,
+        message_id: str,
+        *,
+        rating: str,
+        user: str,
+        content: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> SendMessageFeedbackByAppAdvancedChatResponse:
+        """
+        End user feedback on messages, likes/dislikes, to help application developers optimize output expectations.
+
+        Parameters
+        ----------
+        message_id : str
+            Message ID
+
+        rating : str
+            Like, dislike, or null to remove feedback
+
+        user : str
+            User identifier, defined by the developer, must be unique within the application.
+
+        content : typing.Optional[str]
+            Specific feedback information.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        SendMessageFeedbackByAppAdvancedChatResponse
+            Successful response
+
+        Examples
+        --------
+        from dify import DifyApi
+
+        client = DifyApi(
+            token="YOUR_TOKEN",
+        )
+        client.advanced_chat.send_message_feedback_by_app_advanced_chat(
+            message_id="message_id",
+            rating="rating",
+            user="user",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"messages/{jsonable_encoder(message_id)}/feedbacks",
+            method="POST",
+            json={
+                "rating": rating,
+                "user": user,
+                "content": content,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    SendMessageFeedbackByAppAdvancedChatResponse,
+                    parse_obj_as(
+                        type_=SendMessageFeedbackByAppAdvancedChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def get_suggested_questions_by_app_advanced_chat(
+        self,
+        message_id: str,
+        *,
+        user: str,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetSuggestedQuestionsByAppAdvancedChatResponse:
+        """
+        Get a list of suggested questions for the next round.
+
+        Parameters
+        ----------
+        message_id : str
+            Message ID
+
+        user : str
+            User identifier, defined by the developer, must be unique within the application.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetSuggestedQuestionsByAppAdvancedChatResponse
+            Successful response
+
+        Examples
+        --------
+        from dify import DifyApi
+
+        client = DifyApi(
+            token="YOUR_TOKEN",
+        )
+        client.advanced_chat.get_suggested_questions_by_app_advanced_chat(
+            message_id="message_id",
+            user="user",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"messages/{jsonable_encoder(message_id)}/suggested",
+            method="GET",
+            params={
+                "user": user,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    GetSuggestedQuestionsByAppAdvancedChatResponse,
+                    parse_obj_as(
+                        type_=GetSuggestedQuestionsByAppAdvancedChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def get_conversation_messages_by_app_advanced_chat(
+        self,
+        *,
+        conversation_id: str,
+        user: str,
+        first_id: typing.Optional[str] = None,
+        limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetConversationMessagesByAppAdvancedChatResponse:
+        """
+        Returns chat history in a scrolling load format, with the first page returning the latest `limit` messages, i.e., in reverse order.
+
+        Parameters
+        ----------
+        conversation_id : str
+            Conversation ID
+
+        user : str
+            User identifier, defined by the developer, must be unique within the application.
+
+        first_id : typing.Optional[str]
+            ID of the first chat message on the current page, default null
+
+        limit : typing.Optional[int]
+            Number of chat messages to return per request, default 20.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetConversationMessagesByAppAdvancedChatResponse
+            Successful response
+
+        Examples
+        --------
+        from dify import DifyApi
+
+        client = DifyApi(
+            token="YOUR_TOKEN",
+        )
+        client.advanced_chat.get_conversation_messages_by_app_advanced_chat(
+            conversation_id="conversation_id",
+            user="user",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "messages",
+            method="GET",
+            params={
+                "conversation_id": conversation_id,
+                "user": user,
+                "first_id": first_id,
+                "limit": limit,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    GetConversationMessagesByAppAdvancedChatResponse,
+                    parse_obj_as(
+                        type_=GetConversationMessagesByAppAdvancedChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def get_conversations_by_app_advanced_chat(
+        self,
+        *,
+        user: str,
+        last_id: typing.Optional[str] = None,
+        limit: typing.Optional[int] = None,
+        sort_by: typing.Optional[GetConversationsByAppAdvancedChatRequestSortBy] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetConversationsByAppAdvancedChatResponse:
+        """
+        Get the current user's conversation list, by default returns the most recent 20.
+
+        Parameters
+        ----------
+        user : str
+            User identifier, defined by the developer, must be unique within the application.
+
+        last_id : typing.Optional[str]
+            (Optional) ID of the last record on the current page, default null
+
+        limit : typing.Optional[int]
+            (Optional) Number of records to return per request, default 20, maximum 100, minimum 1.
+
+        sort_by : typing.Optional[GetConversationsByAppAdvancedChatRequestSortBy]
+            (Optional) Sort field, default -updated_at (sorted by update time in descending order)
+            - Available values: created_at, -created_at, updated_at, -updated_at
+            - The symbol in front of the field represents ascending or descending order, - means descending
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetConversationsByAppAdvancedChatResponse
+            Successful response
+
+        Examples
+        --------
+        from dify import DifyApi
+
+        client = DifyApi(
+            token="YOUR_TOKEN",
+        )
+        client.advanced_chat.get_conversations_by_app_advanced_chat(
+            user="user",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "conversations",
+            method="GET",
+            params={
+                "user": user,
+                "last_id": last_id,
+                "limit": limit,
+                "sort_by": sort_by,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    GetConversationsByAppAdvancedChatResponse,
+                    parse_obj_as(
+                        type_=GetConversationsByAppAdvancedChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def delete_conversation_by_app_advanced_chat(
+        self,
+        conversation_id: str,
+        *,
+        user: str,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> DeleteConversationByAppAdvancedChatResponse:
+        """
+        Delete a conversation.
+
+        Parameters
+        ----------
+        conversation_id : str
+            Conversation ID
+
+        user : str
+            User identifier, defined by the developer, must be unique within the application.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        DeleteConversationByAppAdvancedChatResponse
+            Successful response
+
+        Examples
+        --------
+        from dify import DifyApi
+
+        client = DifyApi(
+            token="YOUR_TOKEN",
+        )
+        client.advanced_chat.delete_conversation_by_app_advanced_chat(
+            conversation_id="conversation_id",
+            user="user",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"conversations/{jsonable_encoder(conversation_id)}",
+            method="DELETE",
+            json={
+                "user": user,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    DeleteConversationByAppAdvancedChatResponse,
+                    parse_obj_as(
+                        type_=DeleteConversationByAppAdvancedChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def rename_conversation_by_app_advanced_chat(
+        self,
+        conversation_id: str,
+        *,
+        user: str,
+        name: typing.Optional[str] = OMIT,
+        auto_generate: typing.Optional[bool] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> RenameConversationByAppAdvancedChatResponse:
+        """
+        Rename a conversation, the conversation name is used for display on clients that support multiple conversations.
+
+        Parameters
+        ----------
+        conversation_id : str
+            Conversation ID
+
+        user : str
+            User identifier, defined by the developer, must be unique within the application.
+
+        name : typing.Optional[str]
+            (Optional) Name, if `auto_generate` is `true`, this parameter can be omitted.
+
+        auto_generate : typing.Optional[bool]
+            (Optional) Automatically generate title, default false.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        RenameConversationByAppAdvancedChatResponse
+            Successful response
+
+        Examples
+        --------
+        from dify import DifyApi
+
+        client = DifyApi(
+            token="YOUR_TOKEN",
+        )
+        client.advanced_chat.rename_conversation_by_app_advanced_chat(
+            conversation_id="conversation_id",
+            user="user",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"conversations/{jsonable_encoder(conversation_id)}/name",
+            method="POST",
+            json={
+                "name": name,
+                "auto_generate": auto_generate,
+                "user": user,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    RenameConversationByAppAdvancedChatResponse,
+                    parse_obj_as(
+                        type_=RenameConversationByAppAdvancedChatResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -1018,9 +1456,10 @@ class AsyncAdvancedChatClient:
             Conversation ID
 
         files : typing.Optional[typing.Sequence[FileInput]]
+            File list, suitable for combining files with text understanding to answer questions, only available when the model supports Vision capabilities.
 
         auto_generate_name : typing.Optional[bool]
-            Whether to automatically generate title
+            (Optional) Automatically generate title, default `true`. If set to `false`, you can call the conversation rename interface and set `auto_generate` to `true` to generate a title asynchronously.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1511,6 +1950,470 @@ class AsyncAdvancedChatClient:
                     GetApplicationParametersByAppAdvancedChatResponse,
                     parse_obj_as(
                         type_=GetApplicationParametersByAppAdvancedChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def send_message_feedback_by_app_advanced_chat(
+        self,
+        message_id: str,
+        *,
+        rating: str,
+        user: str,
+        content: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> SendMessageFeedbackByAppAdvancedChatResponse:
+        """
+        End user feedback on messages, likes/dislikes, to help application developers optimize output expectations.
+
+        Parameters
+        ----------
+        message_id : str
+            Message ID
+
+        rating : str
+            Like, dislike, or null to remove feedback
+
+        user : str
+            User identifier, defined by the developer, must be unique within the application.
+
+        content : typing.Optional[str]
+            Specific feedback information.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        SendMessageFeedbackByAppAdvancedChatResponse
+            Successful response
+
+        Examples
+        --------
+        import asyncio
+
+        from dify import AsyncDifyApi
+
+        client = AsyncDifyApi(
+            token="YOUR_TOKEN",
+        )
+
+
+        async def main() -> None:
+            await client.advanced_chat.send_message_feedback_by_app_advanced_chat(
+                message_id="message_id",
+                rating="rating",
+                user="user",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"messages/{jsonable_encoder(message_id)}/feedbacks",
+            method="POST",
+            json={
+                "rating": rating,
+                "user": user,
+                "content": content,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    SendMessageFeedbackByAppAdvancedChatResponse,
+                    parse_obj_as(
+                        type_=SendMessageFeedbackByAppAdvancedChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def get_suggested_questions_by_app_advanced_chat(
+        self,
+        message_id: str,
+        *,
+        user: str,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetSuggestedQuestionsByAppAdvancedChatResponse:
+        """
+        Get a list of suggested questions for the next round.
+
+        Parameters
+        ----------
+        message_id : str
+            Message ID
+
+        user : str
+            User identifier, defined by the developer, must be unique within the application.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetSuggestedQuestionsByAppAdvancedChatResponse
+            Successful response
+
+        Examples
+        --------
+        import asyncio
+
+        from dify import AsyncDifyApi
+
+        client = AsyncDifyApi(
+            token="YOUR_TOKEN",
+        )
+
+
+        async def main() -> None:
+            await client.advanced_chat.get_suggested_questions_by_app_advanced_chat(
+                message_id="message_id",
+                user="user",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"messages/{jsonable_encoder(message_id)}/suggested",
+            method="GET",
+            params={
+                "user": user,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    GetSuggestedQuestionsByAppAdvancedChatResponse,
+                    parse_obj_as(
+                        type_=GetSuggestedQuestionsByAppAdvancedChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def get_conversation_messages_by_app_advanced_chat(
+        self,
+        *,
+        conversation_id: str,
+        user: str,
+        first_id: typing.Optional[str] = None,
+        limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetConversationMessagesByAppAdvancedChatResponse:
+        """
+        Returns chat history in a scrolling load format, with the first page returning the latest `limit` messages, i.e., in reverse order.
+
+        Parameters
+        ----------
+        conversation_id : str
+            Conversation ID
+
+        user : str
+            User identifier, defined by the developer, must be unique within the application.
+
+        first_id : typing.Optional[str]
+            ID of the first chat message on the current page, default null
+
+        limit : typing.Optional[int]
+            Number of chat messages to return per request, default 20.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetConversationMessagesByAppAdvancedChatResponse
+            Successful response
+
+        Examples
+        --------
+        import asyncio
+
+        from dify import AsyncDifyApi
+
+        client = AsyncDifyApi(
+            token="YOUR_TOKEN",
+        )
+
+
+        async def main() -> None:
+            await client.advanced_chat.get_conversation_messages_by_app_advanced_chat(
+                conversation_id="conversation_id",
+                user="user",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "messages",
+            method="GET",
+            params={
+                "conversation_id": conversation_id,
+                "user": user,
+                "first_id": first_id,
+                "limit": limit,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    GetConversationMessagesByAppAdvancedChatResponse,
+                    parse_obj_as(
+                        type_=GetConversationMessagesByAppAdvancedChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def get_conversations_by_app_advanced_chat(
+        self,
+        *,
+        user: str,
+        last_id: typing.Optional[str] = None,
+        limit: typing.Optional[int] = None,
+        sort_by: typing.Optional[GetConversationsByAppAdvancedChatRequestSortBy] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetConversationsByAppAdvancedChatResponse:
+        """
+        Get the current user's conversation list, by default returns the most recent 20.
+
+        Parameters
+        ----------
+        user : str
+            User identifier, defined by the developer, must be unique within the application.
+
+        last_id : typing.Optional[str]
+            (Optional) ID of the last record on the current page, default null
+
+        limit : typing.Optional[int]
+            (Optional) Number of records to return per request, default 20, maximum 100, minimum 1.
+
+        sort_by : typing.Optional[GetConversationsByAppAdvancedChatRequestSortBy]
+            (Optional) Sort field, default -updated_at (sorted by update time in descending order)
+            - Available values: created_at, -created_at, updated_at, -updated_at
+            - The symbol in front of the field represents ascending or descending order, - means descending
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetConversationsByAppAdvancedChatResponse
+            Successful response
+
+        Examples
+        --------
+        import asyncio
+
+        from dify import AsyncDifyApi
+
+        client = AsyncDifyApi(
+            token="YOUR_TOKEN",
+        )
+
+
+        async def main() -> None:
+            await client.advanced_chat.get_conversations_by_app_advanced_chat(
+                user="user",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "conversations",
+            method="GET",
+            params={
+                "user": user,
+                "last_id": last_id,
+                "limit": limit,
+                "sort_by": sort_by,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    GetConversationsByAppAdvancedChatResponse,
+                    parse_obj_as(
+                        type_=GetConversationsByAppAdvancedChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def delete_conversation_by_app_advanced_chat(
+        self,
+        conversation_id: str,
+        *,
+        user: str,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> DeleteConversationByAppAdvancedChatResponse:
+        """
+        Delete a conversation.
+
+        Parameters
+        ----------
+        conversation_id : str
+            Conversation ID
+
+        user : str
+            User identifier, defined by the developer, must be unique within the application.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        DeleteConversationByAppAdvancedChatResponse
+            Successful response
+
+        Examples
+        --------
+        import asyncio
+
+        from dify import AsyncDifyApi
+
+        client = AsyncDifyApi(
+            token="YOUR_TOKEN",
+        )
+
+
+        async def main() -> None:
+            await client.advanced_chat.delete_conversation_by_app_advanced_chat(
+                conversation_id="conversation_id",
+                user="user",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"conversations/{jsonable_encoder(conversation_id)}",
+            method="DELETE",
+            json={
+                "user": user,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    DeleteConversationByAppAdvancedChatResponse,
+                    parse_obj_as(
+                        type_=DeleteConversationByAppAdvancedChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def rename_conversation_by_app_advanced_chat(
+        self,
+        conversation_id: str,
+        *,
+        user: str,
+        name: typing.Optional[str] = OMIT,
+        auto_generate: typing.Optional[bool] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> RenameConversationByAppAdvancedChatResponse:
+        """
+        Rename a conversation, the conversation name is used for display on clients that support multiple conversations.
+
+        Parameters
+        ----------
+        conversation_id : str
+            Conversation ID
+
+        user : str
+            User identifier, defined by the developer, must be unique within the application.
+
+        name : typing.Optional[str]
+            (Optional) Name, if `auto_generate` is `true`, this parameter can be omitted.
+
+        auto_generate : typing.Optional[bool]
+            (Optional) Automatically generate title, default false.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        RenameConversationByAppAdvancedChatResponse
+            Successful response
+
+        Examples
+        --------
+        import asyncio
+
+        from dify import AsyncDifyApi
+
+        client = AsyncDifyApi(
+            token="YOUR_TOKEN",
+        )
+
+
+        async def main() -> None:
+            await client.advanced_chat.rename_conversation_by_app_advanced_chat(
+                conversation_id="conversation_id",
+                user="user",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"conversations/{jsonable_encoder(conversation_id)}/name",
+            method="POST",
+            json={
+                "name": name,
+                "auto_generate": auto_generate,
+                "user": user,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    RenameConversationByAppAdvancedChatResponse,
+                    parse_obj_as(
+                        type_=RenameConversationByAppAdvancedChatResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

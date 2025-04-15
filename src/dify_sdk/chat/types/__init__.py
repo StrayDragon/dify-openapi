@@ -60,6 +60,12 @@ from .get_conversation_messages_by_app_chat_response import (
 from .get_suggested_questions_by_app_chat_response import (
     GetSuggestedQuestionsByAppChatResponse,
 )
+from .send_chat_message_by_app_chat_request_files_item import (
+    SendChatMessageByAppChatRequestFilesItem,
+)
+from .send_chat_message_by_app_chat_request_files_item_transfer_method import (
+    SendChatMessageByAppChatRequestFilesItemTransferMethod,
+)
 from .send_chat_message_by_app_chat_request_response_mode import (
     SendChatMessageByAppChatRequestResponseMode,
 )
@@ -92,6 +98,8 @@ __all__ = [
     "GetConversationListByAppChatResponse",
     "GetConversationMessagesByAppChatResponse",
     "GetSuggestedQuestionsByAppChatResponse",
+    "SendChatMessageByAppChatRequestFilesItem",
+    "SendChatMessageByAppChatRequestFilesItemTransferMethod",
     "SendChatMessageByAppChatRequestResponseMode",
     "SendMessageFeedbackByAppChatResponse",
     "StopChatResponseByAppChatResponse",
