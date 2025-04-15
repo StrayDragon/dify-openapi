@@ -1,9 +1,9 @@
 openapi: 3.0.0
 info:
-  title: Dify API - Advanced Chat Application
+  title: Dify API - Workflow Orchestration Chat Application
   description: |
-    Dify API provides a series of interfaces for advanced conversation functionality.
-    It supports advanced conversational applications.
+    Dify API provides a series of interfaces for workflow orchestration chat applications.
+    Chat applications support session persistence, allowing previous chat history to be used as context for responses, suitable for chat/customer service AI, etc.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
     official raw document: https://github.com/langgenius/dify/blob/1.2.0/web/app/components/develop/template/template_advanced_chat.en.mdx
   version: 1.2.0
@@ -253,29 +253,38 @@ components:
             - audio
             - video
             - custom
-          description: File type
+          description: |
+            File type:
+            - `document` Specific types include: 'TXT', 'MD', 'MARKDOWN', 'PDF', 'HTML', 'XLSX', 'XLS', 'DOCX', 'CSV', 'EML', 'MSG', 'PPTX', 'PPT', 'XML', 'EPUB'
+            - `image` Specific types include: 'JPG', 'JPEG', 'PNG', 'GIF', 'WEBP', 'SVG'
+            - `audio` Specific types include: 'MP3', 'M4A', 'WAV', 'WEBM', 'AMR'
+            - `video` Specific types include: 'MP4', 'MOV', 'MPEG', 'MPGA'
+            - `custom` Specific types include: other file types
         transfer_method:
           type: string
           enum:
             - remote_url
             - local_file
-          description: Transfer method
+          description: |
+            Transfer method:
+            - `remote_url`: Image URL.
+            - `local_file`: Upload file.
         url:
           type: string
-          description: Remote URL
+          description: Image URL. (Only when transfer method is `remote_url`).
         upload_file_id:
           type: string
-          description: Upload file ID
+          description: Upload file ID. (Only when transfer method is `local_file`).
 tags:
   - name: AdvancedChat
-    description: Advanced Chat Application Operations
+    description: Workflow Orchestration Chat Application Operations
 paths:
   /chat-messages:
     post:
       tags:
         - AdvancedChat
       operationId: sendChatMessageByAppAdvancedChat
-      summary: Send Chat Message (Advanced Chat App)
+      summary: Send Chat Message
       description: Create conversation message
       requestBody:
         required: true
@@ -309,11 +318,12 @@ paths:
                   description: Conversation ID
                 files:
                   type: array
+                  description: 'File list, suitable for combining files with text understanding to answer questions, only available when the model supports Vision capabilities.'
                   items:
                     $ref: '#/components/schemas/FileInput'
                 auto_generate_name:
                   type: boolean
-                  description: Whether to automatically generate title
+                  description: '(Optional) Automatically generate title, default `true`. If set to `false`, you can call the conversation rename interface and set `auto_generate` to `true` to generate a title asynchronously.'
                   default: true
       responses:
         '200':
@@ -578,6 +588,387 @@ paths:
                   system_parameters:
                     type: object
                     description: System parameters
+  '/messages/{message_id}/feedbacks':
+    post:
+      tags:
+        - AdvancedChat
+      operationId: sendMessageFeedbackByAppAdvancedChat
+      summary: Message Feedback (Like/Dislike)
+      description: 'End user feedback on messages, likes/dislikes, to help application developers optimize output expectations.'
+      parameters:
+        - name: message_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Message ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - rating
+                - user
+              properties:
+                rating:
+                  type: string
+                  enum:
+                    - like
+                    - dislike
+                    - null
+                  description: 'Like, dislike, or null to remove feedback'
+                user:
+                  type: string
+                  description: 'User identifier, defined by the developer, must be unique within the application.'
+                content:
+                  type: string
+                  description: Specific feedback information.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    enum:
+                      - success
+                    description: Fixed return value 'success'
+  '/messages/{message_id}/suggested':
+    get:
+      tags:
+        - AdvancedChat
+      operationId: getSuggestedQuestionsByAppAdvancedChat
+      summary: Get Suggested Questions for Next Round
+      description: Get a list of suggested questions for the next round.
+      parameters:
+        - name: message_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Message ID
+        - name: user
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 'User identifier, defined by the developer, must be unique within the application.'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    enum:
+                      - success
+                    description: Fixed return value 'success'
+                  data:
+                    type: array
+                    items:
+                      type: string
+                    description: List of suggested questions
+  /messages:
+    get:
+      tags:
+        - AdvancedChat
+      operationId: getConversationMessagesByAppAdvancedChat
+      summary: Get Conversation History Messages
+      description: 'Returns chat history in a scrolling load format, with the first page returning the latest `limit` messages, i.e., in reverse order.'
+      parameters:
+        - name: conversation_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Conversation ID
+        - name: user
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 'User identifier, defined by the developer, must be unique within the application.'
+        - name: first_id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: 'ID of the first chat message on the current page, default null'
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+          description: 'Number of chat messages to return per request, default 20.'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Message ID
+                        conversation_id:
+                          type: string
+                          description: Conversation ID
+                        inputs:
+                          type: object
+                          description: User input parameters.
+                        query:
+                          type: string
+                          description: User input / question content.
+                        message_files:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                description: ID
+                              type:
+                                type: string
+                                description: 'File type, image for images'
+                              url:
+                                type: string
+                                description: Preview image URL
+                              belongs_to:
+                                type: string
+                                enum:
+                                  - user
+                                  - assistant
+                                description: 'File owner, user or assistant'
+                          description: Message files
+                        answer:
+                          type: string
+                          description: Response message content
+                        created_at:
+                          type: integer
+                          description: Creation time
+                        feedback:
+                          type: object
+                          properties:
+                            rating:
+                              type: string
+                              enum:
+                                - like
+                                - dislike
+                              description: Like or dislike
+                          description: Feedback information
+                        retriever_resources:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/RetrieverResource'
+                          description: List of referenced and attributed segments
+                    description: Message list
+                  has_more:
+                    type: boolean
+                    description: Whether there is a next page
+                  limit:
+                    type: integer
+                    description: 'Number of returned items, if input exceeds system limit, returns system limit quantity'
+  /conversations:
+    get:
+      tags:
+        - AdvancedChat
+      operationId: getConversationsByAppAdvancedChat
+      summary: Get Conversation List
+      description: 'Get the current user''s conversation list, by default returns the most recent 20.'
+      parameters:
+        - name: user
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 'User identifier, defined by the developer, must be unique within the application.'
+        - name: last_id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: '(Optional) ID of the last record on the current page, default null'
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+          description: '(Optional) Number of records to return per request, default 20, maximum 100, minimum 1.'
+        - name: sort_by
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - created_at
+              - '-created_at'
+              - updated_at
+              - '-updated_at'
+            default: '-updated_at'
+          description: |
+            (Optional) Sort field, default -updated_at (sorted by update time in descending order)
+            - Available values: created_at, -created_at, updated_at, -updated_at
+            - The symbol in front of the field represents ascending or descending order, - means descending
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Conversation ID
+                        name:
+                          type: string
+                          description: 'Conversation name, by default generated by the large language model.'
+                        inputs:
+                          type: object
+                          description: User input parameters.
+                        status:
+                          type: string
+                          description: Conversation status
+                        introduction:
+                          type: string
+                          description: Opening statement
+                        created_at:
+                          type: integer
+                          description: Creation time
+                        updated_at:
+                          type: integer
+                          description: Update time
+                    description: Conversation list
+                  has_more:
+                    type: boolean
+                    description: Whether there is more data
+                  limit:
+                    type: integer
+                    description: 'Number of returned items, if input exceeds system limit, returns system limit quantity'
+  '/conversations/{conversation_id}':
+    delete:
+      tags:
+        - AdvancedChat
+      operationId: deleteConversationByAppAdvancedChat
+      summary: Delete Conversation
+      description: Delete a conversation.
+      parameters:
+        - name: conversation_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Conversation ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user
+              properties:
+                user:
+                  type: string
+                  description: 'User identifier, defined by the developer, must be unique within the application.'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    enum:
+                      - success
+                    description: Fixed return value 'success'
+  '/conversations/{conversation_id}/name':
+    post:
+      tags:
+        - AdvancedChat
+      operationId: renameConversationByAppAdvancedChat
+      summary: Rename Conversation
+      description: 'Rename a conversation, the conversation name is used for display on clients that support multiple conversations.'
+      parameters:
+        - name: conversation_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Conversation ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user
+              properties:
+                name:
+                  type: string
+                  description: '(Optional) Name, if `auto_generate` is `true`, this parameter can be omitted.'
+                auto_generate:
+                  type: boolean
+                  default: false
+                  description: '(Optional) Automatically generate title, default false.'
+                user:
+                  type: string
+                  description: 'User identifier, defined by the developer, must be unique within the application.'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Conversation ID
+                  name:
+                    type: string
+                    description: Conversation name
+                  inputs:
+                    type: object
+                    description: User input parameters
+                  status:
+                    type: string
+                    description: Conversation status
+                  introduction:
+                    type: string
+                    description: Opening statement
+                  created_at:
+                    type: integer
+                    description: Creation time
+                  updated_at:
+                    type: integer
+                    description: Update time
   /meta:
     get:
       tags:

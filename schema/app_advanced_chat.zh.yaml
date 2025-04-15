@@ -1,9 +1,9 @@
 openapi: 3.0.0
 info:
-  title: Dify API - 高级对话型应用
+  title: Dify API - 工作流编排对话型应用
   description: |
-    Dify API 提供了一系列接口用于高级对话功能。
-    支持高级对话型应用。
+    Dify API 提供了一系列接口用于工作流编排对话型应用。
+    对话应用支持会话持久化，可将之前的聊天记录作为上下文进行回答，可适用于聊天/客服 AI 等。
     所有 API 请求都需要在 Authorization HTTP Header 中包含应用级 API-Key。
     官方原始文档见: https://github.com/langgenius/dify/blob/1.2.0/web/app/components/develop/template/template_advanced_chat.zh.mdx
   version: 1.2.0
@@ -267,21 +267,30 @@ components:
         type:
           type: string
           enum: [document, image, audio, video, custom]
-          description: 文件类型
+          description: |
+            文件类型：
+            - `document` 具体类型包含：'TXT', 'MD', 'MARKDOWN', 'PDF', 'HTML', 'XLSX', 'XLS', 'DOCX', 'CSV', 'EML', 'MSG', 'PPTX', 'PPT', 'XML', 'EPUB'
+            - `image` 具体类型包含：'JPG', 'JPEG', 'PNG', 'GIF', 'WEBP', 'SVG'
+            - `audio` 具体类型包含：'MP3', 'M4A', 'WAV', 'WEBM', 'AMR'
+            - `video` 具体类型包含：'MP4', 'MOV', 'MPEG', 'MPGA'
+            - `custom` 具体类型包含：其他文件类型
         transfer_method:
           type: string
           enum: [remote_url, local_file]
-          description: 传递方式
+          description: |
+            传递方式:
+            - `remote_url`: 图片地址。
+            - `local_file`: 上传文件。
         url:
           type: string
-          description: 远程URL
+          description: 图片地址。（仅当传递方式为 `remote_url` 时）。
         upload_file_id:
           type: string
-          description: 上传文件ID
+          description: 上传文件 ID。（仅当传递方式为 `local_file` 时）。
 
 tags:
   - name: AdvancedChat
-    description: 高级对话型应用相关操作
+    description: 工作流编排对话型应用相关操作
 
 paths:
   /chat-messages:
@@ -289,7 +298,7 @@ paths:
       tags:
         - AdvancedChat
       operationId: sendChatMessageByAppAdvancedChat
-      summary: 发送对话消息(高级对话型应用)
+      summary: 发送对话消息
       description: 创建会话消息
       requestBody:
         required: true
@@ -321,11 +330,12 @@ paths:
                   description: 会话 ID
                 files:
                   type: array
+                  description: 文件列表，适用于传入文件结合文本理解并回答问题，仅当模型支持 Vision 能力时可用。
                   items:
                     $ref: "#/components/schemas/FileInput"
                 auto_generate_name:
                   type: boolean
-                  description: 是否自动生成标题
+                  description: （选填）自动生成标题，默认 `true`。 若设置为 `false`，则可通过调用会话重命名接口并设置 `auto_generate` 为 `true` 实现异步生成标题。
                   default: true
       responses:
         "200":
@@ -595,6 +605,379 @@ paths:
                   system_parameters:
                     type: object
                     description: 系统参数
+
+  /messages/{message_id}/feedbacks:
+    post:
+      tags:
+        - AdvancedChat
+      operationId: sendMessageFeedbackByAppAdvancedChat
+      summary: 消息反馈（点赞）
+      description: 消息终端用户反馈、点赞，方便应用开发者优化输出预期。
+      parameters:
+        - name: message_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 消息 ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - rating
+                - user
+              properties:
+                rating:
+                  type: string
+                  enum: [like, dislike, null]
+                  description: 点赞 like, 点踩 dislike, 撤销点赞 null
+                user:
+                  type: string
+                  description: 用户标识，由开发者定义规则，需保证用户标识在应用内唯一。
+                content:
+                  type: string
+                  description: 消息反馈的具体信息。
+      responses:
+        '200':
+          description: 成功响应
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    enum: [success]
+                    description: 固定返回 success
+
+  /messages/{message_id}/suggested:
+    get:
+      tags:
+        - AdvancedChat
+      operationId: getSuggestedQuestionsByAppAdvancedChat
+      summary: 获取下一轮建议问题列表
+      description: 获取下一轮建议问题列表。
+      parameters:
+        - name: message_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Message ID
+        - name: user
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 用户标识，由开发者定义规则，需保证用户标识在应用内唯一。
+      responses:
+        '200':
+          description: 成功响应
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    enum: [success]
+                    description: 固定返回 success
+                  data:
+                    type: array
+                    items:
+                      type: string
+                    description: 建议问题列表
+
+  /messages:
+    get:
+      tags:
+        - AdvancedChat
+      operationId: getConversationMessagesByAppAdvancedChat
+      summary: 获取会话历史消息
+      description: 滚动加载形式返回历史聊天记录，第一页返回最新 `limit` 条，即：倒序返回。
+      parameters:
+        - name: conversation_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 会话 ID
+        - name: user
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 用户标识，由开发者定义规则，需保证用户标识在应用内唯一。
+        - name: first_id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: 当前页第一条聊天记录的 ID，默认 null
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+          description: 一次请求返回多少条聊天记录，默认 20 条。
+      responses:
+        '200':
+          description: 成功响应
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: 消息 ID
+                        conversation_id:
+                          type: string
+                          description: 会话 ID
+                        inputs:
+                          type: object
+                          description: 用户输入参数。
+                        query:
+                          type: string
+                          description: 用户输入 / 提问内容。
+                        message_files:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                description: ID
+                              type:
+                                type: string
+                                description: 文件类型，image 图片
+                              url:
+                                type: string
+                                description: 预览图片地址
+                              belongs_to:
+                                type: string
+                                enum: [user, assistant]
+                                description: 文件归属方，user 或 assistant
+                          description: 消息文件
+                        answer:
+                          type: string
+                          description: 回答消息内容
+                        created_at:
+                          type: integer
+                          description: 创建时间
+                        feedback:
+                          type: object
+                          properties:
+                            rating:
+                              type: string
+                              enum: [like, dislike]
+                              description: 点赞 like / 点踩 dislike
+                          description: 反馈信息
+                        retriever_resources:
+                          type: array
+                          items:
+                            $ref: "#/components/schemas/RetrieverResource"
+                          description: 引用和归属分段列表
+                    description: 消息列表
+                  has_more:
+                    type: boolean
+                    description: 是否存在下一页
+                  limit:
+                    type: integer
+                    description: 返回条数，若传入超过系统限制，返回系统限制数量
+
+  /conversations:
+    get:
+      tags:
+        - AdvancedChat
+      operationId: getConversationsByAppAdvancedChat
+      summary: 获取会话列表
+      description: 获取当前用户的会话列表，默认返回最近的 20 条。
+      parameters:
+        - name: user
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 用户标识，由开发者定义规则，需保证用户标识在应用内唯一。
+        - name: last_id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: （选填）当前页最后面一条记录的 ID，默认 null
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+          description: （选填）一次请求返回多少条记录，默认 20 条，最大 100 条，最小 1 条。
+        - name: sort_by
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [created_at, -created_at, updated_at, -updated_at]
+            default: -updated_at
+          description: |
+            （选填）排序字段，默认 -updated_at(按更新时间倒序排列)
+            - 可选值：created_at, -created_at, updated_at, -updated_at
+            - 字段前面的符号代表顺序或倒序，-代表倒序
+      responses:
+        '200':
+          description: 成功响应
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: 会话 ID
+                        name:
+                          type: string
+                          description: 会话名称，默认由大语言模型生成。
+                        inputs:
+                          type: object
+                          description: 用户输入参数。
+                        status:
+                          type: string
+                          description: 会话状态
+                        introduction:
+                          type: string
+                          description: 开场白
+                        created_at:
+                          type: integer
+                          description: 创建时间
+                        updated_at:
+                          type: integer
+                          description: 更新时间
+                    description: 会话列表
+                  has_more:
+                    type: boolean
+                    description: 是否有更多数据
+                  limit:
+                    type: integer
+                    description: 返回条数，若传入超过系统限制，返回系统限制数量
+
+  /conversations/{conversation_id}:
+    delete:
+      tags:
+        - AdvancedChat
+      operationId: deleteConversationByAppAdvancedChat
+      summary: 删除会话
+      description: 删除会话。
+      parameters:
+        - name: conversation_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 会话 ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user
+              properties:
+                user:
+                  type: string
+                  description: 用户标识，由开发者定义规则，需保证用户标识在应用内唯一。
+      responses:
+        '200':
+          description: 成功响应
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    enum: [success]
+                    description: 固定返回 success
+
+  /conversations/{conversation_id}/name:
+    post:
+      tags:
+        - AdvancedChat
+      operationId: renameConversationByAppAdvancedChat
+      summary: 会话重命名
+      description: 对会话进行重命名，会话名称用于显示在支持多会话的客户端上。
+      parameters:
+        - name: conversation_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 会话 ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user
+              properties:
+                name:
+                  type: string
+                  description: （选填）名称，若 `auto_generate` 为 `true` 时，该参数可不传。
+                auto_generate:
+                  type: boolean
+                  default: false
+                  description: （选填）自动生成标题，默认 false。
+                user:
+                  type: string
+                  description: 用户标识，由开发者定义规则，需保证用户标识在应用内唯一。
+      responses:
+        '200':
+          description: 成功响应
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: 会话 ID
+                  name:
+                    type: string
+                    description: 会话名称
+                  inputs:
+                    type: object
+                    description: 用户输入参数
+                  status:
+                    type: string
+                    description: 会话状态
+                  introduction:
+                    type: string
+                    description: 开场白
+                  created_at:
+                    type: integer
+                    description: 创建时间
+                  updated_at:
+                    type: integer
+                    description: 更新时间
 
   /meta:
     get:

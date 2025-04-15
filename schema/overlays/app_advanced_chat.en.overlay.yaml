@@ -5,13 +5,13 @@ info:
 extends: ../app_advanced_chat.zh.yaml
 actions:
   - target: $.tags[0].description
-    update: "Advanced Chat Application Operations"
+    update: "Workflow Orchestration Chat Application Operations"
   - target: $.info
     update:
-      title: "Dify API - Advanced Chat Application"
+      title: "Dify API - Workflow Orchestration Chat Application"
       description: |
-        Dify API provides a series of interfaces for advanced conversation functionality.
-        It supports advanced conversational applications.
+        Dify API provides a series of interfaces for workflow orchestration chat applications.
+        Chat applications support session persistence, allowing previous chat history to be used as context for responses, suitable for chat/customer service AI, etc.
         All API requests require an application-level API-Key in the Authorization HTTP Header.
         official raw document: https://github.com/langgenius/dify/blob/1.2.0/web/app/components/develop/template/template_advanced_chat.en.mdx
 
@@ -168,20 +168,29 @@ actions:
     update: "Upload time"
 
   - target: $.components.schemas.FileInput.properties.type.description
-    update: "File type"
+    update: |
+      File type:
+      - `document` Specific types include: 'TXT', 'MD', 'MARKDOWN', 'PDF', 'HTML', 'XLSX', 'XLS', 'DOCX', 'CSV', 'EML', 'MSG', 'PPTX', 'PPT', 'XML', 'EPUB'
+      - `image` Specific types include: 'JPG', 'JPEG', 'PNG', 'GIF', 'WEBP', 'SVG'
+      - `audio` Specific types include: 'MP3', 'M4A', 'WAV', 'WEBM', 'AMR'
+      - `video` Specific types include: 'MP4', 'MOV', 'MPEG', 'MPGA'
+      - `custom` Specific types include: other file types
 
   - target: $.components.schemas.FileInput.properties.transfer_method.description
-    update: "Transfer method"
+    update: |
+      Transfer method:
+      - `remote_url`: Image URL.
+      - `local_file`: Upload file.
 
   - target: $.components.schemas.FileInput.properties.url.description
-    update: "Remote URL"
+    update: "Image URL. (Only when transfer method is `remote_url`)."
 
   - target: $.components.schemas.FileInput.properties.upload_file_id.description
-    update: "Upload file ID"
+    update: "Upload file ID. (Only when transfer method is `local_file`)."
 
   - target: $.paths['/chat-messages'].post
     update:
-      summary: "Send Chat Message (Advanced Chat App)"
+      summary: "Send Chat Message"
       description: "Create conversation message"
 
   - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.query
@@ -207,9 +216,13 @@ actions:
     update:
       description: "Conversation ID"
 
+  - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.files
+    update:
+      description: "File list, suitable for combining files with text understanding to answer questions, only available when the model supports Vision capabilities."
+
   - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.auto_generate_name
     update:
-      description: "Whether to automatically generate title"
+      description: "(Optional) Automatically generate title, default `true`. If set to `false`, you can call the conversation rename interface and set `auto_generate` to `true` to generate a title asynchronously."
 
   - target: $.paths['/chat-messages'].post.responses['200'].description
     update: "Successful response"
@@ -391,6 +404,231 @@ actions:
 
   - target: $.paths['/meta'].get.responses['200'].content['application/json'].schema.properties.tool_icons.additionalProperties.oneOf[0].properties.content.description
     update: "Emoji"
+
+  - target: $.paths['/messages/{message_id}/feedbacks'].post
+    update:
+      summary: "Message Feedback (Like/Dislike)"
+      description: "End user feedback on messages, likes/dislikes, to help application developers optimize output expectations."
+
+  - target: $.paths['/messages/{message_id}/feedbacks'].post.parameters[0].description
+    update: "Message ID"
+
+  - target: $.paths['/messages/{message_id}/feedbacks'].post.requestBody.content['application/json'].schema.properties.rating.description
+    update: "Like, dislike, or null to remove feedback"
+
+  - target: $.paths['/messages/{message_id}/feedbacks'].post.requestBody.content['application/json'].schema.properties.user.description
+    update: "User identifier, defined by the developer, must be unique within the application."
+
+  - target: $.paths['/messages/{message_id}/feedbacks'].post.requestBody.content['application/json'].schema.properties.content.description
+    update: "Specific feedback information."
+
+  - target: $.paths['/messages/{message_id}/feedbacks'].post.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/messages/{message_id}/feedbacks'].post.responses['200'].content['application/json'].schema.properties.result.description
+    update: "Fixed return value 'success'"
+
+  - target: $.paths['/messages/{message_id}/suggested'].get
+    update:
+      summary: "Get Suggested Questions for Next Round"
+      description: "Get a list of suggested questions for the next round."
+
+  - target: $.paths['/messages/{message_id}/suggested'].get.parameters[0].description
+    update: "Message ID"
+
+  - target: $.paths['/messages/{message_id}/suggested'].get.parameters[1].description
+    update: "User identifier, defined by the developer, must be unique within the application."
+
+  - target: $.paths['/messages/{message_id}/suggested'].get.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/messages/{message_id}/suggested'].get.responses['200'].content['application/json'].schema.properties.result.description
+    update: "Fixed return value 'success'"
+
+  - target: $.paths['/messages/{message_id}/suggested'].get.responses['200'].content['application/json'].schema.properties.data.description
+    update: "List of suggested questions"
+
+  - target: $.paths['/messages'].get
+    update:
+      summary: "Get Conversation History Messages"
+      description: "Returns chat history in a scrolling load format, with the first page returning the latest `limit` messages, i.e., in reverse order."
+
+  - target: $.paths['/messages'].get.parameters[0].description
+    update: "Conversation ID"
+
+  - target: $.paths['/messages'].get.parameters[1].description
+    update: "User identifier, defined by the developer, must be unique within the application."
+
+  - target: $.paths['/messages'].get.parameters[2].description
+    update: "ID of the first chat message on the current page, default null"
+
+  - target: $.paths['/messages'].get.parameters[3].description
+    update: "Number of chat messages to return per request, default 20."
+
+  - target: $.paths['/messages'].get.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/messages'].get.responses['200'].content['application/json'].schema.properties.data.description
+    update: "Message list"
+
+  - target: $.paths['/messages'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.id.description
+    update: "Message ID"
+
+  - target: $.paths['/messages'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.conversation_id.description
+    update: "Conversation ID"
+
+  - target: $.paths['/messages'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.inputs.description
+    update: "User input parameters."
+
+  - target: $.paths['/messages'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.query.description
+    update: "User input / question content."
+
+  - target: $.paths['/messages'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.message_files.description
+    update: "Message files"
+
+  - target: $.paths['/messages'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.message_files.items.properties.id.description
+    update: "ID"
+
+  - target: $.paths['/messages'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.message_files.items.properties.type.description
+    update: "File type, image for images"
+
+  - target: $.paths['/messages'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.message_files.items.properties.url.description
+    update: "Preview image URL"
+
+  - target: $.paths['/messages'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.message_files.items.properties.belongs_to.description
+    update: "File owner, user or assistant"
+
+  - target: $.paths['/messages'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.answer.description
+    update: "Response message content"
+
+  - target: $.paths['/messages'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.created_at.description
+    update: "Creation time"
+
+  - target: $.paths['/messages'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.feedback.description
+    update: "Feedback information"
+
+  - target: $.paths['/messages'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.feedback.properties.rating.description
+    update: "Like or dislike"
+
+  - target: $.paths['/messages'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.retriever_resources.description
+    update: "List of referenced and attributed segments"
+
+  - target: $.paths['/messages'].get.responses['200'].content['application/json'].schema.properties.has_more.description
+    update: "Whether there is a next page"
+
+  - target: $.paths['/messages'].get.responses['200'].content['application/json'].schema.properties.limit.description
+    update: "Number of returned items, if input exceeds system limit, returns system limit quantity"
+
+  - target: $.paths['/conversations'].get
+    update:
+      summary: "Get Conversation List"
+      description: "Get the current user's conversation list, by default returns the most recent 20."
+
+  - target: $.paths['/conversations'].get.parameters[0].description
+    update: "User identifier, defined by the developer, must be unique within the application."
+
+  - target: $.paths['/conversations'].get.parameters[1].description
+    update: "(Optional) ID of the last record on the current page, default null"
+
+  - target: $.paths['/conversations'].get.parameters[2].description
+    update: "(Optional) Number of records to return per request, default 20, maximum 100, minimum 1."
+
+  - target: $.paths['/conversations'].get.parameters[3].description
+    update: |
+      (Optional) Sort field, default -updated_at (sorted by update time in descending order)
+      - Available values: created_at, -created_at, updated_at, -updated_at
+      - The symbol in front of the field represents ascending or descending order, - means descending
+
+  - target: $.paths['/conversations'].get.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/conversations'].get.responses['200'].content['application/json'].schema.properties.data.description
+    update: "Conversation list"
+
+  - target: $.paths['/conversations'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.id.description
+    update: "Conversation ID"
+
+  - target: $.paths['/conversations'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.name.description
+    update: "Conversation name, by default generated by the large language model."
+
+  - target: $.paths['/conversations'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.inputs.description
+    update: "User input parameters."
+
+  - target: $.paths['/conversations'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.status.description
+    update: "Conversation status"
+
+  - target: $.paths['/conversations'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.introduction.description
+    update: "Opening statement"
+
+  - target: $.paths['/conversations'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.created_at.description
+    update: "Creation time"
+
+  - target: $.paths['/conversations'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.updated_at.description
+    update: "Update time"
+
+  - target: $.paths['/conversations'].get.responses['200'].content['application/json'].schema.properties.has_more.description
+    update: "Whether there is more data"
+
+  - target: $.paths['/conversations'].get.responses['200'].content['application/json'].schema.properties.limit.description
+    update: "Number of returned items, if input exceeds system limit, returns system limit quantity"
+
+  - target: $.paths['/conversations/{conversation_id}'].delete
+    update:
+      summary: "Delete Conversation"
+      description: "Delete a conversation."
+
+  - target: $.paths['/conversations/{conversation_id}'].delete.parameters[0].description
+    update: "Conversation ID"
+
+  - target: $.paths['/conversations/{conversation_id}'].delete.requestBody.content['application/json'].schema.properties.user.description
+    update: "User identifier, defined by the developer, must be unique within the application."
+
+  - target: $.paths['/conversations/{conversation_id}'].delete.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/conversations/{conversation_id}'].delete.responses['200'].content['application/json'].schema.properties.result.description
+    update: "Fixed return value 'success'"
+
+  - target: $.paths['/conversations/{conversation_id}/name'].post
+    update:
+      summary: "Rename Conversation"
+      description: "Rename a conversation, the conversation name is used for display on clients that support multiple conversations."
+
+  - target: $.paths['/conversations/{conversation_id}/name'].post.parameters[0].description
+    update: "Conversation ID"
+
+  - target: $.paths['/conversations/{conversation_id}/name'].post.requestBody.content['application/json'].schema.properties.name.description
+    update: "(Optional) Name, if `auto_generate` is `true`, this parameter can be omitted."
+
+  - target: $.paths['/conversations/{conversation_id}/name'].post.requestBody.content['application/json'].schema.properties.auto_generate.description
+    update: "(Optional) Automatically generate title, default false."
+
+  - target: $.paths['/conversations/{conversation_id}/name'].post.requestBody.content['application/json'].schema.properties.user.description
+    update: "User identifier, defined by the developer, must be unique within the application."
+
+  - target: $.paths['/conversations/{conversation_id}/name'].post.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/conversations/{conversation_id}/name'].post.responses['200'].content['application/json'].schema.properties.id.description
+    update: "Conversation ID"
+
+  - target: $.paths['/conversations/{conversation_id}/name'].post.responses['200'].content['application/json'].schema.properties.name.description
+    update: "Conversation name"
+
+  - target: $.paths['/conversations/{conversation_id}/name'].post.responses['200'].content['application/json'].schema.properties.inputs.description
+    update: "User input parameters"
+
+  - target: $.paths['/conversations/{conversation_id}/name'].post.responses['200'].content['application/json'].schema.properties.status.description
+    update: "Conversation status"
+
+  - target: $.paths['/conversations/{conversation_id}/name'].post.responses['200'].content['application/json'].schema.properties.introduction.description
+    update: "Opening statement"
+
+  - target: $.paths['/conversations/{conversation_id}/name'].post.responses['200'].content['application/json'].schema.properties.created_at.description
+    update: "Creation time"
+
+  - target: $.paths['/conversations/{conversation_id}/name'].post.responses['200'].content['application/json'].schema.properties.updated_at.description
+    update: "Update time"
 
   - target: $.paths['/meta'].get.responses['200'].content['application/json'].schema.properties.tool_icons.additionalProperties.oneOf[1].description
     update: "Icon URL"
