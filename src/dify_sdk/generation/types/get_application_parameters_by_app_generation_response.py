@@ -12,6 +12,9 @@ from .get_application_parameters_by_app_generation_response_speech_to_text impor
 from .get_application_parameters_by_app_generation_response_retriever_resource import (
     GetApplicationParametersByAppGenerationResponseRetrieverResource,
 )
+from .get_application_parameters_by_app_generation_response_annotation_reply import (
+    GetApplicationParametersByAppGenerationResponseAnnotationReply,
+)
 from ...core.pydantic_utilities import IS_PYDANTIC_V2
 
 
@@ -45,6 +48,13 @@ class GetApplicationParametersByAppGenerationResponse(UniversalBaseModel):
     )
     """
     Citation and attribution settings
+    """
+
+    annotation_reply: typing.Optional[GetApplicationParametersByAppGenerationResponseAnnotationReply] = pydantic.Field(
+        default=None
+    )
+    """
+    Annotation reply settings
     """
 
     user_input_form: typing.Optional[typing.List[typing.Dict[str, typing.Optional[typing.Any]]]] = pydantic.Field(

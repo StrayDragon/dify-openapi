@@ -54,6 +54,9 @@ from .retrieval_model_search_method import RetrievalModelSearchMethod
 from .retriever_resource import RetrieverResource
 from .segment import Segment
 from .stream_event import StreamEvent
+from .stream_event_data import StreamEventData
+from .stream_event_data_execution_metadata import StreamEventDataExecutionMetadata
+from .stream_event_data_status import StreamEventDataStatus
 from .stream_event_event import StreamEventEvent
 from .stream_event_metadata import StreamEventMetadata
 from .upload_document import UploadDocument
@@ -114,6 +117,9 @@ __all__ = [
     "RetrieverResource",
     "Segment",
     "StreamEvent",
+    "StreamEventData",
+    "StreamEventDataExecutionMetadata",
+    "StreamEventDataStatus",
     "StreamEventEvent",
     "StreamEventMetadata",
     "UploadDocument",

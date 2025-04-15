@@ -39,6 +39,9 @@ from .get_application_info_by_app_generation_response import (
 from .get_application_parameters_by_app_generation_response import (
     GetApplicationParametersByAppGenerationResponse,
 )
+from .get_application_parameters_by_app_generation_response_annotation_reply import (
+    GetApplicationParametersByAppGenerationResponseAnnotationReply,
+)
 from .get_application_parameters_by_app_generation_response_retriever_resource import (
     GetApplicationParametersByAppGenerationResponseRetrieverResource,
 )
@@ -78,6 +81,7 @@ __all__ = [
     "GetAppMetaInfoByAppGenerationResponseToolIconsValueBackground",
     "GetApplicationInfoByAppGenerationResponse",
     "GetApplicationParametersByAppGenerationResponse",
+    "GetApplicationParametersByAppGenerationResponseAnnotationReply",
     "GetApplicationParametersByAppGenerationResponseRetrieverResource",
     "GetApplicationParametersByAppGenerationResponseSpeechToText",
     "GetApplicationParametersByAppGenerationResponseSuggestedQuestionsAfterAnswer",

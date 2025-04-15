@@ -364,6 +364,7 @@ class DatasetsClient:
         self,
         dataset_id: str,
         *,
+        name: typing.Optional[str] = OMIT,
         indexing_technique: typing.Optional[PatchDatasetsDatasetIdRequestIndexingTechnique] = OMIT,
         permission: typing.Optional[PatchDatasetsDatasetIdRequestPermission] = OMIT,
         embedding_model_provider: typing.Optional[str] = OMIT,
@@ -379,6 +380,9 @@ class DatasetsClient:
         ----------
         dataset_id : str
             Knowledge Base ID
+
+        name : typing.Optional[str]
+            Knowledge Base name (optional)
 
         indexing_technique : typing.Optional[PatchDatasetsDatasetIdRequestIndexingTechnique]
             Indexing mode (optional, recommended)
@@ -426,6 +430,7 @@ class DatasetsClient:
             f"datasets/{jsonable_encoder(dataset_id)}",
             method="PATCH",
             json={
+                "name": name,
                 "indexing_technique": indexing_technique,
                 "permission": permission,
                 "embedding_model_provider": embedding_model_provider,
@@ -933,6 +938,7 @@ class AsyncDatasetsClient:
         self,
         dataset_id: str,
         *,
+        name: typing.Optional[str] = OMIT,
         indexing_technique: typing.Optional[PatchDatasetsDatasetIdRequestIndexingTechnique] = OMIT,
         permission: typing.Optional[PatchDatasetsDatasetIdRequestPermission] = OMIT,
         embedding_model_provider: typing.Optional[str] = OMIT,
@@ -948,6 +954,9 @@ class AsyncDatasetsClient:
         ----------
         dataset_id : str
             Knowledge Base ID
+
+        name : typing.Optional[str]
+            Knowledge Base name (optional)
 
         indexing_technique : typing.Optional[PatchDatasetsDatasetIdRequestIndexingTechnique]
             Indexing mode (optional, recommended)
@@ -1003,6 +1012,7 @@ class AsyncDatasetsClient:
             f"datasets/{jsonable_encoder(dataset_id)}",
             method="PATCH",
             json={
+                "name": name,
                 "indexing_technique": indexing_technique,
                 "permission": permission,
                 "embedding_model_provider": embedding_model_provider,

@@ -3,10 +3,8 @@
 import typing
 from ..core.client_wrapper import SyncClientWrapper
 from .types.run_workflow_request_response_mode import RunWorkflowRequestResponseMode
-from ..types.file_input import FileInput
 from ..core.request_options import RequestOptions
 from ..types.workflow_message import WorkflowMessage
-from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.pydantic_utilities import parse_obj_as
 from ..errors.bad_request_error import BadRequestError
 from ..types.error import Error
@@ -22,6 +20,13 @@ from ..errors.unauthorized_error import UnauthorizedError
 from .types.stop_workflow_response import StopWorkflowResponse
 from .types.get_workflow_logs_request_status import GetWorkflowLogsRequestStatus
 from .types.get_workflow_logs_response import GetWorkflowLogsResponse
+from .. import core
+from .types.upload_file_response import UploadFileResponse
+from ..errors.content_too_large_error import ContentTooLargeError
+from ..errors.unsupported_media_type_error import UnsupportedMediaTypeError
+from ..errors.service_unavailable_error import ServiceUnavailableError
+from .types.get_app_info_response import GetAppInfoResponse
+from .types.get_app_parameters_response import GetAppParametersResponse
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -38,7 +43,6 @@ class WorkflowClient:
         inputs: typing.Dict[str, typing.Optional[typing.Any]],
         response_mode: RunWorkflowRequestResponseMode,
         user: str,
-        files: typing.Optional[typing.Sequence[FileInput]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowMessage:
         """
@@ -47,15 +51,28 @@ class WorkflowClient:
         Parameters
         ----------
         inputs : typing.Dict[str, typing.Optional[typing.Any]]
-            Workflow input parameters
+            Allows passing values for variables defined in the App.
+            The inputs parameter contains multiple key/value pairs, where each key corresponds to a specific variable and each value is the specific value for that variable. Variables can be of file list type.
+            File list type variables are suitable for passing files combined with text understanding to answer questions, only available when the model supports parsing capabilities for that type of file. If the variable is a file list type, the value corresponding to the variable should be in list format, where each element should include the following:
+              - `type` (string) Supported types:
+                - `document` Specific types include: 'TXT', 'MD', 'MARKDOWN', 'PDF', 'HTML', 'XLSX', 'XLS', 'DOCX', 'CSV', 'EML', 'MSG', 'PPTX', 'PPT', 'XML', 'EPUB'
+                - `image` Specific types include: 'JPG', 'JPEG', 'PNG', 'GIF', 'WEBP', 'SVG'
+                - `audio` Specific types include: 'MP3', 'M4A', 'WAV', 'WEBM', 'AMR'
+                - `video` Specific types include: 'MP4', 'MOV', 'MPEG', 'MPGA'
+                - `custom` Specific types include: other file types
+              - `transfer_method` (string) Transfer method, `remote_url` image address / `local_file` uploaded file
+              - `url` (string) Image address (only when the transfer method is `remote_url`)
+              - `upload_file_id` (string) Upload file ID (only when the transfer method is `local_file`)
 
         response_mode : RunWorkflowRequestResponseMode
-            Response mode
+            Response mode, supports:
+            - `streaming` Streaming mode (recommended). Implements streaming return similar to typewriter output based on SSE (Server-Sent Events).
+            - `blocking` Blocking mode, waits for execution to complete before returning results. (Requests may be interrupted if the process is lengthy).
+            Due to Cloudflare limitations, requests will be interrupted after 100 seconds of timeout with no response.
 
         user : str
-            User identifier
-
-        files : typing.Optional[typing.Sequence[FileInput]]
+            User identifier, used to define the identity of the end user, for easy retrieval and statistics.
+            Rules defined by the developer, the user identifier must be unique within the application.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -85,11 +102,6 @@ class WorkflowClient:
                 "inputs": inputs,
                 "response_mode": response_mode,
                 "user": user,
-                "files": convert_and_respect_annotation_metadata(
-                    object_=files,
-                    annotation=typing.Sequence[FileInput],
-                    direction="write",
-                ),
             },
             headers={
                 "content-type": "application/json",
@@ -400,6 +412,335 @@ class WorkflowClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 500:
+                raise InternalServerError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def upload_file(
+        self,
+        *,
+        file: core.File,
+        user: str,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> UploadFileResponse:
+        """
+        Upload a file to use when sending messages, enabling multimodal understanding. Supports any format supported by your workflow. Uploaded files are only available to the current end user.
+
+        Parameters
+        ----------
+        file : core.File
+            See core.File for more documentation
+
+        user : str
+            User identifier, used to define the identity of the end user, must be consistent with the user passed in the message sending interface
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        UploadFileResponse
+            File uploaded successfully
+
+        Examples
+        --------
+        from dify import DifyApi
+
+        client = DifyApi(
+            token="YOUR_TOKEN",
+        )
+        client.workflow.upload_file(
+            user="user",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "files/upload",
+            method="POST",
+            data={
+                "user": user,
+            },
+            files={
+                "file": file,
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    UploadFileResponse,
+                    parse_obj_as(
+                        type_=UploadFileResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 413:
+                raise ContentTooLargeError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 415:
+                raise UnsupportedMediaTypeError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 500:
+                raise InternalServerError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 503:
+                raise ServiceUnavailableError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def get_app_info(self, *, request_options: typing.Optional[RequestOptions] = None) -> GetAppInfoResponse:
+        """
+        Used to get basic information about the application
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetAppInfoResponse
+            Successfully retrieved application information
+
+        Examples
+        --------
+        from dify import DifyApi
+
+        client = DifyApi(
+            token="YOUR_TOKEN",
+        )
+        client.workflow.get_app_info()
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "info",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    GetAppInfoResponse,
+                    parse_obj_as(
+                        type_=GetAppInfoResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 500:
+                raise InternalServerError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def get_app_parameters(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> GetAppParametersResponse:
+        """
+        Used at the beginning of page entry to get feature switches, input parameter names, types, and default values
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetAppParametersResponse
+            Successfully retrieved application parameters
+
+        Examples
+        --------
+        from dify import DifyApi
+
+        client = DifyApi(
+            token="YOUR_TOKEN",
+        )
+        client.workflow.get_app_parameters()
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "parameters",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    GetAppParametersResponse,
+                    parse_obj_as(
+                        type_=GetAppParametersResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 500:
+                raise InternalServerError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -416,7 +757,6 @@ class AsyncWorkflowClient:
         inputs: typing.Dict[str, typing.Optional[typing.Any]],
         response_mode: RunWorkflowRequestResponseMode,
         user: str,
-        files: typing.Optional[typing.Sequence[FileInput]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowMessage:
         """
@@ -425,15 +765,28 @@ class AsyncWorkflowClient:
         Parameters
         ----------
         inputs : typing.Dict[str, typing.Optional[typing.Any]]
-            Workflow input parameters
+            Allows passing values for variables defined in the App.
+            The inputs parameter contains multiple key/value pairs, where each key corresponds to a specific variable and each value is the specific value for that variable. Variables can be of file list type.
+            File list type variables are suitable for passing files combined with text understanding to answer questions, only available when the model supports parsing capabilities for that type of file. If the variable is a file list type, the value corresponding to the variable should be in list format, where each element should include the following:
+              - `type` (string) Supported types:
+                - `document` Specific types include: 'TXT', 'MD', 'MARKDOWN', 'PDF', 'HTML', 'XLSX', 'XLS', 'DOCX', 'CSV', 'EML', 'MSG', 'PPTX', 'PPT', 'XML', 'EPUB'
+                - `image` Specific types include: 'JPG', 'JPEG', 'PNG', 'GIF', 'WEBP', 'SVG'
+                - `audio` Specific types include: 'MP3', 'M4A', 'WAV', 'WEBM', 'AMR'
+                - `video` Specific types include: 'MP4', 'MOV', 'MPEG', 'MPGA'
+                - `custom` Specific types include: other file types
+              - `transfer_method` (string) Transfer method, `remote_url` image address / `local_file` uploaded file
+              - `url` (string) Image address (only when the transfer method is `remote_url`)
+              - `upload_file_id` (string) Upload file ID (only when the transfer method is `local_file`)
 
         response_mode : RunWorkflowRequestResponseMode
-            Response mode
+            Response mode, supports:
+            - `streaming` Streaming mode (recommended). Implements streaming return similar to typewriter output based on SSE (Server-Sent Events).
+            - `blocking` Blocking mode, waits for execution to complete before returning results. (Requests may be interrupted if the process is lengthy).
+            Due to Cloudflare limitations, requests will be interrupted after 100 seconds of timeout with no response.
 
         user : str
-            User identifier
-
-        files : typing.Optional[typing.Sequence[FileInput]]
+            User identifier, used to define the identity of the end user, for easy retrieval and statistics.
+            Rules defined by the developer, the user identifier must be unique within the application.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -471,11 +824,6 @@ class AsyncWorkflowClient:
                 "inputs": inputs,
                 "response_mode": response_mode,
                 "user": user,
-                "files": convert_and_respect_annotation_metadata(
-                    object_=files,
-                    annotation=typing.Sequence[FileInput],
-                    direction="write",
-                ),
             },
             headers={
                 "content-type": "application/json",
@@ -809,6 +1157,359 @@ class AsyncWorkflowClient:
                         type_=GetWorkflowLogsResponse,  # type: ignore
                         object_=_response.json(),
                     ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 500:
+                raise InternalServerError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def upload_file(
+        self,
+        *,
+        file: core.File,
+        user: str,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> UploadFileResponse:
+        """
+        Upload a file to use when sending messages, enabling multimodal understanding. Supports any format supported by your workflow. Uploaded files are only available to the current end user.
+
+        Parameters
+        ----------
+        file : core.File
+            See core.File for more documentation
+
+        user : str
+            User identifier, used to define the identity of the end user, must be consistent with the user passed in the message sending interface
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        UploadFileResponse
+            File uploaded successfully
+
+        Examples
+        --------
+        import asyncio
+
+        from dify import AsyncDifyApi
+
+        client = AsyncDifyApi(
+            token="YOUR_TOKEN",
+        )
+
+
+        async def main() -> None:
+            await client.workflow.upload_file(
+                user="user",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "files/upload",
+            method="POST",
+            data={
+                "user": user,
+            },
+            files={
+                "file": file,
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    UploadFileResponse,
+                    parse_obj_as(
+                        type_=UploadFileResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 413:
+                raise ContentTooLargeError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 415:
+                raise UnsupportedMediaTypeError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 500:
+                raise InternalServerError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 503:
+                raise ServiceUnavailableError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def get_app_info(self, *, request_options: typing.Optional[RequestOptions] = None) -> GetAppInfoResponse:
+        """
+        Used to get basic information about the application
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetAppInfoResponse
+            Successfully retrieved application information
+
+        Examples
+        --------
+        import asyncio
+
+        from dify import AsyncDifyApi
+
+        client = AsyncDifyApi(
+            token="YOUR_TOKEN",
+        )
+
+
+        async def main() -> None:
+            await client.workflow.get_app_info()
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "info",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    GetAppInfoResponse,
+                    parse_obj_as(
+                        type_=GetAppInfoResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 500:
+                raise InternalServerError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def get_app_parameters(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> GetAppParametersResponse:
+        """
+        Used at the beginning of page entry to get feature switches, input parameter names, types, and default values
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetAppParametersResponse
+            Successfully retrieved application parameters
+
+        Examples
+        --------
+        import asyncio
+
+        from dify import AsyncDifyApi
+
+        client = AsyncDifyApi(
+            token="YOUR_TOKEN",
+        )
+
+
+        async def main() -> None:
+            await client.workflow.get_app_parameters()
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "parameters",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    GetAppParametersResponse,
+                    parse_obj_as(
+                        type_=GetAppParametersResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 500:
+                raise InternalServerError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
                 )
             _response_json = _response.json()
         except JSONDecodeError:
