@@ -3,6 +3,7 @@
 """
 
 import asyncio
+from multiprocessing.pool import RUN
 import pytest
 
 from dify_sdk import (
@@ -15,7 +16,7 @@ from dify_sdk.segments import (
     CreateSegmentsRequestSegmentsItem,
 )
 from dify_sdk.types.segment import Segment
-from dify_sdk_testing import KnowledgeBaseClient, need_skip_run_until_this_version
+from dify_sdk_testing import RUNNING_IN_CI, KnowledgeBaseClient
 
 
 @pytest.fixture
@@ -122,6 +123,10 @@ async def segment_for_child_chunks(
     return segments_response.data[0]
 
 
+@pytest.mark.skipif(
+    RUNNING_IN_CI,
+    reason="这个测试中有些功能需要付费账号才能使用(CI中使用官方服务器, 测试账号受限), 请使用本地服务测试",
+)
 async def test_child_chunks_workflow(
     kb_client: KnowledgeBaseClient,
     dataset_for_child_chunks: Dataset,
