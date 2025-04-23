@@ -4,11 +4,12 @@ groups:
   local:
     generators:
       - name: fernapi/fern-python-sdk
-        version: 4.3.14
+        version: 4.14.4
         output:
           location: local-file-system
           path: ../src/dify_sdk
         config:
+
 
 api:
   specs:
