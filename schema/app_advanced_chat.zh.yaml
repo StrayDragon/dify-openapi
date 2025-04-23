@@ -338,6 +338,13 @@ paths:
                   type: boolean
                   description: （选填）自动生成标题，默认 `true`。 若设置为 `false`，则可通过调用会话重命名接口并设置 `auto_generate` 为 `true` 实现异步生成标题。
                   default: true
+      x-fern-streaming:
+        format: sse
+        stream-condition: $request.response_mode == "streaming"
+        response:
+          $ref: "#/components/schemas/ChatMessage"
+        response-stream:
+          $ref: "#/components/schemas/StreamEvent"
       responses:
         "200":
           description: 成功响应
