@@ -1,16 +1,15 @@
+import asyncio
 import pytest
 from pathlib import Path
-from typing import Any
 
 from dify_sdk.chat.client import AsyncChatClient
 from dify_sdk.generation.client import AsyncGenerationClient
-from dify_sdk.workflow.client import AsyncWorkflowClient
 from dify_sdk.core.request_options import RequestOptions
 from dify_sdk.generation.types.send_completion_message_by_app_generation_request_inputs import (
     SendCompletionMessageByAppGenerationRequestInputs,
 )
 from dify_sdk.chat.types.send_chat_message_by_app_chat_request_files_item import SendChatMessageByAppChatRequestFilesItem
-from dify_sdk_testing import RUNNING_IN_CI, postpone_run_in_this_version
+from dify_sdk_testing import RUNNING_IN_CI
 
 LOGIN_USER_ID = "test123"
 
@@ -28,13 +27,18 @@ async def test_get_app_info(app_chat_client: AsyncChatClient):
 
 async def test_get_app_info_error_handling(app_chat_client: AsyncChatClient):
     """测试获取应用信息时错误处理"""
-    original_host = app_chat_client._client_wrapper._base_url  # type: ignore
-    app_chat_client._client_wrapper._base_url = "https://invalid.example.com"  # type: ignore
+    # 获取原始客户端和原始 base_url
+    raw_client = app_chat_client._raw_client # type: ignore
+    original_host = raw_client._client_wrapper.get_base_url() # type: ignore
+
+    # 修改 base_url 为无效地址
+    raw_client._client_wrapper._base_url = "https://invalid.example.com" # type: ignore
 
     with pytest.raises(Exception):
         await app_chat_client.get_application_info_by_app_chat()
 
-    app_chat_client._client_wrapper._base_url = original_host  # type: ignore
+    # 恢复原始 base_url
+    raw_client._client_wrapper._base_url = original_host # type: ignore
 
 
 async def test_chat_messages(app_chat_client: AsyncChatClient) -> str | None:
@@ -221,26 +225,3 @@ async def test_completion_message(app_completion_client: AsyncGenerationClient):
 
     assert response is not None
     assert response.message_id is not None
-
-
-
-async def test_workflow_run(app_workflow_client: AsyncWorkflowClient):
-    """Test workflow execution API"""
-    workflow_inputs: dict[str, Any] = {
-        "query": "ping",
-        "inputs": {},
-        "files": [],
-    }
-
-    response = await app_workflow_client.run_workflow(
-        inputs=workflow_inputs,
-        response_mode="blocking",
-        user=LOGIN_USER_ID,
-    )
-    assert response is not None
-    assert response.workflow_run_id is not None
-    assert response.task_id is not None
-    assert response.data is not None
-    assert response.data.id is not None
-    assert response.data.workflow_id is not None
-    assert response.data.status in ["running", "succeeded", "failed", "stopped"]

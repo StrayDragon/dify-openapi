@@ -22,13 +22,18 @@ async def test_get_app_info(app_advanced_chat_client: AsyncAdvancedChatClient):
 
 async def test_get_app_info_error_handling(app_advanced_chat_client: AsyncAdvancedChatClient):
     """测试获取应用信息时错误处理"""
-    original_host = app_advanced_chat_client._client_wrapper._base_url  # type: ignore
-    app_advanced_chat_client._client_wrapper._base_url = "https://invalid.example.com"  # type: ignore
+    # 获取原始客户端和原始 base_url
+    raw_client = app_advanced_chat_client._raw_client # type: ignore
+    original_host = raw_client._client_wrapper.get_base_url() # type: ignore
+
+    # 修改 base_url 为无效地址
+    raw_client._client_wrapper._base_url = "https://invalid.example.com" # type: ignore
 
     with pytest.raises(Exception):
         await app_advanced_chat_client.get_application_info_by_app_advanced_chat()
 
-    app_advanced_chat_client._client_wrapper._base_url = original_host  # type: ignore
+    # 恢复原始 base_url
+    raw_client._client_wrapper._base_url = original_host # type: ignore
 
 
 async def test_chat_messages(app_advanced_chat_client: AsyncAdvancedChatClient) -> str | None:
