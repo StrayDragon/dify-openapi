@@ -380,7 +380,7 @@ class RawDocumentsClient:
             method="POST",
             data={
                 "name": name,
-                "process_rule": process_rule,
+                "process_rule": process_rule.model_dump_json() if process_rule else None,
             },
             files={
                 "file": file,
@@ -1045,7 +1045,7 @@ class AsyncRawDocumentsClient:
             method="POST",
             data={
                 "name": name,
-                "process_rule": process_rule,
+                "process_rule": process_rule.model_dump_json() if process_rule else None,
             },
             files={
                 "file": file,
