@@ -3,6 +3,5 @@
 import typing
 
 RetrieveDatasetRequestRetrievalModelSearchMethod = typing.Union[
-    typing.Literal["keyword_search", "semantic_search", "full_text_search", "hybrid_search"],
-    typing.Any,
+    typing.Literal["keyword_search", "semantic_search", "full_text_search", "hybrid_search"], typing.Any
 ]

@@ -4,6 +4,7 @@ import typing
 
 StreamEventEvent = typing.Union[
     typing.Literal[
+        "message",
         "workflow_started",
         "node_started",
         "node_finished",

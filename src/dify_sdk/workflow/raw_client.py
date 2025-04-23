@@ -106,6 +106,8 @@ class RawWorkflowClient:
                         def _iter():
                             for _text in _response.iter_lines():
                                 try:
+                                    _text = _text.removeprefix("data: ")
+
                                     if len(_text) == 0:
                                         continue
                                     yield typing.cast(
@@ -760,6 +762,8 @@ class AsyncRawWorkflowClient:
                         async def _iter():
                             async for _text in _response.aiter_lines():
                                 try:
+                                    _text = _text.removeprefix("data: ")
+
                                     if len(_text) == 0:
                                         continue
                                     yield typing.cast(

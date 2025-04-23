@@ -4,13 +4,7 @@ import typing
 
 UploadDocumentDataSourceType = typing.Union[
     typing.Literal[
-        "upload_file",
-        "notion_import",
-        "notion_sync",
-        "web_page",
-        "web_site",
-        "notion_page",
-        "github_repository",
+        "upload_file", "notion_import", "notion_sync", "web_page", "web_site", "notion_page", "github_repository"
     ],
     typing.Any,
 ]
