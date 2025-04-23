@@ -5,6 +5,7 @@ info:
     Dify API 提供了一系列接口用于工作流编排对话型应用。
     对话应用支持会话持久化，可将之前的聊天记录作为上下文进行回答，可适用于聊天/客服 AI 等。
     所有 API 请求都需要在 Authorization HTTP Header 中包含应用级 API-Key。
+    强烈建议开发者把 API-Key 放在后端存储，而非分享或者放在客户端存储，以免 API-Key 泄露，导致财产损失。
     官方原始文档见: https://github.com/langgenius/dify/blob/1.2.0/web/app/components/develop/template/template_advanced_chat.zh.mdx
   version: 1.2.0
 
