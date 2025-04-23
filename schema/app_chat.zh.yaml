@@ -283,7 +283,7 @@ components:
           description: 唯一ID
         position:
           type: integer
-          description: agent_thought在消息中的位置
+          description: agent_thought在消息中的位置，如第一轮迭代position为1
         thought:
           type: string
           description: agent的思考内容
@@ -832,7 +832,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -895,6 +895,12 @@ paths:
                       enabled:
                         type: boolean
                     description: 引用和归属设置
+                  annotation_reply:
+                    type: object
+                    properties:
+                      enabled:
+                        type: boolean
+                    description: 标记回复设置
                   user_input_form:
                     type: array
                     items:
@@ -905,6 +911,19 @@ paths:
                     description: 文件上传配置
                   system_parameters:
                     type: object
+                    properties:
+                      file_size_limit:
+                        type: integer
+                        description: 文档上传大小限制 (MB)
+                      image_file_size_limit:
+                        type: integer
+                        description: 图片文件上传大小限制（MB）
+                      audio_file_size_limit:
+                        type: integer
+                        description: 音频文件上传大小限制 (MB)
+                      video_file_size_limit:
+                        type: integer
+                        description: 视频文件上传大小限制 (MB)
                     description: 系统参数
 
   /meta:

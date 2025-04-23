@@ -183,7 +183,7 @@ actions:
     update: "Unique ID"
 
   - target: $.components.schemas.StreamEvent.properties.position.description
-    update: "Position of agent_thought in the message"
+    update: "Position of agent_thought in the message, e.g., the first iteration has position 1"
 
   - target: $.components.schemas.StreamEvent.properties.thought.description
     update: "Agent's thinking content"
@@ -486,6 +486,10 @@ actions:
     update:
       description: "Citation and attribution settings"
 
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply
+    update:
+      description: "Annotation reply settings"
+
   - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form
     update:
       description: "User input form configuration"
@@ -496,6 +500,15 @@ actions:
 
   - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.system_parameters
     update:
+      properties:
+        file_size_limit:
+          description: "Document upload size limit (MB)"
+        image_file_size_limit:
+          description: "Image file upload size limit (MB)"
+        audio_file_size_limit:
+          description: "Audio file upload size limit (MB)"
+        video_file_size_limit:
+          description: "Video file upload size limit (MB)"
       description: "System parameters"
 
   - target: $.paths['/chat-messages/{task_id}/stop'].post
@@ -540,15 +553,15 @@ actions:
       summary: "Text to Audio"
       description: "Convert text to speech"
 
-  - target: $.paths['/text-to-audio'].post.requestBody.content['application/json'].schema.properties.message_id
+  - target: $.paths['/text-to-audio'].post.requestBody.content['multipart/form-data'].schema.properties.message_id
     update:
       description: "Dify generated text message ID. The backend will find the corresponding content directly through the message_id to synthesize speech. If both message_id and text are provided, message_id takes precedence"
 
-  - target: $.paths['/text-to-audio'].post.requestBody.content['application/json'].schema.properties.text
+  - target: $.paths['/text-to-audio'].post.requestBody.content['multipart/form-data'].schema.properties.text
     update:
       description: "Text content for speech generation. If message_id is not provided, this field will be used"
 
-  - target: $.paths['/text-to-audio'].post.requestBody.content['application/json'].schema.properties.user
+  - target: $.paths['/text-to-audio'].post.requestBody.content['multipart/form-data'].schema.properties.user
     update:
       description: "User identifier, defined by developer rules, must be unique within the application"
 

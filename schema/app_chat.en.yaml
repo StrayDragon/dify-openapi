@@ -271,7 +271,7 @@ components:
           description: Unique ID
         position:
           type: integer
-          description: Position of agent_thought in the message
+          description: 'Position of agent_thought in the message, e.g., the first iteration has position 1'
         thought:
           type: string
           description: Agent's thinking content
@@ -827,7 +827,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -889,6 +889,12 @@ paths:
                       enabled:
                         type: boolean
                     description: Citation and attribution settings
+                  annotation_reply:
+                    type: object
+                    properties:
+                      enabled:
+                        type: boolean
+                    description: Annotation reply settings
                   user_input_form:
                     type: array
                     items:
@@ -899,6 +905,19 @@ paths:
                     description: File upload configuration
                   system_parameters:
                     type: object
+                    properties:
+                      file_size_limit:
+                        type: integer
+                        description: Document upload size limit (MB)
+                      image_file_size_limit:
+                        type: integer
+                        description: Image file upload size limit (MB)
+                      audio_file_size_limit:
+                        type: integer
+                        description: Audio file upload size limit (MB)
+                      video_file_size_limit:
+                        type: integer
+                        description: Video file upload size limit (MB)
                     description: System parameters
   /meta:
     get:
