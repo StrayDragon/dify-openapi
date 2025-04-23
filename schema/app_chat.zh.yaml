@@ -832,7 +832,7 @@ paths:
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
               type: object
               properties:
@@ -1170,9 +1170,13 @@ paths:
                 embedding_model_provider:
                   type: string
                   description: 指定的嵌入模型提供商, 必须先在系统内设定好接入的模型，对应的是provider字段
+                embedding_provider_name: # TODO: @l8ng same as `embedding_model_provider` upstream api complain {'code': 'invalid_param', 'message': 'Missing required parameter in the JSON body', 'params': 'embedding_provider_name'}
+                  type: string
                 embedding_model:
                   type: string
                   description: 指定的嵌入模型，对应的是model字段
+                embedding_model_name: # TODO: @l8ng same as `embedding_model_name` upstream api complain {'code': 'invalid_param', 'message': 'Missing required parameter in the JSON body', 'params': 'embedding_model_name'}
+                  type: string
                 score_threshold:
                   type: number
                   description: 相似度阈值，当相似度大于该阈值时，系统会自动回复，否则不回复

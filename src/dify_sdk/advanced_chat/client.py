@@ -1291,7 +1291,9 @@ class AdvancedChatClient:
         action: ConfigureAnnotationReplyByAppAdvancedChatRequestAction,
         *,
         embedding_model_provider: typing.Optional[str] = OMIT,
+        embedding_provider_name: typing.Optional[str] = OMIT,
         embedding_model: typing.Optional[str] = OMIT,
+        embedding_model_name: typing.Optional[str] = OMIT,
         score_threshold: typing.Optional[float] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ConfigureAnnotationReplyByAppAdvancedChatResponse:
@@ -1306,8 +1308,12 @@ class AdvancedChatClient:
         embedding_model_provider : typing.Optional[str]
             Specified embedding model provider, must be configured in the system first, corresponds to the provider field
 
+        embedding_provider_name : typing.Optional[str]
+
         embedding_model : typing.Optional[str]
             Specified embedding model, corresponds to the model field
+
+        embedding_model_name : typing.Optional[str]
 
         score_threshold : typing.Optional[float]
             Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply
@@ -1336,7 +1342,9 @@ class AdvancedChatClient:
             method="POST",
             json={
                 "embedding_model_provider": embedding_model_provider,
+                "embedding_provider_name": embedding_provider_name,
                 "embedding_model": embedding_model,
+                "embedding_model_name": embedding_model_name,
                 "score_threshold": score_threshold,
             },
             headers={
@@ -2756,7 +2764,9 @@ class AsyncAdvancedChatClient:
         action: ConfigureAnnotationReplyByAppAdvancedChatRequestAction,
         *,
         embedding_model_provider: typing.Optional[str] = OMIT,
+        embedding_provider_name: typing.Optional[str] = OMIT,
         embedding_model: typing.Optional[str] = OMIT,
+        embedding_model_name: typing.Optional[str] = OMIT,
         score_threshold: typing.Optional[float] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ConfigureAnnotationReplyByAppAdvancedChatResponse:
@@ -2771,8 +2781,12 @@ class AsyncAdvancedChatClient:
         embedding_model_provider : typing.Optional[str]
             Specified embedding model provider, must be configured in the system first, corresponds to the provider field
 
+        embedding_provider_name : typing.Optional[str]
+
         embedding_model : typing.Optional[str]
             Specified embedding model, corresponds to the model field
+
+        embedding_model_name : typing.Optional[str]
 
         score_threshold : typing.Optional[float]
             Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply
@@ -2809,7 +2823,9 @@ class AsyncAdvancedChatClient:
             method="POST",
             json={
                 "embedding_model_provider": embedding_model_provider,
+                "embedding_provider_name": embedding_provider_name,
                 "embedding_model": embedding_model,
+                "embedding_model_name": embedding_model_name,
                 "score_threshold": score_threshold,
             },
             headers={

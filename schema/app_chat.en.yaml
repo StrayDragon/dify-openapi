@@ -827,7 +827,7 @@ paths:
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
               type: object
               properties:
@@ -1161,9 +1161,13 @@ paths:
                 embedding_model_provider:
                   type: string
                   description: 'Specified embedding model provider, must be configured in the system first, corresponds to the provider field'
+                embedding_provider_name: # TODO: @l8ng same as `embedding_model_provider` upstream api complain {'code': 'invalid_param', 'message': 'Missing required parameter in the JSON body', 'params': 'embedding_provider_name'}
+                  type: string
                 embedding_model:
                   type: string
                   description: 'Specified embedding model, corresponds to the model field'
+                embedding_model_name: # TODO: @l8ng same as `embedding_model_name` upstream api complain {'code': 'invalid_param', 'message': 'Missing required parameter in the JSON body', 'params': 'embedding_model_name'}
+                  type: string
                 score_threshold:
                   type: number
                   description: 'Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply'

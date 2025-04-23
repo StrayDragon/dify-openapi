@@ -553,15 +553,15 @@ actions:
       summary: "Text to Audio"
       description: "Convert text to speech"
 
-  - target: $.paths['/text-to-audio'].post.requestBody.content['multipart/form-data'].schema.properties.message_id
+  - target: $.paths['/text-to-audio'].post.requestBody.content['application/json'].schema.properties.message_id
     update:
       description: "Dify generated text message ID. The backend will find the corresponding content directly through the message_id to synthesize speech. If both message_id and text are provided, message_id takes precedence"
 
-  - target: $.paths['/text-to-audio'].post.requestBody.content['multipart/form-data'].schema.properties.text
+  - target: $.paths['/text-to-audio'].post.requestBody.content['application/json'].schema.properties.text
     update:
       description: "Text content for speech generation. If message_id is not provided, this field will be used"
 
-  - target: $.paths['/text-to-audio'].post.requestBody.content['multipart/form-data'].schema.properties.user
+  - target: $.paths['/text-to-audio'].post.requestBody.content['application/json'].schema.properties.user
     update:
       description: "User identifier, defined by developer rules, must be unique within the application"
 
