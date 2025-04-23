@@ -198,6 +198,13 @@ actions:
     update:
       summary: "Send Message (Text Generation App)"
       description: "Send request to text generation application"
+      x-fern-streaming:
+        format: sse
+        stream-condition: $request.response_mode == "streaming"
+        response:
+          $ref: "#/components/schemas/CompletionMessage"
+        response-stream:
+          $ref: "#/components/schemas/StreamEvent"
 
   - target: $.paths['/completion-messages'].post.requestBody.content['application/json'].schema.properties.inputs.properties.query
     update:

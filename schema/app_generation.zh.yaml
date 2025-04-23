@@ -310,6 +310,13 @@ paths:
       operationId: sendCompletionMessageByAppGeneration
       summary: 发送消息(文本生成型应用)
       description: 发送请求给文本生成型应用
+      x-fern-streaming:
+        format: sse
+        stream-condition: $request.response_mode == "streaming"
+        response:
+          $ref: "#/components/schemas/CompletionMessage"
+        response-stream:
+          $ref: "#/components/schemas/StreamEvent"
       requestBody:
         required: true
         content:
