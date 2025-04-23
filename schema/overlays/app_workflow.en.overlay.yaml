@@ -243,16 +243,22 @@ actions:
     update: "Creation timestamp"
 
   - target: $.components.schemas.FileInput.properties.type.description
-    update: "File type"
+    update: |
+      File type, supported types:
+      - `document` Specific types include: 'TXT', 'MD', 'MARKDOWN', 'PDF', 'HTML', 'XLSX', 'XLS', 'DOCX', 'CSV', 'EML', 'MSG', 'PPTX', 'PPT', 'XML', 'EPUB'
+      - `image` Specific types include: 'JPG', 'JPEG', 'PNG', 'GIF', 'WEBP', 'SVG'
+      - `audio` Specific types include: 'MP3', 'M4A', 'WAV', 'WEBM', 'AMR'
+      - `video` Specific types include: 'MP4', 'MOV', 'MPEG', 'MPGA'
+      - `custom` Specific types include: other file types
 
   - target: $.components.schemas.FileInput.properties.transfer_method.description
-    update: "Transfer method"
+    update: "Transfer method, `remote_url` image address / `local_file` uploaded file"
 
   - target: $.components.schemas.FileInput.properties.url.description
-    update: "Remote URL"
+    update: "Remote URL (only when the transfer method is `remote_url`)"
 
   - target: $.components.schemas.FileInput.properties.upload_file_id.description
-    update: "Upload file ID"
+    update: "Upload file ID (only when the transfer method is `local_file`)"
 
   - target: $.paths['/workflows/run'].post
     update:
