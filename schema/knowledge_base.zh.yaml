@@ -22,6 +22,18 @@ servers:
 security:
   - bearerApiKeyAuth: []
 
+tags:
+  - name: Datasets
+    description: 知识库管理相关操作
+  - name: Documents
+    description: 知识库文档管理相关操作
+  - name: Segments
+    description: 文档分段管理相关操作
+  - name: Models
+    description: 模型信息获取相关操作
+  - name: Metadata
+    description: 知识库元数据管理相关操作
+
 components:
   securitySchemes:
     bearerApiKeyAuth:
@@ -2087,12 +2099,14 @@ paths:
   /datasets/{dataset_id}/metadata:
     post:
       tags:
-        - metadata
+        - Metadata
       summary: 新增元数据
+      description: 为知识库添加新的元数据字段
       operationId: createMetadata
       parameters:
         - name: dataset_id
           in: path
+          description: 知识库 ID
           required: true
           schema:
             type: string
@@ -2108,13 +2122,13 @@ paths:
               properties:
                 type:
                   type: string
-                  description: 元数据类型
+                  description: 元数据类型，例如：string
                 name:
                   type: string
                   description: 元数据名称
       responses:
         '200':
-          description: OK
+          description: 成功创建元数据
           content:
             application/json:
               schema:
@@ -2122,25 +2136,32 @@ paths:
                 properties:
                   id:
                     type: string
+                    description: 元数据 ID
                   type:
                     type: string
+                    description: 元数据类型
                   name:
                     type: string
+                    description: 元数据名称
+        "400":
+          $ref: "#/components/responses/Error400"
 
     get:
       tags:
-        - metadata
+        - Metadata
       summary: 查询知识库元数据列表
+      description: 获取知识库的所有元数据字段列表
       operationId: listDatasetMetadata
       parameters:
         - name: dataset_id
           in: path
+          description: 知识库 ID
           required: true
           schema:
             type: string
       responses:
         '200':
-          description: OK
+          description: 成功获取元数据列表
           content:
             application/json:
               schema:
@@ -2148,24 +2169,33 @@ paths:
                 properties:
                   doc_metadata:
                     type: array
+                    description: 元数据列表
                     items:
                       type: object
                       properties:
                         id:
                           type: string
+                          description: 元数据 ID
                         name:
                           type: string
+                          description: 元数据名称
                         type:
                           type: string
+                          description: 元数据类型
                         use_count:
                           type: integer
+                          description: 使用次数
                   built_in_field_enabled:
                     type: boolean
+                    description: 是否启用内置字段
+        "400":
+          $ref: "#/components/responses/Error400"
 
   /workspaces/current/models/model-types/text-embedding:
     get:
       summary: 获取嵌入模型列表
       description: 获取当前工作空间可用的嵌入模型列表
+      operationId: getEmbeddingModels
       tags:
         - Models
       responses:
@@ -2178,6 +2208,7 @@ paths:
                 properties:
                   data:
                     type: array
+                    description: 嵌入模型列表
                     items:
                       $ref: "#/components/schemas/EmbeddingModel"
         "400":
@@ -2186,17 +2217,20 @@ paths:
   /datasets/{dataset_id}/metadata/{metadata_id}:
     patch:
       tags:
-        - metadata
+        - Metadata
       summary: 更新元数据
+      description: 更新已存在的元数据字段
       operationId: updateMetadata
       parameters:
         - name: dataset_id
           in: path
+          description: 知识库 ID
           required: true
           schema:
             type: string
         - name: metadata_id
           in: path
+          description: 元数据 ID
           required: true
           schema:
             type: string
@@ -2214,7 +2248,7 @@ paths:
                   description: 元数据名称
       responses:
         '200':
-          description: OK
+          description: 成功更新元数据
           content:
             application/json:
               schema:
@@ -2222,62 +2256,79 @@ paths:
                 properties:
                   id:
                     type: string
+                    description: 元数据 ID
                   type:
                     type: string
+                    description: 元数据类型
                   name:
                     type: string
+                    description: 元数据名称
+        "400":
+          $ref: "#/components/responses/Error400"
 
     delete:
       tags:
-        - metadata
+        - Metadata
       summary: 删除元数据
+      description: 删除指定的元数据字段
       operationId: deleteMetadata
       parameters:
         - name: dataset_id
           in: path
+          description: 知识库 ID
           required: true
           schema:
             type: string
         - name: metadata_id
           in: path
+          description: 元数据 ID
           required: true
           schema:
             type: string
       responses:
         '204':
-          description: No Content
+          description: 成功删除元数据
+        "400":
+          $ref: "#/components/responses/Error400"
 
   /datasets/{dataset_id}/metadata/built-in/{action}:
     post:
       tags:
-        - metadata
+        - Metadata
       summary: 启用/禁用内置元数据
+      description: 启用或禁用知识库的内置元数据字段
       operationId: toggleBuiltInMetadata
       parameters:
         - name: dataset_id
           in: path
+          description: 知识库 ID
           required: true
           schema:
             type: string
         - name: action
           in: path
+          description: 操作类型，enable 启用，disable 禁用
           required: true
           schema:
             type: string
             enum: [enable, disable]
       responses:
         '204':
-          description: No Content
+          description: 成功启用/禁用内置元数据
+        "400":
+          $ref: "#/components/responses/Error400"
 
   /datasets/{dataset_id}/documents/metadata:
     post:
       tags:
-        - metadata
+        - Metadata
       summary: 更新文档元数据
+      description: 批量更新多个文档的元数据信息
       operationId: updateDocumentsMetadata
       parameters:
         - name: dataset_id
           in: path
+          description: 知识库 ID
           required: true
           schema:
             type: string
@@ -2287,9 +2338,12 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - operation_data
               properties:
                 operation_data:
                   type: array
+                  description: 操作数据列表
                   items:
                     type: object
                     required:
@@ -2298,19 +2352,30 @@ paths:
                     properties:
                       document_id:
                         type: string
+                        description: 文档 ID
                       metadata_list:
                         type: array
+                        description: 元数据列表
                         items:
                           type: object
+                          required:
+                            - id
+                            - value
                           properties:
                             id:
                               type: string
+                              description: 元数据 ID
                             type:
                               type: string
+                              description: 元数据类型
                             value:
                               type: string
+                              description: 元数据值
                             name:
                               type: string
+                              description: 元数据名称
       responses:
         '204':
-          description: No Content
+          description: 成功更新文档元数据
+        "400":
+          $ref: "#/components/responses/Error400"
