@@ -9,7 +9,7 @@ from dify_sdk.core.request_options import RequestOptions
 from dify_sdk.generation.types.send_completion_message_by_app_generation_request_inputs import (
     SendCompletionMessageByAppGenerationRequestInputs,
 )
-from dify_sdk.types.file_input import FileInput
+from dify_sdk.chat.types.send_chat_message_by_app_chat_request_files_item import SendChatMessageByAppChatRequestFilesItem
 from dify_sdk_testing import RUNNING_IN_CI, postpone_run_in_this_version
 
 LOGIN_USER_ID = "test123"
@@ -50,6 +50,7 @@ async def test_chat_messages(app_chat_client: AsyncChatClient) -> str | None:
     return response.message_id
 
 
+
 async def test_message_feedback(app_chat_client: AsyncChatClient):
     """测试消息反馈接口"""
     message_id = await test_chat_messages(app_chat_client)
@@ -86,13 +87,12 @@ async def test_conversation_management(app_chat_client: AsyncChatClient):
             pytest.skip("无法获取重命名后的会话ID")
         conversation_id = str(renamed.id)
 
-        if postpone_run_in_this_version("1.2.1"):
-            messages = await app_chat_client.get_conversation_messages_by_app_chat(
-                conversation_id=conversation_id,
-                user=LOGIN_USER_ID,
-            )
-            assert messages is not None
-            assert messages.data is not None
+        messages = await app_chat_client.get_conversation_messages_by_app_chat(
+            conversation_id=conversation_id,
+            user=LOGIN_USER_ID,
+        )
+        assert messages is not None
+        assert messages.data is not None
 
         delete_response = await app_chat_client.delete_conversation_by_app_chat(
             conversation_id=conversation_id,
@@ -163,8 +163,8 @@ async def test_chat_with_file(app_chat_client: AsyncChatClient, test_file_path: 
     file_id = await test_file_upload(app_chat_client, test_file_path)
 
     # 2. 发送带文件的对话消息
-    file_input = FileInput(
-        type="document",
+    file_input = SendChatMessageByAppChatRequestFilesItem(
+        type="image",
         transfer_method="local_file",
         upload_file_id=file_id,
     )
@@ -178,7 +178,6 @@ async def test_chat_with_file(app_chat_client: AsyncChatClient, test_file_path: 
     )
     assert response is not None
     assert hasattr(response, "message_id")
-
 
 async def test_audio_to_text(app_chat_client: AsyncChatClient, test_audio_file_path: Path):
     """测试语音转文字接口"""
@@ -210,10 +209,7 @@ async def test_text_to_audio(app_chat_client: AsyncChatClient):
         assert isinstance(chunk, bytes)
 
 
-@pytest.mark.skipif(
-    RUNNING_IN_CI,
-    reason="CI中使用官方服务器, 经常报504超时, 影响CI流程, 请使用本地服务测试",
-)
+
 async def test_completion_message(app_completion_client: AsyncGenerationClient):
     """测试文本生成接口"""
     response = await app_completion_client.send_completion_message_by_app_generation(
@@ -225,6 +221,7 @@ async def test_completion_message(app_completion_client: AsyncGenerationClient):
 
     assert response is not None
     assert response.message_id is not None
+
 
 
 async def test_workflow_run(app_workflow_client: AsyncWorkflowClient):

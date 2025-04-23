@@ -122,10 +122,6 @@ async def segment_for_child_chunks(
     return segments_response.data[0]
 
 
-@pytest.mark.skipif(
-    need_skip_run_until_this_version("1.2.1"),
-    reason="上游有bug, 等待修复后再跑!",
-)
 async def test_child_chunks_workflow(
     kb_client: KnowledgeBaseClient,
     dataset_for_child_chunks: Dataset,
