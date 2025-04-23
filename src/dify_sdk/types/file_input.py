@@ -11,22 +11,27 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 class FileInput(UniversalBaseModel):
     type: typing.Optional[FileInputType] = pydantic.Field(default=None)
     """
-    File type
+    File type, supported types:
+    - `document` Specific types include: 'TXT', 'MD', 'MARKDOWN', 'PDF', 'HTML', 'XLSX', 'XLS', 'DOCX', 'CSV', 'EML', 'MSG', 'PPTX', 'PPT', 'XML', 'EPUB'
+    - `image` Specific types include: 'JPG', 'JPEG', 'PNG', 'GIF', 'WEBP', 'SVG'
+    - `audio` Specific types include: 'MP3', 'M4A', 'WAV', 'WEBM', 'AMR'
+    - `video` Specific types include: 'MP4', 'MOV', 'MPEG', 'MPGA'
+    - `custom` Specific types include: other file types
     """
 
     transfer_method: typing.Optional[FileInputTransferMethod] = pydantic.Field(default=None)
     """
-    Transfer method
+    Transfer method, `remote_url` image address / `local_file` uploaded file
     """
 
     url: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Remote URL
+    Remote URL (only when the transfer method is `remote_url`)
     """
 
     upload_file_id: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Upload file ID
+    Upload file ID (only when the transfer method is `local_file`)
     """
 
     if IS_PYDANTIC_V2:

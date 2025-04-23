@@ -2,24 +2,29 @@
 
 from ...core.pydantic_utilities import UniversalBaseModel
 import typing
-from .list_dataset_metadata_response_doc_metadata_item import (
-    ListDatasetMetadataResponseDocMetadataItem,
-)
 import pydantic
 from ...core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class ListDatasetMetadataResponse(UniversalBaseModel):
-    doc_metadata: typing.Optional[typing.List[ListDatasetMetadataResponseDocMetadataItem]] = pydantic.Field(
-        default=None
-    )
+class GetApplicationParametersByAppGenerationResponseUserInputFormItemParagraphParagraph(UniversalBaseModel):
+    label: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Metadata list
+    Control display label name
     """
 
-    built_in_field_enabled: typing.Optional[bool] = pydantic.Field(default=None)
+    variable: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Whether built-in fields are enabled
+    Control ID
+    """
+
+    required: typing.Optional[bool] = pydantic.Field(default=None)
+    """
+    Whether required
+    """
+
+    default: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Default value
     """
 
     if IS_PYDANTIC_V2:

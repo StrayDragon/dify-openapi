@@ -521,6 +521,7 @@ class GenerationClient:
         message_id: typing.Optional[str] = OMIT,
         text: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
+        streaming: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Iterator[bytes]:
         """
@@ -537,6 +538,9 @@ class GenerationClient:
         user : typing.Optional[str]
             User identifier, defined by developer rules, must be unique within the application
 
+        streaming : typing.Optional[bool]
+            Whether to use streaming mode to return audio data
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration. You can pass in configuration such as `chunk_size`, and more to customize the request and response.
 
@@ -552,6 +556,7 @@ class GenerationClient:
                 "message_id": message_id,
                 "text": text,
                 "user": user,
+                "streaming": streaming,
             },
             headers={
                 "content-type": "application/json",
@@ -1490,6 +1495,7 @@ class AsyncGenerationClient:
         message_id: typing.Optional[str] = OMIT,
         text: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
+        streaming: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.AsyncIterator[bytes]:
         """
@@ -1506,6 +1512,9 @@ class AsyncGenerationClient:
         user : typing.Optional[str]
             User identifier, defined by developer rules, must be unique within the application
 
+        streaming : typing.Optional[bool]
+            Whether to use streaming mode to return audio data
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration. You can pass in configuration such as `chunk_size`, and more to customize the request and response.
 
@@ -1521,6 +1530,7 @@ class AsyncGenerationClient:
                 "message_id": message_id,
                 "text": text,
                 "user": user,
+                "streaming": streaming,
             },
             headers={
                 "content-type": "application/json",

@@ -2,13 +2,15 @@
 
 from ...core.pydantic_utilities import UniversalBaseModel
 import typing
-from ...types.embedding_model import EmbeddingModel
+from .get_application_parameters_by_app_generation_response_user_input_form_item_select_select import (
+    GetApplicationParametersByAppGenerationResponseUserInputFormItemSelectSelect,
+)
 from ...core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 
 
-class GetWorkspacesCurrentModelsModelTypesTextEmbeddingResponse(UniversalBaseModel):
-    data: typing.Optional[typing.List[EmbeddingModel]] = None
+class GetApplicationParametersByAppGenerationResponseUserInputFormItemSelect(UniversalBaseModel):
+    select: typing.Optional[GetApplicationParametersByAppGenerationResponseUserInputFormItemSelectSelect] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

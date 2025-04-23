@@ -2,24 +2,23 @@
 
 from ...core.pydantic_utilities import UniversalBaseModel
 import typing
-from .list_dataset_metadata_response_doc_metadata_item import (
-    ListDatasetMetadataResponseDocMetadataItem,
+from .get_application_parameters_by_app_generation_response_file_upload_image import (
+    GetApplicationParametersByAppGenerationResponseFileUploadImage,
 )
 import pydantic
 from ...core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class ListDatasetMetadataResponse(UniversalBaseModel):
-    doc_metadata: typing.Optional[typing.List[ListDatasetMetadataResponseDocMetadataItem]] = pydantic.Field(
+class GetApplicationParametersByAppGenerationResponseFileUpload(UniversalBaseModel):
+    """
+    File upload configuration
+    """
+
+    image: typing.Optional[GetApplicationParametersByAppGenerationResponseFileUploadImage] = pydantic.Field(
         default=None
     )
     """
-    Metadata list
-    """
-
-    built_in_field_enabled: typing.Optional[bool] = pydantic.Field(default=None)
-    """
-    Whether built-in fields are enabled
+    Image settings
     """
 
     if IS_PYDANTIC_V2:

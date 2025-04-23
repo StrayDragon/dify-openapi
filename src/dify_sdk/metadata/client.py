@@ -6,6 +6,8 @@ from ..core.request_options import RequestOptions
 from .types.list_dataset_metadata_response import ListDatasetMetadataResponse
 from ..core.jsonable_encoder import jsonable_encoder
 from ..core.pydantic_utilities import parse_obj_as
+from ..errors.bad_request_error import BadRequestError
+from ..types.error import Error
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from .types.create_metadata_response import CreateMetadataResponse
@@ -34,11 +36,12 @@ class MetadataClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListDatasetMetadataResponse:
         """
-        Get list of metadata fields for a dataset
+        Get list of all metadata fields for a knowledge base
 
         Parameters
         ----------
         dataset_id : str
+            Knowledge Base ID
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -46,7 +49,7 @@ class MetadataClient:
         Returns
         -------
         ListDatasetMetadataResponse
-            OK
+            Successfully retrieved metadata list
 
         Examples
         --------
@@ -73,6 +76,16 @@ class MetadataClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -87,14 +100,15 @@ class MetadataClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CreateMetadataResponse:
         """
-        Create a new metadata field
+        Add a new metadata field to the knowledge base
 
         Parameters
         ----------
         dataset_id : str
+            Knowledge Base ID
 
         type : str
-            Metadata type
+            Metadata type, e.g. string
 
         name : str
             Metadata name
@@ -105,7 +119,7 @@ class MetadataClient:
         Returns
         -------
         CreateMetadataResponse
-            OK
+            Successfully created metadata
 
         Examples
         --------
@@ -142,6 +156,16 @@ class MetadataClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -160,8 +184,10 @@ class MetadataClient:
         Parameters
         ----------
         dataset_id : str
+            Knowledge Base ID
 
         metadata_id : str
+            Metadata ID
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -190,6 +216,16 @@ class MetadataClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -209,8 +245,10 @@ class MetadataClient:
         Parameters
         ----------
         dataset_id : str
+            Knowledge Base ID
 
         metadata_id : str
+            Metadata ID
 
         name : str
             New metadata name
@@ -221,7 +259,7 @@ class MetadataClient:
         Returns
         -------
         UpdateMetadataResponse
-            OK
+            Successfully updated metadata
 
         Examples
         --------
@@ -257,6 +295,16 @@ class MetadataClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -270,13 +318,15 @@ class MetadataClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
-        Toggle built-in metadata fields
+        Enable or disable built-in metadata fields for a knowledge base
 
         Parameters
         ----------
         dataset_id : str
+            Knowledge Base ID
 
         action : ToggleBuiltInMetadataRequestAction
+            Action type, enable or disable
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -305,6 +355,16 @@ class MetadataClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -314,17 +374,18 @@ class MetadataClient:
         self,
         dataset_id: str,
         *,
-        operation_data: typing.Optional[typing.Sequence[UpdateDocumentsMetadataRequestOperationDataItem]] = OMIT,
+        operation_data: typing.Sequence[UpdateDocumentsMetadataRequestOperationDataItem],
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
-        Update metadata for multiple documents
+        Update metadata for multiple documents in batch
 
         Parameters
         ----------
         dataset_id : str
+            Knowledge Base ID
 
-        operation_data : typing.Optional[typing.Sequence[UpdateDocumentsMetadataRequestOperationDataItem]]
+        operation_data : typing.Sequence[UpdateDocumentsMetadataRequestOperationDataItem]
             List of document metadata operations
 
         request_options : typing.Optional[RequestOptions]
@@ -337,12 +398,27 @@ class MetadataClient:
         Examples
         --------
         from dify import DifyApi
+        from dify.metadata import (
+            UpdateDocumentsMetadataRequestOperationDataItem,
+            UpdateDocumentsMetadataRequestOperationDataItemMetadataListItem,
+        )
 
         client = DifyApi(
             token="YOUR_TOKEN",
         )
         client.metadata.update_documents_metadata(
             dataset_id="dataset_id",
+            operation_data=[
+                UpdateDocumentsMetadataRequestOperationDataItem(
+                    document_id="document_id",
+                    metadata_list=[
+                        UpdateDocumentsMetadataRequestOperationDataItemMetadataListItem(
+                            id="id",
+                            value="value",
+                        )
+                    ],
+                )
+            ],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -364,6 +440,16 @@ class MetadataClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -381,11 +467,12 @@ class AsyncMetadataClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListDatasetMetadataResponse:
         """
-        Get list of metadata fields for a dataset
+        Get list of all metadata fields for a knowledge base
 
         Parameters
         ----------
         dataset_id : str
+            Knowledge Base ID
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -393,7 +480,7 @@ class AsyncMetadataClient:
         Returns
         -------
         ListDatasetMetadataResponse
-            OK
+            Successfully retrieved metadata list
 
         Examples
         --------
@@ -428,6 +515,16 @@ class AsyncMetadataClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -442,14 +539,15 @@ class AsyncMetadataClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CreateMetadataResponse:
         """
-        Create a new metadata field
+        Add a new metadata field to the knowledge base
 
         Parameters
         ----------
         dataset_id : str
+            Knowledge Base ID
 
         type : str
-            Metadata type
+            Metadata type, e.g. string
 
         name : str
             Metadata name
@@ -460,7 +558,7 @@ class AsyncMetadataClient:
         Returns
         -------
         CreateMetadataResponse
-            OK
+            Successfully created metadata
 
         Examples
         --------
@@ -505,6 +603,16 @@ class AsyncMetadataClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -523,8 +631,10 @@ class AsyncMetadataClient:
         Parameters
         ----------
         dataset_id : str
+            Knowledge Base ID
 
         metadata_id : str
+            Metadata ID
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -561,6 +671,16 @@ class AsyncMetadataClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -580,8 +700,10 @@ class AsyncMetadataClient:
         Parameters
         ----------
         dataset_id : str
+            Knowledge Base ID
 
         metadata_id : str
+            Metadata ID
 
         name : str
             New metadata name
@@ -592,7 +714,7 @@ class AsyncMetadataClient:
         Returns
         -------
         UpdateMetadataResponse
-            OK
+            Successfully updated metadata
 
         Examples
         --------
@@ -636,6 +758,16 @@ class AsyncMetadataClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -649,13 +781,15 @@ class AsyncMetadataClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
-        Toggle built-in metadata fields
+        Enable or disable built-in metadata fields for a knowledge base
 
         Parameters
         ----------
         dataset_id : str
+            Knowledge Base ID
 
         action : ToggleBuiltInMetadataRequestAction
+            Action type, enable or disable
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -692,6 +826,16 @@ class AsyncMetadataClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -701,17 +845,18 @@ class AsyncMetadataClient:
         self,
         dataset_id: str,
         *,
-        operation_data: typing.Optional[typing.Sequence[UpdateDocumentsMetadataRequestOperationDataItem]] = OMIT,
+        operation_data: typing.Sequence[UpdateDocumentsMetadataRequestOperationDataItem],
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
-        Update metadata for multiple documents
+        Update metadata for multiple documents in batch
 
         Parameters
         ----------
         dataset_id : str
+            Knowledge Base ID
 
-        operation_data : typing.Optional[typing.Sequence[UpdateDocumentsMetadataRequestOperationDataItem]]
+        operation_data : typing.Sequence[UpdateDocumentsMetadataRequestOperationDataItem]
             List of document metadata operations
 
         request_options : typing.Optional[RequestOptions]
@@ -726,6 +871,10 @@ class AsyncMetadataClient:
         import asyncio
 
         from dify import AsyncDifyApi
+        from dify.metadata import (
+            UpdateDocumentsMetadataRequestOperationDataItem,
+            UpdateDocumentsMetadataRequestOperationDataItemMetadataListItem,
+        )
 
         client = AsyncDifyApi(
             token="YOUR_TOKEN",
@@ -735,6 +884,17 @@ class AsyncMetadataClient:
         async def main() -> None:
             await client.metadata.update_documents_metadata(
                 dataset_id="dataset_id",
+                operation_data=[
+                    UpdateDocumentsMetadataRequestOperationDataItem(
+                        document_id="document_id",
+                        metadata_list=[
+                            UpdateDocumentsMetadataRequestOperationDataItemMetadataListItem(
+                                id="id",
+                                value="value",
+                            )
+                        ],
+                    )
+                ],
             )
 
 
@@ -759,6 +919,16 @@ class AsyncMetadataClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)

@@ -2,24 +2,15 @@
 
 from ...core.pydantic_utilities import UniversalBaseModel
 import typing
-from .list_dataset_metadata_response_doc_metadata_item import (
-    ListDatasetMetadataResponseDocMetadataItem,
-)
+from ...types.embedding_model import EmbeddingModel
 import pydantic
 from ...core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class ListDatasetMetadataResponse(UniversalBaseModel):
-    doc_metadata: typing.Optional[typing.List[ListDatasetMetadataResponseDocMetadataItem]] = pydantic.Field(
-        default=None
-    )
+class GetEmbeddingModelsResponse(UniversalBaseModel):
+    data: typing.Optional[typing.List[EmbeddingModel]] = pydantic.Field(default=None)
     """
-    Metadata list
-    """
-
-    built_in_field_enabled: typing.Optional[bool] = pydantic.Field(default=None)
-    """
-    Whether built-in fields are enabled
+    Embedding model list
     """
 
     if IS_PYDANTIC_V2:

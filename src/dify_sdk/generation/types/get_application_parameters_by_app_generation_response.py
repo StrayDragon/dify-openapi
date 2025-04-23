@@ -15,6 +15,15 @@ from .get_application_parameters_by_app_generation_response_retriever_resource i
 from .get_application_parameters_by_app_generation_response_annotation_reply import (
     GetApplicationParametersByAppGenerationResponseAnnotationReply,
 )
+from .get_application_parameters_by_app_generation_response_user_input_form_item import (
+    GetApplicationParametersByAppGenerationResponseUserInputFormItem,
+)
+from .get_application_parameters_by_app_generation_response_file_upload import (
+    GetApplicationParametersByAppGenerationResponseFileUpload,
+)
+from .get_application_parameters_by_app_generation_response_system_parameters import (
+    GetApplicationParametersByAppGenerationResponseSystemParameters,
+)
 from ...core.pydantic_utilities import IS_PYDANTIC_V2
 
 
@@ -57,19 +66,23 @@ class GetApplicationParametersByAppGenerationResponse(UniversalBaseModel):
     Annotation reply settings
     """
 
-    user_input_form: typing.Optional[typing.List[typing.Dict[str, typing.Optional[typing.Any]]]] = pydantic.Field(
-        default=None
+    user_input_form: typing.Optional[typing.List[GetApplicationParametersByAppGenerationResponseUserInputFormItem]] = (
+        pydantic.Field(default=None)
     )
     """
     User input form configuration
     """
 
-    file_upload: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
+    file_upload: typing.Optional[GetApplicationParametersByAppGenerationResponseFileUpload] = pydantic.Field(
+        default=None
+    )
     """
     File upload configuration
     """
 
-    system_parameters: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
+    system_parameters: typing.Optional[GetApplicationParametersByAppGenerationResponseSystemParameters] = (
+        pydantic.Field(default=None)
+    )
     """
     System parameters
     """

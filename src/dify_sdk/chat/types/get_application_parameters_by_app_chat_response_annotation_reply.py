@@ -2,25 +2,16 @@
 
 from ...core.pydantic_utilities import UniversalBaseModel
 import typing
-from .list_dataset_metadata_response_doc_metadata_item import (
-    ListDatasetMetadataResponseDocMetadataItem,
-)
-import pydantic
 from ...core.pydantic_utilities import IS_PYDANTIC_V2
+import pydantic
 
 
-class ListDatasetMetadataResponse(UniversalBaseModel):
-    doc_metadata: typing.Optional[typing.List[ListDatasetMetadataResponseDocMetadataItem]] = pydantic.Field(
-        default=None
-    )
+class GetApplicationParametersByAppChatResponseAnnotationReply(UniversalBaseModel):
     """
-    Metadata list
+    Annotation reply settings
     """
 
-    built_in_field_enabled: typing.Optional[bool] = pydantic.Field(default=None)
-    """
-    Whether built-in fields are enabled
-    """
+    enabled: typing.Optional[bool] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

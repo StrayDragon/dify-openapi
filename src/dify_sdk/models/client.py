@@ -3,9 +3,7 @@
 from ..core.client_wrapper import SyncClientWrapper
 import typing
 from ..core.request_options import RequestOptions
-from .types.get_workspaces_current_models_model_types_text_embedding_response import (
-    GetWorkspacesCurrentModelsModelTypesTextEmbeddingResponse,
-)
+from .types.get_embedding_models_response import GetEmbeddingModelsResponse
 from ..core.pydantic_utilities import parse_obj_as
 from ..errors.bad_request_error import BadRequestError
 from ..types.error import Error
@@ -18,9 +16,9 @@ class ModelsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    def get_embedding_model_list(
+    def get_embedding_models(
         self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> GetWorkspacesCurrentModelsModelTypesTextEmbeddingResponse:
+    ) -> GetEmbeddingModelsResponse:
         """
         Get a list of available embedding models for the current workspace
 
@@ -31,7 +29,7 @@ class ModelsClient:
 
         Returns
         -------
-        GetWorkspacesCurrentModelsModelTypesTextEmbeddingResponse
+        GetEmbeddingModelsResponse
             Successfully retrieved embedding model list
 
         Examples
@@ -41,7 +39,7 @@ class ModelsClient:
         client = DifyApi(
             token="YOUR_TOKEN",
         )
-        client.models.get_embedding_model_list()
+        client.models.get_embedding_models()
         """
         _response = self._client_wrapper.httpx_client.request(
             "workspaces/current/models/model-types/text-embedding",
@@ -51,9 +49,9 @@ class ModelsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GetWorkspacesCurrentModelsModelTypesTextEmbeddingResponse,
+                    GetEmbeddingModelsResponse,
                     parse_obj_as(
-                        type_=GetWorkspacesCurrentModelsModelTypesTextEmbeddingResponse,  # type: ignore
+                        type_=GetEmbeddingModelsResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -77,9 +75,9 @@ class AsyncModelsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    async def get_embedding_model_list(
+    async def get_embedding_models(
         self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> GetWorkspacesCurrentModelsModelTypesTextEmbeddingResponse:
+    ) -> GetEmbeddingModelsResponse:
         """
         Get a list of available embedding models for the current workspace
 
@@ -90,7 +88,7 @@ class AsyncModelsClient:
 
         Returns
         -------
-        GetWorkspacesCurrentModelsModelTypesTextEmbeddingResponse
+        GetEmbeddingModelsResponse
             Successfully retrieved embedding model list
 
         Examples
@@ -105,7 +103,7 @@ class AsyncModelsClient:
 
 
         async def main() -> None:
-            await client.models.get_embedding_model_list()
+            await client.models.get_embedding_models()
 
 
         asyncio.run(main())
@@ -118,9 +116,9 @@ class AsyncModelsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GetWorkspacesCurrentModelsModelTypesTextEmbeddingResponse,
+                    GetEmbeddingModelsResponse,
                     parse_obj_as(
-                        type_=GetWorkspacesCurrentModelsModelTypesTextEmbeddingResponse,  # type: ignore
+                        type_=GetEmbeddingModelsResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

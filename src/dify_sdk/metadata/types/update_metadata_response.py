@@ -2,14 +2,25 @@
 
 from ...core.pydantic_utilities import UniversalBaseModel
 import typing
-from ...core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
+from ...core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class UpdateMetadataResponse(UniversalBaseModel):
-    id: typing.Optional[str] = None
-    type: typing.Optional[str] = None
-    name: typing.Optional[str] = None
+    id: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Metadata ID
+    """
+
+    type: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Metadata type
+    """
+
+    name: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Metadata name
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

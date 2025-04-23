@@ -6,25 +6,30 @@ import pydantic
 from ...core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class ListDatasetMetadataResponseDocMetadataItem(UniversalBaseModel):
-    id: typing.Optional[str] = pydantic.Field(default=None)
+class GetApplicationParametersByAppGenerationResponseUserInputFormItemTextInputTextInput(UniversalBaseModel):
+    label: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Metadata ID
-    """
-
-    name: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Metadata name
+    Control display label name
     """
 
-    type: typing.Optional[str] = pydantic.Field(default=None)
+    variable: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Metadata type
+    Control ID
     """
 
-    use_count: typing.Optional[int] = pydantic.Field(default=None)
+    required: typing.Optional[bool] = pydantic.Field(default=None)
     """
-    Usage count
+    Whether required
+    """
+
+    default: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Default value
+    """
+
+    max_length: typing.Optional[int] = pydantic.Field(default=None)
+    """
+    Maximum length
     """
 
     if IS_PYDANTIC_V2:

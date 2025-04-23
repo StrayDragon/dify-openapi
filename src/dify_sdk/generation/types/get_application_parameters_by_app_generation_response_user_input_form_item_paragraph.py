@@ -2,25 +2,17 @@
 
 from ...core.pydantic_utilities import UniversalBaseModel
 import typing
-from .list_dataset_metadata_response_doc_metadata_item import (
-    ListDatasetMetadataResponseDocMetadataItem,
+from .get_application_parameters_by_app_generation_response_user_input_form_item_paragraph_paragraph import (
+    GetApplicationParametersByAppGenerationResponseUserInputFormItemParagraphParagraph,
 )
-import pydantic
 from ...core.pydantic_utilities import IS_PYDANTIC_V2
+import pydantic
 
 
-class ListDatasetMetadataResponse(UniversalBaseModel):
-    doc_metadata: typing.Optional[typing.List[ListDatasetMetadataResponseDocMetadataItem]] = pydantic.Field(
-        default=None
+class GetApplicationParametersByAppGenerationResponseUserInputFormItemParagraph(UniversalBaseModel):
+    paragraph: typing.Optional[GetApplicationParametersByAppGenerationResponseUserInputFormItemParagraphParagraph] = (
+        None
     )
-    """
-    Metadata list
-    """
-
-    built_in_field_enabled: typing.Optional[bool] = pydantic.Field(default=None)
-    """
-    Whether built-in fields are enabled
-    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

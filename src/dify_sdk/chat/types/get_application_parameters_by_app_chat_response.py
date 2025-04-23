@@ -12,6 +12,12 @@ from .get_application_parameters_by_app_chat_response_speech_to_text import (
 from .get_application_parameters_by_app_chat_response_retriever_resource import (
     GetApplicationParametersByAppChatResponseRetrieverResource,
 )
+from .get_application_parameters_by_app_chat_response_annotation_reply import (
+    GetApplicationParametersByAppChatResponseAnnotationReply,
+)
+from .get_application_parameters_by_app_chat_response_system_parameters import (
+    GetApplicationParametersByAppChatResponseSystemParameters,
+)
 from ...core.pydantic_utilities import IS_PYDANTIC_V2
 
 
@@ -47,6 +53,13 @@ class GetApplicationParametersByAppChatResponse(UniversalBaseModel):
     Citation and attribution settings
     """
 
+    annotation_reply: typing.Optional[GetApplicationParametersByAppChatResponseAnnotationReply] = pydantic.Field(
+        default=None
+    )
+    """
+    Annotation reply settings
+    """
+
     user_input_form: typing.Optional[typing.List[typing.Dict[str, typing.Optional[typing.Any]]]] = pydantic.Field(
         default=None
     )
@@ -59,7 +72,9 @@ class GetApplicationParametersByAppChatResponse(UniversalBaseModel):
     File upload configuration
     """
 
-    system_parameters: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
+    system_parameters: typing.Optional[GetApplicationParametersByAppChatResponseSystemParameters] = pydantic.Field(
+        default=None
+    )
     """
     System parameters
     """

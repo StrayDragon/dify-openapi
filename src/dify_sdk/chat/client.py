@@ -926,14 +926,12 @@ class ChatClient:
         with self._client_wrapper.httpx_client.stream(
             "text-to-audio",
             method="POST",
-            json={
+            data={
                 "message_id": message_id,
                 "text": text,
                 "user": user,
             },
-            headers={
-                "content-type": "application/json",
-            },
+            files={},
             request_options=request_options,
             omit=OMIT,
         ) as _response:
@@ -2337,14 +2335,12 @@ class AsyncChatClient:
         async with self._client_wrapper.httpx_client.stream(
             "text-to-audio",
             method="POST",
-            json={
+            data={
                 "message_id": message_id,
                 "text": text,
                 "user": user,
             },
-            headers={
-                "content-type": "application/json",
-            },
+            files={},
             request_options=request_options,
             omit=OMIT,
         ) as _response:
