@@ -217,6 +217,57 @@ actions:
   - target: $.paths['/completion-messages'].post.responses['200'].description
     update: "Successful response"
 
+  - target: $.paths['/completion-messages'].post.responses['200'].content['application/json'].description
+    update: |
+      When `response_mode` is `blocking`, returns a ChatCompletionResponse object.
+      - `message_id` (string) Unique message ID
+      - `mode` (string) App mode, fixed as chat
+      - `answer` (string) Complete response content
+      - `metadata` (object) Metadata
+        - `usage` (Usage) Model usage information
+        - `retriever_resources` (array[RetrieverResource]) Citation and attribution segment list
+      - `created_at` (int) Message creation timestamp
+
+  - target: $.paths['/completion-messages'].post.responses['200'].content['text/event-stream'].description
+    update: |
+      When `response_mode` is `streaming`, returns a stream of ChunkChatCompletionResponse objects.
+      Returns App output stream chunks, `Content-Type` is `text/event-stream`.
+      Each stream chunk starts with data: and chunks are separated by `\n\n` (two newlines).
+      Stream chunks have different structures based on the `event` type:
+      - `event: message` LLM text chunk event, i.e., complete text output in chunks.
+        - `task_id` (string) Task ID, used for request tracking and stopping response
+        - `message_id` (string) Unique message ID
+        - `answer` (string) LLM text chunk content
+        - `created_at` (int) Creation timestamp
+      - `event: message_end` Message end event, receiving this event means the text stream response has ended.
+        - `task_id` (string) Task ID
+        - `message_id` (string) Unique message ID
+        - `metadata` (object) Metadata
+          - `usage` (Usage) Model usage information
+          - `retriever_resources` (array[RetrieverResource]) Citation and attribution segment list
+      - `event: tts_message` TTS audio stream event, i.e., speech synthesis output. Content is Mp3 format audio chunk, base64 encoded string, decode directly for playback.
+        - `task_id` (string) Task ID
+        - `message_id` (string) Unique message ID
+        - `audio` (string) Base64 encoded audio chunk from speech synthesis
+        - `created_at` (int) Creation timestamp
+      - `event: tts_message_end` TTS audio stream end event, receiving this event means the audio stream response has ended.
+        - `task_id` (string) Task ID
+        - `message_id` (string) Unique message ID
+        - `audio` (string) Empty string as there is no audio in the end event
+        - `created_at` (int) Creation timestamp
+      - `event: message_replace` Message content replacement event.
+        - `task_id` (string) Task ID
+        - `message_id` (string) Unique message ID
+        - `answer` (string) Replacement content (directly replaces all LLM response text)
+        - `created_at` (int) Creation timestamp
+      - `event: error` Exceptions during streaming output are output as stream events, and the stream ends after receiving an exception event.
+        - `task_id` (string) Task ID
+        - `message_id` (string) Unique message ID
+        - `status` (int) HTTP status code
+        - `code` (string) Error code
+        - `message` (string) Error message
+      - `event: ping` Ping event every 10s to keep the connection alive.
+
   - target: $.paths['/files/upload'].post
     update:
       summary: "Upload File"
@@ -311,13 +362,79 @@ actions:
     update:
       description: "User input form configuration"
 
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.oneOf[0].properties.text-input.properties.label.description
+    update: "Control display label name"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.oneOf[0].properties.text-input.properties.variable.description
+    update: "Control ID"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.oneOf[0].properties.text-input.properties.required.description
+    update: "Whether required"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.oneOf[0].properties.text-input.properties.default.description
+    update: "Default value"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.oneOf[0].properties.text-input.properties.max_length.description
+    update: "Maximum length"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.oneOf[1].properties.paragraph.properties.label.description
+    update: "Control display label name"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.oneOf[1].properties.paragraph.properties.variable.description
+    update: "Control ID"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.oneOf[1].properties.paragraph.properties.required.description
+    update: "Whether required"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.oneOf[1].properties.paragraph.properties.default.description
+    update: "Default value"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.oneOf[2].properties.select.properties.label.description
+    update: "Control display label name"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.oneOf[2].properties.select.properties.variable.description
+    update: "Control ID"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.oneOf[2].properties.select.properties.required.description
+    update: "Whether required"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.oneOf[2].properties.select.properties.default.description
+    update: "Default value"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.items.oneOf[2].properties.select.properties.options.description
+    update: "Option values"
+
   - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload
     update:
       description: "File upload configuration"
 
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.image.description
+    update: "Image settings"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.image.properties.enabled.description
+    update: "Whether enabled"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.image.properties.number_limits.description
+    update: "Image quantity limit, default 3"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.image.properties.transfer_methods.description
+    update: "Transfer method list"
+
   - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.system_parameters
     update:
       description: "System parameters"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.system_parameters.properties.file_size_limit.description
+    update: "Document upload size limit (MB)"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.system_parameters.properties.image_file_size_limit.description
+    update: "Image file upload size limit (MB)"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.system_parameters.properties.audio_file_size_limit.description
+    update: "Audio file upload size limit (MB)"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.system_parameters.properties.video_file_size_limit.description
+    update: "Video file upload size limit (MB)"
 
   - target: $.paths['/meta'].get
     update:
@@ -393,11 +510,17 @@ actions:
   - target: $.paths['/text-to-audio'].post.requestBody.content['application/json'].schema.properties.user.description
     update: "User identifier, defined by developer rules, must be unique within the application"
 
+  - target: $.paths['/text-to-audio'].post.requestBody.content['application/json'].schema.properties.streaming.description
+    update: "Whether to use streaming mode to return audio data"
+
   - target: $.paths['/text-to-audio'].post.responses['200'].description
     update: "Successful response"
 
   - target: $.paths['/text-to-audio'].post.responses['200'].content['audio/wav'].schema.description
     update: "Audio file"
+
+  - target: $.paths['/text-to-audio'].post.responses['200'].content['audio/mpeg'].schema.description
+    update: "MP3 format audio file"
 
   - target: $.paths['/apps/annotations'].get
     update:

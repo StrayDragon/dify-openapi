@@ -336,9 +336,56 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CompletionMessage'
+              description: |
+                When `response_mode` is `blocking`, returns a ChatCompletionResponse object.
+                - `message_id` (string) Unique message ID
+                - `mode` (string) App mode, fixed as chat
+                - `answer` (string) Complete response content
+                - `metadata` (object) Metadata
+                  - `usage` (Usage) Model usage information
+                  - `retriever_resources` (array[RetrieverResource]) Citation and attribution segment list
+                - `created_at` (int) Message creation timestamp
             text/event-stream:
               schema:
                 $ref: '#/components/schemas/StreamEvent'
+              description: |
+                When `response_mode` is `streaming`, returns a stream of ChunkChatCompletionResponse objects.
+                Returns App output stream chunks, `Content-Type` is `text/event-stream`.
+                Each stream chunk starts with data: and chunks are separated by `\n\n` (two newlines).
+                Stream chunks have different structures based on the `event` type:
+                - `event: message` LLM text chunk event, i.e., complete text output in chunks.
+                  - `task_id` (string) Task ID, used for request tracking and stopping response
+                  - `message_id` (string) Unique message ID
+                  - `answer` (string) LLM text chunk content
+                  - `created_at` (int) Creation timestamp
+                - `event: message_end` Message end event, receiving this event means the text stream response has ended.
+                  - `task_id` (string) Task ID
+                  - `message_id` (string) Unique message ID
+                  - `metadata` (object) Metadata
+                    - `usage` (Usage) Model usage information
+                    - `retriever_resources` (array[RetrieverResource]) Citation and attribution segment list
+                - `event: tts_message` TTS audio stream event, i.e., speech synthesis output. Content is Mp3 format audio chunk, base64 encoded string, decode directly for playback.
+                  - `task_id` (string) Task ID
+                  - `message_id` (string) Unique message ID
+                  - `audio` (string) Base64 encoded audio chunk from speech synthesis
+                  - `created_at` (int) Creation timestamp
+                - `event: tts_message_end` TTS audio stream end event, receiving this event means the audio stream response has ended.
+                  - `task_id` (string) Task ID
+                  - `message_id` (string) Unique message ID
+                  - `audio` (string) Empty string as there is no audio in the end event
+                  - `created_at` (int) Creation timestamp
+                - `event: message_replace` Message content replacement event.
+                  - `task_id` (string) Task ID
+                  - `message_id` (string) Unique message ID
+                  - `answer` (string) Replacement content (directly replaces all LLM response text)
+                  - `created_at` (int) Creation timestamp
+                - `event: error` Exceptions during streaming output are output as stream events, and the stream ends after receiving an exception event.
+                  - `task_id` (string) Task ID
+                  - `message_id` (string) Unique message ID
+                  - `status` (int) HTTP status code
+                  - `code` (string) Error code
+                  - `message` (string) Error message
+                - `event: ping` Ping event every 10s to keep the connection alive.
         '400':
           $ref: '#/components/responses/Error400'
         '404':
@@ -483,12 +530,101 @@ paths:
                     type: array
                     items:
                       type: object
+                      oneOf:
+                        - properties:
+                            text-input:
+                              type: object
+                              properties:
+                                label:
+                                  type: string
+                                  description: Control display label name
+                                variable:
+                                  type: string
+                                  description: Control ID
+                                required:
+                                  type: boolean
+                                  description: Whether required
+                                default:
+                                  type: string
+                                  description: Default value
+                                max_length:
+                                  type: integer
+                                  description: Maximum length
+                        - properties:
+                            paragraph:
+                              type: object
+                              properties:
+                                label:
+                                  type: string
+                                  description: Control display label name
+                                variable:
+                                  type: string
+                                  description: Control ID
+                                required:
+                                  type: boolean
+                                  description: Whether required
+                                default:
+                                  type: string
+                                  description: Default value
+                        - properties:
+                            select:
+                              type: object
+                              properties:
+                                label:
+                                  type: string
+                                  description: Control display label name
+                                variable:
+                                  type: string
+                                  description: Control ID
+                                required:
+                                  type: boolean
+                                  description: Whether required
+                                default:
+                                  type: string
+                                  description: Default value
+                                options:
+                                  type: array
+                                  items:
+                                    type: string
+                                  description: Option values
                     description: User input form configuration
                   file_upload:
                     type: object
+                    properties:
+                      image:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: Whether enabled
+                          number_limits:
+                            type: integer
+                            description: 'Image quantity limit, default 3'
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum:
+                                - remote_url
+                                - local_file
+                            description: Transfer method list
+                        description: Image settings
                     description: File upload configuration
                   system_parameters:
                     type: object
+                    properties:
+                      file_size_limit:
+                        type: integer
+                        description: Document upload size limit (MB)
+                      image_file_size_limit:
+                        type: integer
+                        description: Image file upload size limit (MB)
+                      audio_file_size_limit:
+                        type: integer
+                        description: Audio file upload size limit (MB)
+                      video_file_size_limit:
+                        type: integer
+                        description: Video file upload size limit (MB)
                     description: System parameters
   '/completion-messages/{task_id}/stop':
     post:
@@ -602,6 +738,9 @@ paths:
                 user:
                   type: string
                   description: 'User identifier, defined by developer rules, must be unique within the application'
+                streaming:
+                  type: boolean
+                  description: Whether to use streaming mode to return audio data
       responses:
         '200':
           description: Successful response
@@ -611,6 +750,11 @@ paths:
                 type: string
                 format: binary
                 description: Audio file
+            audio/mpeg:
+              schema:
+                type: string
+                format: binary
+                description: MP3 format audio file
   /apps/annotations:
     get:
       tags:
