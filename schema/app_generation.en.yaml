@@ -132,15 +132,18 @@ components:
         content:
           type: string
           description: Content
-    BaseMessage:
+    ChatCompletionResponse:
       type: object
       properties:
         message_id:
           type: string
           description: Unique message ID
-        created_at:
-          type: integer
-          description: Message creation timestamp
+        mode:
+          type: string
+          description: 'App mode, fixed as completion'
+        answer:
+          type: string
+          description: Complete response content
         metadata:
           type: object
           properties:
@@ -150,17 +153,9 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/RetrieverResource'
-    CompletionMessage:
-      allOf:
-        - $ref: '#/components/schemas/BaseMessage'
-        - type: object
-          properties:
-            mode:
-              type: string
-              description: 'App mode, fixed as completion'
-            answer:
-              type: string
-              description: Complete response content
+        created_at:
+          type: integer
+          description: Message creation timestamp
     FileInput:
       type: object
       properties:
@@ -198,13 +193,6 @@ components:
             - message_replace
             - error
             - ping
-            - workflow_started
-            - node_started
-            - node_finished
-            - workflow_finished
-            - agent_message
-            - agent_thought
-            - message_file
           description: Event type
         task_id:
           type: string
@@ -212,21 +200,12 @@ components:
         message_id:
           type: string
           description: Unique message ID
-        conversation_id:
-          type: string
-          description: Conversation ID
-        workflow_run_id:
-          type: string
-          description: Workflow execution ID
         answer:
           type: string
           description: Response content
         audio:
           type: string
           description: Voice synthesis audio data (base64 encoded)
-        data:
-          type: object
-          description: Event related data
         metadata:
           type: object
           properties:
@@ -236,22 +215,6 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/RetrieverResource'
-            annotation_reply:
-              type: object
-              properties:
-                id:
-                  type: string
-                  description: Annotation ID
-                account:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                      description: Account ID
-                    name:
-                      type: string
-                      description: Account name
-              description: Annotation reply information
         created_at:
           type: integer
           description: Creation timestamp
@@ -261,6 +224,9 @@ components:
         code:
           type: string
           description: Error code
+        message:
+          type: string
+          description: Error message
     UploadedFile:
       type: object
       properties:
@@ -300,7 +266,7 @@ paths:
         format: sse
         stream-condition: $request.response_mode == "streaming"
         response:
-          $ref: '#/components/schemas/CompletionMessage'
+          $ref: '#/components/schemas/ChatCompletionResponse'
         response-stream:
           $ref: '#/components/schemas/StreamEvent'
       requestBody:
@@ -342,7 +308,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CompletionMessage'
+                $ref: '#/components/schemas/ChatCompletionResponse'
               description: |
                 When `response_mode` is `blocking`, returns a ChatCompletionResponse object.
                 - `message_id` (string) Unique message ID
@@ -356,7 +322,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/StreamEvent'
               description: |
-                When `response_mode` is `streaming`, returns a stream of ChunkChatCompletionResponse objects.
+                When `response_mode` is `streaming`, returns a stream of StreamEvent objects.
                 Returns App output stream chunks, `Content-Type` is `text/event-stream`.
                 Each stream chunk starts with data: and chunks are separated by `\n\n` (two newlines).
                 Stream chunks have different structures based on the `event` type:

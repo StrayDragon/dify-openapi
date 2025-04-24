@@ -104,17 +104,17 @@ actions:
   - target: $.components.schemas.RetrieverResource.properties.content.description
     update: "Content"
 
-  - target: $.components.schemas.BaseMessage.properties.message_id.description
+  - target: $.components.schemas.ChatCompletionResponse.properties.message_id.description
     update: "Unique message ID"
 
-  - target: $.components.schemas.BaseMessage.properties.created_at.description
-    update: "Message creation timestamp"
-
-  - target: $.components.schemas.CompletionMessage.allOf[1].properties.mode.description
+  - target: $.components.schemas.ChatCompletionResponse.properties.mode.description
     update: "App mode, fixed as completion"
 
-  - target: $.components.schemas.CompletionMessage.allOf[1].properties.answer.description
+  - target: $.components.schemas.ChatCompletionResponse.properties.answer.description
     update: "Complete response content"
+
+  - target: $.components.schemas.ChatCompletionResponse.properties.created_at.description
+    update: "Message creation timestamp"
 
   - target: $.components.schemas.FileInput.properties.type.description
     update: "File type"
@@ -137,32 +137,11 @@ actions:
   - target: $.components.schemas.StreamEvent.properties.message_id.description
     update: "Unique message ID"
 
-  - target: $.components.schemas.StreamEvent.properties.conversation_id.description
-    update: "Conversation ID"
-
-  - target: $.components.schemas.StreamEvent.properties.workflow_run_id.description
-    update: "Workflow execution ID"
-
   - target: $.components.schemas.StreamEvent.properties.answer.description
     update: "Response content"
 
   - target: $.components.schemas.StreamEvent.properties.audio.description
     update: "Voice synthesis audio data (base64 encoded)"
-
-  - target: $.components.schemas.StreamEvent.properties.data.description
-    update: "Event related data"
-
-  - target: $.components.schemas.StreamEvent.properties.metadata.properties.annotation_reply.description
-    update: "Annotation reply information"
-
-  - target: $.components.schemas.StreamEvent.properties.metadata.properties.annotation_reply.properties.id.description
-    update: "Annotation ID"
-
-  - target: $.components.schemas.StreamEvent.properties.metadata.properties.annotation_reply.properties.account.properties.id.description
-    update: "Account ID"
-
-  - target: $.components.schemas.StreamEvent.properties.metadata.properties.annotation_reply.properties.account.properties.name.description
-    update: "Account name"
 
   - target: $.components.schemas.StreamEvent.properties.created_at.description
     update: "Creation timestamp"
@@ -172,6 +151,9 @@ actions:
 
   - target: $.components.schemas.StreamEvent.properties.code.description
     update: "Error code"
+
+  - target: $.components.schemas.StreamEvent.properties.message.description
+    update: "Error message"
 
   - target: $.components.schemas.UploadedFile.properties.id.description
     update: "File ID"
@@ -202,7 +184,7 @@ actions:
         format: sse
         stream-condition: $request.response_mode == "streaming"
         response:
-          $ref: "#/components/schemas/CompletionMessage"
+          $ref: "#/components/schemas/ChatCompletionResponse"
         response-stream:
           $ref: "#/components/schemas/StreamEvent"
 
@@ -237,7 +219,7 @@ actions:
 
   - target: $.paths['/completion-messages'].post.responses['200'].content['text/event-stream'].description
     update: |
-      When `response_mode` is `streaming`, returns a stream of ChunkChatCompletionResponse objects.
+      When `response_mode` is `streaming`, returns a stream of StreamEvent objects.
       Returns App output stream chunks, `Content-Type` is `text/event-stream`.
       Each stream chunk starts with data: and chunks are separated by `\n\n` (two newlines).
       Stream chunks have different structures based on the `event` type:

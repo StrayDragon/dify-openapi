@@ -145,15 +145,18 @@ components:
           type: string
           description: 内容
 
-    BaseMessage:
+    ChatCompletionResponse:
       type: object
       properties:
         message_id:
           type: string
           description: 消息唯一 ID
-        created_at:
-          type: integer
-          description: 消息创建时间戳
+        mode:
+          type: string
+          description: App 模式，固定为 completion
+        answer:
+          type: string
+          description: 完整回复内容
         metadata:
           type: object
           properties:
@@ -163,18 +166,9 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/RetrieverResource"
-
-    CompletionMessage:
-      allOf:
-        - $ref: "#/components/schemas/BaseMessage"
-        - type: object
-          properties:
-            mode:
-              type: string
-              description: App 模式，固定为 completion
-            answer:
-              type: string
-              description: 完整回复内容
+        created_at:
+          type: integer
+          description: 消息创建时间戳
 
     FileInput:
       type: object
@@ -208,13 +202,6 @@ components:
               message_replace,
               error,
               ping,
-              workflow_started,
-              node_started,
-              node_finished,
-              workflow_finished,
-              agent_message,
-              agent_thought,
-              message_file,
             ]
           description: 事件类型
         task_id:
@@ -223,21 +210,12 @@ components:
         message_id:
           type: string
           description: 消息唯一 ID
-        conversation_id:
-          type: string
-          description: 会话 ID
-        workflow_run_id:
-          type: string
-          description: workflow 执行 ID
         answer:
           type: string
           description: 回复内容
         audio:
           type: string
           description: 语音合成音频数据（base64编码）
-        data:
-          type: object
-          description: 事件相关数据
         metadata:
           type: object
           properties:
@@ -247,22 +225,6 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/RetrieverResource"
-            annotation_reply:
-              type: object
-              properties:
-                id:
-                  type: string
-                  description: 标注ID
-                account:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                      description: 账户ID
-                    name:
-                      type: string
-                      description: 账户名称
-              description: 标注回复信息
         created_at:
           type: integer
           description: 创建时间戳
@@ -272,6 +234,9 @@ components:
         code:
           type: string
           description: 错误码
+        message:
+          type: string
+          description: 错误消息
 
     UploadedFile:
       type: object
@@ -314,7 +279,7 @@ paths:
         format: sse
         stream-condition: $request.response_mode == "streaming"
         response:
-          $ref: "#/components/schemas/CompletionMessage"
+          $ref: "#/components/schemas/ChatCompletionResponse"
         response-stream:
           $ref: "#/components/schemas/StreamEvent"
       requestBody:
@@ -354,9 +319,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CompletionMessage"
+                $ref: "#/components/schemas/ChatCompletionResponse"
               description: |
-                当 `response_mode` 为 `blocking` 时，返回 ChatCompletionResponse object。
+                当 `response_mode` 为 `blocking` 时，返回 ChatCompletionResponse 对象。
                 - `message_id` (string) 消息唯一 ID
                 - `mode` (string) App 模式，固定为 chat
                 - `answer` (string) 完整回复内容
@@ -368,7 +333,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/StreamEvent"
               description: |
-                当 `response_mode` 为 `streaming`时，返回 ChunkChatCompletionResponse object 流式序列。
+                当 `response_mode` 为 `streaming`时，返回 StreamEvent object 流式序列。
                 返回 App 输出的流式块，`Content-Type` 为 `text/event-stream`。
                 每个流式块均为 data: 开头，块之间以 `\n\n` 即两个换行符分隔。
                 流式块中根据 `event` 不同，结构也不同：
