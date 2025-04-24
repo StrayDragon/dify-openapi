@@ -4,7 +4,7 @@ info:
   description: |
     This API is used to connect to a knowledge base that is independent of Dify and maintained by developers. Users can use this schema to generate server-side code for their own implementation.
     For more details, please refer to "External Knowledge API" documentation (https://docs.dify.ai/guides/knowledge-base/external-knowledge-api-documentation).
-  version: 1.2.0
+  version: 1.3.0
 servers:
   - url: '{baseUrl}'
     variables:

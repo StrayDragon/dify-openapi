@@ -4,7 +4,7 @@ info:
   description: |
     此 API 用于连接独立于 Dify 并由开发者维护的知识库, 用户可使用该schema生成server端代码自己实现
     更多详细信息请参考"连接外部知识库"文档 (https://docs.dify.ai/guides/knowledge-base/external-knowledge-api-documentation)。
-  version: 1.2.0
+  version: 1.3.0
 
 servers:
   - url: "{baseUrl}"
