@@ -318,25 +318,6 @@ actions:
     update:
       description: "Maximum length (tokens)"
 
-  - target: $.components.schemas.ProcessRule.properties.rules.properties.parent_mode
-    update:
-      description: "Parent segment recall mode"
-
-  - target: $.components.schemas.ProcessRule.properties.rules.properties.subchunk_segmentation
-    update:
-      description: "Sub-segment configuration"
-
-  - target: $.components.schemas.ProcessRule.properties.rules.properties.subchunk_segmentation.properties.separator
-    update:
-      description: "Segmentation identifier"
-
-  - target: $.components.schemas.ProcessRule.properties.rules.properties.subchunk_segmentation.properties.max_tokens
-    update:
-      description: "Maximum length (tokens)"
-
-  - target: $.components.schemas.ProcessRule.properties.rules.properties.subchunk_segmentation.properties.chunk_overlap
-    update:
-      description: "Segment overlap length"
 
   - target: $.components.schemas.ProcessRule.properties.rules.properties.pre_processing_rules.items.properties.name
     update:
@@ -346,25 +327,9 @@ actions:
     update:
       description: "Document ID"
 
-  - target: $.components.schemas.Document.properties.position
-    update:
-      description: "Position"
-
   - target: $.components.schemas.Document.properties.data_source_type
     update:
       description: "Data source type"
-
-  - target: $.components.schemas.Document.properties.data_source_info
-    update:
-      description: "Data source information"
-
-  - target: $.components.schemas.Document.properties.data_source_info.properties.upload_file_id
-    update:
-      description: "Upload file ID"
-
-  - target: $.components.schemas.Document.properties.dataset_process_rule_id
-    update:
-      description: "Dataset process rule ID"
 
   - target: $.components.schemas.Document.properties.name
     update:
@@ -382,29 +347,9 @@ actions:
     update:
       description: "Creation timestamp"
 
-  - target: $.components.schemas.Document.properties.tokens
-    update:
-      description: "Token count"
-
-  - target: $.components.schemas.Document.properties.indexing_status
-    update:
-      description: "Indexing status"
-
-  - target: $.components.schemas.Document.properties.error
-    update:
-      description: "Error message"
-
   - target: $.components.schemas.Document.properties.enabled
     update:
       description: "Whether enabled"
-
-  - target: $.components.schemas.Document.properties.disabled_at
-    update:
-      description: "Disabled timestamp"
-
-  - target: $.components.schemas.Document.properties.disabled_by
-    update:
-      description: "Disabled by user ID"
 
   - target: $.components.schemas.Document.properties.updated_at
     update:
@@ -425,10 +370,6 @@ actions:
   - target: $.components.schemas.Document.properties.hit_count
     update:
       description: "Hit count"
-
-  - target: $.components.schemas.Document.properties.doc_form
-    update:
-      description: "Document form"
 
   - target: $.components.schemas.Document.properties.dataset_id
     update:

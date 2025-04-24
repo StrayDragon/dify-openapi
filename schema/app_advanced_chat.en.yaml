@@ -326,6 +326,13 @@ paths:
                   type: boolean
                   description: '(Optional) Automatically generate title, default `true`. If set to `false`, you can call the conversation rename interface and set `auto_generate` to `true` to generate a title asynchronously.'
                   default: true
+      x-fern-streaming:
+        format: sse
+        stream-condition: $request.response_mode == "streaming"
+        response:
+          $ref: '#/components/schemas/ChatMessage'
+        response-stream:
+          $ref: '#/components/schemas/StreamEvent'
       responses:
         '200':
           description: Successful response

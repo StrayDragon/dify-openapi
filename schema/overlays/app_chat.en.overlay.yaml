@@ -285,9 +285,6 @@ actions:
   - target: $.paths['/chat-messages'].post.responses['200'].content['application/json'].schema.description
     update: "When response_mode is blocking, returns a ChatCompletionResponse object"
 
-  - target: $.paths['/chat-messages'].post.responses['200'].content['text/event-stream'].schema.description
-    update: "When response_mode is streaming, returns a ChunkChatCompletionResponse object stream sequence"
-
   - target: $.paths['/chat-messages'].post.responses['200'].content['text/event-stream']
     update:
       schema:
