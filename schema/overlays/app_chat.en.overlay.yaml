@@ -110,14 +110,89 @@ actions:
   - target: $.components.schemas.BaseMessage.properties.created_at.description
     update: "Message creation timestamp"
 
-  - target: $.components.schemas.ChatMessage.allOf[1].properties.conversation_id.description
+  - target: $.components.schemas.ChatCompletionResponse.allOf[1].properties.conversation_id.description
     update: "Conversation ID"
 
-  - target: $.components.schemas.ChatMessage.allOf[1].properties.mode.description
+  - target: $.components.schemas.ChatCompletionResponse.allOf[1].properties.mode.description
     update: "App mode, fixed as chat"
 
-  - target: $.components.schemas.ChatMessage.allOf[1].properties.answer.description
+  - target: $.components.schemas.ChatCompletionResponse.allOf[1].properties.answer.description
     update: "Complete response content"
+
+  - target: $.components.schemas.ChatHistoryMessage.properties.id.description
+    update: "Message ID"
+
+  - target: $.components.schemas.ChatHistoryMessage.properties.conversation_id.description
+    update: "Conversation ID"
+
+  - target: $.components.schemas.ChatHistoryMessage.properties.inputs.description
+    update: "User input parameters"
+
+  - target: $.components.schemas.ChatHistoryMessage.properties.query.description
+    update: "User input/question content"
+
+  - target: $.components.schemas.ChatHistoryMessage.properties.message_files.description
+    update: "Message files"
+
+  - target: $.components.schemas.ChatHistoryMessage.properties.message_files.items.properties.id.description
+    update: "ID"
+
+  - target: $.components.schemas.ChatHistoryMessage.properties.message_files.items.properties.type.description
+    update: "File type, image"
+
+  - target: $.components.schemas.ChatHistoryMessage.properties.message_files.items.properties.url.description
+    update: "Preview image URL"
+
+  - target: $.components.schemas.ChatHistoryMessage.properties.message_files.items.properties.belongs_to.description
+    update: "File ownership, user or assistant"
+
+  - target: $.components.schemas.ChatHistoryMessage.properties.agent_thoughts.description
+    update: "Agent thinking content (only non-empty in Agent mode)"
+
+  - target: $.components.schemas.ChatHistoryMessage.properties.agent_thoughts.items.properties.id.description
+    update: "agent_thought ID, each Agent iteration round has a unique ID"
+
+  - target: $.components.schemas.ChatHistoryMessage.properties.agent_thoughts.items.properties.message_id.description
+    update: "Unique message ID"
+
+  - target: $.components.schemas.ChatHistoryMessage.properties.agent_thoughts.items.properties.position.description
+    update: "Position of agent_thought in the message, e.g., the first iteration has position 1"
+
+  - target: $.components.schemas.ChatHistoryMessage.properties.agent_thoughts.items.properties.thought.description
+    update: "Agent's thinking content"
+
+  - target: $.components.schemas.ChatHistoryMessage.properties.agent_thoughts.items.properties.observation.description
+    update: "Return result of tool call"
+
+  - target: $.components.schemas.ChatHistoryMessage.properties.agent_thoughts.items.properties.tool.description
+    update: "List of tools used, multiple tools separated by ;"
+
+  - target: $.components.schemas.ChatHistoryMessage.properties.agent_thoughts.items.properties.tool_input.description
+    update: "Tool input, JSON format string (object). E.g.: {\"dalle3\": {\"prompt\": \"a cute cat\"}}"
+
+  - target: $.components.schemas.ChatHistoryMessage.properties.agent_thoughts.items.properties.created_at.description
+    update: "Creation timestamp, e.g., 1705395332"
+
+  - target: $.components.schemas.ChatHistoryMessage.properties.agent_thoughts.items.properties.message_files.description
+    update: "File IDs associated with the current agent_thought"
+
+  - target: $.components.schemas.ChatHistoryMessage.properties.agent_thoughts.items.properties.conversation_id.description
+    update: "Conversation ID"
+
+  - target: $.components.schemas.ChatHistoryMessage.properties.answer.description
+    update: "Response message content"
+
+  - target: $.components.schemas.ChatHistoryMessage.properties.created_at.description
+    update: "Creation time"
+
+  - target: $.components.schemas.ChatHistoryMessage.properties.feedback.description
+    update: "Feedback information"
+
+  - target: $.components.schemas.ChatHistoryMessage.properties.feedback.properties.rating.description
+    update: "Like or dislike rating"
+
+  - target: $.components.schemas.ChatHistoryMessage.properties.retriever_resources.description
+    update: "Citation and attribution segment list"
 
   - target: $.components.schemas.Conversation.properties.id.description
     update: "Conversation ID"
@@ -152,62 +227,65 @@ actions:
   - target: $.components.schemas.FileInput.properties.upload_file_id.description
     update: "Upload file ID"
 
-  - target: $.components.schemas.StreamEvent.properties.event.description
-    update: "Event type"
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.event.description
+    update: "Event type, determines the structure of the response"
 
-  - target: $.components.schemas.StreamEvent.properties.task_id.description
-    update: "Task ID for request tracking and stopping responses"
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.task_id.description
+    update: "Task ID for request tracking and stopping responses (used in message, message_end, tts_message, tts_message_end, message_replace, error, workflow events)"
 
-  - target: $.components.schemas.StreamEvent.properties.message_id.description
-    update: "Unique message ID"
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.message_id.description
+    update: "Unique message ID (used in message, message_end, tts_message, tts_message_end, message_replace, error events)"
 
-  - target: $.components.schemas.StreamEvent.properties.conversation_id.description
-    update: "Conversation ID"
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.conversation_id.description
+    update: "Conversation ID (used in message, message_end, message_replace, message_file, agent_message, agent_thought events)"
 
-  - target: $.components.schemas.StreamEvent.properties.workflow_run_id.description
-    update: "Workflow execution ID"
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.workflow_run_id.description
+    update: "Workflow execution ID (used in workflow_started, node_started, node_finished, workflow_finished events)"
 
-  - target: $.components.schemas.StreamEvent.properties.answer.description
-    update: "Response content"
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.answer.description
+    update: "Response content (used in message, message_replace, agent_message events)"
 
-  - target: $.components.schemas.StreamEvent.properties.audio.description
-    update: "Voice synthesis audio data (base64 encoded)"
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.audio.description
+    update: "Voice synthesis audio data (base64 encoded) (used in tts_message, tts_message_end events)"
 
-  - target: $.components.schemas.StreamEvent.properties.data.description
-    update: "Event related data"
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.data.description
+    update: "Event related data (used in workflow_started, node_started, node_finished, workflow_finished events)"
 
-  - target: $.components.schemas.StreamEvent.properties.created_at.description
-    update: "Creation timestamp"
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.metadata.description
+    update: "Metadata including usage information and retriever resources (used in message_end event)"
 
-  - target: $.components.schemas.StreamEvent.properties.id.description
-    update: "Unique ID"
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.created_at.description
+    update: "Creation timestamp (used in message, tts_message, tts_message_end, message_replace, agent_message, agent_thought events)"
 
-  - target: $.components.schemas.StreamEvent.properties.position.description
-    update: "Position of agent_thought in the message, e.g., the first iteration has position 1"
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.id.description
+    update: "Unique ID (used in agent_thought, message_file events)"
 
-  - target: $.components.schemas.StreamEvent.properties.thought.description
-    update: "Agent's thinking content"
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.position.description
+    update: "Position of agent_thought in the message, e.g., the first iteration has position 1 (used in agent_thought event)"
 
-  - target: $.components.schemas.StreamEvent.properties.observation.description
-    update: "Return result of tool call"
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.thought.description
+    update: "Agent's thinking content (used in agent_thought event)"
 
-  - target: $.components.schemas.StreamEvent.properties.tool.description
-    update: "List of tools used, multiple tools separated by ;"
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.observation.description
+    update: "Return result of tool call (used in agent_thought event)"
 
-  - target: $.components.schemas.StreamEvent.properties.tool_input.description
-    update: "Tool input, JSON format string"
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.tool.description
+    update: "List of tools used, multiple tools separated by ; (used in agent_thought event)"
 
-  - target: $.components.schemas.StreamEvent.properties.message_files.description
-    update: "File IDs associated with the current agent_thought"
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.tool_input.description
+    update: "Tool input, JSON format string (used in agent_thought event)"
 
-  - target: $.components.schemas.StreamEvent.properties.type.description
-    update: "File type"
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.message_files.description
+    update: "File IDs associated with the current agent_thought (used in agent_thought event)"
 
-  - target: $.components.schemas.StreamEvent.properties.belongs_to.description
-    update: "File ownership, user or assistant"
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.type.description
+    update: "File type, currently only 'image' (used in message_file event)"
 
-  - target: $.components.schemas.StreamEvent.properties.url.description
-    update: "File access URL"
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.belongs_to.description
+    update: "File ownership, user or assistant (used in message_file event)"
+
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.url.description
+    update: "File access URL (used in message_file event)"
 
   - target: $.components.schemas.UploadedFile.properties.id.description
     update: "File ID"
@@ -305,6 +383,25 @@ actions:
           - conversation_id (string) Conversation ID
           - answer (string) LLM text chunk content
           - created_at (int) Creation timestamp, e.g., 1705395332
+        - event: agent_message Agent mode text chunk event, i.e., text output in chunks in Agent mode (only used in Agent mode)
+          - task_id (string) Task ID for request tracking and stopping responses
+          - message_id (string) Unique message ID
+          - conversation_id (string) Conversation ID
+          - answer (string) LLM text chunk content
+          - created_at (int) Creation timestamp, e.g., 1705395332
+        - event: agent_thought Agent mode thinking step content related to tool calls (only used in Agent mode)
+          - id (string) agent_thought ID, each Agent iteration round has a unique ID
+          - task_id (string) Task ID for request tracking and stopping responses
+          - message_id (string) Unique message ID
+          - position (int) Position of agent_thought in the message, e.g., the first iteration has position 1
+          - thought (string) Agent's thinking content
+          - observation (string) Return result of tool call
+          - tool (string) List of tools used, multiple tools separated by ;
+          - tool_input (string) Tool input, JSON format string (object). E.g.: {"dalle3": {"prompt": "a cute cat"}}
+          - created_at (int) Creation timestamp, e.g., 1705395332
+          - message_files (array[string]) File IDs associated with the current agent_thought
+            - file_id (string) File ID
+          - conversation_id (string) Conversation ID
         - event: message_file File event, indicates a new file to display
           - id (string) Unique file ID
           - type (string) File type, currently only image

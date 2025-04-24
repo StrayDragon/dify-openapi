@@ -150,7 +150,7 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/RetrieverResource'
-    ChatMessage:
+    ChatCompletionResponse:
       allOf:
         - $ref: '#/components/schemas/BaseMessage'
         - type: object
@@ -212,7 +212,99 @@ components:
         upload_file_id:
           type: string
           description: Upload file ID
-    StreamEvent:
+    ChatHistoryMessage:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Message ID
+        conversation_id:
+          type: string
+          description: Conversation ID
+        inputs:
+          type: object
+          description: User input parameters
+        query:
+          type: string
+          description: User input/question content
+        message_files:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: ID
+              type:
+                type: string
+                description: 'File type, image'
+              url:
+                type: string
+                description: Preview image URL
+              belongs_to:
+                type: string
+                description: 'File ownership, user or assistant'
+          description: Message files
+        agent_thoughts:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: 'agent_thought ID, each Agent iteration round has a unique ID'
+              message_id:
+                type: string
+                description: Unique message ID
+              position:
+                type: integer
+                description: 'Position of agent_thought in the message, e.g., the first iteration has position 1'
+              thought:
+                type: string
+                description: Agent's thinking content
+              observation:
+                type: string
+                description: Return result of tool call
+              tool:
+                type: string
+                description: 'List of tools used, multiple tools separated by ;'
+              tool_input:
+                type: string
+                description: 'Tool input, JSON format string (object). E.g.: {"dalle3": {"prompt": "a cute cat"}}'
+              created_at:
+                type: integer
+                description: 'Creation timestamp, e.g., 1705395332'
+              message_files:
+                type: array
+                items:
+                  type: string
+                description: File IDs associated with the current agent_thought
+              conversation_id:
+                type: string
+                description: Conversation ID
+          description: Agent thinking content (only non-empty in Agent mode)
+        answer:
+          type: string
+          description: Response message content
+        created_at:
+          type: integer
+          description: Creation time
+        feedback:
+          type: object
+          properties:
+            rating:
+              type: string
+              enum:
+                - like
+                - dislike
+              description: Like or dislike rating
+          description: Feedback information
+        retriever_resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/RetrieverResource'
+          description: Citation and attribution segment list
+    ChunkChatCompletionResponse:
       type: object
       properties:
         event:
@@ -225,37 +317,34 @@ components:
             - message_replace
             - error
             - ping
-            - workflow_started
-            - node_started
-            - node_finished
-            - workflow_finished
             - agent_message
             - agent_thought
             - message_file
-          description: Event type
+          description: 'Event type, determines the structure of the response'
         task_id:
           type: string
-          description: Task ID for request tracking and stopping responses
+          description: 'Task ID for request tracking and stopping responses (used in message, message_end, tts_message, tts_message_end, message_replace, error, workflow events)'
         message_id:
           type: string
-          description: Unique message ID
+          description: 'Unique message ID (used in message, message_end, tts_message, tts_message_end, message_replace, error events)'
         conversation_id:
           type: string
-          description: Conversation ID
+          description: 'Conversation ID (used in message, message_end, message_replace, message_file, agent_message, agent_thought events)'
         workflow_run_id:
           type: string
-          description: Workflow execution ID
+          description: 'Workflow execution ID (used in workflow_started, node_started, node_finished, workflow_finished events)'
         answer:
           type: string
-          description: Response content
+          description: 'Response content (used in message, message_replace, agent_message events)'
         audio:
           type: string
-          description: Voice synthesis audio data (base64 encoded)
+          description: 'Voice synthesis audio data (base64 encoded) (used in tts_message, tts_message_end events)'
         data:
           type: object
-          description: Event related data
+          description: 'Event related data (used in workflow_started, node_started, node_finished, workflow_finished events)'
         metadata:
           type: object
+          description: Metadata including usage information and retriever resources (used in message_end event)
           properties:
             usage:
               $ref: '#/components/schemas/Usage'
@@ -265,39 +354,39 @@ components:
                 $ref: '#/components/schemas/RetrieverResource'
         created_at:
           type: integer
-          description: Creation timestamp
+          description: 'Creation timestamp (used in message, tts_message, tts_message_end, message_replace, agent_message, agent_thought events)'
         id:
           type: string
-          description: Unique ID
+          description: 'Unique ID (used in agent_thought, message_file events)'
         position:
           type: integer
-          description: 'Position of agent_thought in the message, e.g., the first iteration has position 1'
+          description: 'Position of agent_thought in the message, e.g., the first iteration has position 1 (used in agent_thought event)'
         thought:
           type: string
-          description: Agent's thinking content
+          description: Agent's thinking content (used in agent_thought event)
         observation:
           type: string
-          description: Return result of tool call
+          description: Return result of tool call (used in agent_thought event)
         tool:
           type: string
-          description: 'List of tools used, multiple tools separated by ;'
+          description: 'List of tools used, multiple tools separated by ; (used in agent_thought event)'
         tool_input:
           type: string
-          description: 'Tool input, JSON format string'
+          description: 'Tool input, JSON format string (used in agent_thought event)'
         message_files:
           type: array
           items:
             type: string
-          description: File IDs associated with the current agent_thought
+          description: File IDs associated with the current agent_thought (used in agent_thought event)
         type:
           type: string
-          description: File type
+          description: 'File type, currently only ''image'' (used in message_file event)'
         belongs_to:
           type: string
-          description: 'File ownership, user or assistant'
+          description: 'File ownership, user or assistant (used in message_file event)'
         url:
           type: string
-          description: File access URL
+          description: File access URL (used in message_file event)
     UploadedFile:
       type: object
       properties:
@@ -337,9 +426,9 @@ paths:
         format: sse
         stream-condition: $request.response_mode == "streaming"
         response:
-          $ref: '#/components/schemas/ChatMessage'
+          $ref: '#/components/schemas/ChatCompletionResponse'
         response-stream:
-          $ref: '#/components/schemas/StreamEvent'
+          $ref: '#/components/schemas/ChunkChatCompletionResponse'
       requestBody:
         required: true
         content:
@@ -404,7 +493,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChatMessage'
+                $ref: '#/components/schemas/ChatCompletionResponse'
                 description: 'When response_mode is blocking, returns a ChatCompletionResponse object'
             text/event-stream:
               schema:
@@ -425,6 +514,25 @@ paths:
                   - conversation_id (string) Conversation ID
                   - answer (string) LLM text chunk content
                   - created_at (int) Creation timestamp, e.g., 1705395332
+                - event: agent_message Agent mode text chunk event, i.e., text output in chunks in Agent mode (only used in Agent mode)
+                  - task_id (string) Task ID for request tracking and stopping responses
+                  - message_id (string) Unique message ID
+                  - conversation_id (string) Conversation ID
+                  - answer (string) LLM text chunk content
+                  - created_at (int) Creation timestamp, e.g., 1705395332
+                - event: agent_thought Agent mode thinking step content related to tool calls (only used in Agent mode)
+                  - id (string) agent_thought ID, each Agent iteration round has a unique ID
+                  - task_id (string) Task ID for request tracking and stopping responses
+                  - message_id (string) Unique message ID
+                  - position (int) Position of agent_thought in the message, e.g., the first iteration has position 1
+                  - thought (string) Agent's thinking content
+                  - observation (string) Return result of tool call
+                  - tool (string) List of tools used, multiple tools separated by ;
+                  - tool_input (string) Tool input, JSON format string (object). E.g.: {"dalle3": {"prompt": "a cute cat"}}
+                  - created_at (int) Creation timestamp, e.g., 1705395332
+                  - message_files (array[string]) File IDs associated with the current agent_thought
+                    - file_id (string) File ID
+                  - conversation_id (string) Conversation ID
                 - event: message_file File event, indicates a new file to display
                   - id (string) Unique file ID
                   - type (string) File type, currently only image
@@ -692,7 +800,7 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/ChatMessage'
+                      $ref: '#/components/schemas/ChatHistoryMessage'
                   has_more:
                     type: boolean
                   limit:
