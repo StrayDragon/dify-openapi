@@ -309,56 +309,56 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChatCompletionResponse'
-              description: |
-                When `response_mode` is `blocking`, returns a ChatCompletionResponse object.
-                - `message_id` (string) Unique message ID
-                - `mode` (string) App mode, fixed as chat
-                - `answer` (string) Complete response content
-                - `metadata` (object) Metadata
-                  - `usage` (Usage) Model usage information
-                  - `retriever_resources` (array[RetrieverResource]) Citation and attribution segment list
-                - `created_at` (int) Message creation timestamp
-            text/event-stream:
-              schema:
-                $ref: '#/components/schemas/ChunkChatCompletionResponse'
-              description: |
-                When `response_mode` is `streaming`, returns a stream of ChunkChatCompletionResponse objects.
-                Returns App output stream chunks, `Content-Type` is `text/event-stream`.
-                Each stream chunk starts with data: and chunks are separated by `\n\n` (two newlines).
-                Stream chunks have different structures based on the `event` type:
-                - `event: message` LLM text chunk event, i.e., complete text output in chunks.
-                  - `task_id` (string) Task ID, used for request tracking and stopping response
+                description: |
+                  When `response_mode` is `blocking`, returns a ChatCompletionResponse object.
                   - `message_id` (string) Unique message ID
-                  - `answer` (string) LLM text chunk content
-                  - `created_at` (int) Creation timestamp
-                - `event: message_end` Message end event, receiving this event means the text stream response has ended.
-                  - `task_id` (string) Task ID
-                  - `message_id` (string) Unique message ID
+                  - `mode` (string) App mode, fixed as chat
+                  - `answer` (string) Complete response content
                   - `metadata` (object) Metadata
                     - `usage` (Usage) Model usage information
                     - `retriever_resources` (array[RetrieverResource]) Citation and attribution segment list
-                - `event: tts_message` TTS audio stream event, i.e., speech synthesis output. Content is Mp3 format audio chunk, base64 encoded string, decode directly for playback.
-                  - `task_id` (string) Task ID
-                  - `message_id` (string) Unique message ID
-                  - `audio` (string) Base64 encoded audio chunk from speech synthesis
-                  - `created_at` (int) Creation timestamp
-                - `event: tts_message_end` TTS audio stream end event, receiving this event means the audio stream response has ended.
-                  - `task_id` (string) Task ID
-                  - `message_id` (string) Unique message ID
-                  - `audio` (string) Empty string as there is no audio in the end event
-                  - `created_at` (int) Creation timestamp
-                - `event: message_replace` Message content replacement event.
-                  - `task_id` (string) Task ID
-                  - `message_id` (string) Unique message ID
-                  - `answer` (string) Replacement content (directly replaces all LLM response text)
-                  - `created_at` (int) Creation timestamp
-                - `event: error` Exceptions during streaming output are output as stream events, and the stream ends after receiving an exception event.
-                  - `task_id` (string) Task ID
-                  - `message_id` (string) Unique message ID
-                  - `status` (int) HTTP status code
-                  - `code` (string) Error code
-                  - `message` (string) Error message
-                - `event: ping` Ping event every 10s to keep the connection alive.
+                  - `created_at` (int) Message creation timestamp
+            text/event-stream:
+              schema:
+                $ref: '#/components/schemas/ChunkChatCompletionResponse'
+                description: |
+                  When `response_mode` is `streaming`, returns a stream of ChunkChatCompletionResponse objects.
+                  Returns App output stream chunks, `Content-Type` is `text/event-stream`.
+                  Each stream chunk starts with data: and chunks are separated by \\n\\n (two newlines).
+                  Stream chunks have different structures based on the `event` type:
+                  - `event: message` LLM text chunk event, i.e., complete text output in chunks.
+                    - `task_id` (string) Task ID, used for request tracking and stopping response
+                    - `message_id` (string) Unique message ID
+                    - `answer` (string) LLM text chunk content
+                    - `created_at` (int) Creation timestamp
+                  - `event: message_end` Message end event, receiving this event means the text stream response has ended.
+                    - `task_id` (string) Task ID
+                    - `message_id` (string) Unique message ID
+                    - `metadata` (object) Metadata
+                      - `usage` (Usage) Model usage information
+                      - `retriever_resources` (array[RetrieverResource]) Citation and attribution segment list
+                  - `event: tts_message` TTS audio stream event, i.e., speech synthesis output. Content is Mp3 format audio chunk, base64 encoded string, decode directly for playback.
+                    - `task_id` (string) Task ID
+                    - `message_id` (string) Unique message ID
+                    - `audio` (string) Base64 encoded audio chunk from speech synthesis
+                    - `created_at` (int) Creation timestamp
+                  - `event: tts_message_end` TTS audio stream end event, receiving this event means the audio stream response has ended.
+                    - `task_id` (string) Task ID
+                    - `message_id` (string) Unique message ID
+                    - `audio` (string) Empty string as there is no audio in the end event
+                    - `created_at` (int) Creation timestamp
+                  - `event: message_replace` Message content replacement event.
+                    - `task_id` (string) Task ID
+                    - `message_id` (string) Unique message ID
+                    - `answer` (string) Replacement content (directly replaces all LLM response text)
+                    - `created_at` (int) Creation timestamp
+                  - `event: error` Exceptions during streaming output are output as stream events, and the stream ends after receiving an exception event.
+                    - `task_id` (string) Task ID
+                    - `message_id` (string) Unique message ID
+                    - `status` (int) HTTP status code
+                    - `code` (string) Error code
+                    - `message` (string) Error message
+                  - `event: ping` Ping event every 10s to keep the connection alive.
         '400':
           $ref: '#/components/responses/Error400'
         '404':

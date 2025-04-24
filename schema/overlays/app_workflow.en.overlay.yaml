@@ -141,7 +141,7 @@ actions:
   - target: $.components.schemas.WorkflowMessage.properties.data.properties.finished_at.description
     update: "End time"
 
-  - target: $.components.schemas.StreamEvent.properties.event.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.event.description
     update: |
       Event type, including the following types:
       - `event: message` Message event, used to deliver simple text messages
@@ -153,94 +153,94 @@ actions:
       - `event: tts_message_end` TTS audio stream end event, receiving this event indicates the end of the audio stream return.
       - `event: ping` ping event every 10s, keeps the connection alive.
 
-  - target: $.components.schemas.StreamEvent.properties.task_id.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.task_id.description
     update: "Task ID"
 
-  - target: $.components.schemas.StreamEvent.properties.message_id.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.message_id.description
     update: "Unique message ID"
 
-  - target: $.components.schemas.StreamEvent.properties.conversation_id.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.conversation_id.description
     update: "Conversation ID"
 
-  - target: $.components.schemas.StreamEvent.properties.workflow_run_id.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.workflow_run_id.description
     update: "Workflow execution ID"
 
-  - target: $.components.schemas.StreamEvent.properties.answer.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.answer.description
     update: "Response content"
 
-  - target: $.components.schemas.StreamEvent.properties.audio.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.audio.description
     update: "Voice synthesis audio data (base64 encoded)"
 
-  - target: $.components.schemas.StreamEvent.properties.data.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.data.description
     update: "Event related data"
 
-  - target: $.components.schemas.StreamEvent.properties.data.properties.id.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.id.description
     update: "Workflow execution ID or node execution ID"
 
-  - target: $.components.schemas.StreamEvent.properties.data.properties.workflow_id.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.workflow_id.description
     update: "Associated Workflow ID"
 
-  - target: $.components.schemas.StreamEvent.properties.data.properties.node_id.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.node_id.description
     update: "Node ID"
 
-  - target: $.components.schemas.StreamEvent.properties.data.properties.node_type.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.node_type.description
     update: "Node type"
 
-  - target: $.components.schemas.StreamEvent.properties.data.properties.title.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.title.description
     update: "Node name"
 
-  - target: $.components.schemas.StreamEvent.properties.data.properties.index.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.index.description
     update: "Execution sequence number, used to display Tracing Node order"
 
-  - target: $.components.schemas.StreamEvent.properties.data.properties.predecessor_node_id.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.predecessor_node_id.description
     update: "Predecessor node ID, used to display execution path on canvas"
 
-  - target: $.components.schemas.StreamEvent.properties.data.properties.inputs.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.inputs.description
     update: "All predecessor node variable content used in the node"
 
-  - target: $.components.schemas.StreamEvent.properties.data.properties.process_data.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.process_data.description
     update: "Node process data"
 
-  - target: $.components.schemas.StreamEvent.properties.data.properties.outputs.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.outputs.description
     update: "Output content"
 
-  - target: $.components.schemas.StreamEvent.properties.data.properties.status.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.status.description
     update: "Execution status"
 
-  - target: $.components.schemas.StreamEvent.properties.data.properties.error.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.error.description
     update: "Error reason"
 
-  - target: $.components.schemas.StreamEvent.properties.data.properties.elapsed_time.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.elapsed_time.description
     update: "Elapsed time (s)"
 
-  - target: $.components.schemas.StreamEvent.properties.data.properties.execution_metadata.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.execution_metadata.description
     update: "Metadata"
 
-  - target: $.components.schemas.StreamEvent.properties.data.properties.execution_metadata.properties.total_tokens.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.execution_metadata.properties.total_tokens.description
     update: "Total tokens used"
 
-  - target: $.components.schemas.StreamEvent.properties.data.properties.execution_metadata.properties.total_price.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.execution_metadata.properties.total_price.description
     update: "Total price"
 
-  - target: $.components.schemas.StreamEvent.properties.data.properties.execution_metadata.properties.currency.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.execution_metadata.properties.currency.description
     update: "Currency, such as USD / RMB"
 
-  - target: $.components.schemas.StreamEvent.properties.data.properties.sequence_number.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.sequence_number.description
     update: "Auto-incrementing sequence number, starting from 1 within the App"
 
-  - target: $.components.schemas.StreamEvent.properties.data.properties.total_steps.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.total_steps.description
     update: "Total steps"
 
-  - target: $.components.schemas.StreamEvent.properties.data.properties.total_tokens.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.total_tokens.description
     update: "Total tokens used"
 
-  - target: $.components.schemas.StreamEvent.properties.data.properties.created_at.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.created_at.description
     update: "Start time"
 
-  - target: $.components.schemas.StreamEvent.properties.data.properties.finished_at.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.finished_at.description
     update: "End time"
 
-  - target: $.components.schemas.StreamEvent.properties.created_at.description
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.created_at.description
     update: "Creation timestamp"
 
   - target: $.components.schemas.FileInput.properties.type.description
@@ -297,13 +297,10 @@ actions:
   - target: $.paths['/workflows/run'].post.responses['200'].description
     update: "Successful response"
 
-  - target: $.paths['/workflows/run'].post.responses['200'].content['application/json'].description
+  - target: $.paths['/workflows/run'].post.responses['200'].content['application/json'].schema.description
     update: "When `response_mode` is `blocking`, returns a CompletionResponse object."
 
-  - target: $.paths['/workflows/run'].post.responses['200'].content['text/event-stream'].format
-    update: "sse"
-
-  - target: $.paths['/workflows/run'].post.responses['200'].content['text/event-stream'].description
+  - target: $.paths['/workflows/run'].post.responses['200'].content['text/event-stream'].schema.description
     update: |
       When `response_mode` is `streaming`, returns a stream of ChunkCompletionResponse objects.
       Returns App output stream chunks, Content-Type is text/event-stream.

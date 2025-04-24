@@ -180,13 +180,6 @@ actions:
     update:
       summary: "Send Message (Text Generation App)"
       description: "Send request to text generation application"
-      x-fern-streaming:
-        format: sse
-        stream-condition: $request.response_mode == "streaming"
-        response:
-          $ref: "#/components/schemas/ChatCompletionResponse"
-        response-stream:
-          $ref: "#/components/schemas/ChunkChatCompletionResponse"
 
   - target: $.paths['/completion-messages'].post.requestBody.content['application/json'].schema.properties.inputs.properties.query
     update:
@@ -206,7 +199,7 @@ actions:
   - target: $.paths['/completion-messages'].post.responses['200'].description
     update: "Successful response"
 
-  - target: $.paths['/completion-messages'].post.responses['200'].content['application/json'].description
+  - target: $.paths['/completion-messages'].post.responses['200'].content['application/json'].schema.description
     update: |
       When `response_mode` is `blocking`, returns a ChatCompletionResponse object.
       - `message_id` (string) Unique message ID
@@ -217,11 +210,11 @@ actions:
         - `retriever_resources` (array[RetrieverResource]) Citation and attribution segment list
       - `created_at` (int) Message creation timestamp
 
-  - target: $.paths['/completion-messages'].post.responses['200'].content['text/event-stream'].description
+  - target: $.paths['/completion-messages'].post.responses['200'].content['text/event-stream'].schema.description
     update: |
       When `response_mode` is `streaming`, returns a stream of ChunkChatCompletionResponse objects.
       Returns App output stream chunks, `Content-Type` is `text/event-stream`.
-      Each stream chunk starts with data: and chunks are separated by `\n\n` (two newlines).
+      Each stream chunk starts with data: and chunks are separated by \\n\\n (two newlines).
       Stream chunks have different structures based on the `event` type:
       - `event: message` LLM text chunk event, i.e., complete text output in chunks.
         - `task_id` (string) Task ID, used for request tracking and stopping response

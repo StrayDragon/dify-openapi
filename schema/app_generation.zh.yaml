@@ -188,7 +188,7 @@ components:
           type: string
           description: 上传文件ID
 
-    StreamEvent:
+    ChunkChatCompletionResponse:
       type: object
       properties:
         event:
@@ -281,7 +281,7 @@ paths:
         response:
           $ref: "#/components/schemas/ChatCompletionResponse"
         response-stream:
-          $ref: "#/components/schemas/StreamEvent"
+          $ref: "#/components/schemas/ChunkChatCompletionResponse"
       requestBody:
         required: true
         content:
@@ -320,56 +320,56 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ChatCompletionResponse"
-              description: |
-                当 `response_mode` 为 `blocking` 时，返回 ChatCompletionResponse 对象。
-                - `message_id` (string) 消息唯一 ID
-                - `mode` (string) App 模式，固定为 chat
-                - `answer` (string) 完整回复内容
-                - `metadata` (object) 元数据
-                  - `usage` (Usage) 模型用量信息
-                  - `retriever_resources` (array[RetrieverResource]) 引用和归属分段列表
-                - `created_at` (int) 消息创建时间戳
-            text/event-stream:
-              schema:
-                $ref: "#/components/schemas/StreamEvent"
-              description: |
-                当 `response_mode` 为 `streaming`时，返回 StreamEvent object 流式序列。
-                返回 App 输出的流式块，`Content-Type` 为 `text/event-stream`。
-                每个流式块均为 data: 开头，块之间以 `\n\n` 即两个换行符分隔。
-                流式块中根据 `event` 不同，结构也不同：
-                - `event: message` LLM 返回文本块事件，即：完整的文本以分块的方式输出。
-                  - `task_id` (string) 任务 ID，用于请求跟踪和停止响应接口
+                description: |
+                  当 `response_mode` 为 `blocking` 时，返回 ChatCompletionResponse 对象。
                   - `message_id` (string) 消息唯一 ID
-                  - `answer` (string) LLM 返回文本块内容
-                  - `created_at` (int) 创建时间戳
-                - `event: message_end` 消息结束事件，收到此事件则代表文本流式返回结束。
-                  - `task_id` (string) 任务 ID
-                  - `message_id` (string) 消息唯一 ID
+                  - `mode` (string) App 模式，固定为 chat
+                  - `answer` (string) 完整回复内容
                   - `metadata` (object) 元数据
                     - `usage` (Usage) 模型用量信息
                     - `retriever_resources` (array[RetrieverResource]) 引用和归属分段列表
-                - `event: tts_message` TTS 音频流事件，即：语音合成输出。内容是Mp3格式的音频块，使用 base64 编码后的字符串，播放的时候直接解码即可。
-                  - `task_id` (string) 任务 ID
-                  - `message_id` (string) 消息唯一 ID
-                  - `audio` (string) 语音合成之后的音频块使用 Base64 编码之后的文本内容
-                  - `created_at` (int) 创建时间戳
-                - `event: tts_message_end` TTS 音频流结束事件，收到这个事件表示音频流返回结束。
-                  - `task_id` (string) 任务 ID
-                  - `message_id` (string) 消息唯一 ID
-                  - `audio` (string) 结束事件是没有音频的，所以这里是空字符串
-                  - `created_at` (int) 创建时间戳
-                - `event: message_replace` 消息内容替换事件。
-                  - `task_id` (string) 任务 ID
-                  - `message_id` (string) 消息唯一 ID
-                  - `answer` (string) 替换内容（直接替换 LLM 所有回复文本）
-                  - `created_at` (int) 创建时间戳
-                - `event: error` 流式输出过程中出现的异常会以 stream event 形式输出，收到异常事件后即结束。
-                  - `task_id` (string) 任务 ID
-                  - `message_id` (string) 消息唯一 ID
-                  - `status` (int) HTTP 状态码
-                  - `code` (string) 错误码
-                  - `message` (string) 错误消息
-                - `event: ping` 每 10s 一次的 ping 事件，保持连接存活。
+                  - `created_at` (int) 消息创建时间戳
+            text/event-stream:
+              schema:
+                $ref: "#/components/schemas/ChunkChatCompletionResponse"
+                description: |
+                  当 `response_mode` 为 `streaming`时，返回 ChunkChatCompletionResponse object 流式序列。
+                  返回 App 输出的流式块，`Content-Type` 为 `text/event-stream`。
+                  每个流式块均为 data: 开头，块之间以 \\n\\n 即两个换行符分隔。
+                  流式块中根据 `event` 不同，结构也不同：
+                  - `event: message` LLM 返回文本块事件，即：完整的文本以分块的方式输出。
+                    - `task_id` (string) 任务 ID，用于请求跟踪和停止响应接口
+                    - `message_id` (string) 消息唯一 ID
+                    - `answer` (string) LLM 返回文本块内容
+                    - `created_at` (int) 创建时间戳
+                  - `event: message_end` 消息结束事件，收到此事件则代表文本流式返回结束。
+                    - `task_id` (string) 任务 ID
+                    - `message_id` (string) 消息唯一 ID
+                    - `metadata` (object) 元数据
+                      - `usage` (Usage) 模型用量信息
+                      - `retriever_resources` (array[RetrieverResource]) 引用和归属分段列表
+                  - `event: tts_message` TTS 音频流事件，即：语音合成输出。内容是Mp3格式的音频块，使用 base64 编码后的字符串，播放的时候直接解码即可。
+                    - `task_id` (string) 任务 ID
+                    - `message_id` (string) 消息唯一 ID
+                    - `audio` (string) 语音合成之后的音频块使用 Base64 编码之后的文本内容
+                    - `created_at` (int) 创建时间戳
+                  - `event: tts_message_end` TTS 音频流结束事件，收到这个事件表示音频流返回结束。
+                    - `task_id` (string) 任务 ID
+                    - `message_id` (string) 消息唯一 ID
+                    - `audio` (string) 结束事件是没有音频的，所以这里是空字符串
+                    - `created_at` (int) 创建时间戳
+                  - `event: message_replace` 消息内容替换事件。
+                    - `task_id` (string) 任务 ID
+                    - `message_id` (string) 消息唯一 ID
+                    - `answer` (string) 替换内容（直接替换 LLM 所有回复文本）
+                    - `created_at` (int) 创建时间戳
+                  - `event: error` 流式输出过程中出现的异常会以 stream event 形式输出，收到异常事件后即结束。
+                    - `task_id` (string) 任务 ID
+                    - `message_id` (string) 消息唯一 ID
+                    - `status` (int) HTTP 状态码
+                    - `code` (string) 错误码
+                    - `message` (string) 错误消息
+                  - `event: ping` 每 10s 一次的 ping 事件，保持连接存活。
         "400":
           $ref: "#/components/responses/Error400"
         "404":
