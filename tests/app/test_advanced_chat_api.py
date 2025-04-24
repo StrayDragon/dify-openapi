@@ -22,13 +22,18 @@ async def test_get_app_info(app_advanced_chat_client: AsyncAdvancedChatClient):
 
 async def test_get_app_info_error_handling(app_advanced_chat_client: AsyncAdvancedChatClient):
     """测试获取应用信息时错误处理"""
-    original_host = app_advanced_chat_client._client_wrapper._base_url  # type: ignore
-    app_advanced_chat_client._client_wrapper._base_url = "https://invalid.example.com"  # type: ignore
+    # 获取原始客户端和原始 base_url
+    raw_client = app_advanced_chat_client._raw_client # type: ignore
+    original_host = raw_client._client_wrapper.get_base_url() # type: ignore
+
+    # 修改 base_url 为无效地址
+    raw_client._client_wrapper._base_url = "https://invalid.example.com" # type: ignore
 
     with pytest.raises(Exception):
         await app_advanced_chat_client.get_application_info_by_app_advanced_chat()
 
-    app_advanced_chat_client._client_wrapper._base_url = original_host  # type: ignore
+    # 恢复原始 base_url
+    raw_client._client_wrapper._base_url = original_host # type: ignore
 
 
 async def test_chat_messages(app_advanced_chat_client: AsyncAdvancedChatClient) -> str | None:
@@ -82,13 +87,12 @@ async def test_conversation_management(app_advanced_chat_client: AsyncAdvancedCh
             pytest.skip("无法获取重命名后的会话ID")
         conversation_id = str(renamed.id)
 
-        if postpone_run_in_this_version("1.2.1"):
-            messages = await app_advanced_chat_client.get_conversation_messages_by_app_advanced_chat(
-                conversation_id=conversation_id,
-                user=LOGIN_USER_ID,
-            )
-            assert messages is not None
-            assert messages.data is not None
+        messages = await app_advanced_chat_client.get_conversation_messages_by_app_advanced_chat(
+            conversation_id=conversation_id,
+            user=LOGIN_USER_ID,
+        )
+        assert messages is not None
+        assert messages.data is not None
 
         delete_response = await app_advanced_chat_client.delete_conversation_by_app_advanced_chat(
             conversation_id=conversation_id,
@@ -241,7 +245,7 @@ async def test_text_to_audio(app_advanced_chat_client: AsyncAdvancedChatClient):
 
 
 @pytest.mark.skipif(
-    RUNNING_IN_CI or not postpone_run_in_this_version("1.2.1"),
+    RUNNING_IN_CI,
     reason="CI中使用官方服务器, 经常报504超时, 影响CI流程, 请使用本地服务测试",
 )
 async def test_annotation_features(app_advanced_chat_client: AsyncAdvancedChatClient):
@@ -257,24 +261,23 @@ async def test_annotation_features(app_advanced_chat_client: AsyncAdvancedChatCl
     # 配置标注回复
     config_response = await app_advanced_chat_client.configure_annotation_reply_by_app_advanced_chat(
         action="enable",
-        embedding_model_provider="siliconflow",
-        embedding_model="BAAI/bge-large-en-v1.5",
+        embedding_provider_name="siliconflow",
+        embedding_model_name="BAAI/bge-large-en-v1.5",
         score_threshold=0.8,
     )
     assert config_response is not None
     assert config_response.job_id is not None
 
+
     # 获取标注回复状态
-    try:
-        await asyncio.sleep(3)
-        status_response = await app_advanced_chat_client.get_annotation_reply_status_by_app_advanced_chat(
-            action="enable",
-            job_id=config_response.job_id,
-        )
-        assert status_response is not None
-        # 检查响应中是否有状态信息
-        response_dict = status_response.model_dump()
-        assert "status" in response_dict
-        assert response_dict["status"] in ["pending", "running", "completed", "failed"]
-    except Exception as e:
-        pytest.skip(f"Get annotation reply status failed: {e}")
+    await asyncio.sleep(5)
+    # 如果前面的配置标注回复成功了，才获取状态
+    status_response = await app_advanced_chat_client.get_annotation_reply_status_by_app_advanced_chat(
+        action="enable",
+        job_id=config_response.job_id,
+    )
+    assert status_response is not None
+    # 检查响应中是否有状态信息
+    response_dict = status_response.model_dump()
+    assert "job_status" in response_dict
+    assert response_dict["job_status"] in ["pending", "running", "completed", "failed"]

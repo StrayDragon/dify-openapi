@@ -132,15 +132,18 @@ components:
         content:
           type: string
           description: Content
-    BaseMessage:
+    ChatCompletionResponse:
       type: object
       properties:
         message_id:
           type: string
           description: Unique message ID
-        created_at:
-          type: integer
-          description: Message creation timestamp
+        mode:
+          type: string
+          description: 'App mode, fixed as completion'
+        answer:
+          type: string
+          description: Complete response content
         metadata:
           type: object
           properties:
@@ -150,17 +153,9 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/RetrieverResource'
-    CompletionMessage:
-      allOf:
-        - $ref: '#/components/schemas/BaseMessage'
-        - type: object
-          properties:
-            mode:
-              type: string
-              description: 'App mode, fixed as completion'
-            answer:
-              type: string
-              description: Complete response content
+        created_at:
+          type: integer
+          description: Message creation timestamp
     FileInput:
       type: object
       properties:
@@ -185,7 +180,7 @@ components:
         upload_file_id:
           type: string
           description: Upload file ID
-    StreamEvent:
+    ChunkChatCompletionResponse:
       type: object
       properties:
         event:
@@ -198,13 +193,6 @@ components:
             - message_replace
             - error
             - ping
-            - workflow_started
-            - node_started
-            - node_finished
-            - workflow_finished
-            - agent_message
-            - agent_thought
-            - message_file
           description: Event type
         task_id:
           type: string
@@ -212,21 +200,12 @@ components:
         message_id:
           type: string
           description: Unique message ID
-        conversation_id:
-          type: string
-          description: Conversation ID
-        workflow_run_id:
-          type: string
-          description: Workflow execution ID
         answer:
           type: string
           description: Response content
         audio:
           type: string
           description: Voice synthesis audio data (base64 encoded)
-        data:
-          type: object
-          description: Event related data
         metadata:
           type: object
           properties:
@@ -236,22 +215,6 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/RetrieverResource'
-            annotation_reply:
-              type: object
-              properties:
-                id:
-                  type: string
-                  description: Annotation ID
-                account:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                      description: Account ID
-                    name:
-                      type: string
-                      description: Account name
-              description: Annotation reply information
         created_at:
           type: integer
           description: Creation timestamp
@@ -261,6 +224,9 @@ components:
         code:
           type: string
           description: Error code
+        message:
+          type: string
+          description: Error message
     UploadedFile:
       type: object
       properties:
@@ -296,6 +262,13 @@ paths:
       operationId: sendCompletionMessageByAppGeneration
       summary: Send Message (Text Generation App)
       description: Send request to text generation application
+      x-fern-streaming:
+        format: sse
+        stream-condition: $request.response_mode == "streaming"
+        response:
+          $ref: '#/components/schemas/ChatCompletionResponse'
+        response-stream:
+          $ref: '#/components/schemas/ChunkChatCompletionResponse'
       requestBody:
         required: true
         content:
@@ -335,10 +308,57 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CompletionMessage'
+                $ref: '#/components/schemas/ChatCompletionResponse'
+                description: |
+                  When `response_mode` is `blocking`, returns a ChatCompletionResponse object.
+                  - `message_id` (string) Unique message ID
+                  - `mode` (string) App mode, fixed as chat
+                  - `answer` (string) Complete response content
+                  - `metadata` (object) Metadata
+                    - `usage` (Usage) Model usage information
+                    - `retriever_resources` (array[RetrieverResource]) Citation and attribution segment list
+                  - `created_at` (int) Message creation timestamp
             text/event-stream:
               schema:
-                $ref: '#/components/schemas/StreamEvent'
+                $ref: '#/components/schemas/ChunkChatCompletionResponse'
+                description: |
+                  When `response_mode` is `streaming`, returns a stream of ChunkChatCompletionResponse objects.
+                  Returns App output stream chunks, `Content-Type` is `text/event-stream`.
+                  Each stream chunk starts with data: and chunks are separated by \\n\\n (two newlines).
+                  Stream chunks have different structures based on the `event` type:
+                  - `event: message` LLM text chunk event, i.e., complete text output in chunks.
+                    - `task_id` (string) Task ID, used for request tracking and stopping response
+                    - `message_id` (string) Unique message ID
+                    - `answer` (string) LLM text chunk content
+                    - `created_at` (int) Creation timestamp
+                  - `event: message_end` Message end event, receiving this event means the text stream response has ended.
+                    - `task_id` (string) Task ID
+                    - `message_id` (string) Unique message ID
+                    - `metadata` (object) Metadata
+                      - `usage` (Usage) Model usage information
+                      - `retriever_resources` (array[RetrieverResource]) Citation and attribution segment list
+                  - `event: tts_message` TTS audio stream event, i.e., speech synthesis output. Content is Mp3 format audio chunk, base64 encoded string, decode directly for playback.
+                    - `task_id` (string) Task ID
+                    - `message_id` (string) Unique message ID
+                    - `audio` (string) Base64 encoded audio chunk from speech synthesis
+                    - `created_at` (int) Creation timestamp
+                  - `event: tts_message_end` TTS audio stream end event, receiving this event means the audio stream response has ended.
+                    - `task_id` (string) Task ID
+                    - `message_id` (string) Unique message ID
+                    - `audio` (string) Empty string as there is no audio in the end event
+                    - `created_at` (int) Creation timestamp
+                  - `event: message_replace` Message content replacement event.
+                    - `task_id` (string) Task ID
+                    - `message_id` (string) Unique message ID
+                    - `answer` (string) Replacement content (directly replaces all LLM response text)
+                    - `created_at` (int) Creation timestamp
+                  - `event: error` Exceptions during streaming output are output as stream events, and the stream ends after receiving an exception event.
+                    - `task_id` (string) Task ID
+                    - `message_id` (string) Unique message ID
+                    - `status` (int) HTTP status code
+                    - `code` (string) Error code
+                    - `message` (string) Error message
+                  - `event: ping` Ping event every 10s to keep the connection alive.
         '400':
           $ref: '#/components/responses/Error400'
         '404':
@@ -483,12 +503,101 @@ paths:
                     type: array
                     items:
                       type: object
+                      oneOf:
+                        - properties:
+                            text-input:
+                              type: object
+                              properties:
+                                label:
+                                  type: string
+                                  description: Control display label name
+                                variable:
+                                  type: string
+                                  description: Control ID
+                                required:
+                                  type: boolean
+                                  description: Whether required
+                                default:
+                                  type: string
+                                  description: Default value
+                                max_length:
+                                  type: integer
+                                  description: Maximum length
+                        - properties:
+                            paragraph:
+                              type: object
+                              properties:
+                                label:
+                                  type: string
+                                  description: Control display label name
+                                variable:
+                                  type: string
+                                  description: Control ID
+                                required:
+                                  type: boolean
+                                  description: Whether required
+                                default:
+                                  type: string
+                                  description: Default value
+                        - properties:
+                            select:
+                              type: object
+                              properties:
+                                label:
+                                  type: string
+                                  description: Control display label name
+                                variable:
+                                  type: string
+                                  description: Control ID
+                                required:
+                                  type: boolean
+                                  description: Whether required
+                                default:
+                                  type: string
+                                  description: Default value
+                                options:
+                                  type: array
+                                  items:
+                                    type: string
+                                  description: Option values
                     description: User input form configuration
                   file_upload:
                     type: object
+                    properties:
+                      image:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: Whether enabled
+                          number_limits:
+                            type: integer
+                            description: 'Image quantity limit, default 3'
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum:
+                                - remote_url
+                                - local_file
+                            description: Transfer method list
+                        description: Image settings
                     description: File upload configuration
                   system_parameters:
                     type: object
+                    properties:
+                      file_size_limit:
+                        type: integer
+                        description: Document upload size limit (MB)
+                      image_file_size_limit:
+                        type: integer
+                        description: Image file upload size limit (MB)
+                      audio_file_size_limit:
+                        type: integer
+                        description: Audio file upload size limit (MB)
+                      video_file_size_limit:
+                        type: integer
+                        description: Video file upload size limit (MB)
                     description: System parameters
   '/completion-messages/{task_id}/stop':
     post:
@@ -602,6 +711,9 @@ paths:
                 user:
                   type: string
                   description: 'User identifier, defined by developer rules, must be unique within the application'
+                streaming:
+                  type: boolean
+                  description: Whether to use streaming mode to return audio data
       responses:
         '200':
           description: Successful response
@@ -611,6 +723,11 @@ paths:
                 type: string
                 format: binary
                 description: Audio file
+            audio/mpeg:
+              schema:
+                type: string
+                format: binary
+                description: MP3 format audio file
   /apps/annotations:
     get:
       tags:
@@ -823,9 +940,13 @@ paths:
                 embedding_model_provider:
                   type: string
                   description: 'Specified embedding model provider, must be configured in the system first, corresponds to the provider field'
+                embedding_provider_name: # TODO: @l8ng same as `embedding_model_provider` upstream api complain {'code': 'invalid_param', 'message': 'Missing required parameter in the JSON body', 'params': 'embedding_provider_name'}
+                  type: string
                 embedding_model:
                   type: string
                   description: 'Specified embedding model, corresponds to the model field'
+                embedding_model_name: # TODO: @l8ng same as `embedding_model_name` upstream api complain {'code': 'invalid_param', 'message': 'Missing required parameter in the JSON body', 'params': 'embedding_model_name'}
+                  type: string
                 score_threshold:
                   type: number
                   description: 'Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply'

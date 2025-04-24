@@ -17,6 +17,17 @@ servers:
     description: author of dify-openapi dev server
 security:
   - bearerApiKeyAuth: []
+tags:
+  - name: Datasets
+    description: Operations for managing knowledge bases
+  - name: Documents
+    description: Operations for managing documents in knowledge bases
+  - name: Segments
+    description: Operations for managing document segments
+  - name: Models
+    description: Operations for retrieving model information
+  - name: Metadata
+    description: Operations for managing metadata in knowledge bases
 components:
   securitySchemes:
     bearerApiKeyAuth:
@@ -2125,12 +2136,14 @@ paths:
   '/datasets/{dataset_id}/metadata':
     post:
       tags:
-        - metadata
-      summary: Create metadata
+        - Metadata
+      summary: Create Metadata
+      description: Add a new metadata field to the knowledge base
       operationId: createMetadata
       parameters:
         - name: dataset_id
           in: path
+          description: Knowledge Base ID
           required: true
           schema:
             type: string
@@ -2146,13 +2159,13 @@ paths:
               properties:
                 type:
                   type: string
-                  description: Metadata type
+                  description: 'Metadata type, e.g. string'
                 name:
                   type: string
                   description: Metadata name
       responses:
         '200':
-          description: OK
+          description: Successfully created metadata
           content:
             application/json:
               schema:
@@ -2160,25 +2173,31 @@ paths:
                 properties:
                   id:
                     type: string
+                    description: Metadata ID
                   type:
                     type: string
+                    description: Metadata type
                   name:
                     type: string
-      description: Create a new metadata field
+                    description: Metadata name
+        '400':
+          $ref: '#/components/responses/Error400'
     get:
       tags:
-        - metadata
-      summary: List dataset metadata
+        - Metadata
+      summary: List Dataset Metadata
+      description: Get list of all metadata fields for a knowledge base
       operationId: listDatasetMetadata
       parameters:
         - name: dataset_id
           in: path
+          description: Knowledge Base ID
           required: true
           schema:
             type: string
       responses:
         '200':
-          description: OK
+          description: Successfully retrieved metadata list
           content:
             application/json:
               schema:
@@ -2186,24 +2205,32 @@ paths:
                 properties:
                   doc_metadata:
                     type: array
+                    description: Metadata list
                     items:
                       type: object
                       properties:
                         id:
                           type: string
+                          description: Metadata ID
                         name:
                           type: string
+                          description: Metadata name
                         type:
                           type: string
+                          description: Metadata type
                         use_count:
                           type: integer
+                          description: Usage count
                   built_in_field_enabled:
                     type: boolean
-      description: Get list of metadata fields for a dataset
+                    description: Whether built-in fields are enabled
+        '400':
+          $ref: '#/components/responses/Error400'
   /workspaces/current/models/model-types/text-embedding:
     get:
       summary: Get Embedding Model List
       description: Get a list of available embedding models for the current workspace
+      operationId: getEmbeddingModels
       tags:
         - Models
       responses:
@@ -2216,6 +2243,7 @@ paths:
                 properties:
                   data:
                     type: array
+                    description: Embedding model list
                     items:
                       $ref: '#/components/schemas/EmbeddingModel'
         '400':
@@ -2223,17 +2251,20 @@ paths:
   '/datasets/{dataset_id}/metadata/{metadata_id}':
     patch:
       tags:
-        - metadata
-      summary: Update metadata
+        - Metadata
+      summary: Update Metadata
+      description: Update an existing metadata field
       operationId: updateMetadata
       parameters:
         - name: dataset_id
           in: path
+          description: Knowledge Base ID
           required: true
           schema:
             type: string
         - name: metadata_id
           in: path
+          description: Metadata ID
           required: true
           schema:
             type: string
@@ -2251,7 +2282,7 @@ paths:
                   description: New metadata name
       responses:
         '200':
-          description: OK
+          description: Successfully updated metadata
           content:
             application/json:
               schema:
@@ -2259,45 +2290,56 @@ paths:
                 properties:
                   id:
                     type: string
+                    description: Metadata ID
                   type:
                     type: string
+                    description: Metadata type
                   name:
                     type: string
-      description: Update an existing metadata field
+                    description: Metadata name
+        '400':
+          $ref: '#/components/responses/Error400'
     delete:
       tags:
-        - metadata
-      summary: Delete metadata
+        - Metadata
+      summary: Delete Metadata
+      description: Delete a metadata field
       operationId: deleteMetadata
       parameters:
         - name: dataset_id
           in: path
+          description: Knowledge Base ID
           required: true
           schema:
             type: string
         - name: metadata_id
           in: path
+          description: Metadata ID
           required: true
           schema:
             type: string
       responses:
         '204':
-          description: No Content
-      description: Delete a metadata field
+          description: Successfully deleted metadata
+        '400':
+          $ref: '#/components/responses/Error400'
   '/datasets/{dataset_id}/metadata/built-in/{action}':
     post:
       tags:
-        - metadata
-      summary: Enable/disable built-in metadata
+        - Metadata
+      summary: Enable/Disable Built-in Metadata
+      description: Enable or disable built-in metadata fields for a knowledge base
       operationId: toggleBuiltInMetadata
       parameters:
         - name: dataset_id
           in: path
+          description: Knowledge Base ID
           required: true
           schema:
             type: string
         - name: action
           in: path
+          description: 'Action type, enable or disable'
           required: true
           schema:
             type: string
@@ -2306,17 +2348,20 @@ paths:
               - disable
       responses:
         '204':
-          description: No Content
-      description: Toggle built-in metadata fields
+          description: Successfully enabled/disabled built-in metadata
+        '400':
+          $ref: '#/components/responses/Error400'
   '/datasets/{dataset_id}/documents/metadata':
     post:
       tags:
-        - metadata
-      summary: Update document metadata
+        - Metadata
+      summary: Update Document Metadata
+      description: Update metadata for multiple documents in batch
       operationId: updateDocumentsMetadata
       parameters:
         - name: dataset_id
           in: path
+          description: Knowledge Base ID
           required: true
           schema:
             type: string
@@ -2326,9 +2371,12 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - operation_data
               properties:
                 operation_data:
                   type: array
+                  description: List of document metadata operations
                   items:
                     type: object
                     required:
@@ -2340,8 +2388,12 @@ paths:
                         description: Document ID
                       metadata_list:
                         type: array
+                        description: List of metadata to update
                         items:
                           type: object
+                          required:
+                            - id
+                            - value
                           properties:
                             id:
                               type: string
@@ -2355,10 +2407,9 @@ paths:
                             name:
                               type: string
                               description: Metadata name
-                        description: List of metadata to update
-                  description: List of document metadata operations
       responses:
         '204':
-          description: No Content
-      description: Update metadata for multiple documents
+          description: Successfully updated document metadata
+        '400':
+          $ref: '#/components/responses/Error400'
 

@@ -5,6 +5,7 @@ info:
     Dify API 提供了一系列接口用于工作流编排对话型应用。
     对话应用支持会话持久化，可将之前的聊天记录作为上下文进行回答，可适用于聊天/客服 AI 等。
     所有 API 请求都需要在 Authorization HTTP Header 中包含应用级 API-Key。
+    强烈建议开发者把 API-Key 放在后端存储，而非分享或者放在客户端存储，以免 API-Key 泄露，导致财产损失。
     官方原始文档见: https://github.com/langgenius/dify/blob/1.2.0/web/app/components/develop/template/template_advanced_chat.zh.mdx
   version: 1.2.0
 
@@ -145,15 +146,32 @@ components:
           type: string
           description: 内容
 
-    BaseMessage:
+    ChatCompletionResponse:
       type: object
       properties:
+        event:
+          type: string
+          description: 事件类型，固定为 message
+          enum: [message]
+        task_id:
+          type: string
+          description: 任务 ID，用于请求跟踪和停止响应接口
+        id:
+          type: string
+          description: 唯一ID
         message_id:
           type: string
           description: 消息唯一 ID
-        created_at:
-          type: integer
-          description: 消息创建时间戳
+        conversation_id:
+          type: string
+          description: 会话 ID
+        mode:
+          type: string
+          description: App 模式，固定为 chat
+          enum: [chat]
+        answer:
+          type: string
+          description: 完整回复内容
         metadata:
           type: object
           properties:
@@ -163,23 +181,12 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/RetrieverResource"
+          description: 元数据
+        created_at:
+          type: integer
+          description: 消息创建时间戳
 
-    ChatMessage:
-      allOf:
-        - $ref: "#/components/schemas/BaseMessage"
-        - type: object
-          properties:
-            conversation_id:
-              type: string
-              description: 会话ID
-            mode:
-              type: string
-              description: App 模式，固定为 chat
-            answer:
-              type: string
-              description: 完整回复内容
-
-    StreamEvent:
+    ChunkChatCompletionResponse:
       type: object
       properties:
         event:
@@ -187,24 +194,22 @@ components:
           enum:
             [
               message,
+              message_file,
               message_end,
               tts_message,
               tts_message_end,
               message_replace,
-              error,
-              ping,
               workflow_started,
               node_started,
               node_finished,
               workflow_finished,
-              agent_message,
-              agent_thought,
-              message_file,
+              error,
+              ping,
             ]
           description: 事件类型
         task_id:
           type: string
-          description: 任务 ID
+          description: 任务 ID，用于请求跟踪和停止响应接口
         message_id:
           type: string
           description: 消息唯一 ID
@@ -216,13 +221,22 @@ components:
           description: workflow 执行 ID
         answer:
           type: string
-          description: 回复内容
+          description: LLM 返回文本块内容（message 事件）或替换内容（message_replace 事件）
         audio:
           type: string
-          description: 语音合成音频数据（base64编码）
-        data:
-          type: object
-          description: 事件相关数据
+          description: 语音合成音频数据（base64编码，tts_message 事件）
+        id:
+          type: string
+          description: 文件唯一ID（message_file 事件）
+        type:
+          type: string
+          description: 文件类型，目前仅为image（message_file 事件）
+        belongs_to:
+          type: string
+          description: 文件归属，user或assistant（message_file 事件）
+        url:
+          type: string
+          description: 文件访问地址（message_file 事件）
         metadata:
           type: object
           properties:
@@ -232,6 +246,19 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/RetrieverResource"
+          description: 元数据（message_end 事件）
+        data:
+          type: object
+          description: 详细内容（workflow_started, node_started, node_finished, workflow_finished 事件）
+        status:
+          type: integer
+          description: HTTP 状态码（error 事件）或执行状态（node_finished, workflow_finished 事件中的data.status）
+        code:
+          type: string
+          description: 错误码（error 事件）
+        message:
+          type: string
+          description: 错误消息（error 事件）
         created_at:
           type: integer
           description: 创建时间戳
@@ -337,16 +364,23 @@ paths:
                   type: boolean
                   description: （选填）自动生成标题，默认 `true`。 若设置为 `false`，则可通过调用会话重命名接口并设置 `auto_generate` 为 `true` 实现异步生成标题。
                   default: true
+      x-fern-streaming:
+        format: sse
+        stream-condition: $request.response_mode == "streaming"
+        response:
+          $ref: "#/components/schemas/ChatCompletionResponse"
+        response-stream:
+          $ref: "#/components/schemas/ChunkChatCompletionResponse"
       responses:
         "200":
           description: 成功响应
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ChatMessage"
+                $ref: "#/components/schemas/ChatCompletionResponse"
             text/event-stream:
               schema:
-                $ref: "#/components/schemas/StreamEvent"
+                $ref: "#/components/schemas/ChunkChatCompletionResponse"
         "400":
           $ref: "#/components/responses/Error400"
         "404":
@@ -1223,9 +1257,13 @@ paths:
                 embedding_model_provider:
                   type: string
                   description: 指定的嵌入模型提供商, 必须先在系统内设定好接入的模型，对应的是provider字段
+                embedding_provider_name: # TODO: @l8ng same as `embedding_model_provider` upstream api complain {'code': 'invalid_param', 'message': 'Missing required parameter in the JSON body', 'params': 'embedding_provider_name'}
+                  type: string
                 embedding_model:
                   type: string
                   description: 指定的嵌入模型，对应的是model字段
+                embedding_model_name: # TODO: @l8ng same as `embedding_model_name` upstream api complain {'code': 'invalid_param', 'message': 'Missing required parameter in the JSON body', 'params': 'embedding_model_name'}
+                  type: string
                 score_threshold:
                   type: number
                   description: 相似度阈值，当相似度大于该阈值时，系统会自动回复，否则不回复

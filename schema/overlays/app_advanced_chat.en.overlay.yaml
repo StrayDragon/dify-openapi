@@ -13,6 +13,7 @@ actions:
         Dify API provides a series of interfaces for workflow orchestration chat applications.
         Chat applications support session persistence, allowing previous chat history to be used as context for responses, suitable for chat/customer service AI, etc.
         All API requests require an application-level API-Key in the Authorization HTTP Header.
+        It is strongly recommended that developers store the API-Key on the backend rather than sharing or storing it on the client side to prevent API-Key leakage and financial loss.
         official raw document: https://github.com/langgenius/dify/blob/1.2.0/web/app/components/develop/template/template_advanced_chat.en.mdx
 
   - target: $.servers[0]
@@ -104,46 +105,82 @@ actions:
   - target: $.components.schemas.RetrieverResource.properties.content.description
     update: "Content"
 
-  - target: $.components.schemas.BaseMessage.properties.message_id.description
+  - target: $.components.schemas.ChatCompletionResponse.properties.event.description
+    update: "Event type, fixed as message"
+
+  - target: $.components.schemas.ChatCompletionResponse.properties.task_id.description
+    update: "Task ID for request tracking and stopping responses"
+
+  - target: $.components.schemas.ChatCompletionResponse.properties.id.description
+    update: "Unique ID"
+
+  - target: $.components.schemas.ChatCompletionResponse.properties.message_id.description
     update: "Unique message ID"
 
-  - target: $.components.schemas.BaseMessage.properties.created_at.description
-    update: "Message creation timestamp"
-
-  - target: $.components.schemas.ChatMessage.allOf[1].properties.conversation_id.description
+  - target: $.components.schemas.ChatCompletionResponse.properties.conversation_id.description
     update: "Conversation ID"
 
-  - target: $.components.schemas.ChatMessage.allOf[1].properties.mode.description
+  - target: $.components.schemas.ChatCompletionResponse.properties.mode.description
     update: "App mode, fixed as chat"
 
-  - target: $.components.schemas.ChatMessage.allOf[1].properties.answer.description
+  - target: $.components.schemas.ChatCompletionResponse.properties.answer.description
     update: "Complete response content"
 
-  - target: $.components.schemas.StreamEvent.properties.event.description
+  - target: $.components.schemas.ChatCompletionResponse.properties.metadata.description
+    update: "Metadata"
+
+  - target: $.components.schemas.ChatCompletionResponse.properties.created_at.description
+    update: "Message creation timestamp"
+
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.event.description
     update: "Event type"
 
-  - target: $.components.schemas.StreamEvent.properties.task_id.description
-    update: "Task ID"
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.task_id.description
+    update: "Task ID for request tracking and stopping responses"
 
-  - target: $.components.schemas.StreamEvent.properties.message_id.description
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.message_id.description
     update: "Unique message ID"
 
-  - target: $.components.schemas.StreamEvent.properties.conversation_id.description
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.conversation_id.description
     update: "Conversation ID"
 
-  - target: $.components.schemas.StreamEvent.properties.workflow_run_id.description
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.workflow_run_id.description
     update: "Workflow execution ID"
 
-  - target: $.components.schemas.StreamEvent.properties.answer.description
-    update: "Response content"
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.answer.description
+    update: "LLM text chunk content (for message event) or replacement content (for message_replace event)"
 
-  - target: $.components.schemas.StreamEvent.properties.audio.description
-    update: "Voice synthesis audio data (base64 encoded)"
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.audio.description
+    update: "Voice synthesis audio data (base64 encoded, for tts_message event)"
 
-  - target: $.components.schemas.StreamEvent.properties.data.description
-    update: "Event related data"
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.id.description
+    update: "Unique file ID (for message_file event)"
 
-  - target: $.components.schemas.StreamEvent.properties.created_at.description
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.type.description
+    update: "File type, currently only 'image' (for message_file event)"
+
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.belongs_to.description
+    update: "File ownership, 'user' or 'assistant' (for message_file event)"
+
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.url.description
+    update: "File access URL (for message_file event)"
+
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.metadata.description
+    update: "Metadata (for message_end event)"
+
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.data.description
+    update: "Detailed content (for workflow_started, node_started, node_finished, workflow_finished events)"
+
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.status.description
+    update: "HTTP status code (for error event) or execution status (data.status in node_finished, workflow_finished events)"
+
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.code.description
+    update: "Error code (for error event)"
+
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.message.description
+    update: "Error message (for error event)"
+
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.created_at.description
     update: "Creation timestamp"
 
   - target: $.components.schemas.UploadedFile.properties.id.description

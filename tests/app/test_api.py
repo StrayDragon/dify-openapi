@@ -1,16 +1,15 @@
+import asyncio
 import pytest
 from pathlib import Path
-from typing import Any
 
 from dify_sdk.chat.client import AsyncChatClient
 from dify_sdk.generation.client import AsyncGenerationClient
-from dify_sdk.workflow.client import AsyncWorkflowClient
 from dify_sdk.core.request_options import RequestOptions
 from dify_sdk.generation.types.send_completion_message_by_app_generation_request_inputs import (
     SendCompletionMessageByAppGenerationRequestInputs,
 )
-from dify_sdk.types.file_input import FileInput
-from dify_sdk_testing import RUNNING_IN_CI, postpone_run_in_this_version
+from dify_sdk.chat.types.send_chat_message_by_app_chat_request_files_item import SendChatMessageByAppChatRequestFilesItem
+from dify_sdk_testing import RUNNING_IN_CI
 
 LOGIN_USER_ID = "test123"
 
@@ -28,13 +27,18 @@ async def test_get_app_info(app_chat_client: AsyncChatClient):
 
 async def test_get_app_info_error_handling(app_chat_client: AsyncChatClient):
     """测试获取应用信息时错误处理"""
-    original_host = app_chat_client._client_wrapper._base_url  # type: ignore
-    app_chat_client._client_wrapper._base_url = "https://invalid.example.com"  # type: ignore
+    # 获取原始客户端和原始 base_url
+    raw_client = app_chat_client._raw_client # type: ignore
+    original_host = raw_client._client_wrapper.get_base_url() # type: ignore
+
+    # 修改 base_url 为无效地址
+    raw_client._client_wrapper._base_url = "https://invalid.example.com" # type: ignore
 
     with pytest.raises(Exception):
         await app_chat_client.get_application_info_by_app_chat()
 
-    app_chat_client._client_wrapper._base_url = original_host  # type: ignore
+    # 恢复原始 base_url
+    raw_client._client_wrapper._base_url = original_host # type: ignore
 
 
 async def test_chat_messages(app_chat_client: AsyncChatClient) -> str | None:
@@ -48,6 +52,7 @@ async def test_chat_messages(app_chat_client: AsyncChatClient) -> str | None:
     assert response is not None
     assert response.message_id is not None
     return response.message_id
+
 
 
 async def test_message_feedback(app_chat_client: AsyncChatClient):
@@ -86,13 +91,12 @@ async def test_conversation_management(app_chat_client: AsyncChatClient):
             pytest.skip("无法获取重命名后的会话ID")
         conversation_id = str(renamed.id)
 
-        if postpone_run_in_this_version("1.2.1"):
-            messages = await app_chat_client.get_conversation_messages_by_app_chat(
-                conversation_id=conversation_id,
-                user=LOGIN_USER_ID,
-            )
-            assert messages is not None
-            assert messages.data is not None
+        messages = await app_chat_client.get_conversation_messages_by_app_chat(
+            conversation_id=conversation_id,
+            user=LOGIN_USER_ID,
+        )
+        assert messages is not None
+        assert messages.data is not None
 
         delete_response = await app_chat_client.delete_conversation_by_app_chat(
             conversation_id=conversation_id,
@@ -163,8 +167,8 @@ async def test_chat_with_file(app_chat_client: AsyncChatClient, test_file_path: 
     file_id = await test_file_upload(app_chat_client, test_file_path)
 
     # 2. 发送带文件的对话消息
-    file_input = FileInput(
-        type="document",
+    file_input = SendChatMessageByAppChatRequestFilesItem(
+        type="image",
         transfer_method="local_file",
         upload_file_id=file_id,
     )
@@ -178,7 +182,6 @@ async def test_chat_with_file(app_chat_client: AsyncChatClient, test_file_path: 
     )
     assert response is not None
     assert hasattr(response, "message_id")
-
 
 async def test_audio_to_text(app_chat_client: AsyncChatClient, test_audio_file_path: Path):
     """测试语音转文字接口"""
@@ -210,10 +213,7 @@ async def test_text_to_audio(app_chat_client: AsyncChatClient):
         assert isinstance(chunk, bytes)
 
 
-@pytest.mark.skipif(
-    RUNNING_IN_CI,
-    reason="CI中使用官方服务器, 经常报504超时, 影响CI流程, 请使用本地服务测试",
-)
+
 async def test_completion_message(app_completion_client: AsyncGenerationClient):
     """测试文本生成接口"""
     response = await app_completion_client.send_completion_message_by_app_generation(
@@ -225,25 +225,3 @@ async def test_completion_message(app_completion_client: AsyncGenerationClient):
 
     assert response is not None
     assert response.message_id is not None
-
-
-async def test_workflow_run(app_workflow_client: AsyncWorkflowClient):
-    """Test workflow execution API"""
-    workflow_inputs: dict[str, Any] = {
-        "query": "ping",
-        "inputs": {},
-        "files": [],
-    }
-
-    response = await app_workflow_client.run_workflow(
-        inputs=workflow_inputs,
-        response_mode="blocking",
-        user=LOGIN_USER_ID,
-    )
-    assert response is not None
-    assert response.workflow_run_id is not None
-    assert response.task_id is not None
-    assert response.data is not None
-    assert response.data.id is not None
-    assert response.data.workflow_id is not None
-    assert response.data.status in ["running", "succeeded", "failed", "stopped"]

@@ -21,9 +21,11 @@ print-llm-prompt:
 	uv run scripts/prompt-generater.py
 
 gen-client: apply-i18n-overlay-to-openapi-schema
+    rm -rf src/dify_sdk
     fern generate --local
     ruff format src/
-    bash misc/fern_sdk_hotfix_patch.sh
+    uv run misc/fern_sdk_hotfix_patch.py
+    # bash misc/fern_sdk_hotfix_patch.sh
 
 # bump from bump-cli using this cmd to global install `npm install -g bump-cli`
 apply-i18n-overlay-to-openapi-schema: && check-i18n-openapi-schema
@@ -48,5 +50,10 @@ run-openapi-ui:
 bump-version-guide:
     @echo "search/replace by vscode,add version to replace and selected match whole word, add files to exclude=> libs/dify,overlays,scripts,uv.lock"
 
-test:
-    uv run pytest
+test *pattern='':
+    #!/usr/bin/env bash
+    if [ -z "{{pattern}}" ]; then
+        uv run pytest
+    else
+        uv run pytest {{pattern}}
+    fi

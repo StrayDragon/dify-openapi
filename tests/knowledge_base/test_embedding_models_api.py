@@ -9,7 +9,7 @@ async def test_get_embedding_models(kb_client: KnowledgeBaseClient):
     """测试获取嵌入模型列表"""
     # 以下是正确的测试逻辑，当SDK添加models属性后可以启用
     # 获取嵌入模型列表
-    models_response = await kb_client.models.get_embedding_model_list()
+    models_response = await kb_client.models.get_embedding_models()
 
     # 验证返回的数据
     assert models_response is not None

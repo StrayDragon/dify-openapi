@@ -55,6 +55,11 @@ async def app_workflow_client() -> AsyncGenerator[AsyncWorkflowClient]:
     client = AsyncDifyApi(
         token=os.environ["TEST_DIFY_APP_WORKFLOW_API_KEY"],
         base_url=TEST_DIFY_HOST,
+        httpx_client=httpx.AsyncClient(
+            timeout=60,
+            follow_redirects=True,
+            transport=httpx.AsyncHTTPTransport(retries=3),
+        ),
     )
     yield client.workflow
 
@@ -64,6 +69,11 @@ async def app_completion_client() -> AsyncGenerator[AsyncGenerationClient]:
     client = AsyncDifyApi(
         token=os.environ["TEST_DIFY_APP_COMPLETION_API_KEY"],
         base_url=TEST_DIFY_HOST,
+        httpx_client=httpx.AsyncClient(
+            timeout=60,
+            follow_redirects=True,
+            transport=httpx.AsyncHTTPTransport(retries=3),
+        ),
     )
     yield client.generation
 
@@ -73,6 +83,11 @@ async def kb_client() -> AsyncGenerator[KnowledgeBaseClient]:
     client = AsyncDifyApi(
         token=os.environ["TEST_DIFY_KNOWLEDGE_BASE_API_KEY"],
         base_url=TEST_DIFY_HOST,
+        httpx_client=httpx.AsyncClient(
+            timeout=60,
+            follow_redirects=True,
+            transport=httpx.AsyncHTTPTransport(retries=3),
+        ),
     )
     yield KnowledgeBaseClient(
         dataset=client.datasets,

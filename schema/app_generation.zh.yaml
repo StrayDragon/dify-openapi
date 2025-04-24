@@ -145,15 +145,18 @@ components:
           type: string
           description: 内容
 
-    BaseMessage:
+    ChatCompletionResponse:
       type: object
       properties:
         message_id:
           type: string
           description: 消息唯一 ID
-        created_at:
-          type: integer
-          description: 消息创建时间戳
+        mode:
+          type: string
+          description: App 模式，固定为 completion
+        answer:
+          type: string
+          description: 完整回复内容
         metadata:
           type: object
           properties:
@@ -163,18 +166,9 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/RetrieverResource"
-
-    CompletionMessage:
-      allOf:
-        - $ref: "#/components/schemas/BaseMessage"
-        - type: object
-          properties:
-            mode:
-              type: string
-              description: App 模式，固定为 completion
-            answer:
-              type: string
-              description: 完整回复内容
+        created_at:
+          type: integer
+          description: 消息创建时间戳
 
     FileInput:
       type: object
@@ -194,7 +188,7 @@ components:
           type: string
           description: 上传文件ID
 
-    StreamEvent:
+    ChunkChatCompletionResponse:
       type: object
       properties:
         event:
@@ -208,13 +202,6 @@ components:
               message_replace,
               error,
               ping,
-              workflow_started,
-              node_started,
-              node_finished,
-              workflow_finished,
-              agent_message,
-              agent_thought,
-              message_file,
             ]
           description: 事件类型
         task_id:
@@ -223,21 +210,12 @@ components:
         message_id:
           type: string
           description: 消息唯一 ID
-        conversation_id:
-          type: string
-          description: 会话 ID
-        workflow_run_id:
-          type: string
-          description: workflow 执行 ID
         answer:
           type: string
           description: 回复内容
         audio:
           type: string
           description: 语音合成音频数据（base64编码）
-        data:
-          type: object
-          description: 事件相关数据
         metadata:
           type: object
           properties:
@@ -247,22 +225,6 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/RetrieverResource"
-            annotation_reply:
-              type: object
-              properties:
-                id:
-                  type: string
-                  description: 标注ID
-                account:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                      description: 账户ID
-                    name:
-                      type: string
-                      description: 账户名称
-              description: 标注回复信息
         created_at:
           type: integer
           description: 创建时间戳
@@ -272,6 +234,9 @@ components:
         code:
           type: string
           description: 错误码
+        message:
+          type: string
+          description: 错误消息
 
     UploadedFile:
       type: object
@@ -310,6 +275,13 @@ paths:
       operationId: sendCompletionMessageByAppGeneration
       summary: 发送消息(文本生成型应用)
       description: 发送请求给文本生成型应用
+      x-fern-streaming:
+        format: sse
+        stream-condition: $request.response_mode == "streaming"
+        response:
+          $ref: "#/components/schemas/ChatCompletionResponse"
+        response-stream:
+          $ref: "#/components/schemas/ChunkChatCompletionResponse"
       requestBody:
         required: true
         content:
@@ -347,10 +319,57 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CompletionMessage"
+                $ref: "#/components/schemas/ChatCompletionResponse"
+                description: |
+                  当 `response_mode` 为 `blocking` 时，返回 ChatCompletionResponse 对象。
+                  - `message_id` (string) 消息唯一 ID
+                  - `mode` (string) App 模式，固定为 chat
+                  - `answer` (string) 完整回复内容
+                  - `metadata` (object) 元数据
+                    - `usage` (Usage) 模型用量信息
+                    - `retriever_resources` (array[RetrieverResource]) 引用和归属分段列表
+                  - `created_at` (int) 消息创建时间戳
             text/event-stream:
               schema:
-                $ref: "#/components/schemas/StreamEvent"
+                $ref: "#/components/schemas/ChunkChatCompletionResponse"
+                description: |
+                  当 `response_mode` 为 `streaming`时，返回 ChunkChatCompletionResponse object 流式序列。
+                  返回 App 输出的流式块，`Content-Type` 为 `text/event-stream`。
+                  每个流式块均为 data: 开头，块之间以 \\n\\n 即两个换行符分隔。
+                  流式块中根据 `event` 不同，结构也不同：
+                  - `event: message` LLM 返回文本块事件，即：完整的文本以分块的方式输出。
+                    - `task_id` (string) 任务 ID，用于请求跟踪和停止响应接口
+                    - `message_id` (string) 消息唯一 ID
+                    - `answer` (string) LLM 返回文本块内容
+                    - `created_at` (int) 创建时间戳
+                  - `event: message_end` 消息结束事件，收到此事件则代表文本流式返回结束。
+                    - `task_id` (string) 任务 ID
+                    - `message_id` (string) 消息唯一 ID
+                    - `metadata` (object) 元数据
+                      - `usage` (Usage) 模型用量信息
+                      - `retriever_resources` (array[RetrieverResource]) 引用和归属分段列表
+                  - `event: tts_message` TTS 音频流事件，即：语音合成输出。内容是Mp3格式的音频块，使用 base64 编码后的字符串，播放的时候直接解码即可。
+                    - `task_id` (string) 任务 ID
+                    - `message_id` (string) 消息唯一 ID
+                    - `audio` (string) 语音合成之后的音频块使用 Base64 编码之后的文本内容
+                    - `created_at` (int) 创建时间戳
+                  - `event: tts_message_end` TTS 音频流结束事件，收到这个事件表示音频流返回结束。
+                    - `task_id` (string) 任务 ID
+                    - `message_id` (string) 消息唯一 ID
+                    - `audio` (string) 结束事件是没有音频的，所以这里是空字符串
+                    - `created_at` (int) 创建时间戳
+                  - `event: message_replace` 消息内容替换事件。
+                    - `task_id` (string) 任务 ID
+                    - `message_id` (string) 消息唯一 ID
+                    - `answer` (string) 替换内容（直接替换 LLM 所有回复文本）
+                    - `created_at` (int) 创建时间戳
+                  - `event: error` 流式输出过程中出现的异常会以 stream event 形式输出，收到异常事件后即结束。
+                    - `task_id` (string) 任务 ID
+                    - `message_id` (string) 消息唯一 ID
+                    - `status` (int) HTTP 状态码
+                    - `code` (string) 错误码
+                    - `message` (string) 错误消息
+                  - `event: ping` 每 10s 一次的 ping 事件，保持连接存活。
         "400":
           $ref: "#/components/responses/Error400"
         "404":
@@ -498,12 +517,99 @@ paths:
                     type: array
                     items:
                       type: object
+                      oneOf:
+                        - properties:
+                            text-input:
+                              type: object
+                              properties:
+                                label:
+                                  type: string
+                                  description: 控件展示标签名
+                                variable:
+                                  type: string
+                                  description: 控件 ID
+                                required:
+                                  type: boolean
+                                  description: 是否必填
+                                default:
+                                  type: string
+                                  description: 默认值
+                                max_length:
+                                  type: integer
+                                  description: 最大长度
+                        - properties:
+                            paragraph:
+                              type: object
+                              properties:
+                                label:
+                                  type: string
+                                  description: 控件展示标签名
+                                variable:
+                                  type: string
+                                  description: 控件 ID
+                                required:
+                                  type: boolean
+                                  description: 是否必填
+                                default:
+                                  type: string
+                                  description: 默认值
+                        - properties:
+                            select:
+                              type: object
+                              properties:
+                                label:
+                                  type: string
+                                  description: 控件展示标签名
+                                variable:
+                                  type: string
+                                  description: 控件 ID
+                                required:
+                                  type: boolean
+                                  description: 是否必填
+                                default:
+                                  type: string
+                                  description: 默认值
+                                options:
+                                  type: array
+                                  items:
+                                    type: string
+                                  description: 选项值
                     description: 用户输入表单配置
                   file_upload:
                     type: object
+                    properties:
+                      image:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: 是否开启
+                          number_limits:
+                            type: integer
+                            description: 图片数量限制，默认 3
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum: [remote_url, local_file]
+                            description: 传递方式列表
+                        description: 图片设置
                     description: 文件上传配置
                   system_parameters:
                     type: object
+                    properties:
+                      file_size_limit:
+                        type: integer
+                        description: 文档上传大小限制 (MB)
+                      image_file_size_limit:
+                        type: integer
+                        description: 图片文件上传大小限制（MB）
+                      audio_file_size_limit:
+                        type: integer
+                        description: 音频文件上传大小限制 (MB)
+                      video_file_size_limit:
+                        type: integer
+                        description: 视频文件上传大小限制 (MB)
                     description: 系统参数
 
   /completion-messages/{task_id}/stop:
@@ -615,6 +721,9 @@ paths:
                 user:
                   type: string
                   description: 用户标识，由开发者定义规则，需保证用户标识在应用内唯一
+                streaming:
+                  type: boolean
+                  description: 是否使用流式模式返回音频数据
       responses:
         '200':
           description: 成功响应
@@ -624,6 +733,11 @@ paths:
                 type: string
                 format: binary
                 description: 音频文件
+            audio/mpeg:
+              schema:
+                type: string
+                format: binary
+                description: MP3格式音频文件
 
   /apps/annotations:
     get:
@@ -838,9 +952,13 @@ paths:
                 embedding_model_provider:
                   type: string
                   description: 指定的嵌入模型提供商, 必须先在系统内设定好接入的模型，对应的是provider字段
+                embedding_provider_name: # TODO: @l8ng same as `embedding_model_provider` upstream api complain {'code': 'invalid_param', 'message': 'Missing required parameter in the JSON body', 'params': 'embedding_provider_name'}
+                  type: string
                 embedding_model:
                   type: string
                   description: 指定的嵌入模型，对应的是model字段
+                embedding_model_name: # TODO: @l8ng same as `embedding_model_name` upstream api complain {'code': 'invalid_param', 'message': 'Missing required parameter in the JSON body', 'params': 'embedding_model_name'}
+                  type: string
                 score_threshold:
                   type: number
                   description: 相似度阈值，当相似度大于该阈值时，系统会自动回复，否则不回复

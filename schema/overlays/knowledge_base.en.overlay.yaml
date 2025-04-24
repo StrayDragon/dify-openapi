@@ -318,25 +318,6 @@ actions:
     update:
       description: "Maximum length (tokens)"
 
-  - target: $.components.schemas.ProcessRule.properties.rules.properties.parent_mode
-    update:
-      description: "Parent segment recall mode"
-
-  - target: $.components.schemas.ProcessRule.properties.rules.properties.subchunk_segmentation
-    update:
-      description: "Sub-segment configuration"
-
-  - target: $.components.schemas.ProcessRule.properties.rules.properties.subchunk_segmentation.properties.separator
-    update:
-      description: "Segmentation identifier"
-
-  - target: $.components.schemas.ProcessRule.properties.rules.properties.subchunk_segmentation.properties.max_tokens
-    update:
-      description: "Maximum length (tokens)"
-
-  - target: $.components.schemas.ProcessRule.properties.rules.properties.subchunk_segmentation.properties.chunk_overlap
-    update:
-      description: "Segment overlap length"
 
   - target: $.components.schemas.ProcessRule.properties.rules.properties.pre_processing_rules.items.properties.name
     update:
@@ -346,25 +327,9 @@ actions:
     update:
       description: "Document ID"
 
-  - target: $.components.schemas.Document.properties.position
-    update:
-      description: "Position"
-
   - target: $.components.schemas.Document.properties.data_source_type
     update:
       description: "Data source type"
-
-  - target: $.components.schemas.Document.properties.data_source_info
-    update:
-      description: "Data source information"
-
-  - target: $.components.schemas.Document.properties.data_source_info.properties.upload_file_id
-    update:
-      description: "Upload file ID"
-
-  - target: $.components.schemas.Document.properties.dataset_process_rule_id
-    update:
-      description: "Dataset process rule ID"
 
   - target: $.components.schemas.Document.properties.name
     update:
@@ -382,29 +347,9 @@ actions:
     update:
       description: "Creation timestamp"
 
-  - target: $.components.schemas.Document.properties.tokens
-    update:
-      description: "Token count"
-
-  - target: $.components.schemas.Document.properties.indexing_status
-    update:
-      description: "Indexing status"
-
-  - target: $.components.schemas.Document.properties.error
-    update:
-      description: "Error message"
-
   - target: $.components.schemas.Document.properties.enabled
     update:
       description: "Whether enabled"
-
-  - target: $.components.schemas.Document.properties.disabled_at
-    update:
-      description: "Disabled timestamp"
-
-  - target: $.components.schemas.Document.properties.disabled_by
-    update:
-      description: "Disabled by user ID"
 
   - target: $.components.schemas.Document.properties.updated_at
     update:
@@ -425,10 +370,6 @@ actions:
   - target: $.components.schemas.Document.properties.hit_count
     update:
       description: "Hit count"
-
-  - target: $.components.schemas.Document.properties.doc_form
-    update:
-      description: "Document form"
 
   - target: $.components.schemas.Document.properties.dataset_id
     update:
@@ -1228,72 +1169,144 @@ actions:
 
   - target: $.paths['/datasets/{dataset_id}/metadata'].post
     update:
-      summary: Create metadata
-      description: Create a new metadata field
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                type:
-                  description: Metadata type
-                name:
-                  description: Metadata name
+      summary: Create Metadata
+      description: Add a new metadata field to the knowledge base
+
+  - target: $.paths['/datasets/{dataset_id}/metadata'].post.parameters[0].description
+    update: Knowledge Base ID
+
+  - target: $.paths['/datasets/{dataset_id}/metadata'].post.requestBody.content['application/json'].schema.properties.type.description
+    update: "Metadata type, e.g. string"
+
+  - target: $.paths['/datasets/{dataset_id}/metadata'].post.requestBody.content['application/json'].schema.properties.name.description
+    update: Metadata name
+
+  - target: $.paths['/datasets/{dataset_id}/metadata'].post.responses['200'].description
+    update: Successfully created metadata
+
+  - target: $.paths['/datasets/{dataset_id}/metadata'].post.responses['200'].content['application/json'].schema.properties.id.description
+    update: Metadata ID
+
+  - target: $.paths['/datasets/{dataset_id}/metadata'].post.responses['200'].content['application/json'].schema.properties.type.description
+    update: Metadata type
+
+  - target: $.paths['/datasets/{dataset_id}/metadata'].post.responses['200'].content['application/json'].schema.properties.name.description
+    update: Metadata name
 
   - target: $.paths['/datasets/{dataset_id}/metadata'].get
     update:
-      summary: List dataset metadata
-      description: Get list of metadata fields for a dataset
+      summary: List Dataset Metadata
+      description: Get list of all metadata fields for a knowledge base
+
+  - target: $.paths['/datasets/{dataset_id}/metadata'].get.parameters[0].description
+    update: Knowledge Base ID
+
+  - target: $.paths['/datasets/{dataset_id}/metadata'].get.responses['200'].description
+    update: Successfully retrieved metadata list
+
+  - target: $.paths['/datasets/{dataset_id}/metadata'].get.responses['200'].content['application/json'].schema.properties.doc_metadata.description
+    update: Metadata list
+
+  - target: $.paths['/datasets/{dataset_id}/metadata'].get.responses['200'].content['application/json'].schema.properties.doc_metadata.items.properties.id.description
+    update: Metadata ID
+
+  - target: $.paths['/datasets/{dataset_id}/metadata'].get.responses['200'].content['application/json'].schema.properties.doc_metadata.items.properties.name.description
+    update: Metadata name
+
+  - target: $.paths['/datasets/{dataset_id}/metadata'].get.responses['200'].content['application/json'].schema.properties.doc_metadata.items.properties.type.description
+    update: Metadata type
+
+  - target: $.paths['/datasets/{dataset_id}/metadata'].get.responses['200'].content['application/json'].schema.properties.doc_metadata.items.properties.use_count.description
+    update: Usage count
+
+  - target: $.paths['/datasets/{dataset_id}/metadata'].get.responses['200'].content['application/json'].schema.properties.built_in_field_enabled.description
+    update: Whether built-in fields are enabled
 
   - target: $.paths['/datasets/{dataset_id}/metadata/{metadata_id}'].patch
     update:
-      summary: Update metadata
+      summary: Update Metadata
       description: Update an existing metadata field
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                name:
-                  description: New metadata name
+
+  - target: $.paths['/datasets/{dataset_id}/metadata/{metadata_id}'].patch.parameters[0].description
+    update: Knowledge Base ID
+
+  - target: $.paths['/datasets/{dataset_id}/metadata/{metadata_id}'].patch.parameters[1].description
+    update: Metadata ID
+
+  - target: $.paths['/datasets/{dataset_id}/metadata/{metadata_id}'].patch.requestBody.content['application/json'].schema.properties.name.description
+    update: New metadata name
+
+  - target: $.paths['/datasets/{dataset_id}/metadata/{metadata_id}'].patch.responses['200'].description
+    update: Successfully updated metadata
+
+  - target: $.paths['/datasets/{dataset_id}/metadata/{metadata_id}'].patch.responses['200'].content['application/json'].schema.properties.id.description
+    update: Metadata ID
+
+  - target: $.paths['/datasets/{dataset_id}/metadata/{metadata_id}'].patch.responses['200'].content['application/json'].schema.properties.type.description
+    update: Metadata type
+
+  - target: $.paths['/datasets/{dataset_id}/metadata/{metadata_id}'].patch.responses['200'].content['application/json'].schema.properties.name.description
+    update: Metadata name
 
   - target: $.paths['/datasets/{dataset_id}/metadata/{metadata_id}'].delete
     update:
-      summary: Delete metadata
+      summary: Delete Metadata
       description: Delete a metadata field
+
+  - target: $.paths['/datasets/{dataset_id}/metadata/{metadata_id}'].delete.parameters[0].description
+    update: Knowledge Base ID
+
+  - target: $.paths['/datasets/{dataset_id}/metadata/{metadata_id}'].delete.parameters[1].description
+    update: Metadata ID
+
+  - target: $.paths['/datasets/{dataset_id}/metadata/{metadata_id}'].delete.responses['204'].description
+    update: Successfully deleted metadata
 
   - target: $.paths['/datasets/{dataset_id}/metadata/built-in/{action}'].post
     update:
-      summary: Enable/disable built-in metadata
-      description: Toggle built-in metadata fields
+      summary: Enable/Disable Built-in Metadata
+      description: Enable or disable built-in metadata fields for a knowledge base
+
+  - target: $.paths['/datasets/{dataset_id}/metadata/built-in/{action}'].post.parameters[0].description
+    update: Knowledge Base ID
+
+  - target: $.paths['/datasets/{dataset_id}/metadata/built-in/{action}'].post.parameters[1].description
+    update: "Action type, enable or disable"
+
+  - target: $.paths['/datasets/{dataset_id}/metadata/built-in/{action}'].post.responses['204'].description
+    update: Successfully enabled/disabled built-in metadata
 
   - target: $.paths['/datasets/{dataset_id}/documents/metadata'].post
     update:
-      summary: Update document metadata
-      description: Update metadata for multiple documents
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                operation_data:
-                  description: List of document metadata operations
-                  items:
-                    properties:
-                      document_id:
-                        description: Document ID
-                      metadata_list:
-                        description: List of metadata to update
-                        items:
-                          properties:
-                            id:
-                              description: Metadata ID
-                            type:
-                              description: Metadata type
-                            value:
-                              description: Metadata value
-                            name:
-                              description: Metadata name
+      summary: Update Document Metadata
+      description: Update metadata for multiple documents in batch
+
+  - target: $.paths['/datasets/{dataset_id}/documents/metadata'].post.parameters[0].description
+    update: Knowledge Base ID
+
+  - target: $.paths['/datasets/{dataset_id}/documents/metadata'].post.requestBody.content['application/json'].schema.properties.operation_data.description
+    update: List of document metadata operations
+
+  - target: $.paths['/datasets/{dataset_id}/documents/metadata'].post.requestBody.content['application/json'].schema.properties.operation_data.items.properties.document_id.description
+    update: Document ID
+
+  - target: $.paths['/datasets/{dataset_id}/documents/metadata'].post.requestBody.content['application/json'].schema.properties.operation_data.items.properties.metadata_list.description
+    update: List of metadata to update
+
+  - target: $.paths['/datasets/{dataset_id}/documents/metadata'].post.requestBody.content['application/json'].schema.properties.operation_data.items.properties.metadata_list.items.properties.id.description
+    update: Metadata ID
+
+  - target: $.paths['/datasets/{dataset_id}/documents/metadata'].post.requestBody.content['application/json'].schema.properties.operation_data.items.properties.metadata_list.items.properties.type.description
+    update: Metadata type
+
+  - target: $.paths['/datasets/{dataset_id}/documents/metadata'].post.requestBody.content['application/json'].schema.properties.operation_data.items.properties.metadata_list.items.properties.value.description
+    update: Metadata value
+
+  - target: $.paths['/datasets/{dataset_id}/documents/metadata'].post.requestBody.content['application/json'].schema.properties.operation_data.items.properties.metadata_list.items.properties.name.description
+    update: Metadata name
+
+  - target: $.paths['/datasets/{dataset_id}/documents/metadata'].post.responses['204'].description
+    update: Successfully updated document metadata
 
   - target: $.components.schemas.UploadDocument.properties.data_source.properties.type
     update:
@@ -1376,9 +1389,16 @@ actions:
     update:
       summary: "Get Embedding Model List"
       description: "Get a list of available embedding models for the current workspace"
+      operationId: "getEmbeddingModels"
       responses:
         '200':
           description: "Successfully retrieved embedding model list"
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    description: "Embedding model list"
 
   - target: $.components.schemas.ChildChunk.properties.id
     update:
@@ -1531,3 +1551,28 @@ actions:
   - target: $.components.schemas.EmbeddingModel.properties.models.items.properties.load_balancing_enabled
     update:
       description: "Whether load balancing is enabled"
+
+  - target: $.tags[0]
+    update:
+      name: Datasets
+      description: Operations for managing knowledge bases
+
+  - target: $.tags[1]
+    update:
+      name: Documents
+      description: Operations for managing documents in knowledge bases
+
+  - target: $.tags[2]
+    update:
+      name: Segments
+      description: Operations for managing document segments
+
+  - target: $.tags[3]
+    update:
+      name: Models
+      description: Operations for retrieving model information
+
+  - target: $.tags[4]
+    update:
+      name: Metadata
+      description: Operations for managing metadata in knowledge bases

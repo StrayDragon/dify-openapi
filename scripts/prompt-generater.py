@@ -1,3 +1,9 @@
+#!/bin/uv run
+# /// script
+# requires-python = ">=3.13"
+# dependencies = [
+# ]
+# ///
 """
 生成喂给LLM的prompt, 用于修改/更新schema等
 

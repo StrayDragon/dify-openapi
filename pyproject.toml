@@ -49,4 +49,15 @@ line-ending = "auto"
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
-addopts = "-v --ignore libs --showlocals -x --cov=src --cov-branch --cov-report=xml" # --cov-report=term-missing
+addopts = "-s -v --ignore libs --showlocals -x --cov=src --cov-branch --cov-report=xml --cov-report=term-missing"
+xfail_strict = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "pass",
+    "raise ImportError",
+]

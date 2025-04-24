@@ -180,12 +180,13 @@ components:
             finished_at:
               type: integer
               description: End time
-    StreamEvent:
+    ChunkWorkflowMessage:
       type: object
       properties:
         event:
           type: string
           enum:
+            - message
             - workflow_started
             - node_started
             - node_finished
@@ -195,6 +196,7 @@ components:
             - ping
           description: |
             Event type, including the following types:
+            - `event: message` Message event, used to deliver simple text messages
             - `event: workflow_started` workflow execution starts
             - `event: node_started` node execution starts
             - `event: node_finished` node execution ends, success or failure with different statuses in the same event
@@ -319,19 +321,25 @@ components:
             - audio
             - video
             - custom
-          description: File type
+          description: |
+            File type, supported types:
+            - `document` Specific types include: 'TXT', 'MD', 'MARKDOWN', 'PDF', 'HTML', 'XLSX', 'XLS', 'DOCX', 'CSV', 'EML', 'MSG', 'PPTX', 'PPT', 'XML', 'EPUB'
+            - `image` Specific types include: 'JPG', 'JPEG', 'PNG', 'GIF', 'WEBP', 'SVG'
+            - `audio` Specific types include: 'MP3', 'M4A', 'WAV', 'WEBM', 'AMR'
+            - `video` Specific types include: 'MP4', 'MOV', 'MPEG', 'MPGA'
+            - `custom` Specific types include: other file types
         transfer_method:
           type: string
           enum:
             - remote_url
             - local_file
-          description: Transfer method
+          description: 'Transfer method, `remote_url` image address / `local_file` uploaded file'
         url:
           type: string
-          description: Remote URL
+          description: Remote URL (only when the transfer method is `remote_url`)
         upload_file_id:
           type: string
-          description: Upload file ID
+          description: Upload file ID (only when the transfer method is `local_file`)
 tags:
   - name: Workflow
     description: Workflow Application Operations
@@ -343,6 +351,7 @@ paths:
       operationId: runWorkflow
       summary: Execute Workflow
       description: Execute a workflow. Cannot be executed if there is no published workflow.
+      x-fern-streaming: true
       requestBody:
         required: true
         content:
@@ -391,11 +400,87 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WorkflowMessage'
-              description: 'When `response_mode` is `blocking`, returns a CompletionResponse object.'
+                description: 'When `response_mode` is `blocking`, returns a CompletionResponse object.'
             text/event-stream:
               schema:
-                $ref: '#/components/schemas/StreamEvent'
-              description: 'When `response_mode` is `streaming`, returns a stream of ChunkCompletionResponse objects.'
+                $ref: '#/components/schemas/ChunkWorkflowMessage'
+                description: |
+                  When `response_mode` is `streaming`, returns a stream of ChunkCompletionResponse objects.
+                  Returns App output stream chunks, Content-Type is text/event-stream.
+                  Each stream chunk starts with data: and chunks are separated by `\n\n` (two newlines), as shown below:
+
+                  data: {"event": "message", "task_id": "900bbd43-dc0b-4383-a372-aa6e6c414227", "workflow_run_id": "663c5084-a254-4040-8ad3-51f2a3c1a77c", "answer": "Hi", "created_at": 1705398420}\n\n
+
+                  Stream chunks have different structures based on the `event` type:
+
+                  - `event: workflow_started` workflow execution starts
+                    - `task_id` (string) Task ID, used for request tracking and stopping response
+                    - `workflow_run_id` (string) workflow execution ID
+                    - `event` (string) Fixed as workflow_started
+                    - `data` (object) Detailed content
+                      - `id` (string) workflow execution ID
+                      - `workflow_id` (string) Associated Workflow ID
+                      - `sequence_number` (int) Auto-incrementing sequence number, starting from 1 within the App
+                      - `created_at` (timestamp) Start time
+                  - `event: node_started` node execution starts
+                    - `task_id` (string) Task ID, used for request tracking and stopping response
+                    - `workflow_run_id` (string) workflow execution ID
+                    - `event` (string) Fixed as node_started
+                    - `data` (object) Detailed content
+                      - `id` (string) workflow execution ID
+                      - `node_id` (string) Node ID
+                      - `node_type` (string) Node type
+                      - `title` (string) Node name
+                      - `index` (int) Execution sequence number, used to display Tracing Node order
+                      - `predecessor_node_id` (string) Predecessor node ID, used to display execution path on canvas
+                      - `inputs` (object) All predecessor node variable content used in the node
+                      - `created_at` (timestamp) Start time
+                  - `event: node_finished` node execution ends, success or failure with different statuses in the same event
+                    - `task_id` (string) Task ID, used for request tracking and stopping response
+                    - `workflow_run_id` (string) workflow execution ID
+                    - `event` (string) Fixed as node_finished
+                    - `data` (object) Detailed content
+                      - `id` (string) node execution ID
+                      - `node_id` (string) Node ID
+                      - `index` (int) Execution sequence number, used to display Tracing Node order
+                      - `predecessor_node_id` (string) optional Predecessor node ID, used to display execution path on canvas
+                      - `inputs` (object) All predecessor node variable content used in the node
+                      - `process_data` (json) Optional Node process data
+                      - `outputs` (json) Optional Output content
+                      - `status` (string) Execution status: running / succeeded / failed / stopped
+                      - `error` (string) Optional Error reason
+                      - `elapsed_time` (float) Optional Elapsed time(s)
+                      - `execution_metadata` (json) Metadata
+                        - `total_tokens` (int) optional Total tokens used
+                        - `total_price` (decimal) optional Total price
+                        - `currency` (string) optional Currency, such as USD / RMB
+                      - `created_at` (timestamp) Start time
+                  - `event: workflow_finished` workflow execution ends, success or failure with different statuses in the same event
+                    - `task_id` (string) Task ID, used for request tracking and stopping response
+                    - `workflow_run_id` (string) workflow execution ID
+                    - `event` (string) Fixed as workflow_finished
+                    - `data` (object) Detailed content
+                      - `id` (string) workflow execution ID
+                      - `workflow_id` (string) Associated Workflow ID
+                      - `status` (string) Execution status: running / succeeded / failed / stopped
+                      - `outputs` (json) Optional Output content
+                      - `error` (string) Optional Error reason
+                      - `elapsed_time` (float) Optional Elapsed time(s)
+                      - `total_tokens` (int) Optional Total tokens used
+                      - `total_steps` (int) Total steps (redundant), default 0
+                      - `created_at` (timestamp) Start time
+                      - `finished_at` (timestamp) End time
+                  - `event: tts_message` TTS audio stream event, i.e., speech synthesis output. The content is an audio block in Mp3 format, encoded as a base64 string, which can be directly decoded when playing. (Only present when auto-play is enabled)
+                    - `task_id` (string) Task ID, used for request tracking and stopping response
+                    - `message_id` (string) Unique message ID
+                    - `audio` (string) Audio block after voice synthesis using Base64 encoding, which can be directly base64 decoded into the player when playing
+                    - `created_at` (int) Creation timestamp, e.g., 1705395332
+                  - `event: tts_message_end` TTS audio stream end event, receiving this event indicates the end of the audio stream return.
+                    - `task_id` (string) Task ID, used for request tracking and stopping response
+                    - `message_id` (string) Unique message ID
+                    - `audio` (string) The end event has no audio, so this is an empty string
+                    - `created_at` (int) Creation timestamp, e.g., 1705395332
+                  - `event: ping` ping event every 10s, keeps the connection alive.
         '400':
           $ref: '#/components/responses/Error400'
         '404':
