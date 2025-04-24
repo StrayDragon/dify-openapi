@@ -180,7 +180,7 @@ components:
         upload_file_id:
           type: string
           description: Upload file ID
-    StreamEvent:
+    ChunkChatCompletionResponse:
       type: object
       properties:
         event:
@@ -268,7 +268,7 @@ paths:
         response:
           $ref: '#/components/schemas/ChatCompletionResponse'
         response-stream:
-          $ref: '#/components/schemas/StreamEvent'
+          $ref: '#/components/schemas/ChunkChatCompletionResponse'
       requestBody:
         required: true
         content:
@@ -320,9 +320,9 @@ paths:
                 - `created_at` (int) Message creation timestamp
             text/event-stream:
               schema:
-                $ref: '#/components/schemas/StreamEvent'
+                $ref: '#/components/schemas/ChunkChatCompletionResponse'
               description: |
-                When `response_mode` is `streaming`, returns a stream of StreamEvent objects.
+                When `response_mode` is `streaming`, returns a stream of ChunkChatCompletionResponse objects.
                 Returns App output stream chunks, `Content-Type` is `text/event-stream`.
                 Each stream chunk starts with data: and chunks are separated by `\n\n` (two newlines).
                 Stream chunks have different structures based on the `event` type:

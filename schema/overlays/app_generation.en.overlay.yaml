@@ -128,31 +128,31 @@ actions:
   - target: $.components.schemas.FileInput.properties.upload_file_id.description
     update: "Upload file ID"
 
-  - target: $.components.schemas.StreamEvent.properties.event.description
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.event.description
     update: "Event type"
 
-  - target: $.components.schemas.StreamEvent.properties.task_id.description
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.task_id.description
     update: "Task ID"
 
-  - target: $.components.schemas.StreamEvent.properties.message_id.description
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.message_id.description
     update: "Unique message ID"
 
-  - target: $.components.schemas.StreamEvent.properties.answer.description
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.answer.description
     update: "Response content"
 
-  - target: $.components.schemas.StreamEvent.properties.audio.description
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.audio.description
     update: "Voice synthesis audio data (base64 encoded)"
 
-  - target: $.components.schemas.StreamEvent.properties.created_at.description
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.created_at.description
     update: "Creation timestamp"
 
-  - target: $.components.schemas.StreamEvent.properties.status.description
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.status.description
     update: "HTTP status code"
 
-  - target: $.components.schemas.StreamEvent.properties.code.description
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.code.description
     update: "Error code"
 
-  - target: $.components.schemas.StreamEvent.properties.message.description
+  - target: $.components.schemas.ChunkChatCompletionResponse.properties.message.description
     update: "Error message"
 
   - target: $.components.schemas.UploadedFile.properties.id.description
@@ -186,7 +186,7 @@ actions:
         response:
           $ref: "#/components/schemas/ChatCompletionResponse"
         response-stream:
-          $ref: "#/components/schemas/StreamEvent"
+          $ref: "#/components/schemas/ChunkChatCompletionResponse"
 
   - target: $.paths['/completion-messages'].post.requestBody.content['application/json'].schema.properties.inputs.properties.query
     update:
@@ -219,7 +219,7 @@ actions:
 
   - target: $.paths['/completion-messages'].post.responses['200'].content['text/event-stream'].description
     update: |
-      When `response_mode` is `streaming`, returns a stream of StreamEvent objects.
+      When `response_mode` is `streaming`, returns a stream of ChunkChatCompletionResponse objects.
       Returns App output stream chunks, `Content-Type` is `text/event-stream`.
       Each stream chunk starts with data: and chunks are separated by `\n\n` (two newlines).
       Stream chunks have different structures based on the `event` type:
