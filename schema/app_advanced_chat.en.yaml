@@ -133,15 +133,34 @@ components:
         content:
           type: string
           description: Content
-    BaseMessage:
+    ChatCompletionResponse:
       type: object
       properties:
+        event:
+          type: string
+          description: 'Event type, fixed as message'
+          enum:
+            - message
+        task_id:
+          type: string
+          description: Task ID for request tracking and stopping responses
+        id:
+          type: string
+          description: Unique ID
         message_id:
           type: string
           description: Unique message ID
-        created_at:
-          type: integer
-          description: Message creation timestamp
+        conversation_id:
+          type: string
+          description: Conversation ID
+        mode:
+          type: string
+          description: 'App mode, fixed as chat'
+          enum:
+            - chat
+        answer:
+          type: string
+          description: Complete response content
         metadata:
           type: object
           properties:
@@ -151,44 +170,32 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/RetrieverResource'
-    ChatMessage:
-      allOf:
-        - $ref: '#/components/schemas/BaseMessage'
-        - type: object
-          properties:
-            conversation_id:
-              type: string
-              description: Conversation ID
-            mode:
-              type: string
-              description: 'App mode, fixed as chat'
-            answer:
-              type: string
-              description: Complete response content
-    StreamEvent:
+          description: Metadata
+        created_at:
+          type: integer
+          description: Message creation timestamp
+    ChunkChatCompletionResponse:
       type: object
       properties:
         event:
           type: string
           enum:
             - message
+            - message_file
             - message_end
             - tts_message
             - tts_message_end
             - message_replace
-            - error
-            - ping
             - workflow_started
             - node_started
             - node_finished
             - workflow_finished
-            - agent_message
-            - agent_thought
-            - message_file
+            - error
+            - ping
           description: Event type
         task_id:
           type: string
-          description: Task ID
+          description: Task ID for request tracking and stopping responses
         message_id:
           type: string
           description: Unique message ID
@@ -200,13 +207,22 @@ components:
           description: Workflow execution ID
         answer:
           type: string
-          description: Response content
+          description: LLM text chunk content (for message event) or replacement content (for message_replace event)
         audio:
           type: string
-          description: Voice synthesis audio data (base64 encoded)
-        data:
-          type: object
-          description: Event related data
+          description: 'Voice synthesis audio data (base64 encoded, for tts_message event)'
+        id:
+          type: string
+          description: Unique file ID (for message_file event)
+        type:
+          type: string
+          description: 'File type, currently only ''image'' (for message_file event)'
+        belongs_to:
+          type: string
+          description: 'File ownership, ''user'' or ''assistant'' (for message_file event)'
+        url:
+          type: string
+          description: File access URL (for message_file event)
         metadata:
           type: object
           properties:
@@ -216,6 +232,19 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/RetrieverResource'
+          description: Metadata (for message_end event)
+        data:
+          type: object
+          description: 'Detailed content (for workflow_started, node_started, node_finished, workflow_finished events)'
+        status:
+          type: integer
+          description: 'HTTP status code (for error event) or execution status (data.status in node_finished, workflow_finished events)'
+        code:
+          type: string
+          description: Error code (for error event)
+        message:
+          type: string
+          description: Error message (for error event)
         created_at:
           type: integer
           description: Creation timestamp
@@ -330,19 +359,19 @@ paths:
         format: sse
         stream-condition: $request.response_mode == "streaming"
         response:
-          $ref: '#/components/schemas/ChatMessage'
+          $ref: '#/components/schemas/ChatCompletionResponse'
         response-stream:
-          $ref: '#/components/schemas/StreamEvent'
+          $ref: '#/components/schemas/ChunkChatCompletionResponse'
       responses:
         '200':
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChatMessage'
+                $ref: '#/components/schemas/ChatCompletionResponse'
             text/event-stream:
               schema:
-                $ref: '#/components/schemas/StreamEvent'
+                $ref: '#/components/schemas/ChunkChatCompletionResponse'
         '400':
           $ref: '#/components/responses/Error400'
         '404':
