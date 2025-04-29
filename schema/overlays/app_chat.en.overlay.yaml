@@ -550,6 +550,65 @@ actions:
   - target: $.paths['/conversations/{conversation_id}/name'].post.responses['200'].description
     update: "Successful response"
 
+  - target: $.paths['/conversations/{conversation_id}/variables'].get
+    update:
+      summary: "Get Conversation Variables"
+      description: "Retrieve variables from a specific conversation. This endpoint is useful for extracting structured data captured during conversations."
+
+  - target: $.paths['/conversations/{conversation_id}/variables'].get.parameters[0].description
+    update: "ID of the conversation to retrieve variables from"
+
+  - target: $.paths['/conversations/{conversation_id}/variables'].get.parameters[1].description
+    update: "User identifier, defined by developer rules, must be unique within the application"
+
+  - target: $.paths['/conversations/{conversation_id}/variables'].get.parameters[2].description
+    update: "(Optional) ID of the last record on the current page, default null"
+
+  - target: $.paths['/conversations/{conversation_id}/variables'].get.parameters[3].description
+    update: "(Optional) Number of records to return per request, default 20, max 100, min 1"
+
+  - target: $.paths['/conversations/{conversation_id}/variables'].get.responses['200'].description
+    update: "Successfully retrieved variables"
+
+  - target: $.paths['/conversations/{conversation_id}/variables'].get.responses['200'].content['application/json'].schema.properties.limit.description
+    update: "Items per page"
+
+  - target: $.paths['/conversations/{conversation_id}/variables'].get.responses['200'].content['application/json'].schema.properties.has_more.description
+    update: "Whether there are more items"
+
+  - target: $.paths['/conversations/{conversation_id}/variables'].get.responses['200'].content['application/json'].schema.properties.data.description
+    update: "List of variables"
+
+  - target: $.paths['/conversations/{conversation_id}/variables'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.id.description
+    update: "Variable ID"
+
+  - target: $.paths['/conversations/{conversation_id}/variables'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.name.description
+    update: "Variable name"
+
+  - target: $.paths['/conversations/{conversation_id}/variables'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.value_type.description
+    update: "Variable type (string, number, boolean, etc.)"
+
+  - target: $.paths['/conversations/{conversation_id}/variables'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.value.description
+    update: "Variable value"
+
+  - target: $.paths['/conversations/{conversation_id}/variables'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.description.description
+    update: "Variable description"
+
+  - target: $.paths['/conversations/{conversation_id}/variables'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.created_at.description
+    update: "Creation timestamp"
+
+  - target: $.paths['/conversations/{conversation_id}/variables'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.updated_at.description
+    update: "Last update timestamp"
+
+  - target: $.paths['/conversations/{conversation_id}/variables'].get.responses['404'].description
+    update: "Conversation not found"
+
+  - target: $.paths['/conversations/{conversation_id}/variables'].get.responses['404'].content['application/json'].schema.properties.code.description
+    update: "Error code"
+
+  - target: $.paths['/conversations/{conversation_id}/variables'].get.responses['404'].content['application/json'].schema.properties.message.description
+    update: "Error message"
+
   - target: $.paths['/messages'].get
     update:
       summary: "Get Conversation History Messages"
@@ -916,10 +975,10 @@ actions:
   - target: $.paths['/apps/annotation-reply/{action}'].post.parameters[0].description
     update: "Action, can only be 'enable' or 'disable'"
 
-  - target: $.paths['/apps/annotation-reply/{action}'].post.requestBody.content['application/json'].schema.properties.embedding_model_provider.description
+  - target: $.paths['/apps/annotation-reply/{action}'].post.requestBody.content['application/json'].schema.properties.embedding_provider_name.description
     update: "Specified embedding model provider, must be configured in the system first, corresponds to the provider field"
 
-  - target: $.paths['/apps/annotation-reply/{action}'].post.requestBody.content['application/json'].schema.properties.embedding_model.description
+  - target: $.paths['/apps/annotation-reply/{action}'].post.requestBody.content['application/json'].schema.properties.embedding_model_name.description
     update: "Specified embedding model, corresponds to the model field"
 
   - target: $.paths['/apps/annotation-reply/{action}'].post.requestBody.content['application/json'].schema.properties.score_threshold.description

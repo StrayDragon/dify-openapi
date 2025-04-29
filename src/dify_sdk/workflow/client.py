@@ -5,8 +5,8 @@ import typing
 from .. import core
 from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ..core.request_options import RequestOptions
-from ..types.stream_event import StreamEvent
 from .raw_client import AsyncRawWorkflowClient, RawWorkflowClient
+from .types.chunk_workflow_message import ChunkWorkflowMessage
 from .types.get_app_info_response import GetAppInfoResponse
 from .types.get_app_parameters_response import GetAppParametersResponse
 from .types.get_workflow_execution_status_response import GetWorkflowExecutionStatusResponse
@@ -42,7 +42,7 @@ class WorkflowClient:
         response_mode: RunWorkflowRequestResponseMode,
         user: str,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.Iterator[StreamEvent]:
+    ) -> typing.Iterator[ChunkWorkflowMessage]:
         """
         Execute a workflow. Cannot be executed if there is no published workflow.
 
@@ -77,7 +77,7 @@ class WorkflowClient:
 
         Yields
         ------
-        typing.Iterator[StreamEvent]
+        typing.Iterator[ChunkWorkflowMessage]
             Successful response
 
         Examples
@@ -119,8 +119,8 @@ class WorkflowClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.workflow.get_workflow_execution_status(workflow_run_id='workflow_run_id', )
         """
-        response = self._raw_client.get_workflow_execution_status(workflow_run_id, request_options=request_options)
-        return response.data
+        _response = self._raw_client.get_workflow_execution_status(workflow_run_id, request_options=request_options)
+        return _response.data
 
     def stop_workflow(
         self, task_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
@@ -150,8 +150,8 @@ class WorkflowClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.workflow.stop_workflow(task_id='task_id', user='user', )
         """
-        response = self._raw_client.stop_workflow(task_id, user=user, request_options=request_options)
-        return response.data
+        _response = self._raw_client.stop_workflow(task_id, user=user, request_options=request_options)
+        return _response.data
 
     def get_workflow_logs(
         self,
@@ -193,10 +193,10 @@ class WorkflowClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.workflow.get_workflow_logs()
         """
-        response = self._raw_client.get_workflow_logs(
+        _response = self._raw_client.get_workflow_logs(
             keyword=keyword, status=status, page=page, limit=limit, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     def upload_file(
         self, *, file: core.File, user: str, request_options: typing.Optional[RequestOptions] = None
@@ -226,8 +226,8 @@ class WorkflowClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.workflow.upload_file(user='user', )
         """
-        response = self._raw_client.upload_file(file=file, user=user, request_options=request_options)
-        return response.data
+        _response = self._raw_client.upload_file(file=file, user=user, request_options=request_options)
+        return _response.data
 
     def get_app_info(self, *, request_options: typing.Optional[RequestOptions] = None) -> GetAppInfoResponse:
         """
@@ -249,8 +249,8 @@ class WorkflowClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.workflow.get_app_info()
         """
-        response = self._raw_client.get_app_info(request_options=request_options)
-        return response.data
+        _response = self._raw_client.get_app_info(request_options=request_options)
+        return _response.data
 
     def get_app_parameters(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -274,8 +274,8 @@ class WorkflowClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.workflow.get_app_parameters()
         """
-        response = self._raw_client.get_app_parameters(request_options=request_options)
-        return response.data
+        _response = self._raw_client.get_app_parameters(request_options=request_options)
+        return _response.data
 
 
 class AsyncWorkflowClient:
@@ -300,7 +300,7 @@ class AsyncWorkflowClient:
         response_mode: RunWorkflowRequestResponseMode,
         user: str,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.AsyncIterator[StreamEvent]:
+    ) -> typing.AsyncIterator[ChunkWorkflowMessage]:
         """
         Execute a workflow. Cannot be executed if there is no published workflow.
 
@@ -335,7 +335,7 @@ class AsyncWorkflowClient:
 
         Yields
         ------
-        typing.AsyncIterator[StreamEvent]
+        typing.AsyncIterator[ChunkWorkflowMessage]
             Successful response
 
         Examples
@@ -384,10 +384,10 @@ class AsyncWorkflowClient:
             await client.workflow.get_workflow_execution_status(workflow_run_id='workflow_run_id', )
         asyncio.run(main())
         """
-        response = await self._raw_client.get_workflow_execution_status(
+        _response = await self._raw_client.get_workflow_execution_status(
             workflow_run_id, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     async def stop_workflow(
         self, task_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
@@ -420,8 +420,8 @@ class AsyncWorkflowClient:
             await client.workflow.stop_workflow(task_id='task_id', user='user', )
         asyncio.run(main())
         """
-        response = await self._raw_client.stop_workflow(task_id, user=user, request_options=request_options)
-        return response.data
+        _response = await self._raw_client.stop_workflow(task_id, user=user, request_options=request_options)
+        return _response.data
 
     async def get_workflow_logs(
         self,
@@ -466,10 +466,10 @@ class AsyncWorkflowClient:
             await client.workflow.get_workflow_logs()
         asyncio.run(main())
         """
-        response = await self._raw_client.get_workflow_logs(
+        _response = await self._raw_client.get_workflow_logs(
             keyword=keyword, status=status, page=page, limit=limit, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     async def upload_file(
         self, *, file: core.File, user: str, request_options: typing.Optional[RequestOptions] = None
@@ -502,8 +502,8 @@ class AsyncWorkflowClient:
             await client.workflow.upload_file(user='user', )
         asyncio.run(main())
         """
-        response = await self._raw_client.upload_file(file=file, user=user, request_options=request_options)
-        return response.data
+        _response = await self._raw_client.upload_file(file=file, user=user, request_options=request_options)
+        return _response.data
 
     async def get_app_info(self, *, request_options: typing.Optional[RequestOptions] = None) -> GetAppInfoResponse:
         """
@@ -528,8 +528,8 @@ class AsyncWorkflowClient:
             await client.workflow.get_app_info()
         asyncio.run(main())
         """
-        response = await self._raw_client.get_app_info(request_options=request_options)
-        return response.data
+        _response = await self._raw_client.get_app_info(request_options=request_options)
+        return _response.data
 
     async def get_app_parameters(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -556,5 +556,5 @@ class AsyncWorkflowClient:
             await client.workflow.get_app_parameters()
         asyncio.run(main())
         """
-        response = await self._raw_client.get_app_parameters(request_options=request_options)
-        return response.data
+        _response = await self._raw_client.get_app_parameters(request_options=request_options)
+        return _response.data

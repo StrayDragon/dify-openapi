@@ -4,8 +4,6 @@ info:
   version: "1.0.0"
 extends: ../app_generation.zh.yaml
 actions:
-  - target: $.tags[0].description
-    update: "Text Generation Application Operations"
   - target: $.info
     update:
       title: "Dify API - Text Generation Application"
@@ -334,10 +332,10 @@ actions:
   - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply.properties.score_threshold.description
     update: "Similarity threshold"
 
-  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply.properties.embedding_model.description
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply.properties.embedding_model_name.description
     update: "Embedding model"
 
-  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply.properties.embedding_model_provider.description
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply.properties.embedding_provider_name.description
     update: "Embedding model provider"
 
   - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form
@@ -625,10 +623,10 @@ actions:
   - target: $.paths['/apps/annotation-reply/{action}'].post.parameters[0].description
     update: "Action, can only be 'enable' or 'disable'"
 
-  - target: $.paths['/apps/annotation-reply/{action}'].post.requestBody.content['application/json'].schema.properties.embedding_model_provider.description
+  - target: $.paths['/apps/annotation-reply/{action}'].post.requestBody.content['application/json'].schema.properties.embedding_provider_name.description
     update: "Specified embedding model provider, must be configured in the system first, corresponds to the provider field"
 
-  - target: $.paths['/apps/annotation-reply/{action}'].post.requestBody.content['application/json'].schema.properties.embedding_model.description
+  - target: $.paths['/apps/annotation-reply/{action}'].post.requestBody.content['application/json'].schema.properties.embedding_model_name.description
     update: "Specified embedding model, corresponds to the model field"
 
   - target: $.paths['/apps/annotation-reply/{action}'].post.requestBody.content['application/json'].schema.properties.score_threshold.description

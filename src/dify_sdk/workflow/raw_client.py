@@ -12,15 +12,15 @@ from ..core.http_response import AsyncHttpResponse, HttpResponse
 from ..core.jsonable_encoder import jsonable_encoder
 from ..core.pydantic_utilities import parse_obj_as
 from ..core.request_options import RequestOptions
-from ..errors.bad_request_error import BadRequestError
-from ..errors.content_too_large_error import ContentTooLargeError
-from ..errors.internal_server_error import InternalServerError
-from ..errors.not_found_error import NotFoundError
-from ..errors.service_unavailable_error import ServiceUnavailableError
-from ..errors.unauthorized_error import UnauthorizedError
-from ..errors.unsupported_media_type_error import UnsupportedMediaTypeError
-from ..types.error import Error
-from ..types.stream_event import StreamEvent
+from .errors.bad_request_error import BadRequestError
+from .errors.content_too_large_error import ContentTooLargeError
+from .errors.internal_server_error import InternalServerError
+from .errors.not_found_error import NotFoundError
+from .errors.service_unavailable_error import ServiceUnavailableError
+from .errors.unauthorized_error import UnauthorizedError
+from .errors.unsupported_media_type_error import UnsupportedMediaTypeError
+from .types.chunk_workflow_message import ChunkWorkflowMessage
+from .types.error import Error
 from .types.get_app_info_response import GetAppInfoResponse
 from .types.get_app_parameters_response import GetAppParametersResponse
 from .types.get_workflow_execution_status_response import GetWorkflowExecutionStatusResponse
@@ -46,7 +46,7 @@ class RawWorkflowClient:
         response_mode: RunWorkflowRequestResponseMode,
         user: str,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.Iterator[HttpResponse[typing.Iterator[StreamEvent]]]:
+    ) -> typing.Iterator[HttpResponse[typing.Iterator[ChunkWorkflowMessage]]]:
         """
         Execute a workflow. Cannot be executed if there is no published workflow.
 
@@ -81,7 +81,7 @@ class RawWorkflowClient:
 
         Yields
         ------
-        typing.Iterator[HttpResponse[typing.Iterator[StreamEvent]]]
+        typing.Iterator[HttpResponse[typing.Iterator[ChunkWorkflowMessage]]]
             Successful response
         """
         with self._client_wrapper.httpx_client.stream(
@@ -99,7 +99,7 @@ class RawWorkflowClient:
             omit=OMIT,
         ) as _response:
 
-            def stream() -> HttpResponse[typing.Iterator[StreamEvent]]:
+            def stream() -> HttpResponse[typing.Iterator[ChunkWorkflowMessage]]:
                 try:
                     if 200 <= _response.status_code < 300:
 
@@ -111,9 +111,9 @@ class RawWorkflowClient:
                                     if len(_text) == 0:
                                         continue
                                     yield typing.cast(
-                                        StreamEvent,
+                                        ChunkWorkflowMessage,
                                         parse_obj_as(
-                                            type_=StreamEvent,  # type: ignore
+                                            type_=ChunkWorkflowMessage,  # type: ignore
                                             object_=json.loads(_text),
                                         ),
                                     )
@@ -136,9 +136,9 @@ class RawWorkflowClient:
                     if _response.status_code == 404:
                         raise NotFoundError(
                             typing.cast(
-                                Error,
+                                typing.Optional[typing.Any],
                                 parse_obj_as(
-                                    type_=Error,  # type: ignore
+                                    type_=typing.Optional[typing.Any],  # type: ignore
                                     object_=_response.json(),
                                 ),
                             )
@@ -155,8 +155,10 @@ class RawWorkflowClient:
                         )
                     _response_json = _response.json()
                 except JSONDecodeError:
-                    raise ApiError(status_code=_response.status_code, body=_response.text)
-                raise ApiError(status_code=_response.status_code, body=_response_json)
+                    raise ApiError(
+                        headers=dict(_response.headers), status_code=_response.status_code, body=_response.text
+                    )
+                raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
             yield stream()
 
@@ -217,9 +219,9 @@ class RawWorkflowClient:
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -236,8 +238,8 @@ class RawWorkflowClient:
                 )
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def stop_workflow(
         self, task_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
@@ -306,9 +308,9 @@ class RawWorkflowClient:
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -325,8 +327,8 @@ class RawWorkflowClient:
                 )
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def get_workflow_logs(
         self,
@@ -406,9 +408,9 @@ class RawWorkflowClient:
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -425,8 +427,8 @@ class RawWorkflowClient:
                 )
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def upload_file(
         self, *, file: core.File, user: str, request_options: typing.Optional[RequestOptions] = None
@@ -458,6 +460,9 @@ class RawWorkflowClient:
             },
             files={
                 "file": file,
+            },
+            headers={
+                # "content-type": "multipart/form-data",
             },
             request_options=request_options,
             omit=OMIT,
@@ -534,8 +539,8 @@ class RawWorkflowClient:
                 )
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def get_app_info(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -591,9 +596,9 @@ class RawWorkflowClient:
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -610,8 +615,8 @@ class RawWorkflowClient:
                 )
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def get_app_parameters(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -667,9 +672,9 @@ class RawWorkflowClient:
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -686,8 +691,8 @@ class RawWorkflowClient:
                 )
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
 
 class AsyncRawWorkflowClient:
@@ -702,7 +707,7 @@ class AsyncRawWorkflowClient:
         response_mode: RunWorkflowRequestResponseMode,
         user: str,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[StreamEvent]]]:
+    ) -> typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[ChunkWorkflowMessage]]]:
         """
         Execute a workflow. Cannot be executed if there is no published workflow.
 
@@ -737,7 +742,7 @@ class AsyncRawWorkflowClient:
 
         Yields
         ------
-        typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[StreamEvent]]]
+        typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[ChunkWorkflowMessage]]]
             Successful response
         """
         async with self._client_wrapper.httpx_client.stream(
@@ -755,7 +760,7 @@ class AsyncRawWorkflowClient:
             omit=OMIT,
         ) as _response:
 
-            async def stream() -> AsyncHttpResponse[typing.AsyncIterator[StreamEvent]]:
+            async def stream() -> AsyncHttpResponse[typing.AsyncIterator[ChunkWorkflowMessage]]:
                 try:
                     if 200 <= _response.status_code < 300:
 
@@ -767,9 +772,9 @@ class AsyncRawWorkflowClient:
                                     if len(_text) == 0:
                                         continue
                                     yield typing.cast(
-                                        StreamEvent,
+                                        ChunkWorkflowMessage,
                                         parse_obj_as(
-                                            type_=StreamEvent,  # type: ignore
+                                            type_=ChunkWorkflowMessage,  # type: ignore
                                             object_=json.loads(_text),
                                         ),
                                     )
@@ -792,9 +797,9 @@ class AsyncRawWorkflowClient:
                     if _response.status_code == 404:
                         raise NotFoundError(
                             typing.cast(
-                                Error,
+                                typing.Optional[typing.Any],
                                 parse_obj_as(
-                                    type_=Error,  # type: ignore
+                                    type_=typing.Optional[typing.Any],  # type: ignore
                                     object_=_response.json(),
                                 ),
                             )
@@ -811,8 +816,10 @@ class AsyncRawWorkflowClient:
                         )
                     _response_json = _response.json()
                 except JSONDecodeError:
-                    raise ApiError(status_code=_response.status_code, body=_response.text)
-                raise ApiError(status_code=_response.status_code, body=_response_json)
+                    raise ApiError(
+                        headers=dict(_response.headers), status_code=_response.status_code, body=_response.text
+                    )
+                raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
             yield await stream()
 
@@ -873,9 +880,9 @@ class AsyncRawWorkflowClient:
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -892,8 +899,8 @@ class AsyncRawWorkflowClient:
                 )
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def stop_workflow(
         self, task_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
@@ -962,9 +969,9 @@ class AsyncRawWorkflowClient:
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -981,8 +988,8 @@ class AsyncRawWorkflowClient:
                 )
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def get_workflow_logs(
         self,
@@ -1062,9 +1069,9 @@ class AsyncRawWorkflowClient:
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1081,8 +1088,8 @@ class AsyncRawWorkflowClient:
                 )
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def upload_file(
         self, *, file: core.File, user: str, request_options: typing.Optional[RequestOptions] = None
@@ -1114,6 +1121,9 @@ class AsyncRawWorkflowClient:
             },
             files={
                 "file": file,
+            },
+            headers={
+                # "content-type": "multipart/form-data",
             },
             request_options=request_options,
             omit=OMIT,
@@ -1190,8 +1200,8 @@ class AsyncRawWorkflowClient:
                 )
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def get_app_info(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -1247,9 +1257,9 @@ class AsyncRawWorkflowClient:
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1266,8 +1276,8 @@ class AsyncRawWorkflowClient:
                 )
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def get_app_parameters(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -1323,9 +1333,9 @@ class AsyncRawWorkflowClient:
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1342,5 +1352,5 @@ class AsyncRawWorkflowClient:
                 )
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)

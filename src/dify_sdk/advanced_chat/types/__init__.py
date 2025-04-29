@@ -2,6 +2,11 @@
 
 # isort: skip_file
 
+from .chat_completion_response import ChatCompletionResponse
+from .chat_completion_response_metadata import ChatCompletionResponseMetadata
+from .chunk_chat_completion_response import ChunkChatCompletionResponse
+from .chunk_chat_completion_response_event import ChunkChatCompletionResponseEvent
+from .chunk_chat_completion_response_metadata import ChunkChatCompletionResponseMetadata
 from .configure_annotation_reply_by_app_advanced_chat_request_action import (
     ConfigureAnnotationReplyByAppAdvancedChatRequestAction,
 )
@@ -10,6 +15,10 @@ from .convert_audio_to_text_by_app_advanced_chat_response import ConvertAudioToT
 from .create_annotation_by_app_advanced_chat_response import CreateAnnotationByAppAdvancedChatResponse
 from .delete_annotation_by_app_advanced_chat_response import DeleteAnnotationByAppAdvancedChatResponse
 from .delete_conversation_by_app_advanced_chat_response import DeleteConversationByAppAdvancedChatResponse
+from .error import Error
+from .file_input import FileInput
+from .file_input_transfer_method import FileInputTransferMethod
+from .file_input_type import FileInputType
 from .get_annotation_reply_status_by_app_advanced_chat_request_action import (
     GetAnnotationReplyStatusByAppAdvancedChatRequestAction,
 )
@@ -55,25 +64,42 @@ from .get_conversation_messages_by_app_advanced_chat_response_data_item_message_
 from .get_conversation_messages_by_app_advanced_chat_response_data_item_message_files_item_belongs_to import (
     GetConversationMessagesByAppAdvancedChatResponseDataItemMessageFilesItemBelongsTo,
 )
+from .get_conversation_variables_by_app_advanced_chat_response import GetConversationVariablesByAppAdvancedChatResponse
+from .get_conversation_variables_by_app_advanced_chat_response_data_item import (
+    GetConversationVariablesByAppAdvancedChatResponseDataItem,
+)
 from .get_conversations_by_app_advanced_chat_request_sort_by import GetConversationsByAppAdvancedChatRequestSortBy
 from .get_conversations_by_app_advanced_chat_response import GetConversationsByAppAdvancedChatResponse
 from .get_conversations_by_app_advanced_chat_response_data_item import GetConversationsByAppAdvancedChatResponseDataItem
 from .get_suggested_questions_by_app_advanced_chat_response import GetSuggestedQuestionsByAppAdvancedChatResponse
+from .not_found_error_body import NotFoundErrorBody
 from .rename_conversation_by_app_advanced_chat_response import RenameConversationByAppAdvancedChatResponse
+from .retriever_resource import RetrieverResource
 from .send_chat_message_by_app_advanced_chat_request_response_mode import (
     SendChatMessageByAppAdvancedChatRequestResponseMode,
 )
 from .send_message_feedback_by_app_advanced_chat_response import SendMessageFeedbackByAppAdvancedChatResponse
 from .stop_chat_response_by_app_advanced_chat_response import StopChatResponseByAppAdvancedChatResponse
 from .update_annotation_by_app_advanced_chat_response import UpdateAnnotationByAppAdvancedChatResponse
+from .uploaded_file import UploadedFile
+from .usage import Usage
 
 __all__ = [
+    "ChatCompletionResponse",
+    "ChatCompletionResponseMetadata",
+    "ChunkChatCompletionResponse",
+    "ChunkChatCompletionResponseEvent",
+    "ChunkChatCompletionResponseMetadata",
     "ConfigureAnnotationReplyByAppAdvancedChatRequestAction",
     "ConfigureAnnotationReplyByAppAdvancedChatResponse",
     "ConvertAudioToTextByAppAdvancedChatResponse",
     "CreateAnnotationByAppAdvancedChatResponse",
     "DeleteAnnotationByAppAdvancedChatResponse",
     "DeleteConversationByAppAdvancedChatResponse",
+    "Error",
+    "FileInput",
+    "FileInputTransferMethod",
+    "FileInputType",
     "GetAnnotationReplyStatusByAppAdvancedChatRequestAction",
     "GetAnnotationReplyStatusByAppAdvancedChatResponse",
     "GetAnnotationsListByAppAdvancedChatResponse",
@@ -93,13 +119,19 @@ __all__ = [
     "GetConversationMessagesByAppAdvancedChatResponseDataItemFeedbackRating",
     "GetConversationMessagesByAppAdvancedChatResponseDataItemMessageFilesItem",
     "GetConversationMessagesByAppAdvancedChatResponseDataItemMessageFilesItemBelongsTo",
+    "GetConversationVariablesByAppAdvancedChatResponse",
+    "GetConversationVariablesByAppAdvancedChatResponseDataItem",
     "GetConversationsByAppAdvancedChatRequestSortBy",
     "GetConversationsByAppAdvancedChatResponse",
     "GetConversationsByAppAdvancedChatResponseDataItem",
     "GetSuggestedQuestionsByAppAdvancedChatResponse",
+    "NotFoundErrorBody",
     "RenameConversationByAppAdvancedChatResponse",
+    "RetrieverResource",
     "SendChatMessageByAppAdvancedChatRequestResponseMode",
     "SendMessageFeedbackByAppAdvancedChatResponse",
     "StopChatResponseByAppAdvancedChatResponse",
     "UpdateAnnotationByAppAdvancedChatResponse",
+    "UploadedFile",
+    "Usage",
 ]

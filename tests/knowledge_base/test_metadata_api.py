@@ -2,18 +2,19 @@
 测试知识库元数据API的完整工作流程
 """
 
-from dify_sdk import (
+from dify_sdk.knowledge_base import (
+
     UpdateDocumentsMetadataRequestOperationDataItem,
 )
-from dify_sdk.types.process_rule import ProcessRule
+from dify_sdk.knowledge_base.types.process_rule import ProcessRule
 from dify_sdk_testing import KnowledgeBaseClient, wait_for_document_indexing_completed
-from dify_sdk.metadata.types.update_documents_metadata_request_operation_data_item_metadata_list_item import (
+from dify_sdk.knowledge_base.metadata.types.update_documents_metadata_request_operation_data_item_metadata_list_item import (
     UpdateDocumentsMetadataRequestOperationDataItemMetadataListItem,
 )
-from dify_sdk.types.dataset import Dataset
-from dify_sdk.metadata.types.list_dataset_metadata_response import ListDatasetMetadataResponse
-from dify_sdk.metadata.types.create_metadata_response import CreateMetadataResponse
-from dify_sdk.metadata.types.update_metadata_response import UpdateMetadataResponse
+from dify_sdk.knowledge_base.types.dataset import Dataset
+from dify_sdk.knowledge_base.metadata.types.list_dataset_metadata_response import ListDatasetMetadataResponse
+from dify_sdk.knowledge_base.metadata.types.create_metadata_response import CreateMetadataResponse
+from dify_sdk.knowledge_base.metadata.types.update_metadata_response import UpdateMetadataResponse
 
 
 async def test_metadata_workflow(kb_client: KnowledgeBaseClient):

@@ -5,10 +5,8 @@ import typing
 from .. import core
 from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ..core.request_options import RequestOptions
-from ..types.chat_message import ChatMessage
-from ..types.file_input import FileInput
-from ..types.uploaded_file import UploadedFile
 from .raw_client import AsyncRawAdvancedChatClient, RawAdvancedChatClient
+from .types.chunk_chat_completion_response import ChunkChatCompletionResponse
 from .types.configure_annotation_reply_by_app_advanced_chat_request_action import (
     ConfigureAnnotationReplyByAppAdvancedChatRequestAction,
 )
@@ -19,6 +17,7 @@ from .types.convert_audio_to_text_by_app_advanced_chat_response import ConvertAu
 from .types.create_annotation_by_app_advanced_chat_response import CreateAnnotationByAppAdvancedChatResponse
 from .types.delete_annotation_by_app_advanced_chat_response import DeleteAnnotationByAppAdvancedChatResponse
 from .types.delete_conversation_by_app_advanced_chat_response import DeleteConversationByAppAdvancedChatResponse
+from .types.file_input import FileInput
 from .types.get_annotation_reply_status_by_app_advanced_chat_request_action import (
     GetAnnotationReplyStatusByAppAdvancedChatRequestAction,
 )
@@ -34,6 +33,9 @@ from .types.get_application_parameters_by_app_advanced_chat_response import (
 from .types.get_conversation_messages_by_app_advanced_chat_response import (
     GetConversationMessagesByAppAdvancedChatResponse,
 )
+from .types.get_conversation_variables_by_app_advanced_chat_response import (
+    GetConversationVariablesByAppAdvancedChatResponse,
+)
 from .types.get_conversations_by_app_advanced_chat_request_sort_by import GetConversationsByAppAdvancedChatRequestSortBy
 from .types.get_conversations_by_app_advanced_chat_response import GetConversationsByAppAdvancedChatResponse
 from .types.get_suggested_questions_by_app_advanced_chat_response import GetSuggestedQuestionsByAppAdvancedChatResponse
@@ -44,6 +46,7 @@ from .types.send_chat_message_by_app_advanced_chat_request_response_mode import 
 from .types.send_message_feedback_by_app_advanced_chat_response import SendMessageFeedbackByAppAdvancedChatResponse
 from .types.stop_chat_response_by_app_advanced_chat_response import StopChatResponseByAppAdvancedChatResponse
 from .types.update_annotation_by_app_advanced_chat_response import UpdateAnnotationByAppAdvancedChatResponse
+from .types.uploaded_file import UploadedFile
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -75,7 +78,7 @@ class AdvancedChatClient:
         files: typing.Optional[typing.Sequence[FileInput]] = OMIT,
         auto_generate_name: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ChatMessage:
+    ) -> typing.Iterator[ChunkChatCompletionResponse]:
         """
         Create conversation message
 
@@ -107,18 +110,20 @@ class AdvancedChatClient:
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
-        Returns
-        -------
-        ChatMessage
+        Yields
+        ------
+        typing.Iterator[ChunkChatCompletionResponse]
             Successful response
 
         Examples
         --------
         from dify import DifyApi
         client = DifyApi(token="YOUR_TOKEN", )
-        client.advanced_chat.send_chat_message_by_app_advanced_chat(query='query', )
+        response = client.advanced_chat.send_chat_message_by_app_advanced_chat(query='query', )
+        for chunk in response:
+            yield chunk
         """
-        response = self._raw_client.send_chat_message_by_app_advanced_chat(
+        with self._raw_client.send_chat_message_by_app_advanced_chat(
             query=query,
             inputs=inputs,
             response_mode=response_mode,
@@ -127,8 +132,8 @@ class AdvancedChatClient:
             files=files,
             auto_generate_name=auto_generate_name,
             request_options=request_options,
-        )
-        return response.data
+        ) as r:
+            yield from r.data
 
     def stop_chat_response_by_app_advanced_chat(
         self, task_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
@@ -158,10 +163,10 @@ class AdvancedChatClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.advanced_chat.stop_chat_response_by_app_advanced_chat(task_id='task_id', user='user', )
         """
-        response = self._raw_client.stop_chat_response_by_app_advanced_chat(
+        _response = self._raw_client.stop_chat_response_by_app_advanced_chat(
             task_id, user=user, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     def upload_file_by_app_advanced_chat(
         self,
@@ -197,10 +202,10 @@ class AdvancedChatClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.advanced_chat.upload_file_by_app_advanced_chat()
         """
-        response = self._raw_client.upload_file_by_app_advanced_chat(
+        _response = self._raw_client.upload_file_by_app_advanced_chat(
             file=file, user=user, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     def convert_audio_to_text_by_app_advanced_chat(
         self,
@@ -232,10 +237,10 @@ class AdvancedChatClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.advanced_chat.convert_audio_to_text_by_app_advanced_chat()
         """
-        response = self._raw_client.convert_audio_to_text_by_app_advanced_chat(
+        _response = self._raw_client.convert_audio_to_text_by_app_advanced_chat(
             file=file, user=user, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     def convert_text_to_audio_by_app_advanced_chat(
         self,
@@ -290,8 +295,8 @@ class AdvancedChatClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.advanced_chat.get_application_info_by_app_advanced_chat()
         """
-        response = self._raw_client.get_application_info_by_app_advanced_chat(request_options=request_options)
-        return response.data
+        _response = self._raw_client.get_application_info_by_app_advanced_chat(request_options=request_options)
+        return _response.data
 
     def get_application_parameters_by_app_advanced_chat(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -313,8 +318,8 @@ class AdvancedChatClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.advanced_chat.get_application_parameters_by_app_advanced_chat()
         """
-        response = self._raw_client.get_application_parameters_by_app_advanced_chat(request_options=request_options)
-        return response.data
+        _response = self._raw_client.get_application_parameters_by_app_advanced_chat(request_options=request_options)
+        return _response.data
 
     def send_message_feedback_by_app_advanced_chat(
         self,
@@ -356,10 +361,10 @@ class AdvancedChatClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.advanced_chat.send_message_feedback_by_app_advanced_chat(message_id='message_id', rating='rating', user='user', )
         """
-        response = self._raw_client.send_message_feedback_by_app_advanced_chat(
+        _response = self._raw_client.send_message_feedback_by_app_advanced_chat(
             message_id, rating=rating, user=user, content=content, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     def get_suggested_questions_by_app_advanced_chat(
         self, message_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
@@ -389,10 +394,10 @@ class AdvancedChatClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.advanced_chat.get_suggested_questions_by_app_advanced_chat(message_id='message_id', user='user', )
         """
-        response = self._raw_client.get_suggested_questions_by_app_advanced_chat(
+        _response = self._raw_client.get_suggested_questions_by_app_advanced_chat(
             message_id, user=user, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     def get_conversation_messages_by_app_advanced_chat(
         self,
@@ -434,10 +439,10 @@ class AdvancedChatClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.advanced_chat.get_conversation_messages_by_app_advanced_chat(conversation_id='conversation_id', user='user', )
         """
-        response = self._raw_client.get_conversation_messages_by_app_advanced_chat(
+        _response = self._raw_client.get_conversation_messages_by_app_advanced_chat(
             conversation_id=conversation_id, user=user, first_id=first_id, limit=limit, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     def get_conversations_by_app_advanced_chat(
         self,
@@ -481,10 +486,10 @@ class AdvancedChatClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.advanced_chat.get_conversations_by_app_advanced_chat(user='user', )
         """
-        response = self._raw_client.get_conversations_by_app_advanced_chat(
+        _response = self._raw_client.get_conversations_by_app_advanced_chat(
             user=user, last_id=last_id, limit=limit, sort_by=sort_by, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     def delete_conversation_by_app_advanced_chat(
         self, conversation_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
@@ -514,10 +519,10 @@ class AdvancedChatClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.advanced_chat.delete_conversation_by_app_advanced_chat(conversation_id='conversation_id', user='user', )
         """
-        response = self._raw_client.delete_conversation_by_app_advanced_chat(
+        _response = self._raw_client.delete_conversation_by_app_advanced_chat(
             conversation_id, user=user, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     def rename_conversation_by_app_advanced_chat(
         self,
@@ -559,10 +564,64 @@ class AdvancedChatClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.advanced_chat.rename_conversation_by_app_advanced_chat(conversation_id='conversation_id', user='user', )
         """
-        response = self._raw_client.rename_conversation_by_app_advanced_chat(
+        _response = self._raw_client.rename_conversation_by_app_advanced_chat(
             conversation_id, user=user, name=name, auto_generate=auto_generate, request_options=request_options
         )
-        return response.data
+        return _response.data
+
+    def get_conversation_variables_by_app_advanced_chat(
+        self,
+        conversation_id: str,
+        *,
+        user: str,
+        last_id: typing.Optional[str] = None,
+        limit: typing.Optional[int] = None,
+        variable_name: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetConversationVariablesByAppAdvancedChatResponse:
+        """
+        Retrieve variables from a specific conversation. This endpoint is useful for extracting structured data captured during conversations.
+
+        Parameters
+        ----------
+        conversation_id : str
+            The conversation ID to retrieve variables from.
+
+        user : str
+            User identifier, defined by developer rules, must be unique within the application.
+
+        last_id : typing.Optional[str]
+            (Optional) ID of the last record on the current page, default null
+
+        limit : typing.Optional[int]
+            (Optional) Number of records to return per request, default 20, maximum 100, minimum 1.
+
+        variable_name : typing.Optional[str]
+            (Optional) Variable name filter
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetConversationVariablesByAppAdvancedChatResponse
+            Successful response
+
+        Examples
+        --------
+        from dify import DifyApi
+        client = DifyApi(token="YOUR_TOKEN", )
+        client.advanced_chat.get_conversation_variables_by_app_advanced_chat(conversation_id='conversation_id', user='user', )
+        """
+        _response = self._raw_client.get_conversation_variables_by_app_advanced_chat(
+            conversation_id,
+            user=user,
+            last_id=last_id,
+            limit=limit,
+            variable_name=variable_name,
+            request_options=request_options,
+        )
+        return _response.data
 
     def get_app_meta_info_by_app_advanced_chat(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -586,8 +645,8 @@ class AdvancedChatClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.advanced_chat.get_app_meta_info_by_app_advanced_chat()
         """
-        response = self._raw_client.get_app_meta_info_by_app_advanced_chat(request_options=request_options)
-        return response.data
+        _response = self._raw_client.get_app_meta_info_by_app_advanced_chat(request_options=request_options)
+        return _response.data
 
     def get_annotations_list_by_app_advanced_chat(
         self,
@@ -621,10 +680,10 @@ class AdvancedChatClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.advanced_chat.get_annotations_list_by_app_advanced_chat()
         """
-        response = self._raw_client.get_annotations_list_by_app_advanced_chat(
+        _response = self._raw_client.get_annotations_list_by_app_advanced_chat(
             page=page, limit=limit, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     def create_annotation_by_app_advanced_chat(
         self, *, question: str, answer: str, request_options: typing.Optional[RequestOptions] = None
@@ -654,10 +713,10 @@ class AdvancedChatClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.advanced_chat.create_annotation_by_app_advanced_chat(question='question', answer='answer', )
         """
-        response = self._raw_client.create_annotation_by_app_advanced_chat(
+        _response = self._raw_client.create_annotation_by_app_advanced_chat(
             question=question, answer=answer, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     def update_annotation_by_app_advanced_chat(
         self, annotation_id: str, *, question: str, answer: str, request_options: typing.Optional[RequestOptions] = None
@@ -690,10 +749,10 @@ class AdvancedChatClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.advanced_chat.update_annotation_by_app_advanced_chat(annotation_id='annotation_id', question='question', answer='answer', )
         """
-        response = self._raw_client.update_annotation_by_app_advanced_chat(
+        _response = self._raw_client.update_annotation_by_app_advanced_chat(
             annotation_id, question=question, answer=answer, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     def delete_annotation_by_app_advanced_chat(
         self, annotation_id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -720,18 +779,16 @@ class AdvancedChatClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.advanced_chat.delete_annotation_by_app_advanced_chat(annotation_id='annotation_id', )
         """
-        response = self._raw_client.delete_annotation_by_app_advanced_chat(
+        _response = self._raw_client.delete_annotation_by_app_advanced_chat(
             annotation_id, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     def configure_annotation_reply_by_app_advanced_chat(
         self,
         action: ConfigureAnnotationReplyByAppAdvancedChatRequestAction,
         *,
-        embedding_model_provider: typing.Optional[str] = OMIT,
         embedding_provider_name: typing.Optional[str] = OMIT,
-        embedding_model: typing.Optional[str] = OMIT,
         embedding_model_name: typing.Optional[str] = OMIT,
         score_threshold: typing.Optional[float] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -744,15 +801,11 @@ class AdvancedChatClient:
         action : ConfigureAnnotationReplyByAppAdvancedChatRequestAction
             Action, can only be 'enable' or 'disable'
 
-        embedding_model_provider : typing.Optional[str]
+        embedding_provider_name : typing.Optional[str]
             Specified embedding model provider, must be configured in the system first, corresponds to the provider field
 
-        embedding_provider_name : typing.Optional[str]
-
-        embedding_model : typing.Optional[str]
-            Specified embedding model, corresponds to the model field
-
         embedding_model_name : typing.Optional[str]
+            Specified embedding model, corresponds to the model field
 
         score_threshold : typing.Optional[float]
             Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply
@@ -771,16 +824,14 @@ class AdvancedChatClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.advanced_chat.configure_annotation_reply_by_app_advanced_chat(action="enable", )
         """
-        response = self._raw_client.configure_annotation_reply_by_app_advanced_chat(
+        _response = self._raw_client.configure_annotation_reply_by_app_advanced_chat(
             action,
-            embedding_model_provider=embedding_model_provider,
             embedding_provider_name=embedding_provider_name,
-            embedding_model=embedding_model,
             embedding_model_name=embedding_model_name,
             score_threshold=score_threshold,
             request_options=request_options,
         )
-        return response.data
+        return _response.data
 
     def get_annotation_reply_status_by_app_advanced_chat(
         self,
@@ -814,10 +865,10 @@ class AdvancedChatClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.advanced_chat.get_annotation_reply_status_by_app_advanced_chat(action="enable", job_id='job_id', )
         """
-        response = self._raw_client.get_annotation_reply_status_by_app_advanced_chat(
+        _response = self._raw_client.get_annotation_reply_status_by_app_advanced_chat(
             action, job_id, request_options=request_options
         )
-        return response.data
+        return _response.data
 
 
 class AsyncAdvancedChatClient:
@@ -846,7 +897,7 @@ class AsyncAdvancedChatClient:
         files: typing.Optional[typing.Sequence[FileInput]] = OMIT,
         auto_generate_name: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ChatMessage:
+    ) -> typing.AsyncIterator[ChunkChatCompletionResponse]:
         """
         Create conversation message
 
@@ -878,9 +929,9 @@ class AsyncAdvancedChatClient:
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
-        Returns
-        -------
-        ChatMessage
+        Yields
+        ------
+        typing.AsyncIterator[ChunkChatCompletionResponse]
             Successful response
 
         Examples
@@ -889,10 +940,12 @@ class AsyncAdvancedChatClient:
         import asyncio
         client = AsyncDifyApi(token="YOUR_TOKEN", )
         async def main() -> None:
-            await client.advanced_chat.send_chat_message_by_app_advanced_chat(query='query', )
+            response = await client.advanced_chat.send_chat_message_by_app_advanced_chat(query='query', )
+            async for chunk in response:
+                yield chunk
         asyncio.run(main())
         """
-        response = await self._raw_client.send_chat_message_by_app_advanced_chat(
+        async with self._raw_client.send_chat_message_by_app_advanced_chat(
             query=query,
             inputs=inputs,
             response_mode=response_mode,
@@ -901,8 +954,9 @@ class AsyncAdvancedChatClient:
             files=files,
             auto_generate_name=auto_generate_name,
             request_options=request_options,
-        )
-        return response.data
+        ) as r:
+            async for data in r.data:
+                yield data
 
     async def stop_chat_response_by_app_advanced_chat(
         self, task_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
@@ -935,10 +989,10 @@ class AsyncAdvancedChatClient:
             await client.advanced_chat.stop_chat_response_by_app_advanced_chat(task_id='task_id', user='user', )
         asyncio.run(main())
         """
-        response = await self._raw_client.stop_chat_response_by_app_advanced_chat(
+        _response = await self._raw_client.stop_chat_response_by_app_advanced_chat(
             task_id, user=user, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     async def upload_file_by_app_advanced_chat(
         self,
@@ -977,10 +1031,10 @@ class AsyncAdvancedChatClient:
             await client.advanced_chat.upload_file_by_app_advanced_chat()
         asyncio.run(main())
         """
-        response = await self._raw_client.upload_file_by_app_advanced_chat(
+        _response = await self._raw_client.upload_file_by_app_advanced_chat(
             file=file, user=user, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     async def convert_audio_to_text_by_app_advanced_chat(
         self,
@@ -1015,10 +1069,10 @@ class AsyncAdvancedChatClient:
             await client.advanced_chat.convert_audio_to_text_by_app_advanced_chat()
         asyncio.run(main())
         """
-        response = await self._raw_client.convert_audio_to_text_by_app_advanced_chat(
+        _response = await self._raw_client.convert_audio_to_text_by_app_advanced_chat(
             file=file, user=user, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     async def convert_text_to_audio_by_app_advanced_chat(
         self,
@@ -1077,8 +1131,8 @@ class AsyncAdvancedChatClient:
             await client.advanced_chat.get_application_info_by_app_advanced_chat()
         asyncio.run(main())
         """
-        response = await self._raw_client.get_application_info_by_app_advanced_chat(request_options=request_options)
-        return response.data
+        _response = await self._raw_client.get_application_info_by_app_advanced_chat(request_options=request_options)
+        return _response.data
 
     async def get_application_parameters_by_app_advanced_chat(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -1103,10 +1157,10 @@ class AsyncAdvancedChatClient:
             await client.advanced_chat.get_application_parameters_by_app_advanced_chat()
         asyncio.run(main())
         """
-        response = await self._raw_client.get_application_parameters_by_app_advanced_chat(
+        _response = await self._raw_client.get_application_parameters_by_app_advanced_chat(
             request_options=request_options
         )
-        return response.data
+        return _response.data
 
     async def send_message_feedback_by_app_advanced_chat(
         self,
@@ -1151,10 +1205,10 @@ class AsyncAdvancedChatClient:
             await client.advanced_chat.send_message_feedback_by_app_advanced_chat(message_id='message_id', rating='rating', user='user', )
         asyncio.run(main())
         """
-        response = await self._raw_client.send_message_feedback_by_app_advanced_chat(
+        _response = await self._raw_client.send_message_feedback_by_app_advanced_chat(
             message_id, rating=rating, user=user, content=content, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     async def get_suggested_questions_by_app_advanced_chat(
         self, message_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
@@ -1187,10 +1241,10 @@ class AsyncAdvancedChatClient:
             await client.advanced_chat.get_suggested_questions_by_app_advanced_chat(message_id='message_id', user='user', )
         asyncio.run(main())
         """
-        response = await self._raw_client.get_suggested_questions_by_app_advanced_chat(
+        _response = await self._raw_client.get_suggested_questions_by_app_advanced_chat(
             message_id, user=user, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     async def get_conversation_messages_by_app_advanced_chat(
         self,
@@ -1235,10 +1289,10 @@ class AsyncAdvancedChatClient:
             await client.advanced_chat.get_conversation_messages_by_app_advanced_chat(conversation_id='conversation_id', user='user', )
         asyncio.run(main())
         """
-        response = await self._raw_client.get_conversation_messages_by_app_advanced_chat(
+        _response = await self._raw_client.get_conversation_messages_by_app_advanced_chat(
             conversation_id=conversation_id, user=user, first_id=first_id, limit=limit, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     async def get_conversations_by_app_advanced_chat(
         self,
@@ -1285,10 +1339,10 @@ class AsyncAdvancedChatClient:
             await client.advanced_chat.get_conversations_by_app_advanced_chat(user='user', )
         asyncio.run(main())
         """
-        response = await self._raw_client.get_conversations_by_app_advanced_chat(
+        _response = await self._raw_client.get_conversations_by_app_advanced_chat(
             user=user, last_id=last_id, limit=limit, sort_by=sort_by, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     async def delete_conversation_by_app_advanced_chat(
         self, conversation_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
@@ -1321,10 +1375,10 @@ class AsyncAdvancedChatClient:
             await client.advanced_chat.delete_conversation_by_app_advanced_chat(conversation_id='conversation_id', user='user', )
         asyncio.run(main())
         """
-        response = await self._raw_client.delete_conversation_by_app_advanced_chat(
+        _response = await self._raw_client.delete_conversation_by_app_advanced_chat(
             conversation_id, user=user, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     async def rename_conversation_by_app_advanced_chat(
         self,
@@ -1369,10 +1423,67 @@ class AsyncAdvancedChatClient:
             await client.advanced_chat.rename_conversation_by_app_advanced_chat(conversation_id='conversation_id', user='user', )
         asyncio.run(main())
         """
-        response = await self._raw_client.rename_conversation_by_app_advanced_chat(
+        _response = await self._raw_client.rename_conversation_by_app_advanced_chat(
             conversation_id, user=user, name=name, auto_generate=auto_generate, request_options=request_options
         )
-        return response.data
+        return _response.data
+
+    async def get_conversation_variables_by_app_advanced_chat(
+        self,
+        conversation_id: str,
+        *,
+        user: str,
+        last_id: typing.Optional[str] = None,
+        limit: typing.Optional[int] = None,
+        variable_name: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetConversationVariablesByAppAdvancedChatResponse:
+        """
+        Retrieve variables from a specific conversation. This endpoint is useful for extracting structured data captured during conversations.
+
+        Parameters
+        ----------
+        conversation_id : str
+            The conversation ID to retrieve variables from.
+
+        user : str
+            User identifier, defined by developer rules, must be unique within the application.
+
+        last_id : typing.Optional[str]
+            (Optional) ID of the last record on the current page, default null
+
+        limit : typing.Optional[int]
+            (Optional) Number of records to return per request, default 20, maximum 100, minimum 1.
+
+        variable_name : typing.Optional[str]
+            (Optional) Variable name filter
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetConversationVariablesByAppAdvancedChatResponse
+            Successful response
+
+        Examples
+        --------
+        from dify import AsyncDifyApi
+        import asyncio
+        client = AsyncDifyApi(token="YOUR_TOKEN", )
+        async def main() -> None:
+            await client.advanced_chat.get_conversation_variables_by_app_advanced_chat(conversation_id='conversation_id', user='user', )
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.get_conversation_variables_by_app_advanced_chat(
+            conversation_id,
+            user=user,
+            last_id=last_id,
+            limit=limit,
+            variable_name=variable_name,
+            request_options=request_options,
+        )
+        return _response.data
 
     async def get_app_meta_info_by_app_advanced_chat(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -1399,8 +1510,8 @@ class AsyncAdvancedChatClient:
             await client.advanced_chat.get_app_meta_info_by_app_advanced_chat()
         asyncio.run(main())
         """
-        response = await self._raw_client.get_app_meta_info_by_app_advanced_chat(request_options=request_options)
-        return response.data
+        _response = await self._raw_client.get_app_meta_info_by_app_advanced_chat(request_options=request_options)
+        return _response.data
 
     async def get_annotations_list_by_app_advanced_chat(
         self,
@@ -1437,10 +1548,10 @@ class AsyncAdvancedChatClient:
             await client.advanced_chat.get_annotations_list_by_app_advanced_chat()
         asyncio.run(main())
         """
-        response = await self._raw_client.get_annotations_list_by_app_advanced_chat(
+        _response = await self._raw_client.get_annotations_list_by_app_advanced_chat(
             page=page, limit=limit, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     async def create_annotation_by_app_advanced_chat(
         self, *, question: str, answer: str, request_options: typing.Optional[RequestOptions] = None
@@ -1473,10 +1584,10 @@ class AsyncAdvancedChatClient:
             await client.advanced_chat.create_annotation_by_app_advanced_chat(question='question', answer='answer', )
         asyncio.run(main())
         """
-        response = await self._raw_client.create_annotation_by_app_advanced_chat(
+        _response = await self._raw_client.create_annotation_by_app_advanced_chat(
             question=question, answer=answer, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     async def update_annotation_by_app_advanced_chat(
         self, annotation_id: str, *, question: str, answer: str, request_options: typing.Optional[RequestOptions] = None
@@ -1512,10 +1623,10 @@ class AsyncAdvancedChatClient:
             await client.advanced_chat.update_annotation_by_app_advanced_chat(annotation_id='annotation_id', question='question', answer='answer', )
         asyncio.run(main())
         """
-        response = await self._raw_client.update_annotation_by_app_advanced_chat(
+        _response = await self._raw_client.update_annotation_by_app_advanced_chat(
             annotation_id, question=question, answer=answer, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     async def delete_annotation_by_app_advanced_chat(
         self, annotation_id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -1545,18 +1656,16 @@ class AsyncAdvancedChatClient:
             await client.advanced_chat.delete_annotation_by_app_advanced_chat(annotation_id='annotation_id', )
         asyncio.run(main())
         """
-        response = await self._raw_client.delete_annotation_by_app_advanced_chat(
+        _response = await self._raw_client.delete_annotation_by_app_advanced_chat(
             annotation_id, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     async def configure_annotation_reply_by_app_advanced_chat(
         self,
         action: ConfigureAnnotationReplyByAppAdvancedChatRequestAction,
         *,
-        embedding_model_provider: typing.Optional[str] = OMIT,
         embedding_provider_name: typing.Optional[str] = OMIT,
-        embedding_model: typing.Optional[str] = OMIT,
         embedding_model_name: typing.Optional[str] = OMIT,
         score_threshold: typing.Optional[float] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -1569,15 +1678,11 @@ class AsyncAdvancedChatClient:
         action : ConfigureAnnotationReplyByAppAdvancedChatRequestAction
             Action, can only be 'enable' or 'disable'
 
-        embedding_model_provider : typing.Optional[str]
+        embedding_provider_name : typing.Optional[str]
             Specified embedding model provider, must be configured in the system first, corresponds to the provider field
 
-        embedding_provider_name : typing.Optional[str]
-
-        embedding_model : typing.Optional[str]
-            Specified embedding model, corresponds to the model field
-
         embedding_model_name : typing.Optional[str]
+            Specified embedding model, corresponds to the model field
 
         score_threshold : typing.Optional[float]
             Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply
@@ -1599,16 +1704,14 @@ class AsyncAdvancedChatClient:
             await client.advanced_chat.configure_annotation_reply_by_app_advanced_chat(action="enable", )
         asyncio.run(main())
         """
-        response = await self._raw_client.configure_annotation_reply_by_app_advanced_chat(
+        _response = await self._raw_client.configure_annotation_reply_by_app_advanced_chat(
             action,
-            embedding_model_provider=embedding_model_provider,
             embedding_provider_name=embedding_provider_name,
-            embedding_model=embedding_model,
             embedding_model_name=embedding_model_name,
             score_threshold=score_threshold,
             request_options=request_options,
         )
-        return response.data
+        return _response.data
 
     async def get_annotation_reply_status_by_app_advanced_chat(
         self,
@@ -1645,7 +1748,7 @@ class AsyncAdvancedChatClient:
             await client.advanced_chat.get_annotation_reply_status_by_app_advanced_chat(action="enable", job_id='job_id', )
         asyncio.run(main())
         """
-        response = await self._raw_client.get_annotation_reply_status_by_app_advanced_chat(
+        _response = await self._raw_client.get_annotation_reply_status_by_app_advanced_chat(
             action, job_id, request_options=request_options
         )
-        return response.data
+        return _response.data

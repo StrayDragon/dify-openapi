@@ -4,7 +4,7 @@ import typing
 
 import pydantic
 from ...core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
-from ...types.conversation import Conversation
+from .conversation import Conversation
 
 
 class GetConversationListByAppChatResponse(UniversalBaseModel):

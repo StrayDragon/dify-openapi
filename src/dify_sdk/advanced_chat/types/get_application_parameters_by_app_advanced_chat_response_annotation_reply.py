@@ -21,12 +21,12 @@ class GetApplicationParametersByAppAdvancedChatResponseAnnotationReply(Universal
     Similarity score threshold
     """
 
-    embedding_model: typing.Optional[str] = pydantic.Field(default=None)
+    embedding_model_name: typing.Optional[str] = pydantic.Field(default=None)
     """
     Embedding model
     """
 
-    embedding_model_provider: typing.Optional[str] = pydantic.Field(default=None)
+    embedding_provider_name: typing.Optional[str] = pydantic.Field(default=None)
     """
     Embedding model provider
     """

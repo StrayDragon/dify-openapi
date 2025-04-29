@@ -4,6 +4,7 @@ import contextlib
 import typing
 from json.decoder import JSONDecodeError
 
+import httpx_sse
 from .. import core
 from ..core.api_error import ApiError
 from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
@@ -12,22 +13,21 @@ from ..core.jsonable_encoder import jsonable_encoder
 from ..core.pydantic_utilities import parse_obj_as
 from ..core.request_options import RequestOptions
 from ..core.serialization import convert_and_respect_annotation_metadata
-from ..errors.bad_request_error import BadRequestError
-from ..errors.content_too_large_error import ContentTooLargeError
-from ..errors.internal_server_error import InternalServerError
-from ..errors.not_found_error import NotFoundError
-from ..errors.service_unavailable_error import ServiceUnavailableError
-from ..errors.unsupported_media_type_error import UnsupportedMediaTypeError
-from ..types.chat_message import ChatMessage
-from ..types.conversation import Conversation
-from ..types.error import Error
-from ..types.uploaded_file import UploadedFile
+from .errors.bad_request_error import BadRequestError
+from .errors.content_too_large_error import ContentTooLargeError
+from .errors.internal_server_error import InternalServerError
+from .errors.not_found_error import NotFoundError
+from .errors.service_unavailable_error import ServiceUnavailableError
+from .errors.unsupported_media_type_error import UnsupportedMediaTypeError
+from .types.chunk_chat_completion_response import ChunkChatCompletionResponse
 from .types.configure_annotation_reply_by_app_chat_request_action import ConfigureAnnotationReplyByAppChatRequestAction
 from .types.configure_annotation_reply_by_app_chat_response import ConfigureAnnotationReplyByAppChatResponse
+from .types.conversation import Conversation
 from .types.convert_audio_to_text_by_app_chat_response import ConvertAudioToTextByAppChatResponse
 from .types.create_annotation_by_app_chat_response import CreateAnnotationByAppChatResponse
 from .types.delete_annotation_by_app_chat_response import DeleteAnnotationByAppChatResponse
 from .types.delete_conversation_by_app_chat_response import DeleteConversationByAppChatResponse
+from .types.error import Error
 from .types.get_annotation_reply_status_by_app_chat_request_action import GetAnnotationReplyStatusByAppChatRequestAction
 from .types.get_annotation_reply_status_by_app_chat_response import GetAnnotationReplyStatusByAppChatResponse
 from .types.get_annotations_list_by_app_chat_response import GetAnnotationsListByAppChatResponse
@@ -37,12 +37,14 @@ from .types.get_application_parameters_by_app_chat_response import GetApplicatio
 from .types.get_conversation_list_by_app_chat_request_sort_by import GetConversationListByAppChatRequestSortBy
 from .types.get_conversation_list_by_app_chat_response import GetConversationListByAppChatResponse
 from .types.get_conversation_messages_by_app_chat_response import GetConversationMessagesByAppChatResponse
+from .types.get_conversation_variables_by_app_chat_response import GetConversationVariablesByAppChatResponse
 from .types.get_suggested_questions_by_app_chat_response import GetSuggestedQuestionsByAppChatResponse
 from .types.send_chat_message_by_app_chat_request_files_item import SendChatMessageByAppChatRequestFilesItem
 from .types.send_chat_message_by_app_chat_request_response_mode import SendChatMessageByAppChatRequestResponseMode
 from .types.send_message_feedback_by_app_chat_response import SendMessageFeedbackByAppChatResponse
 from .types.stop_chat_response_by_app_chat_response import StopChatResponseByAppChatResponse
 from .types.update_annotation_by_app_chat_response import UpdateAnnotationByAppChatResponse
+from .types.uploaded_file import UploadedFile
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -52,6 +54,7 @@ class RawChatClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
+    @contextlib.contextmanager
     def send_chat_message_by_app_chat(
         self,
         *,
@@ -63,7 +66,7 @@ class RawChatClient:
         files: typing.Optional[typing.Sequence[SendChatMessageByAppChatRequestFilesItem]] = OMIT,
         auto_generate_name: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> HttpResponse[ChatMessage]:
+    ) -> typing.Iterator[HttpResponse[typing.Iterator[ChunkChatCompletionResponse]]]:
         """
         Create conversation message
 
@@ -96,12 +99,12 @@ class RawChatClient:
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
-        Returns
-        -------
-        HttpResponse[ChatMessage]
+        Yields
+        ------
+        typing.Iterator[HttpResponse[typing.Iterator[ChunkChatCompletionResponse]]]
             Successful response
         """
-        _response = self._client_wrapper.httpx_client.request(
+        with self._client_wrapper.httpx_client.stream(
             "chat-messages",
             method="POST",
             json={
@@ -122,51 +125,63 @@ class RawChatClient:
             },
             request_options=request_options,
             omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                _data = typing.cast(
-                    ChatMessage,
-                    parse_obj_as(
-                        type_=ChatMessage,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-                return HttpResponse(response=_response, data=_data)
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        Error,
-                        parse_obj_as(
-                            type_=Error,  # type: ignore
-                            object_=_response.json(),
-                        ),
+        ) as _response:
+
+            def stream() -> HttpResponse[typing.Iterator[ChunkChatCompletionResponse]]:
+                try:
+                    if 200 <= _response.status_code < 300:
+
+                        def _iter():
+                            _event_source = httpx_sse.EventSource(_response)
+                            for _sse in _event_source.iter_sse():
+                                if _sse.data == None:
+                                    return
+                                try:
+                                    yield _sse.data
+                                except Exception:
+                                    pass
+                            return
+
+                        return HttpResponse(response=_response, data=_iter())
+                    _response.read()
+                    if _response.status_code == 400:
+                        raise BadRequestError(
+                            typing.cast(
+                                Error,
+                                parse_obj_as(
+                                    type_=Error,  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 404:
+                        raise NotFoundError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 500:
+                        raise InternalServerError(
+                            typing.cast(
+                                Error,
+                                parse_obj_as(
+                                    type_=Error,  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    _response_json = _response.json()
+                except JSONDecodeError:
+                    raise ApiError(
+                        headers=dict(_response.headers), status_code=_response.status_code, body=_response.text
                     )
-                )
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        Error,
-                        parse_obj_as(
-                            type_=Error,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 500:
-                raise InternalServerError(
-                    typing.cast(
-                        Error,
-                        parse_obj_as(
-                            type_=Error,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+                raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+            yield stream()
 
     def get_conversation_list_by_app_chat(
         self,
@@ -225,8 +240,8 @@ class RawChatClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def delete_conversation_by_app_chat(
         self, conversation_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
@@ -272,8 +287,8 @@ class RawChatClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def rename_conversation_by_app_chat(
         self,
@@ -332,8 +347,77 @@ class RawChatClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+    def get_conversation_variables_by_app_chat(
+        self,
+        conversation_id: str,
+        *,
+        user: str,
+        last_id: typing.Optional[str] = None,
+        limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> HttpResponse[GetConversationVariablesByAppChatResponse]:
+        """
+        Retrieve variables from a specific conversation. This endpoint is useful for extracting structured data captured during conversations.
+
+        Parameters
+        ----------
+        conversation_id : str
+            ID of the conversation to retrieve variables from
+
+        user : str
+            User identifier, defined by developer rules, must be unique within the application
+
+        last_id : typing.Optional[str]
+            (Optional) ID of the last record on the current page, default null
+
+        limit : typing.Optional[int]
+            (Optional) Number of records to return per request, default 20, max 100, min 1
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[GetConversationVariablesByAppChatResponse]
+            Successfully retrieved variables
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"conversations/{jsonable_encoder(conversation_id)}/variables",
+            method="GET",
+            params={
+                "user": user,
+                "last_id": last_id,
+                "limit": limit,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    GetConversationVariablesByAppChatResponse,
+                    parse_obj_as(
+                        type_=GetConversationVariablesByAppChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def get_conversation_messages_by_app_chat(
         self,
@@ -390,8 +474,8 @@ class RawChatClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def send_message_feedback_by_app_chat(
         self,
@@ -451,8 +535,8 @@ class RawChatClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def get_suggested_questions_by_app_chat(
         self, message_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
@@ -496,8 +580,8 @@ class RawChatClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def upload_file_by_app_chat(
         self,
@@ -535,6 +619,9 @@ class RawChatClient:
             },
             files={
                 "file": file,
+            },
+            headers={
+                # "content-type": "multipart/form-data",
             },
             request_options=request_options,
             omit=OMIT,
@@ -591,8 +678,8 @@ class RawChatClient:
                 )
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def get_application_info_by_app_chat(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -625,8 +712,8 @@ class RawChatClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def stop_chat_response_by_app_chat(
         self, task_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
@@ -674,8 +761,8 @@ class RawChatClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def convert_audio_to_text_by_app_chat(
         self,
@@ -712,6 +799,9 @@ class RawChatClient:
             files={
                 "file": file,
             },
+            headers={
+                # "content-type": "multipart/form-data",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -727,8 +817,8 @@ class RawChatClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     @contextlib.contextmanager
     def convert_text_to_audio_by_app_chat(
@@ -786,8 +876,10 @@ class RawChatClient:
                     _response.read()
                     _response_json = _response.json()
                 except JSONDecodeError:
-                    raise ApiError(status_code=_response.status_code, body=_response.text)
-                raise ApiError(status_code=_response.status_code, body=_response_json)
+                    raise ApiError(
+                        headers=dict(_response.headers), status_code=_response.status_code, body=_response.text
+                    )
+                raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
             yield stream()
 
@@ -822,8 +914,8 @@ class RawChatClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def get_app_meta_info_by_app_chat(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -858,8 +950,8 @@ class RawChatClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def get_annotations_list_by_app_chat(
         self,
@@ -908,8 +1000,8 @@ class RawChatClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def create_annotation_by_app_chat(
         self, *, question: str, answer: str, request_options: typing.Optional[RequestOptions] = None
@@ -958,8 +1050,8 @@ class RawChatClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def update_annotation_by_app_chat(
         self, annotation_id: str, *, question: str, answer: str, request_options: typing.Optional[RequestOptions] = None
@@ -1011,8 +1103,8 @@ class RawChatClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def delete_annotation_by_app_chat(
         self, annotation_id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -1050,16 +1142,14 @@ class RawChatClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def configure_annotation_reply_by_app_chat(
         self,
         action: ConfigureAnnotationReplyByAppChatRequestAction,
         *,
-        embedding_model_provider: typing.Optional[str] = OMIT,
         embedding_provider_name: typing.Optional[str] = OMIT,
-        embedding_model: typing.Optional[str] = OMIT,
         embedding_model_name: typing.Optional[str] = OMIT,
         score_threshold: typing.Optional[float] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -1072,15 +1162,11 @@ class RawChatClient:
         action : ConfigureAnnotationReplyByAppChatRequestAction
             Action, can only be 'enable' or 'disable'
 
-        embedding_model_provider : typing.Optional[str]
+        embedding_provider_name : typing.Optional[str]
             Specified embedding model provider, must be configured in the system first, corresponds to the provider field
 
-        embedding_provider_name : typing.Optional[str]
-
-        embedding_model : typing.Optional[str]
-            Specified embedding model, corresponds to the model field
-
         embedding_model_name : typing.Optional[str]
+            Specified embedding model, corresponds to the model field
 
         score_threshold : typing.Optional[float]
             Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply
@@ -1097,9 +1183,7 @@ class RawChatClient:
             f"apps/annotation-reply/{jsonable_encoder(action)}",
             method="POST",
             json={
-                "embedding_model_provider": embedding_model_provider,
                 "embedding_provider_name": embedding_provider_name,
-                "embedding_model": embedding_model,
                 "embedding_model_name": embedding_model_name,
                 "score_threshold": score_threshold,
             },
@@ -1121,8 +1205,8 @@ class RawChatClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def get_annotation_reply_status_by_app_chat(
         self,
@@ -1167,14 +1251,15 @@ class RawChatClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
 
 class AsyncRawChatClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
+    @contextlib.asynccontextmanager
     async def send_chat_message_by_app_chat(
         self,
         *,
@@ -1186,7 +1271,7 @@ class AsyncRawChatClient:
         files: typing.Optional[typing.Sequence[SendChatMessageByAppChatRequestFilesItem]] = OMIT,
         auto_generate_name: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> AsyncHttpResponse[ChatMessage]:
+    ) -> typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[ChunkChatCompletionResponse]]]:
         """
         Create conversation message
 
@@ -1219,12 +1304,12 @@ class AsyncRawChatClient:
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
-        Returns
-        -------
-        AsyncHttpResponse[ChatMessage]
+        Yields
+        ------
+        typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[ChunkChatCompletionResponse]]]
             Successful response
         """
-        _response = await self._client_wrapper.httpx_client.request(
+        async with self._client_wrapper.httpx_client.stream(
             "chat-messages",
             method="POST",
             json={
@@ -1245,51 +1330,63 @@ class AsyncRawChatClient:
             },
             request_options=request_options,
             omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                _data = typing.cast(
-                    ChatMessage,
-                    parse_obj_as(
-                        type_=ChatMessage,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-                return AsyncHttpResponse(response=_response, data=_data)
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        Error,
-                        parse_obj_as(
-                            type_=Error,  # type: ignore
-                            object_=_response.json(),
-                        ),
+        ) as _response:
+
+            async def stream() -> AsyncHttpResponse[typing.AsyncIterator[ChunkChatCompletionResponse]]:
+                try:
+                    if 200 <= _response.status_code < 300:
+
+                        async def _iter():
+                            _event_source = httpx_sse.EventSource(_response)
+                            async for _sse in _event_source.aiter_sse():
+                                if _sse.data == None:
+                                    return
+                                try:
+                                    yield _sse.data
+                                except Exception:
+                                    pass
+                            return
+
+                        return AsyncHttpResponse(response=_response, data=_iter())
+                    await _response.aread()
+                    if _response.status_code == 400:
+                        raise BadRequestError(
+                            typing.cast(
+                                Error,
+                                parse_obj_as(
+                                    type_=Error,  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 404:
+                        raise NotFoundError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 500:
+                        raise InternalServerError(
+                            typing.cast(
+                                Error,
+                                parse_obj_as(
+                                    type_=Error,  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    _response_json = _response.json()
+                except JSONDecodeError:
+                    raise ApiError(
+                        headers=dict(_response.headers), status_code=_response.status_code, body=_response.text
                     )
-                )
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        Error,
-                        parse_obj_as(
-                            type_=Error,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 500:
-                raise InternalServerError(
-                    typing.cast(
-                        Error,
-                        parse_obj_as(
-                            type_=Error,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+                raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+            yield await stream()
 
     async def get_conversation_list_by_app_chat(
         self,
@@ -1348,8 +1445,8 @@ class AsyncRawChatClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def delete_conversation_by_app_chat(
         self, conversation_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
@@ -1395,8 +1492,8 @@ class AsyncRawChatClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def rename_conversation_by_app_chat(
         self,
@@ -1455,8 +1552,77 @@ class AsyncRawChatClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+    async def get_conversation_variables_by_app_chat(
+        self,
+        conversation_id: str,
+        *,
+        user: str,
+        last_id: typing.Optional[str] = None,
+        limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AsyncHttpResponse[GetConversationVariablesByAppChatResponse]:
+        """
+        Retrieve variables from a specific conversation. This endpoint is useful for extracting structured data captured during conversations.
+
+        Parameters
+        ----------
+        conversation_id : str
+            ID of the conversation to retrieve variables from
+
+        user : str
+            User identifier, defined by developer rules, must be unique within the application
+
+        last_id : typing.Optional[str]
+            (Optional) ID of the last record on the current page, default null
+
+        limit : typing.Optional[int]
+            (Optional) Number of records to return per request, default 20, max 100, min 1
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[GetConversationVariablesByAppChatResponse]
+            Successfully retrieved variables
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"conversations/{jsonable_encoder(conversation_id)}/variables",
+            method="GET",
+            params={
+                "user": user,
+                "last_id": last_id,
+                "limit": limit,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    GetConversationVariablesByAppChatResponse,
+                    parse_obj_as(
+                        type_=GetConversationVariablesByAppChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def get_conversation_messages_by_app_chat(
         self,
@@ -1513,8 +1679,8 @@ class AsyncRawChatClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def send_message_feedback_by_app_chat(
         self,
@@ -1574,8 +1740,8 @@ class AsyncRawChatClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def get_suggested_questions_by_app_chat(
         self, message_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
@@ -1619,8 +1785,8 @@ class AsyncRawChatClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def upload_file_by_app_chat(
         self,
@@ -1658,6 +1824,9 @@ class AsyncRawChatClient:
             },
             files={
                 "file": file,
+            },
+            headers={
+                # "content-type": "multipart/form-data",
             },
             request_options=request_options,
             omit=OMIT,
@@ -1714,8 +1883,8 @@ class AsyncRawChatClient:
                 )
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def get_application_info_by_app_chat(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -1748,8 +1917,8 @@ class AsyncRawChatClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def stop_chat_response_by_app_chat(
         self, task_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
@@ -1797,8 +1966,8 @@ class AsyncRawChatClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def convert_audio_to_text_by_app_chat(
         self,
@@ -1835,6 +2004,9 @@ class AsyncRawChatClient:
             files={
                 "file": file,
             },
+            headers={
+                # "content-type": "multipart/form-data",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -1850,8 +2022,8 @@ class AsyncRawChatClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     @contextlib.asynccontextmanager
     async def convert_text_to_audio_by_app_chat(
@@ -1910,8 +2082,10 @@ class AsyncRawChatClient:
                     await _response.aread()
                     _response_json = _response.json()
                 except JSONDecodeError:
-                    raise ApiError(status_code=_response.status_code, body=_response.text)
-                raise ApiError(status_code=_response.status_code, body=_response_json)
+                    raise ApiError(
+                        headers=dict(_response.headers), status_code=_response.status_code, body=_response.text
+                    )
+                raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
             yield await stream()
 
@@ -1946,8 +2120,8 @@ class AsyncRawChatClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def get_app_meta_info_by_app_chat(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -1982,8 +2156,8 @@ class AsyncRawChatClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def get_annotations_list_by_app_chat(
         self,
@@ -2032,8 +2206,8 @@ class AsyncRawChatClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def create_annotation_by_app_chat(
         self, *, question: str, answer: str, request_options: typing.Optional[RequestOptions] = None
@@ -2082,8 +2256,8 @@ class AsyncRawChatClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def update_annotation_by_app_chat(
         self, annotation_id: str, *, question: str, answer: str, request_options: typing.Optional[RequestOptions] = None
@@ -2135,8 +2309,8 @@ class AsyncRawChatClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def delete_annotation_by_app_chat(
         self, annotation_id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -2174,16 +2348,14 @@ class AsyncRawChatClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def configure_annotation_reply_by_app_chat(
         self,
         action: ConfigureAnnotationReplyByAppChatRequestAction,
         *,
-        embedding_model_provider: typing.Optional[str] = OMIT,
         embedding_provider_name: typing.Optional[str] = OMIT,
-        embedding_model: typing.Optional[str] = OMIT,
         embedding_model_name: typing.Optional[str] = OMIT,
         score_threshold: typing.Optional[float] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -2196,15 +2368,11 @@ class AsyncRawChatClient:
         action : ConfigureAnnotationReplyByAppChatRequestAction
             Action, can only be 'enable' or 'disable'
 
-        embedding_model_provider : typing.Optional[str]
+        embedding_provider_name : typing.Optional[str]
             Specified embedding model provider, must be configured in the system first, corresponds to the provider field
 
-        embedding_provider_name : typing.Optional[str]
-
-        embedding_model : typing.Optional[str]
-            Specified embedding model, corresponds to the model field
-
         embedding_model_name : typing.Optional[str]
+            Specified embedding model, corresponds to the model field
 
         score_threshold : typing.Optional[float]
             Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply
@@ -2221,9 +2389,7 @@ class AsyncRawChatClient:
             f"apps/annotation-reply/{jsonable_encoder(action)}",
             method="POST",
             json={
-                "embedding_model_provider": embedding_model_provider,
                 "embedding_provider_name": embedding_provider_name,
-                "embedding_model": embedding_model,
                 "embedding_model_name": embedding_model_name,
                 "score_threshold": score_threshold,
             },
@@ -2245,8 +2411,8 @@ class AsyncRawChatClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def get_annotation_reply_status_by_app_chat(
         self,
@@ -2291,5 +2457,5 @@ class AsyncRawChatClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)

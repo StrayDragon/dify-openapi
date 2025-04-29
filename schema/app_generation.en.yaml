@@ -5,8 +5,8 @@ info:
     Dify API provides a series of interfaces for text generation functionality.
     It supports text generation applications.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
-    official raw document: https://github.com/langgenius/dify/blob/1.3.0/web/app/components/develop/template/template.en.mdx
-  version: 1.3.0
+    official raw document: https://github.com/langgenius/dify/blob/1.3.1/web/app/components/develop/template/template.en.mdx
+  version: 1.3.1
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -251,20 +251,16 @@ components:
         created_at:
           type: integer
           description: Upload time
-tags:
-  - name: Generation
-    description: Text Generation Application Operations
 paths:
   /completion-messages:
     post:
-      tags:
-        - Generation
       operationId: sendCompletionMessageByAppGeneration
       summary: Send Message (Text Generation App)
       description: Send request to text generation application
       x-fern-streaming:
         format: sse
-        stream-condition: $request.response_mode == "streaming"
+        # FIXME: @l8ng fern 暂时不支持
+        # stream-condition: $request.response_mode == "streaming"
         response:
           $ref: '#/components/schemas/ChatCompletionResponse'
         response-stream:
@@ -367,8 +363,6 @@ paths:
           $ref: '#/components/responses/Error500'
   /files/upload:
     post:
-      tags:
-        - Generation
       operationId: uploadFileByAppGeneration
       summary: Upload File
       description: |
@@ -420,8 +414,6 @@ paths:
                 $ref: '#/components/schemas/Error'
   /info:
     get:
-      tags:
-        - Generation
       operationId: getApplicationInfoByAppGeneration
       summary: Get Application Basic Information
       responses:
@@ -445,8 +437,6 @@ paths:
                     description: Application tags
   /parameters:
     get:
-      tags:
-        - Generation
       operationId: getApplicationParametersByAppGeneration
       summary: Get Application Parameters
       responses:
@@ -492,10 +482,10 @@ paths:
                       score_threshold:
                         type: number
                         description: Similarity threshold
-                      embedding_model:
+                      embedding_model_name:
                         type: string
                         description: Embedding model
-                      embedding_model_provider:
+                      embedding_provider_name:
                         type: string
                         description: Embedding model provider
                     description: Annotation reply settings
@@ -601,8 +591,6 @@ paths:
                     description: System parameters
   '/completion-messages/{task_id}/stop':
     post:
-      tags:
-        - Generation
       operationId: stopCompletionResponseByAppGeneration
       summary: Stop Response
       description: Only supports streaming mode
@@ -640,8 +628,6 @@ paths:
                     description: Fixed return value 'success'
   '/messages/{message_id}/feedbacks':
     post:
-      tags:
-        - Generation
       operationId: sendMessageFeedbackByAppGeneration
       summary: Message Feedback (Like/Dislike)
       description: 'End user feedback for messages, helps application developers optimize output expectations'
@@ -690,8 +676,6 @@ paths:
                     description: Fixed return value 'success'
   /text-to-audio:
     post:
-      tags:
-        - Generation
       operationId: convertTextToAudioByAppGeneration
       summary: Text to Audio
       description: Convert text to speech
@@ -730,8 +714,6 @@ paths:
                 description: MP3 format audio file
   /apps/annotations:
     get:
-      tags:
-        - Generation
       operationId: getAnnotationsListByAppGeneration
       summary: Get Annotation List
       description: Get the list of annotations for the application
@@ -791,8 +773,6 @@ paths:
                     type: integer
                     description: Current page number
     post:
-      tags:
-        - Generation
       operationId: createAnnotationByAppGeneration
       summary: Create Annotation
       description: Create a new annotation
@@ -837,8 +817,6 @@ paths:
                     description: Creation timestamp
   '/apps/annotations/{annotation_id}':
     put:
-      tags:
-        - Generation
       operationId: updateAnnotationByAppGeneration
       summary: Update Annotation
       description: Update a specific annotation
@@ -889,8 +867,6 @@ paths:
                     type: integer
                     description: Creation timestamp
     delete:
-      tags:
-        - Generation
       operationId: deleteAnnotationByAppGeneration
       summary: Delete Annotation
       description: Delete a specific annotation
@@ -915,8 +891,6 @@ paths:
                       - success
   '/apps/annotation-reply/{action}':
     post:
-      tags:
-        - Generation
       operationId: configureAnnotationReplyByAppGeneration
       summary: Initialize Annotation Reply Settings
       description: Enable or disable annotation reply functionality
@@ -937,16 +911,12 @@ paths:
             schema:
               type: object
               properties:
-                embedding_model_provider:
+                embedding_provider_name:
                   type: string
                   description: 'Specified embedding model provider, must be configured in the system first, corresponds to the provider field'
-                embedding_provider_name: # TODO: @l8ng same as `embedding_model_provider` upstream api complain {'code': 'invalid_param', 'message': 'Missing required parameter in the JSON body', 'params': 'embedding_provider_name'}
-                  type: string
-                embedding_model:
+                embedding_model_name:
                   type: string
                   description: 'Specified embedding model, corresponds to the model field'
-                embedding_model_name: # TODO: @l8ng same as `embedding_model_name` upstream api complain {'code': 'invalid_param', 'message': 'Missing required parameter in the JSON body', 'params': 'embedding_model_name'}
-                  type: string
                 score_threshold:
                   type: number
                   description: 'Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply'
@@ -966,8 +936,6 @@ paths:
                     description: Job status
   '/apps/annotation-reply/{action}/status/{job_id}':
     get:
-      tags:
-        - Generation
       operationId: getAnnotationReplyStatusByAppGeneration
       summary: Check Annotation Reply Settings Status
       description: Query the status of annotation reply initialization task
@@ -1006,8 +974,6 @@ paths:
                     description: Error message
   /meta:
     get:
-      tags:
-        - Generation
       operationId: getAppMetaInfoByAppGeneration
       summary: Get App Meta Information
       description: Used to get tool icons

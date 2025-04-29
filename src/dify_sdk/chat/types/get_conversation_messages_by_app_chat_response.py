@@ -4,11 +4,11 @@ import typing
 
 import pydantic
 from ...core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
-from ...types.chat_message import ChatMessage
+from .chat_history_message import ChatHistoryMessage
 
 
 class GetConversationMessagesByAppChatResponse(UniversalBaseModel):
-    data: typing.Optional[typing.List[ChatMessage]] = None
+    data: typing.Optional[typing.List[ChatHistoryMessage]] = None
     has_more: typing.Optional[bool] = None
     limit: typing.Optional[int] = None
 

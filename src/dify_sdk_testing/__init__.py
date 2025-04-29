@@ -4,11 +4,11 @@ import os
 import importlib.metadata
 from packaging.version import Version
 
-from dify_sdk.datasets.client import AsyncDatasetsClient
-from dify_sdk.documents.client import AsyncDocumentsClient
-from dify_sdk.metadata.client import AsyncMetadataClient
-from dify_sdk.models.client import AsyncModelsClient
-from dify_sdk.segments.client import AsyncSegmentsClient
+from dify_sdk.knowledge_base.datasets.client import AsyncDatasetsClient
+from dify_sdk.knowledge_base.documents.client import AsyncDocumentsClient
+from dify_sdk.knowledge_base.metadata.client import AsyncMetadataClient
+from dify_sdk.knowledge_base.models.client import AsyncModelsClient
+from dify_sdk.knowledge_base.segments.client import AsyncSegmentsClient
 
 
 PROJECT_NAME = "dify-openapi"

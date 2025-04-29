@@ -5,16 +5,15 @@ import typing
 from .. import core
 from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ..core.request_options import RequestOptions
-from ..types.completion_message import CompletionMessage
-from ..types.file_input import FileInput
-from ..types.uploaded_file import UploadedFile
 from .raw_client import AsyncRawGenerationClient, RawGenerationClient
+from .types.chunk_chat_completion_response import ChunkChatCompletionResponse
 from .types.configure_annotation_reply_by_app_generation_request_action import (
     ConfigureAnnotationReplyByAppGenerationRequestAction,
 )
 from .types.configure_annotation_reply_by_app_generation_response import ConfigureAnnotationReplyByAppGenerationResponse
 from .types.create_annotation_by_app_generation_response import CreateAnnotationByAppGenerationResponse
 from .types.delete_annotation_by_app_generation_response import DeleteAnnotationByAppGenerationResponse
+from .types.file_input import FileInput
 from .types.get_annotation_reply_status_by_app_generation_request_action import (
     GetAnnotationReplyStatusByAppGenerationRequestAction,
 )
@@ -34,6 +33,7 @@ from .types.send_completion_message_by_app_generation_request_response_mode impo
 from .types.send_message_feedback_by_app_generation_response import SendMessageFeedbackByAppGenerationResponse
 from .types.stop_completion_response_by_app_generation_response import StopCompletionResponseByAppGenerationResponse
 from .types.update_annotation_by_app_generation_response import UpdateAnnotationByAppGenerationResponse
+from .types.uploaded_file import UploadedFile
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -62,7 +62,7 @@ class GenerationClient:
         user: typing.Optional[str] = OMIT,
         files: typing.Optional[typing.Sequence[FileInput]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CompletionMessage:
+    ) -> typing.Iterator[ChunkChatCompletionResponse]:
         """
         Send request to text generation application
 
@@ -83,9 +83,9 @@ class GenerationClient:
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
-        Returns
-        -------
-        CompletionMessage
+        Yields
+        ------
+        typing.Iterator[ChunkChatCompletionResponse]
             Successful response
 
         Examples
@@ -93,12 +93,14 @@ class GenerationClient:
         from dify import DifyApi
         from dify.generation import SendCompletionMessageByAppGenerationRequestInputs
         client = DifyApi(token="YOUR_TOKEN", )
-        client.generation.send_completion_message_by_app_generation(inputs=SendCompletionMessageByAppGenerationRequestInputs(query='query', ), )
+        response = client.generation.send_completion_message_by_app_generation(inputs=SendCompletionMessageByAppGenerationRequestInputs(query='query', ), )
+        for chunk in response:
+            yield chunk
         """
-        response = self._raw_client.send_completion_message_by_app_generation(
+        with self._raw_client.send_completion_message_by_app_generation(
             inputs=inputs, response_mode=response_mode, user=user, files=files, request_options=request_options
-        )
-        return response.data
+        ) as r:
+            yield from r.data
 
     def upload_file_by_app_generation(
         self,
@@ -134,8 +136,10 @@ class GenerationClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.generation.upload_file_by_app_generation()
         """
-        response = self._raw_client.upload_file_by_app_generation(file=file, user=user, request_options=request_options)
-        return response.data
+        _response = self._raw_client.upload_file_by_app_generation(
+            file=file, user=user, request_options=request_options
+        )
+        return _response.data
 
     def get_application_info_by_app_generation(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -157,8 +161,8 @@ class GenerationClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.generation.get_application_info_by_app_generation()
         """
-        response = self._raw_client.get_application_info_by_app_generation(request_options=request_options)
-        return response.data
+        _response = self._raw_client.get_application_info_by_app_generation(request_options=request_options)
+        return _response.data
 
     def get_application_parameters_by_app_generation(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -180,8 +184,8 @@ class GenerationClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.generation.get_application_parameters_by_app_generation()
         """
-        response = self._raw_client.get_application_parameters_by_app_generation(request_options=request_options)
-        return response.data
+        _response = self._raw_client.get_application_parameters_by_app_generation(request_options=request_options)
+        return _response.data
 
     def stop_completion_response_by_app_generation(
         self, task_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
@@ -211,10 +215,10 @@ class GenerationClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.generation.stop_completion_response_by_app_generation(task_id='task_id', user='user', )
         """
-        response = self._raw_client.stop_completion_response_by_app_generation(
+        _response = self._raw_client.stop_completion_response_by_app_generation(
             task_id, user=user, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     def send_message_feedback_by_app_generation(
         self,
@@ -256,10 +260,10 @@ class GenerationClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.generation.send_message_feedback_by_app_generation(message_id='message_id', rating='rating', user='user', )
         """
-        response = self._raw_client.send_message_feedback_by_app_generation(
+        _response = self._raw_client.send_message_feedback_by_app_generation(
             message_id, rating=rating, user=user, content=content, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     def convert_text_to_audio_by_app_generation(
         self,
@@ -332,10 +336,10 @@ class GenerationClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.generation.get_annotations_list_by_app_generation()
         """
-        response = self._raw_client.get_annotations_list_by_app_generation(
+        _response = self._raw_client.get_annotations_list_by_app_generation(
             page=page, limit=limit, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     def create_annotation_by_app_generation(
         self, *, question: str, answer: str, request_options: typing.Optional[RequestOptions] = None
@@ -365,10 +369,10 @@ class GenerationClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.generation.create_annotation_by_app_generation(question='question', answer='answer', )
         """
-        response = self._raw_client.create_annotation_by_app_generation(
+        _response = self._raw_client.create_annotation_by_app_generation(
             question=question, answer=answer, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     def update_annotation_by_app_generation(
         self, annotation_id: str, *, question: str, answer: str, request_options: typing.Optional[RequestOptions] = None
@@ -401,10 +405,10 @@ class GenerationClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.generation.update_annotation_by_app_generation(annotation_id='annotation_id', question='question', answer='answer', )
         """
-        response = self._raw_client.update_annotation_by_app_generation(
+        _response = self._raw_client.update_annotation_by_app_generation(
             annotation_id, question=question, answer=answer, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     def delete_annotation_by_app_generation(
         self, annotation_id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -431,16 +435,14 @@ class GenerationClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.generation.delete_annotation_by_app_generation(annotation_id='annotation_id', )
         """
-        response = self._raw_client.delete_annotation_by_app_generation(annotation_id, request_options=request_options)
-        return response.data
+        _response = self._raw_client.delete_annotation_by_app_generation(annotation_id, request_options=request_options)
+        return _response.data
 
     def configure_annotation_reply_by_app_generation(
         self,
         action: ConfigureAnnotationReplyByAppGenerationRequestAction,
         *,
-        embedding_model_provider: typing.Optional[str] = OMIT,
         embedding_provider_name: typing.Optional[str] = OMIT,
-        embedding_model: typing.Optional[str] = OMIT,
         embedding_model_name: typing.Optional[str] = OMIT,
         score_threshold: typing.Optional[float] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -453,15 +455,11 @@ class GenerationClient:
         action : ConfigureAnnotationReplyByAppGenerationRequestAction
             Action, can only be 'enable' or 'disable'
 
-        embedding_model_provider : typing.Optional[str]
+        embedding_provider_name : typing.Optional[str]
             Specified embedding model provider, must be configured in the system first, corresponds to the provider field
 
-        embedding_provider_name : typing.Optional[str]
-
-        embedding_model : typing.Optional[str]
-            Specified embedding model, corresponds to the model field
-
         embedding_model_name : typing.Optional[str]
+            Specified embedding model, corresponds to the model field
 
         score_threshold : typing.Optional[float]
             Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply
@@ -480,16 +478,14 @@ class GenerationClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.generation.configure_annotation_reply_by_app_generation(action="enable", )
         """
-        response = self._raw_client.configure_annotation_reply_by_app_generation(
+        _response = self._raw_client.configure_annotation_reply_by_app_generation(
             action,
-            embedding_model_provider=embedding_model_provider,
             embedding_provider_name=embedding_provider_name,
-            embedding_model=embedding_model,
             embedding_model_name=embedding_model_name,
             score_threshold=score_threshold,
             request_options=request_options,
         )
-        return response.data
+        return _response.data
 
     def get_annotation_reply_status_by_app_generation(
         self,
@@ -523,10 +519,10 @@ class GenerationClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.generation.get_annotation_reply_status_by_app_generation(action="enable", job_id='job_id', )
         """
-        response = self._raw_client.get_annotation_reply_status_by_app_generation(
+        _response = self._raw_client.get_annotation_reply_status_by_app_generation(
             action, job_id, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     def get_app_meta_info_by_app_generation(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -550,8 +546,8 @@ class GenerationClient:
         client = DifyApi(token="YOUR_TOKEN", )
         client.generation.get_app_meta_info_by_app_generation()
         """
-        response = self._raw_client.get_app_meta_info_by_app_generation(request_options=request_options)
-        return response.data
+        _response = self._raw_client.get_app_meta_info_by_app_generation(request_options=request_options)
+        return _response.data
 
 
 class AsyncGenerationClient:
@@ -577,7 +573,7 @@ class AsyncGenerationClient:
         user: typing.Optional[str] = OMIT,
         files: typing.Optional[typing.Sequence[FileInput]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CompletionMessage:
+    ) -> typing.AsyncIterator[ChunkChatCompletionResponse]:
         """
         Send request to text generation application
 
@@ -598,9 +594,9 @@ class AsyncGenerationClient:
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
-        Returns
-        -------
-        CompletionMessage
+        Yields
+        ------
+        typing.AsyncIterator[ChunkChatCompletionResponse]
             Successful response
 
         Examples
@@ -610,13 +606,16 @@ class AsyncGenerationClient:
         import asyncio
         client = AsyncDifyApi(token="YOUR_TOKEN", )
         async def main() -> None:
-            await client.generation.send_completion_message_by_app_generation(inputs=SendCompletionMessageByAppGenerationRequestInputs(query='query', ), )
+            response = await client.generation.send_completion_message_by_app_generation(inputs=SendCompletionMessageByAppGenerationRequestInputs(query='query', ), )
+            async for chunk in response:
+                yield chunk
         asyncio.run(main())
         """
-        response = await self._raw_client.send_completion_message_by_app_generation(
+        async with self._raw_client.send_completion_message_by_app_generation(
             inputs=inputs, response_mode=response_mode, user=user, files=files, request_options=request_options
-        )
-        return response.data
+        ) as r:
+            async for data in r.data:
+                yield data
 
     async def upload_file_by_app_generation(
         self,
@@ -655,10 +654,10 @@ class AsyncGenerationClient:
             await client.generation.upload_file_by_app_generation()
         asyncio.run(main())
         """
-        response = await self._raw_client.upload_file_by_app_generation(
+        _response = await self._raw_client.upload_file_by_app_generation(
             file=file, user=user, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     async def get_application_info_by_app_generation(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -683,8 +682,8 @@ class AsyncGenerationClient:
             await client.generation.get_application_info_by_app_generation()
         asyncio.run(main())
         """
-        response = await self._raw_client.get_application_info_by_app_generation(request_options=request_options)
-        return response.data
+        _response = await self._raw_client.get_application_info_by_app_generation(request_options=request_options)
+        return _response.data
 
     async def get_application_parameters_by_app_generation(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -709,8 +708,8 @@ class AsyncGenerationClient:
             await client.generation.get_application_parameters_by_app_generation()
         asyncio.run(main())
         """
-        response = await self._raw_client.get_application_parameters_by_app_generation(request_options=request_options)
-        return response.data
+        _response = await self._raw_client.get_application_parameters_by_app_generation(request_options=request_options)
+        return _response.data
 
     async def stop_completion_response_by_app_generation(
         self, task_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
@@ -743,10 +742,10 @@ class AsyncGenerationClient:
             await client.generation.stop_completion_response_by_app_generation(task_id='task_id', user='user', )
         asyncio.run(main())
         """
-        response = await self._raw_client.stop_completion_response_by_app_generation(
+        _response = await self._raw_client.stop_completion_response_by_app_generation(
             task_id, user=user, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     async def send_message_feedback_by_app_generation(
         self,
@@ -791,10 +790,10 @@ class AsyncGenerationClient:
             await client.generation.send_message_feedback_by_app_generation(message_id='message_id', rating='rating', user='user', )
         asyncio.run(main())
         """
-        response = await self._raw_client.send_message_feedback_by_app_generation(
+        _response = await self._raw_client.send_message_feedback_by_app_generation(
             message_id, rating=rating, user=user, content=content, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     async def convert_text_to_audio_by_app_generation(
         self,
@@ -871,10 +870,10 @@ class AsyncGenerationClient:
             await client.generation.get_annotations_list_by_app_generation()
         asyncio.run(main())
         """
-        response = await self._raw_client.get_annotations_list_by_app_generation(
+        _response = await self._raw_client.get_annotations_list_by_app_generation(
             page=page, limit=limit, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     async def create_annotation_by_app_generation(
         self, *, question: str, answer: str, request_options: typing.Optional[RequestOptions] = None
@@ -907,10 +906,10 @@ class AsyncGenerationClient:
             await client.generation.create_annotation_by_app_generation(question='question', answer='answer', )
         asyncio.run(main())
         """
-        response = await self._raw_client.create_annotation_by_app_generation(
+        _response = await self._raw_client.create_annotation_by_app_generation(
             question=question, answer=answer, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     async def update_annotation_by_app_generation(
         self, annotation_id: str, *, question: str, answer: str, request_options: typing.Optional[RequestOptions] = None
@@ -946,10 +945,10 @@ class AsyncGenerationClient:
             await client.generation.update_annotation_by_app_generation(annotation_id='annotation_id', question='question', answer='answer', )
         asyncio.run(main())
         """
-        response = await self._raw_client.update_annotation_by_app_generation(
+        _response = await self._raw_client.update_annotation_by_app_generation(
             annotation_id, question=question, answer=answer, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     async def delete_annotation_by_app_generation(
         self, annotation_id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -979,18 +978,16 @@ class AsyncGenerationClient:
             await client.generation.delete_annotation_by_app_generation(annotation_id='annotation_id', )
         asyncio.run(main())
         """
-        response = await self._raw_client.delete_annotation_by_app_generation(
+        _response = await self._raw_client.delete_annotation_by_app_generation(
             annotation_id, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     async def configure_annotation_reply_by_app_generation(
         self,
         action: ConfigureAnnotationReplyByAppGenerationRequestAction,
         *,
-        embedding_model_provider: typing.Optional[str] = OMIT,
         embedding_provider_name: typing.Optional[str] = OMIT,
-        embedding_model: typing.Optional[str] = OMIT,
         embedding_model_name: typing.Optional[str] = OMIT,
         score_threshold: typing.Optional[float] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -1003,15 +1000,11 @@ class AsyncGenerationClient:
         action : ConfigureAnnotationReplyByAppGenerationRequestAction
             Action, can only be 'enable' or 'disable'
 
-        embedding_model_provider : typing.Optional[str]
+        embedding_provider_name : typing.Optional[str]
             Specified embedding model provider, must be configured in the system first, corresponds to the provider field
 
-        embedding_provider_name : typing.Optional[str]
-
-        embedding_model : typing.Optional[str]
-            Specified embedding model, corresponds to the model field
-
         embedding_model_name : typing.Optional[str]
+            Specified embedding model, corresponds to the model field
 
         score_threshold : typing.Optional[float]
             Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply
@@ -1033,16 +1026,14 @@ class AsyncGenerationClient:
             await client.generation.configure_annotation_reply_by_app_generation(action="enable", )
         asyncio.run(main())
         """
-        response = await self._raw_client.configure_annotation_reply_by_app_generation(
+        _response = await self._raw_client.configure_annotation_reply_by_app_generation(
             action,
-            embedding_model_provider=embedding_model_provider,
             embedding_provider_name=embedding_provider_name,
-            embedding_model=embedding_model,
             embedding_model_name=embedding_model_name,
             score_threshold=score_threshold,
             request_options=request_options,
         )
-        return response.data
+        return _response.data
 
     async def get_annotation_reply_status_by_app_generation(
         self,
@@ -1079,10 +1070,10 @@ class AsyncGenerationClient:
             await client.generation.get_annotation_reply_status_by_app_generation(action="enable", job_id='job_id', )
         asyncio.run(main())
         """
-        response = await self._raw_client.get_annotation_reply_status_by_app_generation(
+        _response = await self._raw_client.get_annotation_reply_status_by_app_generation(
             action, job_id, request_options=request_options
         )
-        return response.data
+        return _response.data
 
     async def get_app_meta_info_by_app_generation(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -1109,5 +1100,5 @@ class AsyncGenerationClient:
             await client.generation.get_app_meta_info_by_app_generation()
         asyncio.run(main())
         """
-        response = await self._raw_client.get_app_meta_info_by_app_generation(request_options=request_options)
-        return response.data
+        _response = await self._raw_client.get_app_meta_info_by_app_generation(request_options=request_options)
+        return _response.data

@@ -4,6 +4,7 @@ import contextlib
 import typing
 from json.decoder import JSONDecodeError
 
+import httpx_sse
 from .. import core
 from ..core.api_error import ApiError
 from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
@@ -12,22 +13,21 @@ from ..core.jsonable_encoder import jsonable_encoder
 from ..core.pydantic_utilities import parse_obj_as
 from ..core.request_options import RequestOptions
 from ..core.serialization import convert_and_respect_annotation_metadata
-from ..errors.bad_request_error import BadRequestError
-from ..errors.content_too_large_error import ContentTooLargeError
-from ..errors.internal_server_error import InternalServerError
-from ..errors.not_found_error import NotFoundError
-from ..errors.service_unavailable_error import ServiceUnavailableError
-from ..errors.unsupported_media_type_error import UnsupportedMediaTypeError
-from ..types.completion_message import CompletionMessage
-from ..types.error import Error
-from ..types.file_input import FileInput
-from ..types.uploaded_file import UploadedFile
+from .errors.bad_request_error import BadRequestError
+from .errors.content_too_large_error import ContentTooLargeError
+from .errors.internal_server_error import InternalServerError
+from .errors.not_found_error import NotFoundError
+from .errors.service_unavailable_error import ServiceUnavailableError
+from .errors.unsupported_media_type_error import UnsupportedMediaTypeError
+from .types.chunk_chat_completion_response import ChunkChatCompletionResponse
 from .types.configure_annotation_reply_by_app_generation_request_action import (
     ConfigureAnnotationReplyByAppGenerationRequestAction,
 )
 from .types.configure_annotation_reply_by_app_generation_response import ConfigureAnnotationReplyByAppGenerationResponse
 from .types.create_annotation_by_app_generation_response import CreateAnnotationByAppGenerationResponse
 from .types.delete_annotation_by_app_generation_response import DeleteAnnotationByAppGenerationResponse
+from .types.error import Error
+from .types.file_input import FileInput
 from .types.get_annotation_reply_status_by_app_generation_request_action import (
     GetAnnotationReplyStatusByAppGenerationRequestAction,
 )
@@ -47,6 +47,7 @@ from .types.send_completion_message_by_app_generation_request_response_mode impo
 from .types.send_message_feedback_by_app_generation_response import SendMessageFeedbackByAppGenerationResponse
 from .types.stop_completion_response_by_app_generation_response import StopCompletionResponseByAppGenerationResponse
 from .types.update_annotation_by_app_generation_response import UpdateAnnotationByAppGenerationResponse
+from .types.uploaded_file import UploadedFile
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -56,6 +57,7 @@ class RawGenerationClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
+    @contextlib.contextmanager
     def send_completion_message_by_app_generation(
         self,
         *,
@@ -64,7 +66,7 @@ class RawGenerationClient:
         user: typing.Optional[str] = OMIT,
         files: typing.Optional[typing.Sequence[FileInput]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> HttpResponse[CompletionMessage]:
+    ) -> typing.Iterator[HttpResponse[typing.Iterator[ChunkChatCompletionResponse]]]:
         """
         Send request to text generation application
 
@@ -85,12 +87,12 @@ class RawGenerationClient:
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
-        Returns
-        -------
-        HttpResponse[CompletionMessage]
+        Yields
+        ------
+        typing.Iterator[HttpResponse[typing.Iterator[ChunkChatCompletionResponse]]]
             Successful response
         """
-        _response = self._client_wrapper.httpx_client.request(
+        with self._client_wrapper.httpx_client.stream(
             "completion-messages",
             method="POST",
             json={
@@ -108,51 +110,63 @@ class RawGenerationClient:
             },
             request_options=request_options,
             omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                _data = typing.cast(
-                    CompletionMessage,
-                    parse_obj_as(
-                        type_=CompletionMessage,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-                return HttpResponse(response=_response, data=_data)
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        Error,
-                        parse_obj_as(
-                            type_=Error,  # type: ignore
-                            object_=_response.json(),
-                        ),
+        ) as _response:
+
+            def stream() -> HttpResponse[typing.Iterator[ChunkChatCompletionResponse]]:
+                try:
+                    if 200 <= _response.status_code < 300:
+
+                        def _iter():
+                            _event_source = httpx_sse.EventSource(_response)
+                            for _sse in _event_source.iter_sse():
+                                if _sse.data == None:
+                                    return
+                                try:
+                                    yield _sse.data
+                                except Exception:
+                                    pass
+                            return
+
+                        return HttpResponse(response=_response, data=_iter())
+                    _response.read()
+                    if _response.status_code == 400:
+                        raise BadRequestError(
+                            typing.cast(
+                                Error,
+                                parse_obj_as(
+                                    type_=Error,  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 404:
+                        raise NotFoundError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 500:
+                        raise InternalServerError(
+                            typing.cast(
+                                Error,
+                                parse_obj_as(
+                                    type_=Error,  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    _response_json = _response.json()
+                except JSONDecodeError:
+                    raise ApiError(
+                        headers=dict(_response.headers), status_code=_response.status_code, body=_response.text
                     )
-                )
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        Error,
-                        parse_obj_as(
-                            type_=Error,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 500:
-                raise InternalServerError(
-                    typing.cast(
-                        Error,
-                        parse_obj_as(
-                            type_=Error,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+                raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+            yield stream()
 
     def upload_file_by_app_generation(
         self,
@@ -190,6 +204,9 @@ class RawGenerationClient:
             },
             files={
                 "file": file,
+            },
+            headers={
+                # "content-type": "multipart/form-data",
             },
             request_options=request_options,
             omit=OMIT,
@@ -246,8 +263,8 @@ class RawGenerationClient:
                 )
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def get_application_info_by_app_generation(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -280,8 +297,8 @@ class RawGenerationClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def get_application_parameters_by_app_generation(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -314,8 +331,8 @@ class RawGenerationClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def stop_completion_response_by_app_generation(
         self, task_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
@@ -363,8 +380,8 @@ class RawGenerationClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def send_message_feedback_by_app_generation(
         self,
@@ -426,8 +443,8 @@ class RawGenerationClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     @contextlib.contextmanager
     def convert_text_to_audio_by_app_generation(
@@ -490,8 +507,10 @@ class RawGenerationClient:
                     _response.read()
                     _response_json = _response.json()
                 except JSONDecodeError:
-                    raise ApiError(status_code=_response.status_code, body=_response.text)
-                raise ApiError(status_code=_response.status_code, body=_response_json)
+                    raise ApiError(
+                        headers=dict(_response.headers), status_code=_response.status_code, body=_response.text
+                    )
+                raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
             yield stream()
 
@@ -542,8 +561,8 @@ class RawGenerationClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def create_annotation_by_app_generation(
         self, *, question: str, answer: str, request_options: typing.Optional[RequestOptions] = None
@@ -592,8 +611,8 @@ class RawGenerationClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def update_annotation_by_app_generation(
         self, annotation_id: str, *, question: str, answer: str, request_options: typing.Optional[RequestOptions] = None
@@ -645,8 +664,8 @@ class RawGenerationClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def delete_annotation_by_app_generation(
         self, annotation_id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -684,16 +703,14 @@ class RawGenerationClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def configure_annotation_reply_by_app_generation(
         self,
         action: ConfigureAnnotationReplyByAppGenerationRequestAction,
         *,
-        embedding_model_provider: typing.Optional[str] = OMIT,
         embedding_provider_name: typing.Optional[str] = OMIT,
-        embedding_model: typing.Optional[str] = OMIT,
         embedding_model_name: typing.Optional[str] = OMIT,
         score_threshold: typing.Optional[float] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -706,15 +723,11 @@ class RawGenerationClient:
         action : ConfigureAnnotationReplyByAppGenerationRequestAction
             Action, can only be 'enable' or 'disable'
 
-        embedding_model_provider : typing.Optional[str]
+        embedding_provider_name : typing.Optional[str]
             Specified embedding model provider, must be configured in the system first, corresponds to the provider field
 
-        embedding_provider_name : typing.Optional[str]
-
-        embedding_model : typing.Optional[str]
-            Specified embedding model, corresponds to the model field
-
         embedding_model_name : typing.Optional[str]
+            Specified embedding model, corresponds to the model field
 
         score_threshold : typing.Optional[float]
             Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply
@@ -731,9 +744,7 @@ class RawGenerationClient:
             f"apps/annotation-reply/{jsonable_encoder(action)}",
             method="POST",
             json={
-                "embedding_model_provider": embedding_model_provider,
                 "embedding_provider_name": embedding_provider_name,
-                "embedding_model": embedding_model,
                 "embedding_model_name": embedding_model_name,
                 "score_threshold": score_threshold,
             },
@@ -755,8 +766,8 @@ class RawGenerationClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def get_annotation_reply_status_by_app_generation(
         self,
@@ -801,8 +812,8 @@ class RawGenerationClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     def get_app_meta_info_by_app_generation(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -837,14 +848,15 @@ class RawGenerationClient:
                 return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
 
 class AsyncRawGenerationClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
+    @contextlib.asynccontextmanager
     async def send_completion_message_by_app_generation(
         self,
         *,
@@ -853,7 +865,7 @@ class AsyncRawGenerationClient:
         user: typing.Optional[str] = OMIT,
         files: typing.Optional[typing.Sequence[FileInput]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> AsyncHttpResponse[CompletionMessage]:
+    ) -> typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[ChunkChatCompletionResponse]]]:
         """
         Send request to text generation application
 
@@ -874,12 +886,12 @@ class AsyncRawGenerationClient:
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
-        Returns
-        -------
-        AsyncHttpResponse[CompletionMessage]
+        Yields
+        ------
+        typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[ChunkChatCompletionResponse]]]
             Successful response
         """
-        _response = await self._client_wrapper.httpx_client.request(
+        async with self._client_wrapper.httpx_client.stream(
             "completion-messages",
             method="POST",
             json={
@@ -897,51 +909,63 @@ class AsyncRawGenerationClient:
             },
             request_options=request_options,
             omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                _data = typing.cast(
-                    CompletionMessage,
-                    parse_obj_as(
-                        type_=CompletionMessage,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-                return AsyncHttpResponse(response=_response, data=_data)
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        Error,
-                        parse_obj_as(
-                            type_=Error,  # type: ignore
-                            object_=_response.json(),
-                        ),
+        ) as _response:
+
+            async def stream() -> AsyncHttpResponse[typing.AsyncIterator[ChunkChatCompletionResponse]]:
+                try:
+                    if 200 <= _response.status_code < 300:
+
+                        async def _iter():
+                            _event_source = httpx_sse.EventSource(_response)
+                            async for _sse in _event_source.aiter_sse():
+                                if _sse.data == None:
+                                    return
+                                try:
+                                    yield _sse.data
+                                except Exception:
+                                    pass
+                            return
+
+                        return AsyncHttpResponse(response=_response, data=_iter())
+                    await _response.aread()
+                    if _response.status_code == 400:
+                        raise BadRequestError(
+                            typing.cast(
+                                Error,
+                                parse_obj_as(
+                                    type_=Error,  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 404:
+                        raise NotFoundError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 500:
+                        raise InternalServerError(
+                            typing.cast(
+                                Error,
+                                parse_obj_as(
+                                    type_=Error,  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    _response_json = _response.json()
+                except JSONDecodeError:
+                    raise ApiError(
+                        headers=dict(_response.headers), status_code=_response.status_code, body=_response.text
                     )
-                )
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        Error,
-                        parse_obj_as(
-                            type_=Error,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 500:
-                raise InternalServerError(
-                    typing.cast(
-                        Error,
-                        parse_obj_as(
-                            type_=Error,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+                raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+            yield await stream()
 
     async def upload_file_by_app_generation(
         self,
@@ -979,6 +1003,9 @@ class AsyncRawGenerationClient:
             },
             files={
                 "file": file,
+            },
+            headers={
+                # "content-type": "multipart/form-data",
             },
             request_options=request_options,
             omit=OMIT,
@@ -1035,8 +1062,8 @@ class AsyncRawGenerationClient:
                 )
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def get_application_info_by_app_generation(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -1069,8 +1096,8 @@ class AsyncRawGenerationClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def get_application_parameters_by_app_generation(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -1103,8 +1130,8 @@ class AsyncRawGenerationClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def stop_completion_response_by_app_generation(
         self, task_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
@@ -1152,8 +1179,8 @@ class AsyncRawGenerationClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def send_message_feedback_by_app_generation(
         self,
@@ -1215,8 +1242,8 @@ class AsyncRawGenerationClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     @contextlib.asynccontextmanager
     async def convert_text_to_audio_by_app_generation(
@@ -1280,8 +1307,10 @@ class AsyncRawGenerationClient:
                     await _response.aread()
                     _response_json = _response.json()
                 except JSONDecodeError:
-                    raise ApiError(status_code=_response.status_code, body=_response.text)
-                raise ApiError(status_code=_response.status_code, body=_response_json)
+                    raise ApiError(
+                        headers=dict(_response.headers), status_code=_response.status_code, body=_response.text
+                    )
+                raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
             yield await stream()
 
@@ -1332,8 +1361,8 @@ class AsyncRawGenerationClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def create_annotation_by_app_generation(
         self, *, question: str, answer: str, request_options: typing.Optional[RequestOptions] = None
@@ -1382,8 +1411,8 @@ class AsyncRawGenerationClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def update_annotation_by_app_generation(
         self, annotation_id: str, *, question: str, answer: str, request_options: typing.Optional[RequestOptions] = None
@@ -1435,8 +1464,8 @@ class AsyncRawGenerationClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def delete_annotation_by_app_generation(
         self, annotation_id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -1474,16 +1503,14 @@ class AsyncRawGenerationClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def configure_annotation_reply_by_app_generation(
         self,
         action: ConfigureAnnotationReplyByAppGenerationRequestAction,
         *,
-        embedding_model_provider: typing.Optional[str] = OMIT,
         embedding_provider_name: typing.Optional[str] = OMIT,
-        embedding_model: typing.Optional[str] = OMIT,
         embedding_model_name: typing.Optional[str] = OMIT,
         score_threshold: typing.Optional[float] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -1496,15 +1523,11 @@ class AsyncRawGenerationClient:
         action : ConfigureAnnotationReplyByAppGenerationRequestAction
             Action, can only be 'enable' or 'disable'
 
-        embedding_model_provider : typing.Optional[str]
+        embedding_provider_name : typing.Optional[str]
             Specified embedding model provider, must be configured in the system first, corresponds to the provider field
 
-        embedding_provider_name : typing.Optional[str]
-
-        embedding_model : typing.Optional[str]
-            Specified embedding model, corresponds to the model field
-
         embedding_model_name : typing.Optional[str]
+            Specified embedding model, corresponds to the model field
 
         score_threshold : typing.Optional[float]
             Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply
@@ -1521,9 +1544,7 @@ class AsyncRawGenerationClient:
             f"apps/annotation-reply/{jsonable_encoder(action)}",
             method="POST",
             json={
-                "embedding_model_provider": embedding_model_provider,
                 "embedding_provider_name": embedding_provider_name,
-                "embedding_model": embedding_model,
                 "embedding_model_name": embedding_model_name,
                 "score_threshold": score_threshold,
             },
@@ -1545,8 +1566,8 @@ class AsyncRawGenerationClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def get_annotation_reply_status_by_app_generation(
         self,
@@ -1591,8 +1612,8 @@ class AsyncRawGenerationClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
     async def get_app_meta_info_by_app_generation(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -1627,5 +1648,5 @@ class AsyncRawGenerationClient:
                 return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)

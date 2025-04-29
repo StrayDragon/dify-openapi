@@ -4,13 +4,13 @@ import typing
 
 import pydantic
 from ...core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
-from ...types.retriever_resource import RetrieverResource
 from .get_conversation_messages_by_app_advanced_chat_response_data_item_feedback import (
     GetConversationMessagesByAppAdvancedChatResponseDataItemFeedback,
 )
 from .get_conversation_messages_by_app_advanced_chat_response_data_item_message_files_item import (
     GetConversationMessagesByAppAdvancedChatResponseDataItemMessageFilesItem,
 )
+from .retriever_resource import RetrieverResource
 
 
 class GetConversationMessagesByAppAdvancedChatResponseDataItem(UniversalBaseModel):

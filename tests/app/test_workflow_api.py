@@ -7,7 +7,7 @@ from typing import Any
 from pathlib import Path
 
 from dify_sdk.workflow.client import AsyncWorkflowClient
-from dify_sdk.types.stream_event import StreamEvent
+from dify_sdk.workflow.types.chunk_workflow_message import ChunkWorkflowMessage
 from dify_sdk_testing import RUNNING_IN_CI
 
 LOGIN_USER_ID = "test123"
@@ -34,7 +34,7 @@ async def test_workflow_execution_and_status(app_workflow_client: AsyncWorkflowC
     )
 
     # 收集所有事件
-    events: list[StreamEvent] = []
+    events: list[ChunkWorkflowMessage] = []
     async for event in response_iterator:
         events.append(event)
 
@@ -144,7 +144,7 @@ async def test_workflow_run_with_file(app_workflow_client: AsyncWorkflowClient, 
     )
 
     # 收集所有事件
-    events: list[StreamEvent] = []
+    events: list[ChunkWorkflowMessage] = []
     async for event in response_iterator:
         events.append(event)
 
@@ -172,7 +172,7 @@ async def test_workflow_run_streaming(app_workflow_client: AsyncWorkflowClient):
     )
 
     # 收集所有事件
-    events: list[StreamEvent] = []
+    events: list[ChunkWorkflowMessage] = []
     async for event in response_iterator:
         events.append(event)
 
@@ -201,7 +201,7 @@ async def test_get_workflow_execution_status(app_workflow_client: AsyncWorkflowC
     )
 
     # 收集所有事件
-    events: list[StreamEvent] = []
+    events: list[ChunkWorkflowMessage] = []
     async for event in response_iterator:
         events.append(event)
 
@@ -256,7 +256,7 @@ async def test_stop_workflow(app_workflow_client: AsyncWorkflowClient):
     )
 
     # 收集所有事件
-    events: list[StreamEvent] = []
+    events: list[ChunkWorkflowMessage] = []
     async for event in response_iterator:
         events.append(event)
 

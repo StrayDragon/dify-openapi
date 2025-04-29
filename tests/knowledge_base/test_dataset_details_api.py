@@ -4,7 +4,7 @@
 
 import pytest
 
-from dify_sdk.types.dataset import Dataset
+from dify_sdk.knowledge_base.types.dataset import Dataset
 from dify_sdk_testing import KnowledgeBaseClient
 
 

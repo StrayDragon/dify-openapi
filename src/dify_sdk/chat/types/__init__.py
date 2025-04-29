@@ -2,12 +2,27 @@
 
 # isort: skip_file
 
+from .chat_completion_response import ChatCompletionResponse
+from .chat_completion_response_metadata import ChatCompletionResponseMetadata
+from .chat_history_message import ChatHistoryMessage
+from .chat_history_message_agent_thoughts_item import ChatHistoryMessageAgentThoughtsItem
+from .chat_history_message_feedback import ChatHistoryMessageFeedback
+from .chat_history_message_feedback_rating import ChatHistoryMessageFeedbackRating
+from .chat_history_message_message_files_item import ChatHistoryMessageMessageFilesItem
+from .chunk_chat_completion_response import ChunkChatCompletionResponse
+from .chunk_chat_completion_response_event import ChunkChatCompletionResponseEvent
+from .chunk_chat_completion_response_metadata import ChunkChatCompletionResponseMetadata
 from .configure_annotation_reply_by_app_chat_request_action import ConfigureAnnotationReplyByAppChatRequestAction
 from .configure_annotation_reply_by_app_chat_response import ConfigureAnnotationReplyByAppChatResponse
+from .conversation import Conversation
 from .convert_audio_to_text_by_app_chat_response import ConvertAudioToTextByAppChatResponse
 from .create_annotation_by_app_chat_response import CreateAnnotationByAppChatResponse
 from .delete_annotation_by_app_chat_response import DeleteAnnotationByAppChatResponse
 from .delete_conversation_by_app_chat_response import DeleteConversationByAppChatResponse
+from .error import Error
+from .file_input import FileInput
+from .file_input_transfer_method import FileInputTransferMethod
+from .file_input_type import FileInputType
 from .get_annotation_reply_status_by_app_chat_request_action import GetAnnotationReplyStatusByAppChatRequestAction
 from .get_annotation_reply_status_by_app_chat_response import GetAnnotationReplyStatusByAppChatResponse
 from .get_annotations_list_by_app_chat_response import GetAnnotationsListByAppChatResponse
@@ -37,7 +52,11 @@ from .get_application_parameters_by_app_chat_response_system_parameters import (
 from .get_conversation_list_by_app_chat_request_sort_by import GetConversationListByAppChatRequestSortBy
 from .get_conversation_list_by_app_chat_response import GetConversationListByAppChatResponse
 from .get_conversation_messages_by_app_chat_response import GetConversationMessagesByAppChatResponse
+from .get_conversation_variables_by_app_chat_response import GetConversationVariablesByAppChatResponse
+from .get_conversation_variables_by_app_chat_response_data_item import GetConversationVariablesByAppChatResponseDataItem
 from .get_suggested_questions_by_app_chat_response import GetSuggestedQuestionsByAppChatResponse
+from .not_found_error_body import NotFoundErrorBody
+from .retriever_resource import RetrieverResource
 from .send_chat_message_by_app_chat_request_files_item import SendChatMessageByAppChatRequestFilesItem
 from .send_chat_message_by_app_chat_request_files_item_transfer_method import (
     SendChatMessageByAppChatRequestFilesItemTransferMethod,
@@ -46,14 +65,31 @@ from .send_chat_message_by_app_chat_request_response_mode import SendChatMessage
 from .send_message_feedback_by_app_chat_response import SendMessageFeedbackByAppChatResponse
 from .stop_chat_response_by_app_chat_response import StopChatResponseByAppChatResponse
 from .update_annotation_by_app_chat_response import UpdateAnnotationByAppChatResponse
+from .uploaded_file import UploadedFile
+from .usage import Usage
 
 __all__ = [
+    "ChatCompletionResponse",
+    "ChatCompletionResponseMetadata",
+    "ChatHistoryMessage",
+    "ChatHistoryMessageAgentThoughtsItem",
+    "ChatHistoryMessageFeedback",
+    "ChatHistoryMessageFeedbackRating",
+    "ChatHistoryMessageMessageFilesItem",
+    "ChunkChatCompletionResponse",
+    "ChunkChatCompletionResponseEvent",
+    "ChunkChatCompletionResponseMetadata",
     "ConfigureAnnotationReplyByAppChatRequestAction",
     "ConfigureAnnotationReplyByAppChatResponse",
+    "Conversation",
     "ConvertAudioToTextByAppChatResponse",
     "CreateAnnotationByAppChatResponse",
     "DeleteAnnotationByAppChatResponse",
     "DeleteConversationByAppChatResponse",
+    "Error",
+    "FileInput",
+    "FileInputTransferMethod",
+    "FileInputType",
     "GetAnnotationReplyStatusByAppChatRequestAction",
     "GetAnnotationReplyStatusByAppChatResponse",
     "GetAnnotationsListByAppChatResponse",
@@ -71,11 +107,17 @@ __all__ = [
     "GetConversationListByAppChatRequestSortBy",
     "GetConversationListByAppChatResponse",
     "GetConversationMessagesByAppChatResponse",
+    "GetConversationVariablesByAppChatResponse",
+    "GetConversationVariablesByAppChatResponseDataItem",
     "GetSuggestedQuestionsByAppChatResponse",
+    "NotFoundErrorBody",
+    "RetrieverResource",
     "SendChatMessageByAppChatRequestFilesItem",
     "SendChatMessageByAppChatRequestFilesItemTransferMethod",
     "SendChatMessageByAppChatRequestResponseMode",
     "SendMessageFeedbackByAppChatResponse",
     "StopChatResponseByAppChatResponse",
     "UpdateAnnotationByAppChatResponse",
+    "UploadedFile",
+    "Usage",
 ]
