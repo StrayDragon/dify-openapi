@@ -277,7 +277,8 @@ paths:
       description: 发送请求给文本生成型应用
       x-fern-streaming:
         format: sse
-        stream-condition: $request.response_mode == "streaming"
+        # FIXME: @l8ng fern 暂时不支持
+        # stream-condition: $request.response_mode == "streaming"
         response:
           $ref: "#/components/schemas/ChatCompletionResponse"
         response-stream:

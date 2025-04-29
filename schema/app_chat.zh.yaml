@@ -274,7 +274,7 @@ components:
                 description: 使用的工具列表，以 ; 分割多个工具
               tool_input:
                 type: string
-                description: "工具的输入，JSON格式的字符串(object)。如：{\"dalle3\": {\"prompt\": \"a cute cat\"}}"
+                description: '工具的输入，JSON格式的字符串(object)。如：{"dalle3": {"prompt": "a cute cat"}}'
               created_at:
                 type: integer
                 description: 创建时间戳，如：1705395332
@@ -432,7 +432,8 @@ paths:
       description: 创建会话消息
       x-fern-streaming:
         format: sse
-        stream-condition: $request.response_mode == "streaming"
+        # FIXME: @l8ng fern 暂时不支持
+        # stream-condition: $request.response_mode == "streaming"
         response:
           $ref: "#/components/schemas/ChatCompletionResponse"
         response-stream:
@@ -849,7 +850,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: 成功获取建议问题列表
           content:
             application/json:
@@ -972,7 +973,7 @@ paths:
                   type: string
                   description: 用户标识，必须和发送消息接口传入 user 保持一致
       responses:
-        '200':
+        "200":
           description: 成功响应
           content:
             application/json:
@@ -1008,7 +1009,7 @@ paths:
               required:
                 - file
       responses:
-        '200':
+        "200":
           description: 成功响应
           content:
             application/json:
@@ -1043,7 +1044,7 @@ paths:
                   type: string
                   description: 用户标识，由开发者定义规则，需保证用户标识在应用内唯一
       responses:
-        '200':
+        "200":
           description: 成功响应
           content:
             audio/wav:
@@ -1131,7 +1132,7 @@ paths:
       summary: 获取应用Meta信息
       description: 用于获取工具icon
       responses:
-        '200':
+        "200":
           description: 成功响应
           content:
             application/json:

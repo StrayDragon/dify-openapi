@@ -357,7 +357,8 @@ paths:
       description: 执行 workflow，没有已发布的 workflow，不可执行
       x-fern-streaming:
         format: sse
-        stream-condition: $request.response_mode == "streaming"
+        # FIXME: @l8ng fern 暂时不支持
+        # stream-condition: $request.response_mode == "streaming"
         response:
           $ref: "#/components/schemas/WorkflowMessage"
         response-stream:
