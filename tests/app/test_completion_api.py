@@ -5,7 +5,7 @@
 import pytest
 from pathlib import Path
 
-from dify_sdk.generation.client import AsyncGenerationClient
+from dify_sdk.generation.client import AsyncGenerationClient, ChunkChatCompletionResponse
 from dify_sdk.core.request_options import RequestOptions
 from dify_sdk.generation.types.send_completion_message_by_app_generation_request_inputs import (
     SendCompletionMessageByAppGenerationRequestInputs,
@@ -29,31 +29,39 @@ async def test_get_app_info(app_completion_client: AsyncGenerationClient):
 async def test_get_app_info_error_handling(app_completion_client: AsyncGenerationClient):
     """测试获取应用信息时错误处理"""
     # 获取原始客户端和原始 base_url
-    raw_client = app_completion_client._raw_client # type: ignore
-    original_host = raw_client._client_wrapper.get_base_url() # type: ignore
+    raw_client = app_completion_client._raw_client  # type: ignore
+    original_host = raw_client._client_wrapper.get_base_url()  # type: ignore
 
     # 修改 base_url 为无效地址
-    raw_client._client_wrapper._base_url = "https://invalid.example.com" # type: ignore
+    raw_client._client_wrapper._base_url = "https://invalid.example.com"  # type: ignore
 
     with pytest.raises(Exception):
         await app_completion_client.get_application_info_by_app_generation()
 
     # 恢复原始 base_url
-    raw_client._client_wrapper._base_url = original_host # type: ignore
+    raw_client._client_wrapper._base_url = original_host  # type: ignore
 
 
 async def test_completion_message(app_completion_client: AsyncGenerationClient) -> str | None:
     """测试文本生成接口"""
-    response = await app_completion_client.send_completion_message_by_app_generation(
+    response_iterator = app_completion_client.send_completion_message_by_app_generation(
         inputs=SendCompletionMessageByAppGenerationRequestInputs(query="ping"),
-        response_mode="blocking",
+        response_mode="streaming",
         user=LOGIN_USER_ID,
         request_options=RequestOptions(timeout_in_seconds=30),
     )
 
-    assert response is not None
-    assert response.message_id is not None
-    return response.message_id
+    message_id = None
+    async for event_ in response_iterator:
+        if isinstance(event_, str):
+            event = ChunkChatCompletionResponse.model_validate_json(event_)
+        else:
+            event = event_
+        if not message_id and event.message_id:
+            message_id = event.message_id
+
+    assert message_id is not None, "无法获取 message_id"
+    return message_id
 
 
 async def test_message_feedback(app_completion_client: AsyncGenerationClient):

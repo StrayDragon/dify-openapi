@@ -36,6 +36,7 @@ async def app_chat_client() -> AsyncGenerator[AsyncChatClient]:
     )
     yield client.chat
 
+
 @pytest.fixture()
 async def app_advanced_chat_client() -> AsyncGenerator[AsyncAdvancedChatClient]:
     client = AsyncDifyApi(
@@ -90,9 +91,9 @@ async def kb_client() -> AsyncGenerator[KnowledgeBaseClient]:
         ),
     )
     yield KnowledgeBaseClient(
-        dataset=client.datasets,
-        document=client.documents,
-        segment=client.segments,
-        metadata=client.metadata,
-        models=client.models,
+        dataset=client.knowledge_base.datasets,
+        document=client.knowledge_base.documents,
+        segment=client.knowledge_base.segments,
+        metadata=client.knowledge_base.metadata,
+        models=client.knowledge_base.models,
     )

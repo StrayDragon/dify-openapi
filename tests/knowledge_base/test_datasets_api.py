@@ -6,11 +6,11 @@ from pathlib import Path
 import pytest
 import asyncio
 
-from dify_sdk import (
+from dify_sdk.knowledge_base import (
     ProcessRule,
     RetrieveDatasetRequestRetrievalModel,
 )
-from dify_sdk.types.create_document_by_file_request_data import CreateDocumentByFileRequestData
+from dify_sdk.knowledge_base.types.create_document_by_file_request_data import CreateDocumentByFileRequestData
 from dify_sdk_testing import KnowledgeBaseClient
 
 
