@@ -60,6 +60,7 @@ def init_submodules():
 def update_submodules():
     try:
         subprocess.run(["git", "pull", "origin", "main"], check=True, cwd=DIFY_REPO_DIR)
+        subprocess.run(["git", "fetch"], check=True, cwd=DIFY_REPO_DIR)
         subprocess.run(["git", "add", "libs/dify"], check=True, cwd=PROJECT_ROOT)
         subprocess.run(["git", "commit", "-m", "submodule: update to latest"], check=True, cwd=PROJECT_ROOT)
         logger.info("Submodules updated successfully")

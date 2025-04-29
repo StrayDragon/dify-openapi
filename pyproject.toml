@@ -19,6 +19,14 @@ dev = [
     "langchain[openai]>=0.3.20",
     "pyyaml>=6.0.2",
     "typer>=0.15.2",
+    "langchain-openai>=0.3.8",
+    "langchain-community>=0.3.19",
+    "langchain-text-splitters>=0.3.6",
+    "tiktoken>=0.9.0",
+    "faiss-cpu>=1.10.0",
+    "langgraph>=0.3.34",
+    "langsmith>=0.3.13",
+    "langchain-chroma>=0.2.3",
 ]
 
 [build-system]
@@ -47,9 +55,10 @@ skip-magic-trailing-comma = false
 line-ending = "auto"
 
 [tool.pytest.ini_options]
+testpaths = ["tests"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
-addopts = "-s -v --ignore libs --showlocals -x --cov=src --cov-branch --cov-report=xml --cov-report=term-missing"
+addopts = "-s -v --ignore libs --showlocals -x --cov=src --cov-branch --cov-report=xml" #  --cov-report=term-missing
 xfail_strict = true
 
 [tool.coverage.report]
