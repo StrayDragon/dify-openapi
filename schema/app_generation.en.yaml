@@ -5,8 +5,8 @@ info:
     Dify API provides a series of interfaces for text generation functionality.
     It supports text generation applications.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
-    official raw document: https://github.com/langgenius/dify/blob/1.3.0/web/app/components/develop/template/template.en.mdx
-  version: 1.3.0
+    official raw document: https://github.com/langgenius/dify/blob/1.3.1/web/app/components/develop/template/template.en.mdx
+  version: 1.3.1
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -482,10 +482,10 @@ paths:
                       score_threshold:
                         type: number
                         description: Similarity threshold
-                      embedding_model:
+                      embedding_model_name:
                         type: string
                         description: Embedding model
-                      embedding_model_provider:
+                      embedding_provider_name:
                         type: string
                         description: Embedding model provider
                     description: Annotation reply settings
@@ -911,16 +911,12 @@ paths:
             schema:
               type: object
               properties:
-                embedding_model_provider:
+                embedding_provider_name:
                   type: string
                   description: 'Specified embedding model provider, must be configured in the system first, corresponds to the provider field'
-                embedding_provider_name: # TODO: @l8ng same as `embedding_model_provider` upstream api complain {'code': 'invalid_param', 'message': 'Missing required parameter in the JSON body', 'params': 'embedding_provider_name'}
-                  type: string
-                embedding_model:
+                embedding_model_name:
                   type: string
                   description: 'Specified embedding model, corresponds to the model field'
-                embedding_model_name: # TODO: @l8ng same as `embedding_model_name` upstream api complain {'code': 'invalid_param', 'message': 'Missing required parameter in the JSON body', 'params': 'embedding_model_name'}
-                  type: string
                 score_threshold:
                   type: number
                   description: 'Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply'

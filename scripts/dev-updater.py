@@ -69,7 +69,7 @@ Except for the just commands permitted by me above, please DO NOT run any other 
 NOTE:
 - If you want to invoke `filesystem` tool, you need call shell cmd `pwd` get the current working directory at first and use it as the above given path prefix
 - Prefer using increasing edit mode to adjust code, if you got large context write problem, try using another way to finish
-- Another helpful context is a preset diff file between {v1} to {v2} change, you can find it in {diff_file}
+- Another helpful context is a preset diff file between {v1} to {v2} change, you can find it in {diff_file_path}
 """.strip()
     for local_schema_path, upstream_mdx_doc_path in LOCAL_SCHEMA_PATH__UPSTREAM_MDX_DOC_PATH.items():
         prompt = prompt_pattern.format(

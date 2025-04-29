@@ -6,8 +6,8 @@ info:
     对话应用支持会话持久化，可将之前的聊天记录作为上下文进行回答，可适用于聊天/客服 AI 等。
     所有 API 请求都需要在 Authorization HTTP Header 中包含应用级 API-Key。
     强烈建议开发者把 API-Key 放在后端存储，而非分享或者放在客户端存储，以免 API-Key 泄露，导致财产损失。
-    官方原始文档见: https://github.com/langgenius/dify/blob/1.3.0/web/app/components/develop/template/template_advanced_chat.zh.mdx
-  version: 1.3.0
+    官方原始文档见: https://github.com/langgenius/dify/blob/1.3.1/web/app/components/develop/template/template_advanced_chat.zh.mdx
+  version: 1.3.1
 
 servers:
   - url: https://api.dify.ai/v1
@@ -605,10 +605,10 @@ paths:
                       score_threshold:
                         type: number
                         description: 相似度阈值
-                      embedding_model:
+                      embedding_model_name:
                         type: string
                         description: 嵌入模型
-                      embedding_model_provider:
+                      embedding_provider_name:
                         type: string
                         description: 嵌入模型提供商
                   user_input_form:
@@ -984,6 +984,101 @@ paths:
                     type: integer
                     description: 更新时间
 
+  /conversations/{conversation_id}/variables:
+    get:
+      operationId: getConversationVariablesByAppAdvancedChat
+      summary: 获取对话变量
+      description: 从特定对话中检索变量。此端点对于提取对话过程中捕获的结构化数据非常有用。
+      parameters:
+        - name: conversation_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 要从中检索变量的对话ID。
+        - name: user
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 用户标识符，由开发人员定义的规则，在应用程序内必须唯一。
+        - name: last_id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: （选填）当前页最后面一条记录的 ID，默认 null
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+          description: （选填）一次请求返回多少条记录，默认 20 条，最大 100 条，最小 1 条。
+        - name: variable_name
+          in: query
+          required: false
+          schema:
+            type: string
+          description: （选填）变量名称过滤器
+      responses:
+        "200":
+          description: 成功响应
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  limit:
+                    type: integer
+                    description: 每页项目数
+                  has_more:
+                    type: boolean
+                    description: 是否有更多项目
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: 变量ID
+                        name:
+                          type: string
+                          description: 变量名称
+                        value_type:
+                          type: string
+                          description: 变量类型（字符串、数字、布尔等）
+                        value:
+                          type: string
+                          description: 变量值
+                        description:
+                          type: string
+                          description: 变量描述
+                        created_at:
+                          type: integer
+                          description: 创建时间戳
+                        updated_at:
+                          type: integer
+                          description: 最后更新时间戳
+                    description: 变量列表
+        "404":
+          description: 对话不存在
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum: [conversation_not_exists]
+                    description: 错误代码
+                  message:
+                    type: string
+                    description: 错误消息
+
   /meta:
     get:
       operationId: getAppMetaInfoByAppAdvancedChat
@@ -1213,16 +1308,12 @@ paths:
             schema:
               type: object
               properties:
-                embedding_model_provider:
+                embedding_provider_name:
                   type: string
                   description: 指定的嵌入模型提供商, 必须先在系统内设定好接入的模型，对应的是provider字段
-                embedding_provider_name: # TODO: @l8ng same as `embedding_model_provider` upstream api complain {'code': 'invalid_param', 'message': 'Missing required parameter in the JSON body', 'params': 'embedding_provider_name'}
-                  type: string
-                embedding_model:
+                embedding_model_name:
                   type: string
                   description: 指定的嵌入模型，对应的是model字段
-                embedding_model_name: # TODO: @l8ng same as `embedding_model_name` upstream api complain {'code': 'invalid_param', 'message': 'Missing required parameter in the JSON body', 'params': 'embedding_model_name'}
-                  type: string
                 score_threshold:
                   type: number
                   description: 相似度阈值，当相似度大于该阈值时，系统会自动回复，否则不回复

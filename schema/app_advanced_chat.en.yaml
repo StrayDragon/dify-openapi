@@ -6,8 +6,8 @@ info:
     Chat applications support session persistence, allowing previous chat history to be used as context for responses, suitable for chat/customer service AI, etc.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
     It is strongly recommended that developers store the API-Key on the backend rather than sharing or storing it on the client side to prevent API-Key leakage and financial loss.
-    official raw document: https://github.com/langgenius/dify/blob/1.3.0/web/app/components/develop/template/template_advanced_chat.en.mdx
-  version: 1.3.0
+    official raw document: https://github.com/langgenius/dify/blob/1.3.1/web/app/components/develop/template/template_advanced_chat.en.mdx
+  version: 1.3.1
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -592,10 +592,10 @@ paths:
                       score_threshold:
                         type: number
                         description: Similarity score threshold
-                      embedding_model:
+                      embedding_model_name:
                         type: string
                         description: Embedding model
-                      embedding_model_provider:
+                      embedding_provider_name:
                         type: string
                         description: Embedding model provider
                   user_input_form:
@@ -978,6 +978,101 @@ paths:
                   updated_at:
                     type: integer
                     description: Update time
+  '/conversations/{conversation_id}/variables':
+    get:
+      operationId: getConversationVariablesByAppAdvancedChat
+      summary: Get Conversation Variables
+      description: Retrieve variables from a specific conversation. This endpoint is useful for extracting structured data captured during conversations.
+      parameters:
+        - name: conversation_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The conversation ID to retrieve variables from.
+        - name: user
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 'User identifier, defined by developer rules, must be unique within the application.'
+        - name: last_id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: '(Optional) ID of the last record on the current page, default null'
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+          description: '(Optional) Number of records to return per request, default 20, maximum 100, minimum 1.'
+        - name: variable_name
+          in: query
+          required: false
+          schema:
+            type: string
+          description: (Optional) Variable name filter
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  limit:
+                    type: integer
+                    description: Items per page
+                  has_more:
+                    type: boolean
+                    description: Whether there is more data
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Variable ID
+                        name:
+                          type: string
+                          description: Variable name
+                        value_type:
+                          type: string
+                          description: 'Variable type (string, number, boolean, etc.)'
+                        value:
+                          type: string
+                          description: Variable value
+                        description:
+                          type: string
+                          description: Variable description
+                        created_at:
+                          type: integer
+                          description: Creation timestamp
+                        updated_at:
+                          type: integer
+                          description: Last update timestamp
+                    description: Variable list
+        '404':
+          description: Conversation not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - conversation_not_exists
+                    description: Error code
+                  message:
+                    type: string
+                    description: Error message
   /meta:
     get:
       operationId: getAppMetaInfoByAppAdvancedChat
@@ -1205,16 +1300,12 @@ paths:
             schema:
               type: object
               properties:
-                embedding_model_provider:
+                embedding_provider_name:
                   type: string
                   description: 'Specified embedding model provider, must be configured in the system first, corresponds to the provider field'
-                embedding_provider_name: # TODO: @l8ng same as `embedding_model_provider` upstream api complain {'code': 'invalid_param', 'message': 'Missing required parameter in the JSON body', 'params': 'embedding_provider_name'}
-                  type: string
-                embedding_model:
+                embedding_model_name:
                   type: string
                   description: 'Specified embedding model, corresponds to the model field'
-                embedding_model_name: # TODO: @l8ng same as `embedding_model_name` upstream api complain {'code': 'invalid_param', 'message': 'Missing required parameter in the JSON body', 'params': 'embedding_model_name'}
-                  type: string
                 score_threshold:
                   type: number
                   description: 'Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply'

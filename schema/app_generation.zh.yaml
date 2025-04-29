@@ -5,8 +5,8 @@ info:
     Dify API 提供了一系列接口用于文本生成功能。
     支持文本生成型应用。
     所有 API 请求都需要在 Authorization HTTP Header 中包含应用级 API-Key。
-    官方原始文档见: https://github.com/langgenius/dify/blob/1.3.0/web/app/components/develop/template/template.zh.mdx
-  version: 1.3.0
+    官方原始文档见: https://github.com/langgenius/dify/blob/1.3.1/web/app/components/develop/template/template.zh.mdx
+  version: 1.3.1
 
 servers:
   - url: https://api.dify.ai/v1
@@ -495,10 +495,10 @@ paths:
                       score_threshold:
                         type: number
                         description: 相似度阈值
-                      embedding_model:
+                      embedding_model_name:
                         type: string
                         description: 嵌入模型
-                      embedding_model_provider:
+                      embedding_provider_name:
                         type: string
                         description: 嵌入模型提供商
                     description: 标记回复设置
@@ -922,16 +922,12 @@ paths:
             schema:
               type: object
               properties:
-                embedding_model_provider:
+                embedding_provider_name:
                   type: string
                   description: 指定的嵌入模型提供商, 必须先在系统内设定好接入的模型，对应的是provider字段
-                embedding_provider_name: # TODO: @l8ng same as `embedding_model_provider` upstream api complain {'code': 'invalid_param', 'message': 'Missing required parameter in the JSON body', 'params': 'embedding_provider_name'}
-                  type: string
-                embedding_model:
+                embedding_model_name:
                   type: string
                   description: 指定的嵌入模型，对应的是model字段
-                embedding_model_name: # TODO: @l8ng same as `embedding_model_name` upstream api complain {'code': 'invalid_param', 'message': 'Missing required parameter in the JSON body', 'params': 'embedding_model_name'}
-                  type: string
                 score_threshold:
                   type: number
                   description: 相似度阈值，当相似度大于该阈值时，系统会自动回复，否则不回复

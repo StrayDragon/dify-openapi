@@ -5,8 +5,8 @@ info:
     Dify API provides a series of interfaces for conversation functionality.
     It supports conversational applications.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
-    official raw document: https://github.com/langgenius/dify/blob/1.3.0/web/app/components/develop/template/template_chat.en.mdx
-  version: 1.3.0
+    official raw document: https://github.com/langgenius/dify/blob/1.3.1/web/app/components/develop/template/template_chat.en.mdx
+  version: 1.3.1
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -744,6 +744,93 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Conversation'
+  '/conversations/{conversation_id}/variables':
+    get:
+      operationId: getConversationVariablesByAppChat
+      summary: Get Conversation Variables
+      description: Retrieve variables from a specific conversation. This endpoint is useful for extracting structured data captured during conversations.
+      parameters:
+        - name: conversation_id
+          in: path
+          description: ID of the conversation to retrieve variables from
+          required: true
+          schema:
+            type: string
+        - name: user
+          in: query
+          description: 'User identifier, defined by developer rules, must be unique within the application'
+          required: true
+          schema:
+            type: string
+        - name: last_id
+          in: query
+          description: '(Optional) ID of the last record on the current page, default null'
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: '(Optional) Number of records to return per request, default 20, max 100, min 1'
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: Successfully retrieved variables
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  limit:
+                    type: integer
+                    description: Items per page
+                  has_more:
+                    type: boolean
+                    description: Whether there are more items
+                  data:
+                    type: array
+                    description: List of variables
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Variable ID
+                        name:
+                          type: string
+                          description: Variable name
+                        value_type:
+                          type: string
+                          description: 'Variable type (string, number, boolean, etc.)'
+                        value:
+                          type: string
+                          description: Variable value
+                        description:
+                          type: string
+                          description: Variable description
+                        created_at:
+                          type: integer
+                          description: Creation timestamp
+                        updated_at:
+                          type: integer
+                          description: Last update timestamp
+        '404':
+          description: Conversation not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - conversation_not_exists
+                    description: Error code
+                  message:
+                    type: string
+                    description: Error message
   /messages:
     get:
       operationId: getConversationMessagesByAppChat
@@ -1336,16 +1423,12 @@ paths:
             schema:
               type: object
               properties:
-                embedding_model_provider:
+                embedding_provider_name:
                   type: string
                   description: 'Specified embedding model provider, must be configured in the system first, corresponds to the provider field'
-                embedding_provider_name: # TODO: @l8ng same as `embedding_model_provider` upstream api complain {'code': 'invalid_param', 'message': 'Missing required parameter in the JSON body', 'params': 'embedding_provider_name'}
-                  type: string
-                embedding_model:
+                embedding_model_name:
                   type: string
                   description: 'Specified embedding model, corresponds to the model field'
-                embedding_model_name: # TODO: @l8ng same as `embedding_model_name` upstream api complain {'code': 'invalid_param', 'message': 'Missing required parameter in the JSON body', 'params': 'embedding_model_name'}
-                  type: string
                 score_threshold:
                   type: number
                   description: 'Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply'
