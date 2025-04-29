@@ -99,6 +99,17 @@ def main() -> None:
     replacement: str = r'\1_text = _text.removeprefix("data: ")\n\1if len(_text) == 0:'
     patch_file(target_file, pattern, replacement)
 
+    for target_file in [
+        "src/dify_sdk/advanced_chat/raw_client.py",
+        "src/dify_sdk/chat/raw_client.py",
+        "src/dify_sdk/generation/raw_client.py",
+        "src/dify_sdk/workflow/raw_client.py",
+        "src/dify_sdk/knowledge_base/documents/raw_client.py",
+    ]:
+        pattern: str = r""""content-type": "multipart/form-data","""
+        replacement: str = "#" + r""" "content-type": "multipart/form-data","""
+        patch_file(target_file, pattern, replacement)
+
 
 if __name__ == "__main__":
     main()
