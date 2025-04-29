@@ -343,15 +343,11 @@ components:
           type: string
           description: 上传文件ID（仅当传递方式为 `local_file` 时）
 
-tags:
-  - name: Workflow
-    description: 工作流应用相关操作
 
 paths:
   /workflows/run:
     post:
-      tags:
-        - Workflow
+
       operationId: runWorkflow
       summary: 执行工作流
       description: 执行 workflow，没有已发布的 workflow，不可执行
@@ -500,8 +496,7 @@ paths:
 
   /workflows/run/{workflow_run_id}:
     get:
-      tags:
-        - Workflow
+
       operationId: getWorkflowExecutionStatus
       summary: 获取workflow执行情况
       description: 根据 workflow 执行 ID 获取 workflow 任务当前执行结果
@@ -566,8 +561,7 @@ paths:
 
   /workflows/tasks/{task_id}/stop:
     post:
-      tags:
-        - Workflow
+
       operationId: stopWorkflow
       summary: 停止响应
       description: 仅支持流式模式
@@ -612,8 +606,7 @@ paths:
 
   /workflows/logs:
     get:
-      tags:
-        - Workflow
+
       operationId: getWorkflowLogs
       summary: 获取 workflow 日志
       description: 倒序返回workflow日志
@@ -746,8 +739,7 @@ paths:
 
   /files/upload:
     post:
-      tags:
-        - Workflow
+
       operationId: uploadFile
       summary: 上传文件
       description: 上传文件并在发送消息时使用，可实现图文多模态理解。支持您的工作流程所支持的任何格式。上传的文件仅供当前终端用户使用。
@@ -826,8 +818,7 @@ paths:
 
   /info:
     get:
-      tags:
-        - Workflow
+
       operationId: getAppInfo
       summary: 获取应用基本信息
       description: 用于获取应用的基本信息
@@ -861,8 +852,7 @@ paths:
 
   /parameters:
     get:
-      tags:
-        - Workflow
+
       operationId: getAppParameters
       summary: 获取应用参数
       description: 用于进入页面一开始，获取功能开关、输入参数名称、类型及默认值等使用

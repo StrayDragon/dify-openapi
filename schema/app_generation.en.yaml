@@ -251,14 +251,9 @@ components:
         created_at:
           type: integer
           description: Upload time
-tags:
-  - name: Generation
-    description: Text Generation Application Operations
 paths:
   /completion-messages:
     post:
-      tags:
-        - Generation
       operationId: sendCompletionMessageByAppGeneration
       summary: Send Message (Text Generation App)
       description: Send request to text generation application
@@ -368,8 +363,6 @@ paths:
           $ref: '#/components/responses/Error500'
   /files/upload:
     post:
-      tags:
-        - Generation
       operationId: uploadFileByAppGeneration
       summary: Upload File
       description: |
@@ -421,8 +414,6 @@ paths:
                 $ref: '#/components/schemas/Error'
   /info:
     get:
-      tags:
-        - Generation
       operationId: getApplicationInfoByAppGeneration
       summary: Get Application Basic Information
       responses:
@@ -446,8 +437,6 @@ paths:
                     description: Application tags
   /parameters:
     get:
-      tags:
-        - Generation
       operationId: getApplicationParametersByAppGeneration
       summary: Get Application Parameters
       responses:
@@ -602,8 +591,6 @@ paths:
                     description: System parameters
   '/completion-messages/{task_id}/stop':
     post:
-      tags:
-        - Generation
       operationId: stopCompletionResponseByAppGeneration
       summary: Stop Response
       description: Only supports streaming mode
@@ -641,8 +628,6 @@ paths:
                     description: Fixed return value 'success'
   '/messages/{message_id}/feedbacks':
     post:
-      tags:
-        - Generation
       operationId: sendMessageFeedbackByAppGeneration
       summary: Message Feedback (Like/Dislike)
       description: 'End user feedback for messages, helps application developers optimize output expectations'
@@ -691,8 +676,6 @@ paths:
                     description: Fixed return value 'success'
   /text-to-audio:
     post:
-      tags:
-        - Generation
       operationId: convertTextToAudioByAppGeneration
       summary: Text to Audio
       description: Convert text to speech
@@ -731,8 +714,6 @@ paths:
                 description: MP3 format audio file
   /apps/annotations:
     get:
-      tags:
-        - Generation
       operationId: getAnnotationsListByAppGeneration
       summary: Get Annotation List
       description: Get the list of annotations for the application
@@ -792,8 +773,6 @@ paths:
                     type: integer
                     description: Current page number
     post:
-      tags:
-        - Generation
       operationId: createAnnotationByAppGeneration
       summary: Create Annotation
       description: Create a new annotation
@@ -838,8 +817,6 @@ paths:
                     description: Creation timestamp
   '/apps/annotations/{annotation_id}':
     put:
-      tags:
-        - Generation
       operationId: updateAnnotationByAppGeneration
       summary: Update Annotation
       description: Update a specific annotation
@@ -890,8 +867,6 @@ paths:
                     type: integer
                     description: Creation timestamp
     delete:
-      tags:
-        - Generation
       operationId: deleteAnnotationByAppGeneration
       summary: Delete Annotation
       description: Delete a specific annotation
@@ -916,8 +891,6 @@ paths:
                       - success
   '/apps/annotation-reply/{action}':
     post:
-      tags:
-        - Generation
       operationId: configureAnnotationReplyByAppGeneration
       summary: Initialize Annotation Reply Settings
       description: Enable or disable annotation reply functionality
@@ -967,8 +940,6 @@ paths:
                     description: Job status
   '/apps/annotation-reply/{action}/status/{job_id}':
     get:
-      tags:
-        - Generation
       operationId: getAnnotationReplyStatusByAppGeneration
       summary: Check Annotation Reply Settings Status
       description: Query the status of annotation reply initialization task
@@ -1007,8 +978,6 @@ paths:
                     description: Error message
   /meta:
     get:
-      tags:
-        - Generation
       operationId: getAppMetaInfoByAppGeneration
       summary: Get App Meta Information
       description: Used to get tool icons

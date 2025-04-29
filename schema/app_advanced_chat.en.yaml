@@ -305,14 +305,9 @@ components:
         upload_file_id:
           type: string
           description: Upload file ID. (Only when transfer method is `local_file`).
-tags:
-  - name: AdvancedChat
-    description: Workflow Orchestration Chat Application Operations
 paths:
   /chat-messages:
     post:
-      tags:
-        - AdvancedChat
       operationId: sendChatMessageByAppAdvancedChat
       summary: Send Chat Message
       description: Create conversation message
@@ -381,8 +376,6 @@ paths:
           $ref: '#/components/responses/Error500'
   '/chat-messages/{task_id}/stop':
     post:
-      tags:
-        - AdvancedChat
       operationId: stopChatResponseByAppAdvancedChat
       summary: Stop Response
       description: Only supports streaming mode
@@ -420,8 +413,6 @@ paths:
                     description: Fixed return value 'success'
   /files/upload:
     post:
-      tags:
-        - AdvancedChat
       operationId: uploadFileByAppAdvancedChat
       summary: Upload File
       description: |
@@ -473,8 +464,6 @@ paths:
                 $ref: '#/components/schemas/Error'
   /audio-to-text:
     post:
-      tags:
-        - AdvancedChat
       operationId: convertAudioToTextByAppAdvancedChat
       summary: Audio to Text
       requestBody:
@@ -506,8 +495,6 @@ paths:
                     description: Converted text
   /text-to-audio:
     post:
-      tags:
-        - AdvancedChat
       operationId: convertTextToAudioByAppAdvancedChat
       summary: Text to Audio
       requestBody:
@@ -536,8 +523,6 @@ paths:
                 format: binary
   /info:
     get:
-      tags:
-        - AdvancedChat
       operationId: getApplicationInfoByAppAdvancedChat
       summary: Get Application Basic Information
       responses:
@@ -561,8 +546,6 @@ paths:
                     description: Application tags
   /parameters:
     get:
-      tags:
-        - AdvancedChat
       operationId: getApplicationParametersByAppAdvancedChat
       summary: Get Application Parameters
       responses:
@@ -628,8 +611,6 @@ paths:
                     description: System parameters
   '/messages/{message_id}/feedbacks':
     post:
-      tags:
-        - AdvancedChat
       operationId: sendMessageFeedbackByAppAdvancedChat
       summary: Message Feedback (Like/Dislike)
       description: 'End user feedback on messages, likes/dislikes, to help application developers optimize output expectations.'
@@ -678,8 +659,6 @@ paths:
                     description: Fixed return value 'success'
   '/messages/{message_id}/suggested':
     get:
-      tags:
-        - AdvancedChat
       operationId: getSuggestedQuestionsByAppAdvancedChat
       summary: Get Suggested Questions for Next Round
       description: Get a list of suggested questions for the next round.
@@ -716,8 +695,6 @@ paths:
                     description: List of suggested questions
   /messages:
     get:
-      tags:
-        - AdvancedChat
       operationId: getConversationMessagesByAppAdvancedChat
       summary: Get Conversation History Messages
       description: 'Returns chat history in a scrolling load format, with the first page returning the latest `limit` messages, i.e., in reverse order.'
@@ -823,8 +800,6 @@ paths:
                     description: 'Number of returned items, if input exceeds system limit, returns system limit quantity'
   /conversations:
     get:
-      tags:
-        - AdvancedChat
       operationId: getConversationsByAppAdvancedChat
       summary: Get Conversation List
       description: 'Get the current user''s conversation list, by default returns the most recent 20.'
@@ -908,8 +883,6 @@ paths:
                     description: 'Number of returned items, if input exceeds system limit, returns system limit quantity'
   '/conversations/{conversation_id}':
     delete:
-      tags:
-        - AdvancedChat
       operationId: deleteConversationByAppAdvancedChat
       summary: Delete Conversation
       description: Delete a conversation.
@@ -947,8 +920,6 @@ paths:
                     description: Fixed return value 'success'
   '/conversations/{conversation_id}/name':
     post:
-      tags:
-        - AdvancedChat
       operationId: renameConversationByAppAdvancedChat
       summary: Rename Conversation
       description: 'Rename a conversation, the conversation name is used for display on clients that support multiple conversations.'
@@ -1009,8 +980,6 @@ paths:
                     description: Update time
   /meta:
     get:
-      tags:
-        - AdvancedChat
       operationId: getAppMetaInfoByAppAdvancedChat
       summary: Get App Meta Information
       description: Used to get tool icons
@@ -1039,8 +1008,6 @@ paths:
                           description: Icon URL
   /apps/annotations:
     get:
-      tags:
-        - AdvancedChat
       operationId: getAnnotationsListByAppAdvancedChat
       summary: Get Annotation List
       description: Get the list of annotations for the application
@@ -1100,8 +1067,6 @@ paths:
                     type: integer
                     description: Current page number
     post:
-      tags:
-        - AdvancedChat
       operationId: createAnnotationByAppAdvancedChat
       summary: Create Annotation
       description: Create a new annotation
@@ -1146,8 +1111,6 @@ paths:
                     description: Creation timestamp
   '/apps/annotations/{annotation_id}':
     put:
-      tags:
-        - AdvancedChat
       operationId: updateAnnotationByAppAdvancedChat
       summary: Update Annotation
       description: Update a specific annotation
@@ -1198,8 +1161,6 @@ paths:
                     type: integer
                     description: Creation timestamp
     delete:
-      tags:
-        - AdvancedChat
       operationId: deleteAnnotationByAppAdvancedChat
       summary: Delete Annotation
       description: Delete a specific annotation
@@ -1224,8 +1185,6 @@ paths:
                       - success
   '/apps/annotation-reply/{action}':
     post:
-      tags:
-        - AdvancedChat
       operationId: configureAnnotationReplyByAppAdvancedChat
       summary: Initialize Annotation Reply Settings
       description: Enable or disable annotation reply functionality
@@ -1275,8 +1234,6 @@ paths:
                     description: Job status
   '/apps/annotation-reply/{action}/status/{job_id}':
     get:
-      tags:
-        - AdvancedChat
       operationId: getAnnotationReplyStatusByAppAdvancedChat
       summary: Check Annotation Reply Settings Status
       description: Query the status of annotation reply initialization task

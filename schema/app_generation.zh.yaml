@@ -263,15 +263,9 @@ components:
           type: integer
           description: 上传时间
 
-tags:
-  - name: Generation
-    description: 文本生成型应用相关操作
-
 paths:
   /completion-messages:
     post:
-      tags:
-        - Generation
       operationId: sendCompletionMessageByAppGeneration
       summary: 发送消息(文本生成型应用)
       description: 发送请求给文本生成型应用
@@ -380,8 +374,6 @@ paths:
 
   /files/upload:
     post:
-      tags:
-        - Generation
       operationId: uploadFileByAppGeneration
       summary: 上传文件
       description: |
@@ -434,8 +426,6 @@ paths:
 
   /info:
     get:
-      tags:
-        - Generation
       operationId: getApplicationInfoByAppGeneration
       summary: 获取应用基本信息
       responses:
@@ -460,8 +450,6 @@ paths:
 
   /parameters:
     get:
-      tags:
-        - Generation
       operationId: getApplicationParametersByAppGeneration
       summary: 获取应用参数
       responses:
@@ -615,8 +603,6 @@ paths:
 
   /completion-messages/{task_id}/stop:
     post:
-      tags:
-        - Generation
       operationId: stopCompletionResponseByAppGeneration
       summary: 停止响应
       description: 仅支持流式模式
@@ -640,7 +626,7 @@ paths:
                   type: string
                   description: 用户标识，必须和发送消息接口传入 user 保持一致
       responses:
-        '200':
+        "200":
           description: 成功响应
           content:
             application/json:
@@ -654,8 +640,6 @@ paths:
 
   /messages/{message_id}/feedbacks:
     post:
-      tags:
-        - Generation
       operationId: sendMessageFeedbackByAppGeneration
       summary: 消息反馈（点赞）
       description: 消息终端用户反馈、点赞，方便应用开发者优化输出预期
@@ -687,7 +671,7 @@ paths:
                   type: string
                   description: 消息反馈的具体信息
       responses:
-        '200':
+        "200":
           description: 成功响应
           content:
             application/json:
@@ -701,8 +685,6 @@ paths:
 
   /text-to-audio:
     post:
-      tags:
-        - Generation
       operationId: convertTextToAudioByAppGeneration
       summary: 文字转语音
       description: 文字转语音
@@ -726,7 +708,7 @@ paths:
                   type: boolean
                   description: 是否使用流式模式返回音频数据
       responses:
-        '200':
+        "200":
           description: 成功响应
           content:
             audio/wav:
@@ -742,8 +724,6 @@ paths:
 
   /apps/annotations:
     get:
-      tags:
-        - Generation
       operationId: getAnnotationsListByAppGeneration
       summary: 获取标注列表
       description: 获取应用的标注列表
@@ -804,8 +784,6 @@ paths:
                     description: 当前页码
 
     post:
-      tags:
-        - Generation
       operationId: createAnnotationByAppGeneration
       summary: 创建标注
       description: 创建新的标注
@@ -851,8 +829,6 @@ paths:
 
   /apps/annotations/{annotation_id}:
     put:
-      tags:
-        - Generation
       operationId: updateAnnotationByAppGeneration
       summary: 更新标注
       description: 更新指定的标注
@@ -904,8 +880,6 @@ paths:
                     description: 创建时间戳
 
     delete:
-      tags:
-        - Generation
       operationId: deleteAnnotationByAppGeneration
       summary: 删除标注
       description: 删除指定的标注
@@ -930,8 +904,6 @@ paths:
 
   /apps/annotation-reply/{action}:
     post:
-      tags:
-        - Generation
       operationId: configureAnnotationReplyByAppGeneration
       summary: 标注回复初始设置
       description: 启用或禁用标注回复功能
@@ -980,8 +952,6 @@ paths:
 
   /apps/annotation-reply/{action}/status/{job_id}:
     get:
-      tags:
-        - Generation
       operationId: getAnnotationReplyStatusByAppGeneration
       summary: 查询标注回复初始设置任务状态
       description: 查询标注回复初始设置任务的执行状态
@@ -1019,13 +989,11 @@ paths:
 
   /meta:
     get:
-      tags:
-        - Generation
       operationId: getAppMetaInfoByAppGeneration
       summary: 获取应用Meta信息
       description: 用于获取工具icon
       responses:
-        '200':
+        "200":
           description: 成功响应
           content:
             application/json:

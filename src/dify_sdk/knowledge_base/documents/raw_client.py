@@ -187,7 +187,7 @@ class RawDocumentsClient:
                 "file": file,
             },
             headers={
-                "content-type": "multipart/form-data",
+                # "content-type": "multipart/form-data",
             },
             request_options=request_options,
             omit=OMIT,
@@ -389,7 +389,7 @@ class RawDocumentsClient:
                 "file": file,
             },
             headers={
-                "content-type": "multipart/form-data",
+                # "content-type": "multipart/form-data",
             },
             request_options=request_options,
             omit=OMIT,
@@ -858,7 +858,7 @@ class AsyncRawDocumentsClient:
                 "file": file,
             },
             headers={
-                "content-type": "multipart/form-data",
+                # "content-type": "multipart/form-data",
             },
             request_options=request_options,
             omit=OMIT,
@@ -1060,7 +1060,7 @@ class AsyncRawDocumentsClient:
                 "file": file,
             },
             headers={
-                "content-type": "multipart/form-data",
+                # "content-type": "multipart/form-data",
             },
             request_options=request_options,
             omit=OMIT,

@@ -12,12 +12,56 @@ from .chat_history_message_message_files_item import ChatHistoryMessageMessageFi
 from .chunk_chat_completion_response import ChunkChatCompletionResponse
 from .chunk_chat_completion_response_event import ChunkChatCompletionResponseEvent
 from .chunk_chat_completion_response_metadata import ChunkChatCompletionResponseMetadata
+from .configure_annotation_reply_by_app_chat_request_action import ConfigureAnnotationReplyByAppChatRequestAction
+from .configure_annotation_reply_by_app_chat_response import ConfigureAnnotationReplyByAppChatResponse
 from .conversation import Conversation
+from .convert_audio_to_text_by_app_chat_response import ConvertAudioToTextByAppChatResponse
+from .create_annotation_by_app_chat_response import CreateAnnotationByAppChatResponse
+from .delete_annotation_by_app_chat_response import DeleteAnnotationByAppChatResponse
+from .delete_conversation_by_app_chat_response import DeleteConversationByAppChatResponse
 from .error import Error
 from .file_input import FileInput
 from .file_input_transfer_method import FileInputTransferMethod
 from .file_input_type import FileInputType
+from .get_annotation_reply_status_by_app_chat_request_action import GetAnnotationReplyStatusByAppChatRequestAction
+from .get_annotation_reply_status_by_app_chat_response import GetAnnotationReplyStatusByAppChatResponse
+from .get_annotations_list_by_app_chat_response import GetAnnotationsListByAppChatResponse
+from .get_annotations_list_by_app_chat_response_data_item import GetAnnotationsListByAppChatResponseDataItem
+from .get_app_meta_info_by_app_chat_response import GetAppMetaInfoByAppChatResponse
+from .get_app_meta_info_by_app_chat_response_tool_icons_value import GetAppMetaInfoByAppChatResponseToolIconsValue
+from .get_app_meta_info_by_app_chat_response_tool_icons_value_background import (
+    GetAppMetaInfoByAppChatResponseToolIconsValueBackground,
+)
+from .get_application_info_by_app_chat_response import GetApplicationInfoByAppChatResponse
+from .get_application_parameters_by_app_chat_response import GetApplicationParametersByAppChatResponse
+from .get_application_parameters_by_app_chat_response_annotation_reply import (
+    GetApplicationParametersByAppChatResponseAnnotationReply,
+)
+from .get_application_parameters_by_app_chat_response_retriever_resource import (
+    GetApplicationParametersByAppChatResponseRetrieverResource,
+)
+from .get_application_parameters_by_app_chat_response_speech_to_text import (
+    GetApplicationParametersByAppChatResponseSpeechToText,
+)
+from .get_application_parameters_by_app_chat_response_suggested_questions_after_answer import (
+    GetApplicationParametersByAppChatResponseSuggestedQuestionsAfterAnswer,
+)
+from .get_application_parameters_by_app_chat_response_system_parameters import (
+    GetApplicationParametersByAppChatResponseSystemParameters,
+)
+from .get_conversation_list_by_app_chat_request_sort_by import GetConversationListByAppChatRequestSortBy
+from .get_conversation_list_by_app_chat_response import GetConversationListByAppChatResponse
+from .get_conversation_messages_by_app_chat_response import GetConversationMessagesByAppChatResponse
+from .get_suggested_questions_by_app_chat_response import GetSuggestedQuestionsByAppChatResponse
 from .retriever_resource import RetrieverResource
+from .send_chat_message_by_app_chat_request_files_item import SendChatMessageByAppChatRequestFilesItem
+from .send_chat_message_by_app_chat_request_files_item_transfer_method import (
+    SendChatMessageByAppChatRequestFilesItemTransferMethod,
+)
+from .send_chat_message_by_app_chat_request_response_mode import SendChatMessageByAppChatRequestResponseMode
+from .send_message_feedback_by_app_chat_response import SendMessageFeedbackByAppChatResponse
+from .stop_chat_response_by_app_chat_response import StopChatResponseByAppChatResponse
+from .update_annotation_by_app_chat_response import UpdateAnnotationByAppChatResponse
 from .uploaded_file import UploadedFile
 from .usage import Usage
 
@@ -32,12 +76,42 @@ __all__ = [
     "ChunkChatCompletionResponse",
     "ChunkChatCompletionResponseEvent",
     "ChunkChatCompletionResponseMetadata",
+    "ConfigureAnnotationReplyByAppChatRequestAction",
+    "ConfigureAnnotationReplyByAppChatResponse",
     "Conversation",
+    "ConvertAudioToTextByAppChatResponse",
+    "CreateAnnotationByAppChatResponse",
+    "DeleteAnnotationByAppChatResponse",
+    "DeleteConversationByAppChatResponse",
     "Error",
     "FileInput",
     "FileInputTransferMethod",
     "FileInputType",
+    "GetAnnotationReplyStatusByAppChatRequestAction",
+    "GetAnnotationReplyStatusByAppChatResponse",
+    "GetAnnotationsListByAppChatResponse",
+    "GetAnnotationsListByAppChatResponseDataItem",
+    "GetAppMetaInfoByAppChatResponse",
+    "GetAppMetaInfoByAppChatResponseToolIconsValue",
+    "GetAppMetaInfoByAppChatResponseToolIconsValueBackground",
+    "GetApplicationInfoByAppChatResponse",
+    "GetApplicationParametersByAppChatResponse",
+    "GetApplicationParametersByAppChatResponseAnnotationReply",
+    "GetApplicationParametersByAppChatResponseRetrieverResource",
+    "GetApplicationParametersByAppChatResponseSpeechToText",
+    "GetApplicationParametersByAppChatResponseSuggestedQuestionsAfterAnswer",
+    "GetApplicationParametersByAppChatResponseSystemParameters",
+    "GetConversationListByAppChatRequestSortBy",
+    "GetConversationListByAppChatResponse",
+    "GetConversationMessagesByAppChatResponse",
+    "GetSuggestedQuestionsByAppChatResponse",
     "RetrieverResource",
+    "SendChatMessageByAppChatRequestFilesItem",
+    "SendChatMessageByAppChatRequestFilesItemTransferMethod",
+    "SendChatMessageByAppChatRequestResponseMode",
+    "SendMessageFeedbackByAppChatResponse",
+    "StopChatResponseByAppChatResponse",
+    "UpdateAnnotationByAppChatResponse",
     "UploadedFile",
     "Usage",
 ]

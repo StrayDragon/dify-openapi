@@ -406,14 +406,9 @@ components:
         created_at:
           type: integer
           description: Upload time
-tags:
-  - name: Chat
-    description: Chat Application Operations
 paths:
   /chat-messages:
     post:
-      tags:
-        - Chat
       operationId: sendChatMessageByAppChat
       summary: Send Chat Message (Conversational App)
       description: Create conversation message
@@ -630,8 +625,6 @@ paths:
           $ref: '#/components/responses/Error500'
   /conversations:
     get:
-      tags:
-        - Chat
       operationId: getConversationListByAppChat
       summary: Get Conversation List
       description: Get conversation list for current user
@@ -682,8 +675,6 @@ paths:
                     type: integer
   '/conversations/{conversation_id}':
     delete:
-      tags:
-        - Chat
       operationId: deleteConversationByAppChat
       summary: Delete Conversation
       parameters:
@@ -719,8 +710,6 @@ paths:
                       - success
   '/conversations/{conversation_id}/name':
     post:
-      tags:
-        - Chat
       operationId: renameConversationByAppChat
       summary: Rename Conversation
       parameters:
@@ -757,8 +746,6 @@ paths:
                 $ref: '#/components/schemas/Conversation'
   /messages:
     get:
-      tags:
-        - Chat
       operationId: getConversationMessagesByAppChat
       summary: Get Conversation History Messages
       parameters:
@@ -803,8 +790,6 @@ paths:
                     type: integer
   '/messages/{message_id}/feedbacks':
     post:
-      tags:
-        - Chat
       operationId: sendMessageFeedbackByAppChat
       summary: Message Feedback
       parameters:
@@ -851,8 +836,6 @@ paths:
                       - success
   '/messages/{message_id}/suggested':
     get:
-      tags:
-        - Chat
       operationId: getSuggestedQuestionsByAppChat
       summary: Get Suggested Questions
       description: Get suggested questions for the next round
@@ -887,8 +870,6 @@ paths:
                       type: string
   /files/upload:
     post:
-      tags:
-        - Chat
       operationId: uploadFileByAppChat
       summary: Upload File
       description: |
@@ -940,8 +921,6 @@ paths:
                 $ref: '#/components/schemas/Error'
   /info:
     get:
-      tags:
-        - Chat
       operationId: getApplicationInfoByAppChat
       summary: Get Application Basic Information
       responses:
@@ -965,8 +944,6 @@ paths:
                     description: Application tags
   '/chat-messages/{task_id}/stop':
     post:
-      tags:
-        - Chat
       operationId: stopChatResponseByAppChat
       summary: Stop Response
       description: Only supports streaming mode
@@ -1004,8 +981,6 @@ paths:
                     description: Fixed return value 'success'
   /audio-to-text:
     post:
-      tags:
-        - Chat
       operationId: convertAudioToTextByAppChat
       summary: Audio to Text
       description: Convert audio to text
@@ -1038,8 +1013,6 @@ paths:
                     description: Converted text
   /text-to-audio:
     post:
-      tags:
-        - Chat
       operationId: convertTextToAudioByAppChat
       summary: Text to Audio
       description: Convert text to speech
@@ -1070,8 +1043,6 @@ paths:
                 description: Audio file
   /parameters:
     get:
-      tags:
-        - Chat
       operationId: getApplicationParametersByAppChat
       summary: Get Application Parameters
       responses:
@@ -1140,8 +1111,6 @@ paths:
                     description: System parameters
   /meta:
     get:
-      tags:
-        - Chat
       operationId: getAppMetaInfoByAppChat
       summary: Get App Meta Information
       description: Used to get tool icons
@@ -1170,8 +1139,6 @@ paths:
                           description: Icon URL
   /apps/annotations:
     get:
-      tags:
-        - Chat
       operationId: getAnnotationsListByAppChat
       summary: Get Annotation List
       description: Get the list of annotations for the application
@@ -1231,8 +1198,6 @@ paths:
                     type: integer
                     description: Current page number
     post:
-      tags:
-        - Chat
       operationId: createAnnotationByAppChat
       summary: Create Annotation
       description: Create a new annotation
@@ -1277,8 +1242,6 @@ paths:
                     description: Creation timestamp
   '/apps/annotations/{annotation_id}':
     put:
-      tags:
-        - Chat
       operationId: updateAnnotationByAppChat
       summary: Update Annotation
       description: Update a specific annotation
@@ -1329,8 +1292,6 @@ paths:
                     type: integer
                     description: Creation timestamp
     delete:
-      tags:
-        - Chat
       operationId: deleteAnnotationByAppChat
       summary: Delete Annotation
       description: Delete a specific annotation
@@ -1355,8 +1316,6 @@ paths:
                       - success
   '/apps/annotation-reply/{action}':
     post:
-      tags:
-        - Chat
       operationId: configureAnnotationReplyByAppChat
       summary: Initialize Annotation Reply Settings
       description: Enable or disable annotation reply functionality
@@ -1406,8 +1365,6 @@ paths:
                     description: Job status
   '/apps/annotation-reply/{action}/status/{job_id}':
     get:
-      tags:
-        - Chat
       operationId: getAnnotationReplyStatusByAppChat
       summary: Check Annotation Reply Settings Status
       description: Query the status of annotation reply initialization task

@@ -8,28 +8,14 @@ from .types import (
     ChunkChatCompletionResponse,
     ChunkChatCompletionResponseEvent,
     ChunkChatCompletionResponseMetadata,
-    Error,
-    FileInput,
-    FileInputTransferMethod,
-    FileInputType,
-    RetrieverResource,
-    UploadedFile,
-    Usage,
-)
-from .errors import (
-    BadRequestError,
-    ContentTooLargeError,
-    InternalServerError,
-    NotFoundError,
-    ServiceUnavailableError,
-    UnsupportedMediaTypeError,
-)
-from . import generation
-from .generation import (
     ConfigureAnnotationReplyByAppGenerationRequestAction,
     ConfigureAnnotationReplyByAppGenerationResponse,
     CreateAnnotationByAppGenerationResponse,
     DeleteAnnotationByAppGenerationResponse,
+    Error,
+    FileInput,
+    FileInputTransferMethod,
+    FileInputType,
     GetAnnotationReplyStatusByAppGenerationRequestAction,
     GetAnnotationReplyStatusByAppGenerationResponse,
     GetAnnotationsListByAppGenerationResponse,
@@ -54,11 +40,22 @@ from .generation import (
     GetApplicationParametersByAppGenerationResponseUserInputFormItemSelectSelect,
     GetApplicationParametersByAppGenerationResponseUserInputFormItemTextInput,
     GetApplicationParametersByAppGenerationResponseUserInputFormItemTextInputTextInput,
+    RetrieverResource,
     SendCompletionMessageByAppGenerationRequestInputs,
     SendCompletionMessageByAppGenerationRequestResponseMode,
     SendMessageFeedbackByAppGenerationResponse,
     StopCompletionResponseByAppGenerationResponse,
     UpdateAnnotationByAppGenerationResponse,
+    UploadedFile,
+    Usage,
+)
+from .errors import (
+    BadRequestError,
+    ContentTooLargeError,
+    InternalServerError,
+    NotFoundError,
+    ServiceUnavailableError,
+    UnsupportedMediaTypeError,
 )
 
 __all__ = [
@@ -113,5 +110,4 @@ __all__ = [
     "UpdateAnnotationByAppGenerationResponse",
     "UploadedFile",
     "Usage",
-    "generation",
 ]

@@ -13,31 +13,17 @@ from .types import (
     ChunkChatCompletionResponse,
     ChunkChatCompletionResponseEvent,
     ChunkChatCompletionResponseMetadata,
-    Conversation,
-    Error,
-    FileInput,
-    FileInputTransferMethod,
-    FileInputType,
-    RetrieverResource,
-    UploadedFile,
-    Usage,
-)
-from .errors import (
-    BadRequestError,
-    ContentTooLargeError,
-    InternalServerError,
-    NotFoundError,
-    ServiceUnavailableError,
-    UnsupportedMediaTypeError,
-)
-from . import chat
-from .chat import (
     ConfigureAnnotationReplyByAppChatRequestAction,
     ConfigureAnnotationReplyByAppChatResponse,
+    Conversation,
     ConvertAudioToTextByAppChatResponse,
     CreateAnnotationByAppChatResponse,
     DeleteAnnotationByAppChatResponse,
     DeleteConversationByAppChatResponse,
+    Error,
+    FileInput,
+    FileInputTransferMethod,
+    FileInputType,
     GetAnnotationReplyStatusByAppChatRequestAction,
     GetAnnotationReplyStatusByAppChatResponse,
     GetAnnotationsListByAppChatResponse,
@@ -56,12 +42,23 @@ from .chat import (
     GetConversationListByAppChatResponse,
     GetConversationMessagesByAppChatResponse,
     GetSuggestedQuestionsByAppChatResponse,
+    RetrieverResource,
     SendChatMessageByAppChatRequestFilesItem,
     SendChatMessageByAppChatRequestFilesItemTransferMethod,
     SendChatMessageByAppChatRequestResponseMode,
     SendMessageFeedbackByAppChatResponse,
     StopChatResponseByAppChatResponse,
     UpdateAnnotationByAppChatResponse,
+    UploadedFile,
+    Usage,
+)
+from .errors import (
+    BadRequestError,
+    ContentTooLargeError,
+    InternalServerError,
+    NotFoundError,
+    ServiceUnavailableError,
+    UnsupportedMediaTypeError,
 )
 
 __all__ = [
@@ -119,5 +116,4 @@ __all__ = [
     "UpdateAnnotationByAppChatResponse",
     "UploadedFile",
     "Usage",
-    "chat",
 ]

@@ -8,30 +8,16 @@ from .types import (
     ChunkChatCompletionResponse,
     ChunkChatCompletionResponseEvent,
     ChunkChatCompletionResponseMetadata,
-    Error,
-    FileInput,
-    FileInputTransferMethod,
-    FileInputType,
-    RetrieverResource,
-    UploadedFile,
-    Usage,
-)
-from .errors import (
-    BadRequestError,
-    ContentTooLargeError,
-    InternalServerError,
-    NotFoundError,
-    ServiceUnavailableError,
-    UnsupportedMediaTypeError,
-)
-from . import advanced_chat
-from .advanced_chat import (
     ConfigureAnnotationReplyByAppAdvancedChatRequestAction,
     ConfigureAnnotationReplyByAppAdvancedChatResponse,
     ConvertAudioToTextByAppAdvancedChatResponse,
     CreateAnnotationByAppAdvancedChatResponse,
     DeleteAnnotationByAppAdvancedChatResponse,
     DeleteConversationByAppAdvancedChatResponse,
+    Error,
+    FileInput,
+    FileInputTransferMethod,
+    FileInputType,
     GetAnnotationReplyStatusByAppAdvancedChatRequestAction,
     GetAnnotationReplyStatusByAppAdvancedChatResponse,
     GetAnnotationsListByAppAdvancedChatResponse,
@@ -56,10 +42,21 @@ from .advanced_chat import (
     GetConversationsByAppAdvancedChatResponseDataItem,
     GetSuggestedQuestionsByAppAdvancedChatResponse,
     RenameConversationByAppAdvancedChatResponse,
+    RetrieverResource,
     SendChatMessageByAppAdvancedChatRequestResponseMode,
     SendMessageFeedbackByAppAdvancedChatResponse,
     StopChatResponseByAppAdvancedChatResponse,
     UpdateAnnotationByAppAdvancedChatResponse,
+    UploadedFile,
+    Usage,
+)
+from .errors import (
+    BadRequestError,
+    ContentTooLargeError,
+    InternalServerError,
+    NotFoundError,
+    ServiceUnavailableError,
+    UnsupportedMediaTypeError,
 )
 
 __all__ = [
@@ -115,5 +112,4 @@ __all__ = [
     "UpdateAnnotationByAppAdvancedChatResponse",
     "UploadedFile",
     "Usage",
-    "advanced_chat",
 ]

@@ -315,15 +315,9 @@ components:
           type: string
           description: 上传文件 ID。（仅当传递方式为 `local_file` 时）。
 
-tags:
-  - name: AdvancedChat
-    description: 工作流编排对话型应用相关操作
-
 paths:
   /chat-messages:
     post:
-      tags:
-        - AdvancedChat
       operationId: sendChatMessageByAppAdvancedChat
       summary: 发送对话消息
       description: 创建会话消息
@@ -391,8 +385,6 @@ paths:
 
   /chat-messages/{task_id}/stop:
     post:
-      tags:
-        - AdvancedChat
       operationId: stopChatResponseByAppAdvancedChat
       summary: 停止响应
       description: 仅支持流式模式
@@ -416,7 +408,7 @@ paths:
                   type: string
                   description: 用户标识，必须和发送消息接口传入 user 保持一致
       responses:
-        '200':
+        "200":
           description: 成功响应
           content:
             application/json:
@@ -430,8 +422,6 @@ paths:
 
   /files/upload:
     post:
-      tags:
-        - AdvancedChat
       operationId: uploadFileByAppAdvancedChat
       summary: 上传文件
       description: |
@@ -484,8 +474,6 @@ paths:
 
   /audio-to-text:
     post:
-      tags:
-        - AdvancedChat
       operationId: convertAudioToTextByAppAdvancedChat
       summary: 语音转文字
       requestBody:
@@ -518,8 +506,6 @@ paths:
 
   /text-to-audio:
     post:
-      tags:
-        - AdvancedChat
       operationId: convertTextToAudioByAppAdvancedChat
       summary: 文字转语音
       requestBody:
@@ -549,8 +535,6 @@ paths:
 
   /info:
     get:
-      tags:
-        - AdvancedChat
       operationId: getApplicationInfoByAppAdvancedChat
       summary: 获取应用基本信息
       responses:
@@ -575,8 +559,6 @@ paths:
 
   /parameters:
     get:
-      tags:
-        - AdvancedChat
       operationId: getApplicationParametersByAppAdvancedChat
       summary: 获取应用参数
       responses:
@@ -643,8 +625,6 @@ paths:
 
   /messages/{message_id}/feedbacks:
     post:
-      tags:
-        - AdvancedChat
       operationId: sendMessageFeedbackByAppAdvancedChat
       summary: 消息反馈（点赞）
       description: 消息终端用户反馈、点赞，方便应用开发者优化输出预期。
@@ -676,7 +656,7 @@ paths:
                   type: string
                   description: 消息反馈的具体信息。
       responses:
-        '200':
+        "200":
           description: 成功响应
           content:
             application/json:
@@ -690,8 +670,6 @@ paths:
 
   /messages/{message_id}/suggested:
     get:
-      tags:
-        - AdvancedChat
       operationId: getSuggestedQuestionsByAppAdvancedChat
       summary: 获取下一轮建议问题列表
       description: 获取下一轮建议问题列表。
@@ -709,7 +687,7 @@ paths:
             type: string
           description: 用户标识，由开发者定义规则，需保证用户标识在应用内唯一。
       responses:
-        '200':
+        "200":
           description: 成功响应
           content:
             application/json:
@@ -728,8 +706,6 @@ paths:
 
   /messages:
     get:
-      tags:
-        - AdvancedChat
       operationId: getConversationMessagesByAppAdvancedChat
       summary: 获取会话历史消息
       description: 滚动加载形式返回历史聊天记录，第一页返回最新 `limit` 条，即：倒序返回。
@@ -760,7 +736,7 @@ paths:
             default: 20
           description: 一次请求返回多少条聊天记录，默认 20 条。
       responses:
-        '200':
+        "200":
           description: 成功响应
           content:
             application/json:
@@ -832,8 +808,6 @@ paths:
 
   /conversations:
     get:
-      tags:
-        - AdvancedChat
       operationId: getConversationsByAppAdvancedChat
       summary: 获取会话列表
       description: 获取当前用户的会话列表，默认返回最近的 20 条。
@@ -871,7 +845,7 @@ paths:
             - 可选值：created_at, -created_at, updated_at, -updated_at
             - 字段前面的符号代表顺序或倒序，-代表倒序
       responses:
-        '200':
+        "200":
           description: 成功响应
           content:
             application/json:
@@ -914,8 +888,6 @@ paths:
 
   /conversations/{conversation_id}:
     delete:
-      tags:
-        - AdvancedChat
       operationId: deleteConversationByAppAdvancedChat
       summary: 删除会话
       description: 删除会话。
@@ -939,7 +911,7 @@ paths:
                   type: string
                   description: 用户标识，由开发者定义规则，需保证用户标识在应用内唯一。
       responses:
-        '200':
+        "200":
           description: 成功响应
           content:
             application/json:
@@ -953,8 +925,6 @@ paths:
 
   /conversations/{conversation_id}/name:
     post:
-      tags:
-        - AdvancedChat
       operationId: renameConversationByAppAdvancedChat
       summary: 会话重命名
       description: 对会话进行重命名，会话名称用于显示在支持多会话的客户端上。
@@ -985,7 +955,7 @@ paths:
                   type: string
                   description: 用户标识，由开发者定义规则，需保证用户标识在应用内唯一。
       responses:
-        '200':
+        "200":
           description: 成功响应
           content:
             application/json:
@@ -1016,13 +986,11 @@ paths:
 
   /meta:
     get:
-      tags:
-        - AdvancedChat
       operationId: getAppMetaInfoByAppAdvancedChat
       summary: 获取应用Meta信息
       description: 用于获取工具icon
       responses:
-        '200':
+        "200":
           description: 成功响应
           content:
             application/json:
@@ -1047,8 +1015,6 @@ paths:
 
   /apps/annotations:
     get:
-      tags:
-        - AdvancedChat
       operationId: getAnnotationsListByAppAdvancedChat
       summary: 获取标注列表
       description: 获取应用的标注列表
@@ -1109,8 +1075,6 @@ paths:
                     description: 当前页码
 
     post:
-      tags:
-        - AdvancedChat
       operationId: createAnnotationByAppAdvancedChat
       summary: 创建标注
       description: 创建新的标注
@@ -1156,8 +1120,6 @@ paths:
 
   /apps/annotations/{annotation_id}:
     put:
-      tags:
-        - AdvancedChat
       operationId: updateAnnotationByAppAdvancedChat
       summary: 更新标注
       description: 更新指定的标注
@@ -1209,8 +1171,6 @@ paths:
                     description: 创建时间戳
 
     delete:
-      tags:
-        - AdvancedChat
       operationId: deleteAnnotationByAppAdvancedChat
       summary: 删除标注
       description: 删除指定的标注
@@ -1235,8 +1195,6 @@ paths:
 
   /apps/annotation-reply/{action}:
     post:
-      tags:
-        - AdvancedChat
       operationId: configureAnnotationReplyByAppAdvancedChat
       summary: 标注回复初始设置
       description: 启用或禁用标注回复功能
@@ -1285,8 +1243,6 @@ paths:
 
   /apps/annotation-reply/{action}/status/{job_id}:
     get:
-      tags:
-        - AdvancedChat
       operationId: getAnnotationReplyStatusByAppAdvancedChat
       summary: 查询标注回复初始设置任务状态
       description: 查询标注回复初始设置任务的执行状态

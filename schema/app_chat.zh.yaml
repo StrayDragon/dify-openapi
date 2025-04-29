@@ -418,15 +418,9 @@ components:
           type: integer
           description: 上传时间
 
-tags:
-  - name: Chat
-    description: 对话型应用相关操作
-
 paths:
   /chat-messages:
     post:
-      tags:
-        - Chat
       operationId: sendChatMessageByAppChat
       summary: 发送对话消息(对话型应用)
       description: 创建会话消息
@@ -620,8 +614,6 @@ paths:
 
   /conversations:
     get:
-      tags:
-        - Chat
       operationId: getConversationListByAppChat
       summary: 获取会话列表
       description: 获取当前用户的会话列表
@@ -668,8 +660,6 @@ paths:
 
   /conversations/{conversation_id}:
     delete:
-      tags:
-        - Chat
       operationId: deleteConversationByAppChat
       summary: 删除会话
       parameters:
@@ -705,8 +695,6 @@ paths:
 
   /conversations/{conversation_id}/name:
     post:
-      tags:
-        - Chat
       operationId: renameConversationByAppChat
       summary: 会话重命名
       parameters:
@@ -744,8 +732,6 @@ paths:
 
   /messages:
     get:
-      tags:
-        - Chat
       operationId: getConversationMessagesByAppChat
       summary: 获取会话历史消息
       parameters:
@@ -787,8 +773,6 @@ paths:
 
   /messages/{message_id}/feedbacks:
     post:
-      tags:
-        - Chat
       operationId: sendMessageFeedbackByAppChat
       summary: 消息反馈
       parameters:
@@ -831,8 +815,6 @@ paths:
 
   /messages/{message_id}/suggested:
     get:
-      tags:
-        - Chat
       operationId: getSuggestedQuestionsByAppChat
       summary: 获取下一轮建议问题列表
       description: 获取下一轮建议问题列表
@@ -868,8 +850,6 @@ paths:
 
   /files/upload:
     post:
-      tags:
-        - Chat
       operationId: uploadFileByAppChat
       summary: 上传文件
       description: |
@@ -922,8 +902,6 @@ paths:
 
   /info:
     get:
-      tags:
-        - Chat
       operationId: getApplicationInfoByAppChat
       summary: 获取应用基本信息
       responses:
@@ -948,8 +926,6 @@ paths:
 
   /chat-messages/{task_id}/stop:
     post:
-      tags:
-        - Chat
       operationId: stopChatResponseByAppChat
       summary: 停止响应
       description: 仅支持流式模式
@@ -987,8 +963,6 @@ paths:
 
   /audio-to-text:
     post:
-      tags:
-        - Chat
       operationId: convertAudioToTextByAppChat
       summary: 语音转文字
       description: 语音转文字
@@ -1022,8 +996,6 @@ paths:
 
   /text-to-audio:
     post:
-      tags:
-        - Chat
       operationId: convertTextToAudioByAppChat
       summary: 文字转语音
       description: 文字转语音
@@ -1055,8 +1027,6 @@ paths:
 
   /parameters:
     get:
-      tags:
-        - Chat
       operationId: getApplicationParametersByAppChat
       summary: 获取应用参数
       responses:
@@ -1126,8 +1096,6 @@ paths:
 
   /meta:
     get:
-      tags:
-        - Chat
       operationId: getAppMetaInfoByAppChat
       summary: 获取应用Meta信息
       description: 用于获取工具icon
@@ -1157,8 +1125,6 @@ paths:
 
   /apps/annotations:
     get:
-      tags:
-        - Chat
       operationId: getAnnotationsListByAppChat
       summary: 获取标注列表
       description: 获取应用的标注列表
@@ -1219,8 +1185,6 @@ paths:
                     description: 当前页码
 
     post:
-      tags:
-        - Chat
       operationId: createAnnotationByAppChat
       summary: 创建标注
       description: 创建新的标注
@@ -1266,8 +1230,6 @@ paths:
 
   /apps/annotations/{annotation_id}:
     put:
-      tags:
-        - Chat
       operationId: updateAnnotationByAppChat
       summary: 更新标注
       description: 更新指定的标注
@@ -1319,8 +1281,6 @@ paths:
                     description: 创建时间戳
 
     delete:
-      tags:
-        - Chat
       operationId: deleteAnnotationByAppChat
       summary: 删除标注
       description: 删除指定的标注
@@ -1345,8 +1305,6 @@ paths:
 
   /apps/annotation-reply/{action}:
     post:
-      tags:
-        - Chat
       operationId: configureAnnotationReplyByAppChat
       summary: 标注回复初始设置
       description: 启用或禁用标注回复功能
@@ -1395,8 +1353,6 @@ paths:
 
   /apps/annotation-reply/{action}/status/{job_id}:
     get:
-      tags:
-        - Chat
       operationId: getAnnotationReplyStatusByAppChat
       summary: 查询标注回复初始设置任务状态
       description: 查询标注回复初始设置任务的执行状态
