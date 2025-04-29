@@ -3,6 +3,29 @@
 # isort: skip_file
 
 from .types import (
+    ChatCompletionResponse,
+    ChatCompletionResponseMetadata,
+    ChunkChatCompletionResponse,
+    ChunkChatCompletionResponseEvent,
+    ChunkChatCompletionResponseMetadata,
+    Error,
+    FileInput,
+    FileInputTransferMethod,
+    FileInputType,
+    RetrieverResource,
+    UploadedFile,
+    Usage,
+)
+from .errors import (
+    BadRequestError,
+    ContentTooLargeError,
+    InternalServerError,
+    NotFoundError,
+    ServiceUnavailableError,
+    UnsupportedMediaTypeError,
+)
+from . import generation
+from .generation import (
     ConfigureAnnotationReplyByAppGenerationRequestAction,
     ConfigureAnnotationReplyByAppGenerationResponse,
     CreateAnnotationByAppGenerationResponse,
@@ -39,10 +62,21 @@ from .types import (
 )
 
 __all__ = [
+    "BadRequestError",
+    "ChatCompletionResponse",
+    "ChatCompletionResponseMetadata",
+    "ChunkChatCompletionResponse",
+    "ChunkChatCompletionResponseEvent",
+    "ChunkChatCompletionResponseMetadata",
     "ConfigureAnnotationReplyByAppGenerationRequestAction",
     "ConfigureAnnotationReplyByAppGenerationResponse",
+    "ContentTooLargeError",
     "CreateAnnotationByAppGenerationResponse",
     "DeleteAnnotationByAppGenerationResponse",
+    "Error",
+    "FileInput",
+    "FileInputTransferMethod",
+    "FileInputType",
     "GetAnnotationReplyStatusByAppGenerationRequestAction",
     "GetAnnotationReplyStatusByAppGenerationResponse",
     "GetAnnotationsListByAppGenerationResponse",
@@ -67,9 +101,17 @@ __all__ = [
     "GetApplicationParametersByAppGenerationResponseUserInputFormItemSelectSelect",
     "GetApplicationParametersByAppGenerationResponseUserInputFormItemTextInput",
     "GetApplicationParametersByAppGenerationResponseUserInputFormItemTextInputTextInput",
+    "InternalServerError",
+    "NotFoundError",
+    "RetrieverResource",
     "SendCompletionMessageByAppGenerationRequestInputs",
     "SendCompletionMessageByAppGenerationRequestResponseMode",
     "SendMessageFeedbackByAppGenerationResponse",
+    "ServiceUnavailableError",
     "StopCompletionResponseByAppGenerationResponse",
+    "UnsupportedMediaTypeError",
     "UpdateAnnotationByAppGenerationResponse",
+    "UploadedFile",
+    "Usage",
+    "generation",
 ]

@@ -3,6 +3,29 @@
 # isort: skip_file
 
 from .types import (
+    ChatCompletionResponse,
+    ChatCompletionResponseMetadata,
+    ChunkChatCompletionResponse,
+    ChunkChatCompletionResponseEvent,
+    ChunkChatCompletionResponseMetadata,
+    Error,
+    FileInput,
+    FileInputTransferMethod,
+    FileInputType,
+    RetrieverResource,
+    UploadedFile,
+    Usage,
+)
+from .errors import (
+    BadRequestError,
+    ContentTooLargeError,
+    InternalServerError,
+    NotFoundError,
+    ServiceUnavailableError,
+    UnsupportedMediaTypeError,
+)
+from . import advanced_chat
+from .advanced_chat import (
     ConfigureAnnotationReplyByAppAdvancedChatRequestAction,
     ConfigureAnnotationReplyByAppAdvancedChatResponse,
     ConvertAudioToTextByAppAdvancedChatResponse,
@@ -40,12 +63,23 @@ from .types import (
 )
 
 __all__ = [
+    "BadRequestError",
+    "ChatCompletionResponse",
+    "ChatCompletionResponseMetadata",
+    "ChunkChatCompletionResponse",
+    "ChunkChatCompletionResponseEvent",
+    "ChunkChatCompletionResponseMetadata",
     "ConfigureAnnotationReplyByAppAdvancedChatRequestAction",
     "ConfigureAnnotationReplyByAppAdvancedChatResponse",
+    "ContentTooLargeError",
     "ConvertAudioToTextByAppAdvancedChatResponse",
     "CreateAnnotationByAppAdvancedChatResponse",
     "DeleteAnnotationByAppAdvancedChatResponse",
     "DeleteConversationByAppAdvancedChatResponse",
+    "Error",
+    "FileInput",
+    "FileInputTransferMethod",
+    "FileInputType",
     "GetAnnotationReplyStatusByAppAdvancedChatRequestAction",
     "GetAnnotationReplyStatusByAppAdvancedChatResponse",
     "GetAnnotationsListByAppAdvancedChatResponse",
@@ -69,9 +103,17 @@ __all__ = [
     "GetConversationsByAppAdvancedChatResponse",
     "GetConversationsByAppAdvancedChatResponseDataItem",
     "GetSuggestedQuestionsByAppAdvancedChatResponse",
+    "InternalServerError",
+    "NotFoundError",
     "RenameConversationByAppAdvancedChatResponse",
+    "RetrieverResource",
     "SendChatMessageByAppAdvancedChatRequestResponseMode",
     "SendMessageFeedbackByAppAdvancedChatResponse",
+    "ServiceUnavailableError",
     "StopChatResponseByAppAdvancedChatResponse",
+    "UnsupportedMediaTypeError",
     "UpdateAnnotationByAppAdvancedChatResponse",
+    "UploadedFile",
+    "Usage",
+    "advanced_chat",
 ]

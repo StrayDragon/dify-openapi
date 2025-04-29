@@ -6,13 +6,9 @@ import httpx
 from .advanced_chat.client import AdvancedChatClient, AsyncAdvancedChatClient
 from .chat.client import AsyncChatClient, ChatClient
 from .core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
-from .datasets.client import AsyncDatasetsClient, DatasetsClient
-from .documents.client import AsyncDocumentsClient, DocumentsClient
 from .environment import DifyApiEnvironment
 from .generation.client import AsyncGenerationClient, GenerationClient
-from .metadata.client import AsyncMetadataClient, MetadataClient
-from .models.client import AsyncModelsClient, ModelsClient
-from .segments.client import AsyncSegmentsClient, SegmentsClient
+from .knowledge_base.client import AsyncKnowledgeBaseClient, KnowledgeBaseClient
 from .workflow.client import AsyncWorkflowClient, WorkflowClient
 
 
@@ -71,15 +67,11 @@ class DifyApi:
             else httpx.Client(timeout=_defaulted_timeout),
             timeout=_defaulted_timeout,
         )
-        self.generation = GenerationClient(client_wrapper=self._client_wrapper)
         self.advanced_chat = AdvancedChatClient(client_wrapper=self._client_wrapper)
         self.chat = ChatClient(client_wrapper=self._client_wrapper)
+        self.generation = GenerationClient(client_wrapper=self._client_wrapper)
+        self.knowledge_base = KnowledgeBaseClient(client_wrapper=self._client_wrapper)
         self.workflow = WorkflowClient(client_wrapper=self._client_wrapper)
-        self.datasets = DatasetsClient(client_wrapper=self._client_wrapper)
-        self.documents = DocumentsClient(client_wrapper=self._client_wrapper)
-        self.segments = SegmentsClient(client_wrapper=self._client_wrapper)
-        self.metadata = MetadataClient(client_wrapper=self._client_wrapper)
-        self.models = ModelsClient(client_wrapper=self._client_wrapper)
 
 
 class AsyncDifyApi:
@@ -137,15 +129,11 @@ class AsyncDifyApi:
             else httpx.AsyncClient(timeout=_defaulted_timeout),
             timeout=_defaulted_timeout,
         )
-        self.generation = AsyncGenerationClient(client_wrapper=self._client_wrapper)
         self.advanced_chat = AsyncAdvancedChatClient(client_wrapper=self._client_wrapper)
         self.chat = AsyncChatClient(client_wrapper=self._client_wrapper)
+        self.generation = AsyncGenerationClient(client_wrapper=self._client_wrapper)
+        self.knowledge_base = AsyncKnowledgeBaseClient(client_wrapper=self._client_wrapper)
         self.workflow = AsyncWorkflowClient(client_wrapper=self._client_wrapper)
-        self.datasets = AsyncDatasetsClient(client_wrapper=self._client_wrapper)
-        self.documents = AsyncDocumentsClient(client_wrapper=self._client_wrapper)
-        self.segments = AsyncSegmentsClient(client_wrapper=self._client_wrapper)
-        self.metadata = AsyncMetadataClient(client_wrapper=self._client_wrapper)
-        self.models = AsyncModelsClient(client_wrapper=self._client_wrapper)
 
 
 def _get_base_url(*, base_url: typing.Optional[str] = None, environment: DifyApiEnvironment) -> str:

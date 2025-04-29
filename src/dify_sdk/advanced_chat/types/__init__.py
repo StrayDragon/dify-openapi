@@ -2,104 +2,30 @@
 
 # isort: skip_file
 
-from .configure_annotation_reply_by_app_advanced_chat_request_action import (
-    ConfigureAnnotationReplyByAppAdvancedChatRequestAction,
-)
-from .configure_annotation_reply_by_app_advanced_chat_response import ConfigureAnnotationReplyByAppAdvancedChatResponse
-from .convert_audio_to_text_by_app_advanced_chat_response import ConvertAudioToTextByAppAdvancedChatResponse
-from .create_annotation_by_app_advanced_chat_response import CreateAnnotationByAppAdvancedChatResponse
-from .delete_annotation_by_app_advanced_chat_response import DeleteAnnotationByAppAdvancedChatResponse
-from .delete_conversation_by_app_advanced_chat_response import DeleteConversationByAppAdvancedChatResponse
-from .get_annotation_reply_status_by_app_advanced_chat_request_action import (
-    GetAnnotationReplyStatusByAppAdvancedChatRequestAction,
-)
-from .get_annotation_reply_status_by_app_advanced_chat_response import GetAnnotationReplyStatusByAppAdvancedChatResponse
-from .get_annotations_list_by_app_advanced_chat_response import GetAnnotationsListByAppAdvancedChatResponse
-from .get_annotations_list_by_app_advanced_chat_response_data_item import (
-    GetAnnotationsListByAppAdvancedChatResponseDataItem,
-)
-from .get_app_meta_info_by_app_advanced_chat_response import GetAppMetaInfoByAppAdvancedChatResponse
-from .get_app_meta_info_by_app_advanced_chat_response_tool_icons_value import (
-    GetAppMetaInfoByAppAdvancedChatResponseToolIconsValue,
-)
-from .get_app_meta_info_by_app_advanced_chat_response_tool_icons_value_background import (
-    GetAppMetaInfoByAppAdvancedChatResponseToolIconsValueBackground,
-)
-from .get_application_info_by_app_advanced_chat_response import GetApplicationInfoByAppAdvancedChatResponse
-from .get_application_parameters_by_app_advanced_chat_response import GetApplicationParametersByAppAdvancedChatResponse
-from .get_application_parameters_by_app_advanced_chat_response_annotation_reply import (
-    GetApplicationParametersByAppAdvancedChatResponseAnnotationReply,
-)
-from .get_application_parameters_by_app_advanced_chat_response_retriever_resource import (
-    GetApplicationParametersByAppAdvancedChatResponseRetrieverResource,
-)
-from .get_application_parameters_by_app_advanced_chat_response_speech_to_text import (
-    GetApplicationParametersByAppAdvancedChatResponseSpeechToText,
-)
-from .get_application_parameters_by_app_advanced_chat_response_suggested_questions_after_answer import (
-    GetApplicationParametersByAppAdvancedChatResponseSuggestedQuestionsAfterAnswer,
-)
-from .get_conversation_messages_by_app_advanced_chat_response import GetConversationMessagesByAppAdvancedChatResponse
-from .get_conversation_messages_by_app_advanced_chat_response_data_item import (
-    GetConversationMessagesByAppAdvancedChatResponseDataItem,
-)
-from .get_conversation_messages_by_app_advanced_chat_response_data_item_feedback import (
-    GetConversationMessagesByAppAdvancedChatResponseDataItemFeedback,
-)
-from .get_conversation_messages_by_app_advanced_chat_response_data_item_feedback_rating import (
-    GetConversationMessagesByAppAdvancedChatResponseDataItemFeedbackRating,
-)
-from .get_conversation_messages_by_app_advanced_chat_response_data_item_message_files_item import (
-    GetConversationMessagesByAppAdvancedChatResponseDataItemMessageFilesItem,
-)
-from .get_conversation_messages_by_app_advanced_chat_response_data_item_message_files_item_belongs_to import (
-    GetConversationMessagesByAppAdvancedChatResponseDataItemMessageFilesItemBelongsTo,
-)
-from .get_conversations_by_app_advanced_chat_request_sort_by import GetConversationsByAppAdvancedChatRequestSortBy
-from .get_conversations_by_app_advanced_chat_response import GetConversationsByAppAdvancedChatResponse
-from .get_conversations_by_app_advanced_chat_response_data_item import GetConversationsByAppAdvancedChatResponseDataItem
-from .get_suggested_questions_by_app_advanced_chat_response import GetSuggestedQuestionsByAppAdvancedChatResponse
-from .rename_conversation_by_app_advanced_chat_response import RenameConversationByAppAdvancedChatResponse
-from .send_chat_message_by_app_advanced_chat_request_response_mode import (
-    SendChatMessageByAppAdvancedChatRequestResponseMode,
-)
-from .send_message_feedback_by_app_advanced_chat_response import SendMessageFeedbackByAppAdvancedChatResponse
-from .stop_chat_response_by_app_advanced_chat_response import StopChatResponseByAppAdvancedChatResponse
-from .update_annotation_by_app_advanced_chat_response import UpdateAnnotationByAppAdvancedChatResponse
+from .chat_completion_response import ChatCompletionResponse
+from .chat_completion_response_metadata import ChatCompletionResponseMetadata
+from .chunk_chat_completion_response import ChunkChatCompletionResponse
+from .chunk_chat_completion_response_event import ChunkChatCompletionResponseEvent
+from .chunk_chat_completion_response_metadata import ChunkChatCompletionResponseMetadata
+from .error import Error
+from .file_input import FileInput
+from .file_input_transfer_method import FileInputTransferMethod
+from .file_input_type import FileInputType
+from .retriever_resource import RetrieverResource
+from .uploaded_file import UploadedFile
+from .usage import Usage
 
 __all__ = [
-    "ConfigureAnnotationReplyByAppAdvancedChatRequestAction",
-    "ConfigureAnnotationReplyByAppAdvancedChatResponse",
-    "ConvertAudioToTextByAppAdvancedChatResponse",
-    "CreateAnnotationByAppAdvancedChatResponse",
-    "DeleteAnnotationByAppAdvancedChatResponse",
-    "DeleteConversationByAppAdvancedChatResponse",
-    "GetAnnotationReplyStatusByAppAdvancedChatRequestAction",
-    "GetAnnotationReplyStatusByAppAdvancedChatResponse",
-    "GetAnnotationsListByAppAdvancedChatResponse",
-    "GetAnnotationsListByAppAdvancedChatResponseDataItem",
-    "GetAppMetaInfoByAppAdvancedChatResponse",
-    "GetAppMetaInfoByAppAdvancedChatResponseToolIconsValue",
-    "GetAppMetaInfoByAppAdvancedChatResponseToolIconsValueBackground",
-    "GetApplicationInfoByAppAdvancedChatResponse",
-    "GetApplicationParametersByAppAdvancedChatResponse",
-    "GetApplicationParametersByAppAdvancedChatResponseAnnotationReply",
-    "GetApplicationParametersByAppAdvancedChatResponseRetrieverResource",
-    "GetApplicationParametersByAppAdvancedChatResponseSpeechToText",
-    "GetApplicationParametersByAppAdvancedChatResponseSuggestedQuestionsAfterAnswer",
-    "GetConversationMessagesByAppAdvancedChatResponse",
-    "GetConversationMessagesByAppAdvancedChatResponseDataItem",
-    "GetConversationMessagesByAppAdvancedChatResponseDataItemFeedback",
-    "GetConversationMessagesByAppAdvancedChatResponseDataItemFeedbackRating",
-    "GetConversationMessagesByAppAdvancedChatResponseDataItemMessageFilesItem",
-    "GetConversationMessagesByAppAdvancedChatResponseDataItemMessageFilesItemBelongsTo",
-    "GetConversationsByAppAdvancedChatRequestSortBy",
-    "GetConversationsByAppAdvancedChatResponse",
-    "GetConversationsByAppAdvancedChatResponseDataItem",
-    "GetSuggestedQuestionsByAppAdvancedChatResponse",
-    "RenameConversationByAppAdvancedChatResponse",
-    "SendChatMessageByAppAdvancedChatRequestResponseMode",
-    "SendMessageFeedbackByAppAdvancedChatResponse",
-    "StopChatResponseByAppAdvancedChatResponse",
-    "UpdateAnnotationByAppAdvancedChatResponse",
+    "ChatCompletionResponse",
+    "ChatCompletionResponseMetadata",
+    "ChunkChatCompletionResponse",
+    "ChunkChatCompletionResponseEvent",
+    "ChunkChatCompletionResponseMetadata",
+    "Error",
+    "FileInput",
+    "FileInputTransferMethod",
+    "FileInputType",
+    "RetrieverResource",
+    "UploadedFile",
+    "Usage",
 ]
