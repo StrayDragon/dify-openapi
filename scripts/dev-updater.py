@@ -97,9 +97,9 @@ NOTE:
             break
 
 
-def more_test_coverage_prompt():
+def more_test_coverage_prompt(v1: str, v2: str):
     return """
-I already update the @src/dify_sdk by `just gen-client`, maybe some tests is broken, please fix @tests/ base on original logic and test by `just test` for check result
+I already update the @src/dify_sdk by `just gen-client`, maybe some tests is broken, please fix @tests/ base on original logic and test by `just test` for check result, after check and maybe fix, you need to based on @src/dify_sdk/ and @misc/official_api_doc_changes/{v1}__{v2}.diff write new tests
 """.strip()
 
 
@@ -567,7 +567,10 @@ def main():
             v1=v1,
             v2=v2,
         )
-        more_test_coverage_prompt()
+        more_test_coverage_prompt(
+            v1=v1,
+            v2=v2,
+        )
     elif args.mode == "rag":
         rag_schema_generator(
             schema_key=args.schema,
