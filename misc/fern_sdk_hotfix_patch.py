@@ -89,12 +89,12 @@ def main() -> None:
     print(f"Fern API 版本: {fern_api_version}")
     print(f"Python SDK 版本: {python_sdk_version}")
 
-    target_file: str = "src/dify_sdk/documents/raw_client.py"
+    target_file: str = "src/dify_sdk/knowledge_base/documents/raw_client.py"
     pattern: str = r'"process_rule": process_rule'
     replacement: str = r'"process_rule": process_rule.model_dump_json() if process_rule else None'
     patch_file(target_file, pattern, replacement)
 
-    target_file: str = "src/dify_sdk/workflow/raw_client.py"
+    target_file: str = "src/dify_sdk/workflow/workflow/raw_client.py"
     pattern: str = r"(\s*)(if len\(_text\) == 0:)"
     replacement: str = r'\1_text = _text.removeprefix("data: ")\n\1if len(_text) == 0:'
     patch_file(target_file, pattern, replacement)
