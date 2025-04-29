@@ -47,6 +47,9 @@ from .types.get_application_parameters_by_app_advanced_chat_response import (
 from .types.get_conversation_messages_by_app_advanced_chat_response import (
     GetConversationMessagesByAppAdvancedChatResponse,
 )
+from .types.get_conversation_variables_by_app_advanced_chat_response import (
+    GetConversationVariablesByAppAdvancedChatResponse,
+)
 from .types.get_conversations_by_app_advanced_chat_request_sort_by import GetConversationsByAppAdvancedChatRequestSortBy
 from .types.get_conversations_by_app_advanced_chat_response import GetConversationsByAppAdvancedChatResponse
 from .types.get_suggested_questions_by_app_advanced_chat_response import GetSuggestedQuestionsByAppAdvancedChatResponse
@@ -167,9 +170,9 @@ class RawAdvancedChatClient:
                     if _response.status_code == 404:
                         raise NotFoundError(
                             typing.cast(
-                                Error,
+                                typing.Optional[typing.Any],
                                 parse_obj_as(
-                                    type_=Error,  # type: ignore
+                                    type_=typing.Optional[typing.Any],  # type: ignore
                                     object_=_response.json(),
                                 ),
                             )
@@ -865,6 +868,80 @@ class RawAdvancedChatClient:
             raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
         raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
+    def get_conversation_variables_by_app_advanced_chat(
+        self,
+        conversation_id: str,
+        *,
+        user: str,
+        last_id: typing.Optional[str] = None,
+        limit: typing.Optional[int] = None,
+        variable_name: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> HttpResponse[GetConversationVariablesByAppAdvancedChatResponse]:
+        """
+        Retrieve variables from a specific conversation. This endpoint is useful for extracting structured data captured during conversations.
+
+        Parameters
+        ----------
+        conversation_id : str
+            The conversation ID to retrieve variables from.
+
+        user : str
+            User identifier, defined by developer rules, must be unique within the application.
+
+        last_id : typing.Optional[str]
+            (Optional) ID of the last record on the current page, default null
+
+        limit : typing.Optional[int]
+            (Optional) Number of records to return per request, default 20, maximum 100, minimum 1.
+
+        variable_name : typing.Optional[str]
+            (Optional) Variable name filter
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[GetConversationVariablesByAppAdvancedChatResponse]
+            Successful response
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"conversations/{jsonable_encoder(conversation_id)}/variables",
+            method="GET",
+            params={
+                "user": user,
+                "last_id": last_id,
+                "limit": limit,
+                "variable_name": variable_name,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    GetConversationVariablesByAppAdvancedChatResponse,
+                    parse_obj_as(
+                        type_=GetConversationVariablesByAppAdvancedChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
     def get_app_meta_info_by_app_advanced_chat(
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> HttpResponse[GetAppMetaInfoByAppAdvancedChatResponse]:
@@ -1097,9 +1174,7 @@ class RawAdvancedChatClient:
         self,
         action: ConfigureAnnotationReplyByAppAdvancedChatRequestAction,
         *,
-        embedding_model_provider: typing.Optional[str] = OMIT,
         embedding_provider_name: typing.Optional[str] = OMIT,
-        embedding_model: typing.Optional[str] = OMIT,
         embedding_model_name: typing.Optional[str] = OMIT,
         score_threshold: typing.Optional[float] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -1112,15 +1187,11 @@ class RawAdvancedChatClient:
         action : ConfigureAnnotationReplyByAppAdvancedChatRequestAction
             Action, can only be 'enable' or 'disable'
 
-        embedding_model_provider : typing.Optional[str]
+        embedding_provider_name : typing.Optional[str]
             Specified embedding model provider, must be configured in the system first, corresponds to the provider field
 
-        embedding_provider_name : typing.Optional[str]
-
-        embedding_model : typing.Optional[str]
-            Specified embedding model, corresponds to the model field
-
         embedding_model_name : typing.Optional[str]
+            Specified embedding model, corresponds to the model field
 
         score_threshold : typing.Optional[float]
             Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply
@@ -1137,9 +1208,7 @@ class RawAdvancedChatClient:
             f"apps/annotation-reply/{jsonable_encoder(action)}",
             method="POST",
             json={
-                "embedding_model_provider": embedding_model_provider,
                 "embedding_provider_name": embedding_provider_name,
-                "embedding_model": embedding_model,
                 "embedding_model_name": embedding_model_name,
                 "score_threshold": score_threshold,
             },
@@ -1315,9 +1384,9 @@ class AsyncRawAdvancedChatClient:
                     if _response.status_code == 404:
                         raise NotFoundError(
                             typing.cast(
-                                Error,
+                                typing.Optional[typing.Any],
                                 parse_obj_as(
-                                    type_=Error,  # type: ignore
+                                    type_=typing.Optional[typing.Any],  # type: ignore
                                     object_=_response.json(),
                                 ),
                             )
@@ -2014,6 +2083,80 @@ class AsyncRawAdvancedChatClient:
             raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
         raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
+    async def get_conversation_variables_by_app_advanced_chat(
+        self,
+        conversation_id: str,
+        *,
+        user: str,
+        last_id: typing.Optional[str] = None,
+        limit: typing.Optional[int] = None,
+        variable_name: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AsyncHttpResponse[GetConversationVariablesByAppAdvancedChatResponse]:
+        """
+        Retrieve variables from a specific conversation. This endpoint is useful for extracting structured data captured during conversations.
+
+        Parameters
+        ----------
+        conversation_id : str
+            The conversation ID to retrieve variables from.
+
+        user : str
+            User identifier, defined by developer rules, must be unique within the application.
+
+        last_id : typing.Optional[str]
+            (Optional) ID of the last record on the current page, default null
+
+        limit : typing.Optional[int]
+            (Optional) Number of records to return per request, default 20, maximum 100, minimum 1.
+
+        variable_name : typing.Optional[str]
+            (Optional) Variable name filter
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[GetConversationVariablesByAppAdvancedChatResponse]
+            Successful response
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"conversations/{jsonable_encoder(conversation_id)}/variables",
+            method="GET",
+            params={
+                "user": user,
+                "last_id": last_id,
+                "limit": limit,
+                "variable_name": variable_name,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    GetConversationVariablesByAppAdvancedChatResponse,
+                    parse_obj_as(
+                        type_=GetConversationVariablesByAppAdvancedChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
     async def get_app_meta_info_by_app_advanced_chat(
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> AsyncHttpResponse[GetAppMetaInfoByAppAdvancedChatResponse]:
@@ -2246,9 +2389,7 @@ class AsyncRawAdvancedChatClient:
         self,
         action: ConfigureAnnotationReplyByAppAdvancedChatRequestAction,
         *,
-        embedding_model_provider: typing.Optional[str] = OMIT,
         embedding_provider_name: typing.Optional[str] = OMIT,
-        embedding_model: typing.Optional[str] = OMIT,
         embedding_model_name: typing.Optional[str] = OMIT,
         score_threshold: typing.Optional[float] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -2261,15 +2402,11 @@ class AsyncRawAdvancedChatClient:
         action : ConfigureAnnotationReplyByAppAdvancedChatRequestAction
             Action, can only be 'enable' or 'disable'
 
-        embedding_model_provider : typing.Optional[str]
+        embedding_provider_name : typing.Optional[str]
             Specified embedding model provider, must be configured in the system first, corresponds to the provider field
 
-        embedding_provider_name : typing.Optional[str]
-
-        embedding_model : typing.Optional[str]
-            Specified embedding model, corresponds to the model field
-
         embedding_model_name : typing.Optional[str]
+            Specified embedding model, corresponds to the model field
 
         score_threshold : typing.Optional[float]
             Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply
@@ -2286,9 +2423,7 @@ class AsyncRawAdvancedChatClient:
             f"apps/annotation-reply/{jsonable_encoder(action)}",
             method="POST",
             json={
-                "embedding_model_provider": embedding_model_provider,
                 "embedding_provider_name": embedding_provider_name,
-                "embedding_model": embedding_model,
                 "embedding_model_name": embedding_model_name,
                 "score_threshold": score_threshold,
             },

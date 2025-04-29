@@ -442,9 +442,7 @@ class GenerationClient:
         self,
         action: ConfigureAnnotationReplyByAppGenerationRequestAction,
         *,
-        embedding_model_provider: typing.Optional[str] = OMIT,
         embedding_provider_name: typing.Optional[str] = OMIT,
-        embedding_model: typing.Optional[str] = OMIT,
         embedding_model_name: typing.Optional[str] = OMIT,
         score_threshold: typing.Optional[float] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -457,15 +455,11 @@ class GenerationClient:
         action : ConfigureAnnotationReplyByAppGenerationRequestAction
             Action, can only be 'enable' or 'disable'
 
-        embedding_model_provider : typing.Optional[str]
+        embedding_provider_name : typing.Optional[str]
             Specified embedding model provider, must be configured in the system first, corresponds to the provider field
 
-        embedding_provider_name : typing.Optional[str]
-
-        embedding_model : typing.Optional[str]
-            Specified embedding model, corresponds to the model field
-
         embedding_model_name : typing.Optional[str]
+            Specified embedding model, corresponds to the model field
 
         score_threshold : typing.Optional[float]
             Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply
@@ -486,9 +480,7 @@ class GenerationClient:
         """
         _response = self._raw_client.configure_annotation_reply_by_app_generation(
             action,
-            embedding_model_provider=embedding_model_provider,
             embedding_provider_name=embedding_provider_name,
-            embedding_model=embedding_model,
             embedding_model_name=embedding_model_name,
             score_threshold=score_threshold,
             request_options=request_options,
@@ -995,9 +987,7 @@ class AsyncGenerationClient:
         self,
         action: ConfigureAnnotationReplyByAppGenerationRequestAction,
         *,
-        embedding_model_provider: typing.Optional[str] = OMIT,
         embedding_provider_name: typing.Optional[str] = OMIT,
-        embedding_model: typing.Optional[str] = OMIT,
         embedding_model_name: typing.Optional[str] = OMIT,
         score_threshold: typing.Optional[float] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -1010,15 +1000,11 @@ class AsyncGenerationClient:
         action : ConfigureAnnotationReplyByAppGenerationRequestAction
             Action, can only be 'enable' or 'disable'
 
-        embedding_model_provider : typing.Optional[str]
+        embedding_provider_name : typing.Optional[str]
             Specified embedding model provider, must be configured in the system first, corresponds to the provider field
 
-        embedding_provider_name : typing.Optional[str]
-
-        embedding_model : typing.Optional[str]
-            Specified embedding model, corresponds to the model field
-
         embedding_model_name : typing.Optional[str]
+            Specified embedding model, corresponds to the model field
 
         score_threshold : typing.Optional[float]
             Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply
@@ -1042,9 +1028,7 @@ class AsyncGenerationClient:
         """
         _response = await self._raw_client.configure_annotation_reply_by_app_generation(
             action,
-            embedding_model_provider=embedding_model_provider,
             embedding_provider_name=embedding_provider_name,
-            embedding_model=embedding_model,
             embedding_model_name=embedding_model_name,
             score_threshold=score_threshold,
             request_options=request_options,

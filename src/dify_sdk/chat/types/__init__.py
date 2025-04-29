@@ -52,7 +52,10 @@ from .get_application_parameters_by_app_chat_response_system_parameters import (
 from .get_conversation_list_by_app_chat_request_sort_by import GetConversationListByAppChatRequestSortBy
 from .get_conversation_list_by_app_chat_response import GetConversationListByAppChatResponse
 from .get_conversation_messages_by_app_chat_response import GetConversationMessagesByAppChatResponse
+from .get_conversation_variables_by_app_chat_response import GetConversationVariablesByAppChatResponse
+from .get_conversation_variables_by_app_chat_response_data_item import GetConversationVariablesByAppChatResponseDataItem
 from .get_suggested_questions_by_app_chat_response import GetSuggestedQuestionsByAppChatResponse
+from .not_found_error_body import NotFoundErrorBody
 from .retriever_resource import RetrieverResource
 from .send_chat_message_by_app_chat_request_files_item import SendChatMessageByAppChatRequestFilesItem
 from .send_chat_message_by_app_chat_request_files_item_transfer_method import (
@@ -104,7 +107,10 @@ __all__ = [
     "GetConversationListByAppChatRequestSortBy",
     "GetConversationListByAppChatResponse",
     "GetConversationMessagesByAppChatResponse",
+    "GetConversationVariablesByAppChatResponse",
+    "GetConversationVariablesByAppChatResponseDataItem",
     "GetSuggestedQuestionsByAppChatResponse",
+    "NotFoundErrorBody",
     "RetrieverResource",
     "SendChatMessageByAppChatRequestFilesItem",
     "SendChatMessageByAppChatRequestFilesItemTransferMethod",

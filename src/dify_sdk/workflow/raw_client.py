@@ -136,9 +136,9 @@ class RawWorkflowClient:
                     if _response.status_code == 404:
                         raise NotFoundError(
                             typing.cast(
-                                Error,
+                                typing.Optional[typing.Any],
                                 parse_obj_as(
-                                    type_=Error,  # type: ignore
+                                    type_=typing.Optional[typing.Any],  # type: ignore
                                     object_=_response.json(),
                                 ),
                             )
@@ -219,9 +219,9 @@ class RawWorkflowClient:
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -308,9 +308,9 @@ class RawWorkflowClient:
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -408,9 +408,9 @@ class RawWorkflowClient:
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -596,9 +596,9 @@ class RawWorkflowClient:
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -672,9 +672,9 @@ class RawWorkflowClient:
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -797,9 +797,9 @@ class AsyncRawWorkflowClient:
                     if _response.status_code == 404:
                         raise NotFoundError(
                             typing.cast(
-                                Error,
+                                typing.Optional[typing.Any],
                                 parse_obj_as(
-                                    type_=Error,  # type: ignore
+                                    type_=typing.Optional[typing.Any],  # type: ignore
                                     object_=_response.json(),
                                 ),
                             )
@@ -880,9 +880,9 @@ class AsyncRawWorkflowClient:
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -969,9 +969,9 @@ class AsyncRawWorkflowClient:
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1069,9 +1069,9 @@ class AsyncRawWorkflowClient:
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1257,9 +1257,9 @@ class AsyncRawWorkflowClient:
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1333,9 +1333,9 @@ class AsyncRawWorkflowClient:
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )

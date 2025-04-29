@@ -64,10 +64,15 @@ from .get_conversation_messages_by_app_advanced_chat_response_data_item_message_
 from .get_conversation_messages_by_app_advanced_chat_response_data_item_message_files_item_belongs_to import (
     GetConversationMessagesByAppAdvancedChatResponseDataItemMessageFilesItemBelongsTo,
 )
+from .get_conversation_variables_by_app_advanced_chat_response import GetConversationVariablesByAppAdvancedChatResponse
+from .get_conversation_variables_by_app_advanced_chat_response_data_item import (
+    GetConversationVariablesByAppAdvancedChatResponseDataItem,
+)
 from .get_conversations_by_app_advanced_chat_request_sort_by import GetConversationsByAppAdvancedChatRequestSortBy
 from .get_conversations_by_app_advanced_chat_response import GetConversationsByAppAdvancedChatResponse
 from .get_conversations_by_app_advanced_chat_response_data_item import GetConversationsByAppAdvancedChatResponseDataItem
 from .get_suggested_questions_by_app_advanced_chat_response import GetSuggestedQuestionsByAppAdvancedChatResponse
+from .not_found_error_body import NotFoundErrorBody
 from .rename_conversation_by_app_advanced_chat_response import RenameConversationByAppAdvancedChatResponse
 from .retriever_resource import RetrieverResource
 from .send_chat_message_by_app_advanced_chat_request_response_mode import (
@@ -114,10 +119,13 @@ __all__ = [
     "GetConversationMessagesByAppAdvancedChatResponseDataItemFeedbackRating",
     "GetConversationMessagesByAppAdvancedChatResponseDataItemMessageFilesItem",
     "GetConversationMessagesByAppAdvancedChatResponseDataItemMessageFilesItemBelongsTo",
+    "GetConversationVariablesByAppAdvancedChatResponse",
+    "GetConversationVariablesByAppAdvancedChatResponseDataItem",
     "GetConversationsByAppAdvancedChatRequestSortBy",
     "GetConversationsByAppAdvancedChatResponse",
     "GetConversationsByAppAdvancedChatResponseDataItem",
     "GetSuggestedQuestionsByAppAdvancedChatResponse",
+    "NotFoundErrorBody",
     "RenameConversationByAppAdvancedChatResponse",
     "RetrieverResource",
     "SendChatMessageByAppAdvancedChatRequestResponseMode",

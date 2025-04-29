@@ -37,6 +37,7 @@ from .types.get_application_parameters_by_app_chat_response import GetApplicatio
 from .types.get_conversation_list_by_app_chat_request_sort_by import GetConversationListByAppChatRequestSortBy
 from .types.get_conversation_list_by_app_chat_response import GetConversationListByAppChatResponse
 from .types.get_conversation_messages_by_app_chat_response import GetConversationMessagesByAppChatResponse
+from .types.get_conversation_variables_by_app_chat_response import GetConversationVariablesByAppChatResponse
 from .types.get_suggested_questions_by_app_chat_response import GetSuggestedQuestionsByAppChatResponse
 from .types.send_chat_message_by_app_chat_request_files_item import SendChatMessageByAppChatRequestFilesItem
 from .types.send_chat_message_by_app_chat_request_response_mode import SendChatMessageByAppChatRequestResponseMode
@@ -156,9 +157,9 @@ class RawChatClient:
                     if _response.status_code == 404:
                         raise NotFoundError(
                             typing.cast(
-                                Error,
+                                typing.Optional[typing.Any],
                                 parse_obj_as(
-                                    type_=Error,  # type: ignore
+                                    type_=typing.Optional[typing.Any],  # type: ignore
                                     object_=_response.json(),
                                 ),
                             )
@@ -344,6 +345,75 @@ class RawChatClient:
                     ),
                 )
                 return HttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+    def get_conversation_variables_by_app_chat(
+        self,
+        conversation_id: str,
+        *,
+        user: str,
+        last_id: typing.Optional[str] = None,
+        limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> HttpResponse[GetConversationVariablesByAppChatResponse]:
+        """
+        Retrieve variables from a specific conversation. This endpoint is useful for extracting structured data captured during conversations.
+
+        Parameters
+        ----------
+        conversation_id : str
+            ID of the conversation to retrieve variables from
+
+        user : str
+            User identifier, defined by developer rules, must be unique within the application
+
+        last_id : typing.Optional[str]
+            (Optional) ID of the last record on the current page, default null
+
+        limit : typing.Optional[int]
+            (Optional) Number of records to return per request, default 20, max 100, min 1
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[GetConversationVariablesByAppChatResponse]
+            Successfully retrieved variables
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"conversations/{jsonable_encoder(conversation_id)}/variables",
+            method="GET",
+            params={
+                "user": user,
+                "last_id": last_id,
+                "limit": limit,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    GetConversationVariablesByAppChatResponse,
+                    parse_obj_as(
+                        type_=GetConversationVariablesByAppChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
@@ -1079,9 +1149,7 @@ class RawChatClient:
         self,
         action: ConfigureAnnotationReplyByAppChatRequestAction,
         *,
-        embedding_model_provider: typing.Optional[str] = OMIT,
         embedding_provider_name: typing.Optional[str] = OMIT,
-        embedding_model: typing.Optional[str] = OMIT,
         embedding_model_name: typing.Optional[str] = OMIT,
         score_threshold: typing.Optional[float] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -1094,15 +1162,11 @@ class RawChatClient:
         action : ConfigureAnnotationReplyByAppChatRequestAction
             Action, can only be 'enable' or 'disable'
 
-        embedding_model_provider : typing.Optional[str]
+        embedding_provider_name : typing.Optional[str]
             Specified embedding model provider, must be configured in the system first, corresponds to the provider field
 
-        embedding_provider_name : typing.Optional[str]
-
-        embedding_model : typing.Optional[str]
-            Specified embedding model, corresponds to the model field
-
         embedding_model_name : typing.Optional[str]
+            Specified embedding model, corresponds to the model field
 
         score_threshold : typing.Optional[float]
             Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply
@@ -1119,9 +1183,7 @@ class RawChatClient:
             f"apps/annotation-reply/{jsonable_encoder(action)}",
             method="POST",
             json={
-                "embedding_model_provider": embedding_model_provider,
                 "embedding_provider_name": embedding_provider_name,
-                "embedding_model": embedding_model,
                 "embedding_model_name": embedding_model_name,
                 "score_threshold": score_threshold,
             },
@@ -1300,9 +1362,9 @@ class AsyncRawChatClient:
                     if _response.status_code == 404:
                         raise NotFoundError(
                             typing.cast(
-                                Error,
+                                typing.Optional[typing.Any],
                                 parse_obj_as(
-                                    type_=Error,  # type: ignore
+                                    type_=typing.Optional[typing.Any],  # type: ignore
                                     object_=_response.json(),
                                 ),
                             )
@@ -1488,6 +1550,75 @@ class AsyncRawChatClient:
                     ),
                 )
                 return AsyncHttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+    async def get_conversation_variables_by_app_chat(
+        self,
+        conversation_id: str,
+        *,
+        user: str,
+        last_id: typing.Optional[str] = None,
+        limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AsyncHttpResponse[GetConversationVariablesByAppChatResponse]:
+        """
+        Retrieve variables from a specific conversation. This endpoint is useful for extracting structured data captured during conversations.
+
+        Parameters
+        ----------
+        conversation_id : str
+            ID of the conversation to retrieve variables from
+
+        user : str
+            User identifier, defined by developer rules, must be unique within the application
+
+        last_id : typing.Optional[str]
+            (Optional) ID of the last record on the current page, default null
+
+        limit : typing.Optional[int]
+            (Optional) Number of records to return per request, default 20, max 100, min 1
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[GetConversationVariablesByAppChatResponse]
+            Successfully retrieved variables
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"conversations/{jsonable_encoder(conversation_id)}/variables",
+            method="GET",
+            params={
+                "user": user,
+                "last_id": last_id,
+                "limit": limit,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    GetConversationVariablesByAppChatResponse,
+                    parse_obj_as(
+                        type_=GetConversationVariablesByAppChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
@@ -2224,9 +2355,7 @@ class AsyncRawChatClient:
         self,
         action: ConfigureAnnotationReplyByAppChatRequestAction,
         *,
-        embedding_model_provider: typing.Optional[str] = OMIT,
         embedding_provider_name: typing.Optional[str] = OMIT,
-        embedding_model: typing.Optional[str] = OMIT,
         embedding_model_name: typing.Optional[str] = OMIT,
         score_threshold: typing.Optional[float] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -2239,15 +2368,11 @@ class AsyncRawChatClient:
         action : ConfigureAnnotationReplyByAppChatRequestAction
             Action, can only be 'enable' or 'disable'
 
-        embedding_model_provider : typing.Optional[str]
+        embedding_provider_name : typing.Optional[str]
             Specified embedding model provider, must be configured in the system first, corresponds to the provider field
 
-        embedding_provider_name : typing.Optional[str]
-
-        embedding_model : typing.Optional[str]
-            Specified embedding model, corresponds to the model field
-
         embedding_model_name : typing.Optional[str]
+            Specified embedding model, corresponds to the model field
 
         score_threshold : typing.Optional[float]
             Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply
@@ -2264,9 +2389,7 @@ class AsyncRawChatClient:
             f"apps/annotation-reply/{jsonable_encoder(action)}",
             method="POST",
             json={
-                "embedding_model_provider": embedding_model_provider,
                 "embedding_provider_name": embedding_provider_name,
-                "embedding_model": embedding_model,
                 "embedding_model_name": embedding_model_name,
                 "score_threshold": score_threshold,
             },

@@ -33,6 +33,9 @@ from .types.get_application_parameters_by_app_advanced_chat_response import (
 from .types.get_conversation_messages_by_app_advanced_chat_response import (
     GetConversationMessagesByAppAdvancedChatResponse,
 )
+from .types.get_conversation_variables_by_app_advanced_chat_response import (
+    GetConversationVariablesByAppAdvancedChatResponse,
+)
 from .types.get_conversations_by_app_advanced_chat_request_sort_by import GetConversationsByAppAdvancedChatRequestSortBy
 from .types.get_conversations_by_app_advanced_chat_response import GetConversationsByAppAdvancedChatResponse
 from .types.get_suggested_questions_by_app_advanced_chat_response import GetSuggestedQuestionsByAppAdvancedChatResponse
@@ -566,6 +569,60 @@ class AdvancedChatClient:
         )
         return _response.data
 
+    def get_conversation_variables_by_app_advanced_chat(
+        self,
+        conversation_id: str,
+        *,
+        user: str,
+        last_id: typing.Optional[str] = None,
+        limit: typing.Optional[int] = None,
+        variable_name: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetConversationVariablesByAppAdvancedChatResponse:
+        """
+        Retrieve variables from a specific conversation. This endpoint is useful for extracting structured data captured during conversations.
+
+        Parameters
+        ----------
+        conversation_id : str
+            The conversation ID to retrieve variables from.
+
+        user : str
+            User identifier, defined by developer rules, must be unique within the application.
+
+        last_id : typing.Optional[str]
+            (Optional) ID of the last record on the current page, default null
+
+        limit : typing.Optional[int]
+            (Optional) Number of records to return per request, default 20, maximum 100, minimum 1.
+
+        variable_name : typing.Optional[str]
+            (Optional) Variable name filter
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetConversationVariablesByAppAdvancedChatResponse
+            Successful response
+
+        Examples
+        --------
+        from dify import DifyApi
+        client = DifyApi(token="YOUR_TOKEN", )
+        client.advanced_chat.get_conversation_variables_by_app_advanced_chat(conversation_id='conversation_id', user='user', )
+        """
+        _response = self._raw_client.get_conversation_variables_by_app_advanced_chat(
+            conversation_id,
+            user=user,
+            last_id=last_id,
+            limit=limit,
+            variable_name=variable_name,
+            request_options=request_options,
+        )
+        return _response.data
+
     def get_app_meta_info_by_app_advanced_chat(
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> GetAppMetaInfoByAppAdvancedChatResponse:
@@ -731,9 +788,7 @@ class AdvancedChatClient:
         self,
         action: ConfigureAnnotationReplyByAppAdvancedChatRequestAction,
         *,
-        embedding_model_provider: typing.Optional[str] = OMIT,
         embedding_provider_name: typing.Optional[str] = OMIT,
-        embedding_model: typing.Optional[str] = OMIT,
         embedding_model_name: typing.Optional[str] = OMIT,
         score_threshold: typing.Optional[float] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -746,15 +801,11 @@ class AdvancedChatClient:
         action : ConfigureAnnotationReplyByAppAdvancedChatRequestAction
             Action, can only be 'enable' or 'disable'
 
-        embedding_model_provider : typing.Optional[str]
+        embedding_provider_name : typing.Optional[str]
             Specified embedding model provider, must be configured in the system first, corresponds to the provider field
 
-        embedding_provider_name : typing.Optional[str]
-
-        embedding_model : typing.Optional[str]
-            Specified embedding model, corresponds to the model field
-
         embedding_model_name : typing.Optional[str]
+            Specified embedding model, corresponds to the model field
 
         score_threshold : typing.Optional[float]
             Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply
@@ -775,9 +826,7 @@ class AdvancedChatClient:
         """
         _response = self._raw_client.configure_annotation_reply_by_app_advanced_chat(
             action,
-            embedding_model_provider=embedding_model_provider,
             embedding_provider_name=embedding_provider_name,
-            embedding_model=embedding_model,
             embedding_model_name=embedding_model_name,
             score_threshold=score_threshold,
             request_options=request_options,
@@ -1379,6 +1428,63 @@ class AsyncAdvancedChatClient:
         )
         return _response.data
 
+    async def get_conversation_variables_by_app_advanced_chat(
+        self,
+        conversation_id: str,
+        *,
+        user: str,
+        last_id: typing.Optional[str] = None,
+        limit: typing.Optional[int] = None,
+        variable_name: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetConversationVariablesByAppAdvancedChatResponse:
+        """
+        Retrieve variables from a specific conversation. This endpoint is useful for extracting structured data captured during conversations.
+
+        Parameters
+        ----------
+        conversation_id : str
+            The conversation ID to retrieve variables from.
+
+        user : str
+            User identifier, defined by developer rules, must be unique within the application.
+
+        last_id : typing.Optional[str]
+            (Optional) ID of the last record on the current page, default null
+
+        limit : typing.Optional[int]
+            (Optional) Number of records to return per request, default 20, maximum 100, minimum 1.
+
+        variable_name : typing.Optional[str]
+            (Optional) Variable name filter
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetConversationVariablesByAppAdvancedChatResponse
+            Successful response
+
+        Examples
+        --------
+        from dify import AsyncDifyApi
+        import asyncio
+        client = AsyncDifyApi(token="YOUR_TOKEN", )
+        async def main() -> None:
+            await client.advanced_chat.get_conversation_variables_by_app_advanced_chat(conversation_id='conversation_id', user='user', )
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.get_conversation_variables_by_app_advanced_chat(
+            conversation_id,
+            user=user,
+            last_id=last_id,
+            limit=limit,
+            variable_name=variable_name,
+            request_options=request_options,
+        )
+        return _response.data
+
     async def get_app_meta_info_by_app_advanced_chat(
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> GetAppMetaInfoByAppAdvancedChatResponse:
@@ -1559,9 +1665,7 @@ class AsyncAdvancedChatClient:
         self,
         action: ConfigureAnnotationReplyByAppAdvancedChatRequestAction,
         *,
-        embedding_model_provider: typing.Optional[str] = OMIT,
         embedding_provider_name: typing.Optional[str] = OMIT,
-        embedding_model: typing.Optional[str] = OMIT,
         embedding_model_name: typing.Optional[str] = OMIT,
         score_threshold: typing.Optional[float] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -1574,15 +1678,11 @@ class AsyncAdvancedChatClient:
         action : ConfigureAnnotationReplyByAppAdvancedChatRequestAction
             Action, can only be 'enable' or 'disable'
 
-        embedding_model_provider : typing.Optional[str]
+        embedding_provider_name : typing.Optional[str]
             Specified embedding model provider, must be configured in the system first, corresponds to the provider field
 
-        embedding_provider_name : typing.Optional[str]
-
-        embedding_model : typing.Optional[str]
-            Specified embedding model, corresponds to the model field
-
         embedding_model_name : typing.Optional[str]
+            Specified embedding model, corresponds to the model field
 
         score_threshold : typing.Optional[float]
             Similarity score threshold, when similarity is greater than this threshold, the system will automatically reply, otherwise it will not reply
@@ -1606,9 +1706,7 @@ class AsyncAdvancedChatClient:
         """
         _response = await self._raw_client.configure_annotation_reply_by_app_advanced_chat(
             action,
-            embedding_model_provider=embedding_model_provider,
             embedding_provider_name=embedding_provider_name,
-            embedding_model=embedding_model,
             embedding_model_name=embedding_model_name,
             score_threshold=score_threshold,
             request_options=request_options,
