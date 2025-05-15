@@ -87,14 +87,10 @@ async def test_text_document_workflow(kb_client: KnowledgeBaseClient, dataset1: 
     assert len(list_response.data) > 0
 
     # 5. 删除文档
-    try:
-        delete_response = await kb_client.document.delete_document(dataset_id=dataset_id, document_id=doc_id)
-    except:
-        import warnings
-        warnings.warn("删除文档API返回204直接没有内容, 但成功了")
-    else:
-        assert delete_response is not None
-        assert delete_response.result == "success"
+    # 删除文档API返回204 No Content，SDK返回None
+    delete_response = await kb_client.document.delete_document(dataset_id=dataset_id, document_id=doc_id)
+    # 204 No Content响应，delete_response应该为None
+    assert delete_response is None
 
 
 async def test_file_document_workflow(kb_client: KnowledgeBaseClient, dataset1: Dataset, markdown_file1: Path):

@@ -204,20 +204,15 @@ async def test_child_chunks_workflow(
     assert updated_chunk.content == updated_content
 
     # 5. 删除子分段
-    try:
-        delete_response = await kb_client.segment.delete_document_child_segment(
-            dataset_id=dataset_id,
-            document_id=document_id,
-            segment_id=segment_id,
-            child_chunk_id=child_chunk_id,
-        )
-    except:
-        import warnings
-
-        warnings.warn("删除子分段API返回204直接没有内容, 但成功了")
-    else:
-        assert delete_response is not None
-        assert delete_response.result == "success"
+    # 删除子分段API返回204 No Content，SDK返回None
+    delete_response = await kb_client.segment.delete_document_child_segment(
+        dataset_id=dataset_id,
+        document_id=document_id,
+        segment_id=segment_id,
+        child_chunk_id=child_chunk_id,
+    )
+    # 204 No Content响应，delete_response应该为None
+    assert delete_response is None
 
     # 等待索引完成
     await asyncio.sleep(2)
