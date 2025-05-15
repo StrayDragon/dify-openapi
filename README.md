@@ -66,6 +66,8 @@ Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, whic
   - [x] DELETE /conversations/{conversation_id} - Delete conversation
   - [x] GET /messages - Get conversation history messages
   - [x] GET /conversations/{conversation_id}/variables - Get conversation variables
+  - [x] GET /app/feedbacks - Get application feedbacks
+  - [x] GET /site - Get application WebApp settings
   - [x] GET /info - Get application basic information
   - [x] GET /parameters - Get application parameters
 
@@ -78,6 +80,8 @@ Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, whic
   - [x] DELETE /apps/annotations/{annotation_id} - Delete annotation
   - [x] POST /apps/annotation-reply/{action} - Initialize annotation reply settings
   - [x] GET /apps/annotation-reply/{action}/status/{job_id} - Check annotation reply settings status
+  - [x] GET /app/feedbacks - Get application feedbacks
+  - [x] GET /site - Get application WebApp settings
   - [x] GET /conversations/{conversation_id}/variables - Get conversation variables
 
 - Text Generation Application: [OpenAPI Schema(中文)](./schema/app_generation.zh.yaml) | [OpenAPI Schema(English)](./schema/app_generation.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.4.0/web/app/components/develop/template)
@@ -88,6 +92,7 @@ Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, whic
   - [x] GET /workflows/run/{workflow_run_id} - Get workflow execution status
   - [x] POST /workflows/tasks/{task_id}/stop - Stop response
   - [x] GET /workflows/logs - Get workflow logs
+  - [x] GET /site - Get application WebApp settings
 
 - External Knowledge: [OpenAPI Schema(中文)](./schema/external_knowledge_base.zh.yaml) | [OpenAPI Schema(English)](./schema/external_knowledge_base.en.yaml) | [Official Documentation Source](https://docs.dify.ai/v1.2.0/guides/knowledge-base/external-knowledge-api-documentation)
   - [ ] POST /retrieval - Retrieve knowledge content

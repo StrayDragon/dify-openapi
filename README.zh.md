@@ -68,6 +68,8 @@
   - [x] DELETE /conversations/{conversation_id} - 删除会话
   - [x] GET /messages - 获取会话历史消息
   - [x] GET /conversations/{conversation_id}/variables - 获取对话变量
+  - [x] GET /app/feedbacks - 获取应用反馈
+  - [x] GET /site - 获取应用WebApp设置
   - [x] GET /info - 获取应用基本信息
   - [x] GET /parameters - 获取应用参数
 
@@ -80,6 +82,8 @@
   - [x] DELETE /apps/annotations/{annotation_id} - 删除标注
   - [x] POST /apps/annotation-reply/{action} - 初始化标注回复设置
   - [x] GET /apps/annotation-reply/{action}/status/{job_id} - 检查标注回复设置状态
+  - [x] GET /app/feedbacks - 获取应用反馈
+  - [x] GET /site - 获取应用WebApp设置
   - [x] GET /conversations/{conversation_id}/variables - 获取对话变量
 
 - 文本生成应用: [OpenAPI Schema(中文)](./schema/app_generation.zh.yaml) | [OpenAPI Schema(English)](./schema/app_generation.en.yaml) | [官方文档源码](https://github.com/langgenius/dify/tree/1.4.0/web/app/components/develop/template)
@@ -90,6 +94,7 @@
   - [x] GET /workflows/run/{workflow_run_id} - 获取工作流执行状态
   - [x] POST /workflows/tasks/{task_id}/stop - 停止响应
   - [x] GET /workflows/logs - 获取工作流日志
+  - [x] GET /site - 获取应用WebApp设置
 
 - 外部知识库: [OpenAPI Schema(中文)](./schema/external_knowledge_base.zh.yaml) | [OpenAPI Schema(English)](./schema/external_knowledge_base.en.yaml) | [官方文档源码](https://docs.dify.ai/v1.2.0/guides/knowledge-base/external-knowledge-api-documentation)
   - [ ] POST /retrieval - 检索知识内容
