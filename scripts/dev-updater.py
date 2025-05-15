@@ -101,7 +101,7 @@ NOTE:
 
 
 def more_test_coverage_prompt(v1: str, v2: str):
-    prompt =  f"""
+    prompt = f"""
 I already update the @src/dify_sdk by `just gen-client`, maybe some tests is broken, please fix @tests/ base on original logic and test by `just test` for check result, after check and maybe fix, you need to based on @src/dify_sdk/ and @misc/official_api_doc_changes/{v1}__{v2}.diff write new tests, and you can see changed schema in last git commits
 """.strip()
     print(
@@ -111,6 +111,20 @@ I already update the @src/dify_sdk by `just gen-client`, maybe some tests is bro
     CB.copy(prompt)
     return prompt
 
+
+def update_readme_prompt(v1: str, v2: str) -> str:
+    diff_file_path = f"misc/official_api_doc_changes/{v1}__{v2}.diff"
+    prompt = f"""
+please based on recently schema changed (by git diff) and tests to update README.md and README.zh.md support apis
+
+a short diff file between {v1} to {v2} change, you can find it in {diff_file_path}
+""".strip()
+    print(
+        "\n" + prompt,
+        end="\n\n",
+    )
+    CB.copy(prompt)
+    return prompt
 
 
 class SchemaGenerator:
@@ -574,14 +588,9 @@ def main():
     v2 = str(v2).strip()
 
     if args.mode == "prompt":
-        schema_upgrade_prompt(
-            v1=v1,
-            v2=v2,
-        )
-        more_test_coverage_prompt(
-            v1=v1,
-            v2=v2,
-        )
+        schema_upgrade_prompt(v1=v1, v2=v2)
+        more_test_coverage_prompt(v1=v1, v2=v2)
+        update_readme_prompt(v1=v1, v2=v2)
     elif args.mode == "rag":
         rag_schema_generator(
             schema_key=args.schema,
