@@ -17,9 +17,6 @@ servers:
         description: Custom API server URL
   - url: 'http://ai.urchinet.lan/v1'
     description: author of dify-openapi dev server
-tags:
-  - name: chat
-    description: Chat Application Operations
 security:
   - bearerApiKeyAuth: []
 components:

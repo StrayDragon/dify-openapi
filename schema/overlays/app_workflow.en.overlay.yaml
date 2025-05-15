@@ -14,7 +14,7 @@ actions:
         Workflow applications have no session support and are suitable for translation/article writing/summarization AI, etc.
         All API requests require an application-level API-Key in the Authorization HTTP Header.
         It is strongly recommended that developers store the API-Key on the backend rather than sharing or storing it on the client to prevent API-Key leakage and financial loss.
-        official raw document: https://github.com/langgenius/dify/blob/1.3.1/web/app/components/develop/template/template_workflow.en.mdx
+        official raw document: https://github.com/langgenius/dify/blob/1.4.0/web/app/components/develop/template/template_workflow.en.mdx
 
   - target: $.servers[0]
     update:
@@ -147,6 +147,7 @@ actions:
       - `event: message` Message event, used to deliver simple text messages
       - `event: workflow_started` workflow execution starts
       - `event: node_started` node execution starts
+      - `event: text_chunk` Text fragment
       - `event: node_finished` node execution ends, success or failure with different statuses in the same event
       - `event: workflow_finished` workflow execution ends, success or failure with different statuses in the same event
       - `event: tts_message` TTS audio stream event, i.e., speech synthesis output. The content is an audio block in Mp3 format, encoded as a base64 string, which can be directly decoded when playing. (Only present when auto-play is enabled)
@@ -234,6 +235,12 @@ actions:
   - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.total_tokens.description
     update: "Total tokens used"
 
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.text.description
+    update: "Text content"
+
+  - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.from_variable_selector.description
+    update: "Text source path, helping developers understand which node's variable generated the text"
+
   - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.created_at.description
     update: "Start time"
 
@@ -306,7 +313,7 @@ actions:
       Returns App output stream chunks, Content-Type is text/event-stream.
       Each stream chunk starts with data: and chunks are separated by `\n\n` (two newlines), as shown below:
 
-      data: {"event": "message", "task_id": "900bbd43-dc0b-4383-a372-aa6e6c414227", "workflow_run_id": "663c5084-a254-4040-8ad3-51f2a3c1a77c", "answer": "Hi", "created_at": 1705398420}\n\n
+      data: {"event": "text_chunk", "workflow_run_id": "b85e5fc5-751b-454d-b14e-dc5f240b0a31", "task_id": "bd029338-b068-4d34-a331-fc85478922c2", "data": {"text": "\u4e3a\u4e86", "from_variable_selector": ["1745912968134", "text"]}}\n\n
 
       Stream chunks have different structures based on the `event` type:
 
@@ -332,6 +339,13 @@ actions:
           - `predecessor_node_id` (string) Predecessor node ID, used to display execution path on canvas
           - `inputs` (object) All predecessor node variable content used in the node
           - `created_at` (timestamp) Start time
+      - `event: text_chunk` Text fragment
+        - `task_id` (string) Task ID, used for request tracking and stopping response
+        - `workflow_run_id` (string) workflow execution ID
+        - `event` (string) Fixed as text_chunk
+        - `data` (object) Detailed content
+          - `text` (string) Text content
+          - `from_variable_selector` (array) Text source path, helping developers understand which node's variable generated the text
       - `event: node_finished` node execution ends, success or failure with different statuses in the same event
         - `task_id` (string) Task ID, used for request tracking and stopping response
         - `workflow_run_id` (string) workflow execution ID
@@ -684,3 +698,44 @@ actions:
 
   - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.system_parameters.properties.video_file_size_limit.description
     update: "Video file upload size limit (MB)"
+
+  - target: $.paths['/site'].get
+    update:
+      summary: "Get Application WebApp Settings"
+      description: "Used to get the WebApp settings of the application"
+
+  - target: $.paths['/site'].get.responses['200'].description
+    update: "Successfully retrieved application WebApp settings"
+
+  - target: $.paths['/site'].get.responses['200'].content['application/json'].schema.properties.title.description
+    update: "WebApp name"
+
+  - target: $.paths['/site'].get.responses['200'].content['application/json'].schema.properties.icon_type.description
+    update: "Icon type, `emoji`-emoji, `image`-image"
+
+  - target: $.paths['/site'].get.responses['200'].content['application/json'].schema.properties.icon.description
+    update: "Icon, if the type is `emoji`, it's an emoji symbol, if the type is `image`, it's an image URL"
+
+  - target: $.paths['/site'].get.responses['200'].content['application/json'].schema.properties.icon_background.description
+    update: "Background color in hex format"
+
+  - target: $.paths['/site'].get.responses['200'].content['application/json'].schema.properties.icon_url.description
+    update: "Icon URL"
+
+  - target: $.paths['/site'].get.responses['200'].content['application/json'].schema.properties.description.description
+    update: "Description"
+
+  - target: $.paths['/site'].get.responses['200'].content['application/json'].schema.properties.copyright.description
+    update: "Copyright information"
+
+  - target: $.paths['/site'].get.responses['200'].content['application/json'].schema.properties.privacy_policy.description
+    update: "Privacy policy link"
+
+  - target: $.paths['/site'].get.responses['200'].content['application/json'].schema.properties.custom_disclaimer.description
+    update: "Custom disclaimer"
+
+  - target: $.paths['/site'].get.responses['200'].content['application/json'].schema.properties.default_language.description
+    update: "Default language"
+
+  - target: $.paths['/site'].get.responses['200'].content['application/json'].schema.properties.show_workflow_steps.description
+    update: "Whether to show workflow details"

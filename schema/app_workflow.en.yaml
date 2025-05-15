@@ -6,8 +6,8 @@ info:
     Workflow applications have no session support and are suitable for translation/article writing/summarization AI, etc.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
     It is strongly recommended that developers store the API-Key on the backend rather than sharing or storing it on the client to prevent API-Key leakage and financial loss.
-    official raw document: https://github.com/langgenius/dify/blob/1.3.1/web/app/components/develop/template/template_workflow.en.mdx
-  version: 1.3.1
+    official raw document: https://github.com/langgenius/dify/blob/1.4.0/web/app/components/develop/template/template_workflow.en.mdx
+  version: 1.4.0
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -191,6 +191,7 @@ components:
             - node_started
             - node_finished
             - workflow_finished
+            - text_chunk
             - tts_message
             - tts_message_end
             - ping
@@ -199,6 +200,7 @@ components:
             - `event: message` Message event, used to deliver simple text messages
             - `event: workflow_started` workflow execution starts
             - `event: node_started` node execution starts
+            - `event: text_chunk` Text fragment
             - `event: node_finished` node execution ends, success or failure with different statuses in the same event
             - `event: workflow_finished` workflow execution ends, success or failure with different statuses in the same event
             - `event: tts_message` TTS audio stream event, i.e., speech synthesis output. The content is an audio block in Mp3 format, encoded as a base64 string, which can be directly decoded when playing. (Only present when auto-play is enabled)
@@ -292,6 +294,14 @@ components:
             total_tokens:
               type: integer
               description: Total tokens used
+            text:
+              type: string
+              description: Text content
+            from_variable_selector:
+              type: array
+              description: 'Text source path, helping developers understand which node''s variable generated the text'
+              items:
+                type: string
             created_at:
               type: integer
               description: Start time
@@ -404,7 +414,7 @@ paths:
                   Returns App output stream chunks, Content-Type is text/event-stream.
                   Each stream chunk starts with data: and chunks are separated by `\n\n` (two newlines), as shown below:
 
-                  data: {"event": "message", "task_id": "900bbd43-dc0b-4383-a372-aa6e6c414227", "workflow_run_id": "663c5084-a254-4040-8ad3-51f2a3c1a77c", "answer": "Hi", "created_at": 1705398420}\n\n
+                  data: {"event": "text_chunk", "workflow_run_id": "b85e5fc5-751b-454d-b14e-dc5f240b0a31", "task_id": "bd029338-b068-4d34-a331-fc85478922c2", "data": {"text": "\u4e3a\u4e86", "from_variable_selector": ["1745912968134", "text"]}}\n\n
 
                   Stream chunks have different structures based on the `event` type:
 
@@ -430,6 +440,13 @@ paths:
                       - `predecessor_node_id` (string) Predecessor node ID, used to display execution path on canvas
                       - `inputs` (object) All predecessor node variable content used in the node
                       - `created_at` (timestamp) Start time
+                  - `event: text_chunk` Text fragment
+                    - `task_id` (string) Task ID, used for request tracking and stopping response
+                    - `workflow_run_id` (string) workflow execution ID
+                    - `event` (string) Fixed as text_chunk
+                    - `data` (object) Detailed content
+                      - `text` (string) Text content
+                      - `from_variable_selector` (array) Text source path, helping developers understand which node's variable generated the text
                   - `event: node_finished` node execution ends, success or failure with different statuses in the same event
                     - `task_id` (string) Task ID, used for request tracking and stopping response
                     - `workflow_run_id` (string) workflow execution ID
@@ -949,6 +966,60 @@ paths:
                       video_file_size_limit:
                         type: integer
                         description: Video file upload size limit (MB)
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+  /site:
+    get:
+      operationId: getAppSite
+      summary: Get Application WebApp Settings
+      description: Used to get the WebApp settings of the application
+      responses:
+        '200':
+          description: Successfully retrieved application WebApp settings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    description: WebApp name
+                  icon_type:
+                    type: string
+                    description: 'Icon type, `emoji`-emoji, `image`-image'
+                  icon:
+                    type: string
+                    description: 'Icon, if the type is `emoji`, it''s an emoji symbol, if the type is `image`, it''s an image URL'
+                  icon_background:
+                    type: string
+                    description: Background color in hex format
+                  icon_url:
+                    type: string
+                    description: Icon URL
+                  description:
+                    type: string
+                    description: Description
+                  copyright:
+                    type: string
+                    description: Copyright information
+                  privacy_policy:
+                    type: string
+                    description: Privacy policy link
+                  custom_disclaimer:
+                    type: string
+                    description: Custom disclaimer
+                  default_language:
+                    type: string
+                    description: Default language
+                  show_workflow_steps:
+                    type: boolean
+                    description: Whether to show workflow details
         '400':
           $ref: '#/components/responses/Error400'
         '401':
