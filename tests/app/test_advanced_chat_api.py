@@ -105,18 +105,13 @@ async def test_conversation_management(app_advanced_chat_client: AsyncAdvancedCh
         assert messages is not None
         assert messages.data is not None
 
-        try:
-            delete_response = await app_advanced_chat_client.delete_conversation_by_app_advanced_chat(
-                conversation_id=conversation_id,
-                user=LOGIN_USER_ID,
-            )
-        except:
-            import warnings
-
-            warnings.warn("删除会话API返回204 No Content，但SDK无法处理，跳过删除操作")
-        else:
-            assert delete_response is not None
-            assert delete_response.result == "success"
+        # 删除会话API返回204 No Content，SDK返回None
+        delete_response = await app_advanced_chat_client.delete_conversation_by_app_advanced_chat(
+            conversation_id=conversation_id,
+            user=LOGIN_USER_ID,
+        )
+        # 204 No Content响应，delete_response应该为None
+        assert delete_response is None
 
 
 async def test_get_parameters(app_advanced_chat_client: AsyncAdvancedChatClient):
@@ -284,6 +279,27 @@ async def test_text_to_audio(app_advanced_chat_client: AsyncAdvancedChatClient):
     RUNNING_IN_CI,
     reason="CI中使用官方服务器, 经常报504超时, 影响CI流程, 请使用本地服务测试",
 )
+async def test_get_app_feedbacks(app_advanced_chat_client: AsyncAdvancedChatClient):
+    """测试获取应用反馈"""
+    feedbacks = await app_advanced_chat_client.get_app_feedbacks_by_app_advanced_chat(
+        page=1,
+        limit=10
+    )
+    assert feedbacks is not None
+    assert hasattr(feedbacks, "data")
+    assert isinstance(feedbacks.data, list)
+
+
+async def test_get_app_site_settings(app_advanced_chat_client: AsyncAdvancedChatClient):
+    """测试获取应用WebApp设置"""
+    settings = await app_advanced_chat_client.get_app_web_app_settings_by_app_advanced_chat()
+    assert settings is not None
+    assert hasattr(settings, "title")
+    assert hasattr(settings, "icon_type")
+    assert hasattr(settings, "description")
+    assert hasattr(settings, "default_language")
+
+
 async def test_annotation_features(app_advanced_chat_client: AsyncAdvancedChatClient):
     """测试标注相关功能"""
     # 创建标注
@@ -315,4 +331,4 @@ async def test_annotation_features(app_advanced_chat_client: AsyncAdvancedChatCl
     # 检查响应中是否有状态信息
     response_dict = status_response.model_dump()
     assert "job_status" in response_dict
-    assert response_dict["job_status"] in ["pending", "running", "completed", "failed"]
+    assert response_dict["job_status"] in ["pending", "running", "completed", "failed", "waiting"]

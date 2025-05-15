@@ -106,16 +106,34 @@ async def test_conversation_management(app_chat_client: AsyncChatClient):
         assert messages is not None
         assert messages.data is not None
 
-        try:
-            delete_response = await app_chat_client.delete_conversation_by_app_chat(
-                conversation_id=conversation_id,
-                user=LOGIN_USER_ID,
-            )
-        except:
-            warnings.warn("删除会话API返回204 No Content，但SDK无法处理，跳过删除操作")
-        else:
-            assert delete_response is not None
-            assert delete_response.result == "success"
+        # 删除会话API返回204 No Content，SDK返回None
+        delete_response = await app_chat_client.delete_conversation_by_app_chat(
+            conversation_id=conversation_id,
+            user=LOGIN_USER_ID,
+        )
+        # 204 No Content响应，delete_response应该为None
+        assert delete_response is None
+
+
+async def test_get_app_feedbacks(app_chat_client: AsyncChatClient):
+    """测试获取应用反馈"""
+    feedbacks = await app_chat_client.get_app_feedbacks_by_app_chat(
+        page=1,
+        limit=10
+    )
+    assert feedbacks is not None
+    assert hasattr(feedbacks, "data")
+    assert isinstance(feedbacks.data, list)
+
+
+async def test_get_app_site_settings(app_chat_client: AsyncChatClient):
+    """测试获取应用WebApp设置"""
+    settings = await app_chat_client.get_app_site_settings_by_app_chat()
+    assert settings is not None
+    assert hasattr(settings, "title")
+    assert hasattr(settings, "icon_type")
+    assert hasattr(settings, "description")
+    assert hasattr(settings, "default_language")
 
 
 async def test_get_parameters(app_chat_client: AsyncChatClient):

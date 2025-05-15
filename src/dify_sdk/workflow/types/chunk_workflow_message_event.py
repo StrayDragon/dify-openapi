@@ -9,6 +9,7 @@ ChunkWorkflowMessageEvent = typing.Union[
         "node_started",
         "node_finished",
         "workflow_finished",
+        "text_chunk",
         "tts_message",
         "tts_message_end",
         "ping",

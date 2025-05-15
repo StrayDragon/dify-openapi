@@ -26,12 +26,13 @@ from .types.conversation import Conversation
 from .types.convert_audio_to_text_by_app_chat_response import ConvertAudioToTextByAppChatResponse
 from .types.create_annotation_by_app_chat_response import CreateAnnotationByAppChatResponse
 from .types.delete_annotation_by_app_chat_response import DeleteAnnotationByAppChatResponse
-from .types.delete_conversation_by_app_chat_response import DeleteConversationByAppChatResponse
 from .types.error import Error
 from .types.get_annotation_reply_status_by_app_chat_request_action import GetAnnotationReplyStatusByAppChatRequestAction
 from .types.get_annotation_reply_status_by_app_chat_response import GetAnnotationReplyStatusByAppChatResponse
 from .types.get_annotations_list_by_app_chat_response import GetAnnotationsListByAppChatResponse
+from .types.get_app_feedbacks_by_app_chat_response import GetAppFeedbacksByAppChatResponse
 from .types.get_app_meta_info_by_app_chat_response import GetAppMetaInfoByAppChatResponse
+from .types.get_app_site_settings_by_app_chat_response import GetAppSiteSettingsByAppChatResponse
 from .types.get_application_info_by_app_chat_response import GetApplicationInfoByAppChatResponse
 from .types.get_application_parameters_by_app_chat_response import GetApplicationParametersByAppChatResponse
 from .types.get_conversation_list_by_app_chat_request_sort_by import GetConversationListByAppChatRequestSortBy
@@ -245,7 +246,7 @@ class RawChatClient:
 
     def delete_conversation_by_app_chat(
         self, conversation_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> HttpResponse[DeleteConversationByAppChatResponse]:
+    ) -> HttpResponse[None]:
         """
         Parameters
         ----------
@@ -260,8 +261,7 @@ class RawChatClient:
 
         Returns
         -------
-        HttpResponse[DeleteConversationByAppChatResponse]
-            Successful response
+        HttpResponse[None]
         """
         _response = self._client_wrapper.httpx_client.request(
             f"conversations/{jsonable_encoder(conversation_id)}",
@@ -277,14 +277,7 @@ class RawChatClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _data = typing.cast(
-                    DeleteConversationByAppChatResponse,
-                    parse_obj_as(
-                        type_=DeleteConversationByAppChatResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-                return HttpResponse(response=_response, data=_data)
+                return HttpResponse(response=_response, data=None)
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
@@ -529,6 +522,56 @@ class RawChatClient:
                     SendMessageFeedbackByAppChatResponse,
                     parse_obj_as(
                         type_=SendMessageFeedbackByAppChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+    def get_app_feedbacks_by_app_chat(
+        self,
+        *,
+        page: typing.Optional[int] = None,
+        limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> HttpResponse[GetAppFeedbacksByAppChatResponse]:
+        """
+        Get application's user feedbacks and likes
+
+        Parameters
+        ----------
+        page : typing.Optional[int]
+            (Optional) Pagination, default: 1
+
+        limit : typing.Optional[int]
+            (Optional) Records per page, default: 20
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[GetAppFeedbacksByAppChatResponse]
+            Successful response
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "app/feedbacks",
+            method="GET",
+            params={
+                "page": page,
+                "limit": limit,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    GetAppFeedbacksByAppChatResponse,
+                    parse_obj_as(
+                        type_=GetAppFeedbacksByAppChatResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -944,6 +987,42 @@ class RawChatClient:
                     GetAppMetaInfoByAppChatResponse,
                     parse_obj_as(
                         type_=GetAppMetaInfoByAppChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+    def get_app_site_settings_by_app_chat(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> HttpResponse[GetAppSiteSettingsByAppChatResponse]:
+        """
+        Used to get the WebApp settings of the application
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[GetAppSiteSettingsByAppChatResponse]
+            Successful response
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "site",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    GetAppSiteSettingsByAppChatResponse,
+                    parse_obj_as(
+                        type_=GetAppSiteSettingsByAppChatResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -1450,7 +1529,7 @@ class AsyncRawChatClient:
 
     async def delete_conversation_by_app_chat(
         self, conversation_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> AsyncHttpResponse[DeleteConversationByAppChatResponse]:
+    ) -> AsyncHttpResponse[None]:
         """
         Parameters
         ----------
@@ -1465,8 +1544,7 @@ class AsyncRawChatClient:
 
         Returns
         -------
-        AsyncHttpResponse[DeleteConversationByAppChatResponse]
-            Successful response
+        AsyncHttpResponse[None]
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"conversations/{jsonable_encoder(conversation_id)}",
@@ -1482,14 +1560,7 @@ class AsyncRawChatClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _data = typing.cast(
-                    DeleteConversationByAppChatResponse,
-                    parse_obj_as(
-                        type_=DeleteConversationByAppChatResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-                return AsyncHttpResponse(response=_response, data=_data)
+                return AsyncHttpResponse(response=_response, data=None)
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
@@ -1734,6 +1805,56 @@ class AsyncRawChatClient:
                     SendMessageFeedbackByAppChatResponse,
                     parse_obj_as(
                         type_=SendMessageFeedbackByAppChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+    async def get_app_feedbacks_by_app_chat(
+        self,
+        *,
+        page: typing.Optional[int] = None,
+        limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AsyncHttpResponse[GetAppFeedbacksByAppChatResponse]:
+        """
+        Get application's user feedbacks and likes
+
+        Parameters
+        ----------
+        page : typing.Optional[int]
+            (Optional) Pagination, default: 1
+
+        limit : typing.Optional[int]
+            (Optional) Records per page, default: 20
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[GetAppFeedbacksByAppChatResponse]
+            Successful response
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "app/feedbacks",
+            method="GET",
+            params={
+                "page": page,
+                "limit": limit,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    GetAppFeedbacksByAppChatResponse,
+                    parse_obj_as(
+                        type_=GetAppFeedbacksByAppChatResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -2150,6 +2271,42 @@ class AsyncRawChatClient:
                     GetAppMetaInfoByAppChatResponse,
                     parse_obj_as(
                         type_=GetAppMetaInfoByAppChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+    async def get_app_site_settings_by_app_chat(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> AsyncHttpResponse[GetAppSiteSettingsByAppChatResponse]:
+        """
+        Used to get the WebApp settings of the application
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[GetAppSiteSettingsByAppChatResponse]
+            Successful response
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "site",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    GetAppSiteSettingsByAppChatResponse,
+                    parse_obj_as(
+                        type_=GetAppSiteSettingsByAppChatResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

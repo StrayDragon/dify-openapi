@@ -12,7 +12,6 @@ from .configure_annotation_reply_by_app_generation_request_action import (
 )
 from .configure_annotation_reply_by_app_generation_response import ConfigureAnnotationReplyByAppGenerationResponse
 from .create_annotation_by_app_generation_response import CreateAnnotationByAppGenerationResponse
-from .delete_annotation_by_app_generation_response import DeleteAnnotationByAppGenerationResponse
 from .error import Error
 from .file_input import FileInput
 from .file_input_transfer_method import FileInputTransferMethod
@@ -23,6 +22,8 @@ from .get_annotation_reply_status_by_app_generation_request_action import (
 from .get_annotation_reply_status_by_app_generation_response import GetAnnotationReplyStatusByAppGenerationResponse
 from .get_annotations_list_by_app_generation_response import GetAnnotationsListByAppGenerationResponse
 from .get_annotations_list_by_app_generation_response_data_item import GetAnnotationsListByAppGenerationResponseDataItem
+from .get_app_feedbacks_by_app_generation_response import GetAppFeedbacksByAppGenerationResponse
+from .get_app_feedbacks_by_app_generation_response_data_item import GetAppFeedbacksByAppGenerationResponseDataItem
 from .get_app_meta_info_by_app_generation_response import GetAppMetaInfoByAppGenerationResponse
 from .get_app_meta_info_by_app_generation_response_tool_icons_value import (
     GetAppMetaInfoByAppGenerationResponseToolIconsValue,
@@ -30,6 +31,7 @@ from .get_app_meta_info_by_app_generation_response_tool_icons_value import (
 from .get_app_meta_info_by_app_generation_response_tool_icons_value_background import (
     GetAppMetaInfoByAppGenerationResponseToolIconsValueBackground,
 )
+from .get_app_site_settings_by_app_generation_response import GetAppSiteSettingsByAppGenerationResponse
 from .get_application_info_by_app_generation_response import GetApplicationInfoByAppGenerationResponse
 from .get_application_parameters_by_app_generation_response import GetApplicationParametersByAppGenerationResponse
 from .get_application_parameters_by_app_generation_response_annotation_reply import (
@@ -97,7 +99,6 @@ __all__ = [
     "ConfigureAnnotationReplyByAppGenerationRequestAction",
     "ConfigureAnnotationReplyByAppGenerationResponse",
     "CreateAnnotationByAppGenerationResponse",
-    "DeleteAnnotationByAppGenerationResponse",
     "Error",
     "FileInput",
     "FileInputTransferMethod",
@@ -106,9 +107,12 @@ __all__ = [
     "GetAnnotationReplyStatusByAppGenerationResponse",
     "GetAnnotationsListByAppGenerationResponse",
     "GetAnnotationsListByAppGenerationResponseDataItem",
+    "GetAppFeedbacksByAppGenerationResponse",
+    "GetAppFeedbacksByAppGenerationResponseDataItem",
     "GetAppMetaInfoByAppGenerationResponse",
     "GetAppMetaInfoByAppGenerationResponseToolIconsValue",
     "GetAppMetaInfoByAppGenerationResponseToolIconsValueBackground",
+    "GetAppSiteSettingsByAppGenerationResponse",
     "GetApplicationInfoByAppGenerationResponse",
     "GetApplicationParametersByAppGenerationResponse",
     "GetApplicationParametersByAppGenerationResponseAnnotationReply",

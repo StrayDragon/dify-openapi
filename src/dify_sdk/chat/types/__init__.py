@@ -18,7 +18,6 @@ from .conversation import Conversation
 from .convert_audio_to_text_by_app_chat_response import ConvertAudioToTextByAppChatResponse
 from .create_annotation_by_app_chat_response import CreateAnnotationByAppChatResponse
 from .delete_annotation_by_app_chat_response import DeleteAnnotationByAppChatResponse
-from .delete_conversation_by_app_chat_response import DeleteConversationByAppChatResponse
 from .error import Error
 from .file_input import FileInput
 from .file_input_transfer_method import FileInputTransferMethod
@@ -27,11 +26,14 @@ from .get_annotation_reply_status_by_app_chat_request_action import GetAnnotatio
 from .get_annotation_reply_status_by_app_chat_response import GetAnnotationReplyStatusByAppChatResponse
 from .get_annotations_list_by_app_chat_response import GetAnnotationsListByAppChatResponse
 from .get_annotations_list_by_app_chat_response_data_item import GetAnnotationsListByAppChatResponseDataItem
+from .get_app_feedbacks_by_app_chat_response import GetAppFeedbacksByAppChatResponse
+from .get_app_feedbacks_by_app_chat_response_data_item import GetAppFeedbacksByAppChatResponseDataItem
 from .get_app_meta_info_by_app_chat_response import GetAppMetaInfoByAppChatResponse
 from .get_app_meta_info_by_app_chat_response_tool_icons_value import GetAppMetaInfoByAppChatResponseToolIconsValue
 from .get_app_meta_info_by_app_chat_response_tool_icons_value_background import (
     GetAppMetaInfoByAppChatResponseToolIconsValueBackground,
 )
+from .get_app_site_settings_by_app_chat_response import GetAppSiteSettingsByAppChatResponse
 from .get_application_info_by_app_chat_response import GetApplicationInfoByAppChatResponse
 from .get_application_parameters_by_app_chat_response import GetApplicationParametersByAppChatResponse
 from .get_application_parameters_by_app_chat_response_annotation_reply import (
@@ -85,7 +87,6 @@ __all__ = [
     "ConvertAudioToTextByAppChatResponse",
     "CreateAnnotationByAppChatResponse",
     "DeleteAnnotationByAppChatResponse",
-    "DeleteConversationByAppChatResponse",
     "Error",
     "FileInput",
     "FileInputTransferMethod",
@@ -94,9 +95,12 @@ __all__ = [
     "GetAnnotationReplyStatusByAppChatResponse",
     "GetAnnotationsListByAppChatResponse",
     "GetAnnotationsListByAppChatResponseDataItem",
+    "GetAppFeedbacksByAppChatResponse",
+    "GetAppFeedbacksByAppChatResponseDataItem",
     "GetAppMetaInfoByAppChatResponse",
     "GetAppMetaInfoByAppChatResponseToolIconsValue",
     "GetAppMetaInfoByAppChatResponseToolIconsValueBackground",
+    "GetAppSiteSettingsByAppChatResponse",
     "GetApplicationInfoByAppChatResponse",
     "GetApplicationParametersByAppChatResponse",
     "GetApplicationParametersByAppChatResponseAnnotationReply",

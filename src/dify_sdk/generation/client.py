@@ -12,7 +12,6 @@ from .types.configure_annotation_reply_by_app_generation_request_action import (
 )
 from .types.configure_annotation_reply_by_app_generation_response import ConfigureAnnotationReplyByAppGenerationResponse
 from .types.create_annotation_by_app_generation_response import CreateAnnotationByAppGenerationResponse
-from .types.delete_annotation_by_app_generation_response import DeleteAnnotationByAppGenerationResponse
 from .types.file_input import FileInput
 from .types.get_annotation_reply_status_by_app_generation_request_action import (
     GetAnnotationReplyStatusByAppGenerationRequestAction,
@@ -21,7 +20,9 @@ from .types.get_annotation_reply_status_by_app_generation_response import (
     GetAnnotationReplyStatusByAppGenerationResponse,
 )
 from .types.get_annotations_list_by_app_generation_response import GetAnnotationsListByAppGenerationResponse
+from .types.get_app_feedbacks_by_app_generation_response import GetAppFeedbacksByAppGenerationResponse
 from .types.get_app_meta_info_by_app_generation_response import GetAppMetaInfoByAppGenerationResponse
+from .types.get_app_site_settings_by_app_generation_response import GetAppSiteSettingsByAppGenerationResponse
 from .types.get_application_info_by_app_generation_response import GetApplicationInfoByAppGenerationResponse
 from .types.get_application_parameters_by_app_generation_response import GetApplicationParametersByAppGenerationResponse
 from .types.send_completion_message_by_app_generation_request_inputs import (
@@ -265,6 +266,43 @@ class GenerationClient:
         )
         return _response.data
 
+    def get_app_feedbacks_by_app_generation(
+        self,
+        *,
+        page: typing.Optional[int] = None,
+        limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetAppFeedbacksByAppGenerationResponse:
+        """
+        Get end user feedbacks and likes for the application
+
+        Parameters
+        ----------
+        page : typing.Optional[int]
+            Page number (optional), default: 1
+
+        limit : typing.Optional[int]
+            Items per page (optional), default: 20
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetAppFeedbacksByAppGenerationResponse
+            Successfully retrieved feedback list
+
+        Examples
+        --------
+        from dify import DifyApi
+        client = DifyApi(token="YOUR_TOKEN", )
+        client.generation.get_app_feedbacks_by_app_generation()
+        """
+        _response = self._raw_client.get_app_feedbacks_by_app_generation(
+            page=page, limit=limit, request_options=request_options
+        )
+        return _response.data
+
     def convert_text_to_audio_by_app_generation(
         self,
         *,
@@ -412,7 +450,7 @@ class GenerationClient:
 
     def delete_annotation_by_app_generation(
         self, annotation_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> DeleteAnnotationByAppGenerationResponse:
+    ) -> None:
         """
         Delete a specific annotation
 
@@ -426,8 +464,7 @@ class GenerationClient:
 
         Returns
         -------
-        DeleteAnnotationByAppGenerationResponse
-            Successfully deleted annotation
+        None
 
         Examples
         --------
@@ -547,6 +584,31 @@ class GenerationClient:
         client.generation.get_app_meta_info_by_app_generation()
         """
         _response = self._raw_client.get_app_meta_info_by_app_generation(request_options=request_options)
+        return _response.data
+
+    def get_app_site_settings_by_app_generation(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> GetAppSiteSettingsByAppGenerationResponse:
+        """
+        Used to get the WebApp settings of the application
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetAppSiteSettingsByAppGenerationResponse
+            Successful response
+
+        Examples
+        --------
+        from dify import DifyApi
+        client = DifyApi(token="YOUR_TOKEN", )
+        client.generation.get_app_site_settings_by_app_generation()
+        """
+        _response = self._raw_client.get_app_site_settings_by_app_generation(request_options=request_options)
         return _response.data
 
 
@@ -795,6 +857,46 @@ class AsyncGenerationClient:
         )
         return _response.data
 
+    async def get_app_feedbacks_by_app_generation(
+        self,
+        *,
+        page: typing.Optional[int] = None,
+        limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetAppFeedbacksByAppGenerationResponse:
+        """
+        Get end user feedbacks and likes for the application
+
+        Parameters
+        ----------
+        page : typing.Optional[int]
+            Page number (optional), default: 1
+
+        limit : typing.Optional[int]
+            Items per page (optional), default: 20
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetAppFeedbacksByAppGenerationResponse
+            Successfully retrieved feedback list
+
+        Examples
+        --------
+        from dify import AsyncDifyApi
+        import asyncio
+        client = AsyncDifyApi(token="YOUR_TOKEN", )
+        async def main() -> None:
+            await client.generation.get_app_feedbacks_by_app_generation()
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.get_app_feedbacks_by_app_generation(
+            page=page, limit=limit, request_options=request_options
+        )
+        return _response.data
+
     async def convert_text_to_audio_by_app_generation(
         self,
         *,
@@ -952,7 +1054,7 @@ class AsyncGenerationClient:
 
     async def delete_annotation_by_app_generation(
         self, annotation_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> DeleteAnnotationByAppGenerationResponse:
+    ) -> None:
         """
         Delete a specific annotation
 
@@ -966,8 +1068,7 @@ class AsyncGenerationClient:
 
         Returns
         -------
-        DeleteAnnotationByAppGenerationResponse
-            Successfully deleted annotation
+        None
 
         Examples
         --------
@@ -1101,4 +1202,32 @@ class AsyncGenerationClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.get_app_meta_info_by_app_generation(request_options=request_options)
+        return _response.data
+
+    async def get_app_site_settings_by_app_generation(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> GetAppSiteSettingsByAppGenerationResponse:
+        """
+        Used to get the WebApp settings of the application
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetAppSiteSettingsByAppGenerationResponse
+            Successful response
+
+        Examples
+        --------
+        from dify import AsyncDifyApi
+        import asyncio
+        client = AsyncDifyApi(token="YOUR_TOKEN", )
+        async def main() -> None:
+            await client.generation.get_app_site_settings_by_app_generation()
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.get_app_site_settings_by_app_generation(request_options=request_options)
         return _response.data

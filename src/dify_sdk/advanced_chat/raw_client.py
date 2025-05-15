@@ -28,8 +28,6 @@ from .types.configure_annotation_reply_by_app_advanced_chat_response import (
 )
 from .types.convert_audio_to_text_by_app_advanced_chat_response import ConvertAudioToTextByAppAdvancedChatResponse
 from .types.create_annotation_by_app_advanced_chat_response import CreateAnnotationByAppAdvancedChatResponse
-from .types.delete_annotation_by_app_advanced_chat_response import DeleteAnnotationByAppAdvancedChatResponse
-from .types.delete_conversation_by_app_advanced_chat_response import DeleteConversationByAppAdvancedChatResponse
 from .types.error import Error
 from .types.file_input import FileInput
 from .types.get_annotation_reply_status_by_app_advanced_chat_request_action import (
@@ -39,7 +37,9 @@ from .types.get_annotation_reply_status_by_app_advanced_chat_response import (
     GetAnnotationReplyStatusByAppAdvancedChatResponse,
 )
 from .types.get_annotations_list_by_app_advanced_chat_response import GetAnnotationsListByAppAdvancedChatResponse
+from .types.get_app_feedbacks_by_app_advanced_chat_response import GetAppFeedbacksByAppAdvancedChatResponse
 from .types.get_app_meta_info_by_app_advanced_chat_response import GetAppMetaInfoByAppAdvancedChatResponse
+from .types.get_app_web_app_settings_by_app_advanced_chat_response import GetAppWebAppSettingsByAppAdvancedChatResponse
 from .types.get_application_info_by_app_advanced_chat_response import GetApplicationInfoByAppAdvancedChatResponse
 from .types.get_application_parameters_by_app_advanced_chat_response import (
     GetApplicationParametersByAppAdvancedChatResponse,
@@ -589,6 +589,56 @@ class RawAdvancedChatClient:
             raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
         raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
+    def get_app_feedbacks_by_app_advanced_chat(
+        self,
+        *,
+        page: typing.Optional[int] = None,
+        limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> HttpResponse[GetAppFeedbacksByAppAdvancedChatResponse]:
+        """
+        Get application's end user feedbacks and likes.
+
+        Parameters
+        ----------
+        page : typing.Optional[int]
+            (Optional) Pagination, default: 1
+
+        limit : typing.Optional[int]
+            (Optional) Items per page, default: 20
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[GetAppFeedbacksByAppAdvancedChatResponse]
+            Successful response
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "app/feedbacks",
+            method="GET",
+            params={
+                "page": page,
+                "limit": limit,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    GetAppFeedbacksByAppAdvancedChatResponse,
+                    parse_obj_as(
+                        type_=GetAppFeedbacksByAppAdvancedChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
     def get_suggested_questions_by_app_advanced_chat(
         self, message_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
     ) -> HttpResponse[GetSuggestedQuestionsByAppAdvancedChatResponse]:
@@ -758,7 +808,7 @@ class RawAdvancedChatClient:
 
     def delete_conversation_by_app_advanced_chat(
         self, conversation_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> HttpResponse[DeleteConversationByAppAdvancedChatResponse]:
+    ) -> HttpResponse[None]:
         """
         Delete a conversation.
 
@@ -775,8 +825,7 @@ class RawAdvancedChatClient:
 
         Returns
         -------
-        HttpResponse[DeleteConversationByAppAdvancedChatResponse]
-            Successful response
+        HttpResponse[None]
         """
         _response = self._client_wrapper.httpx_client.request(
             f"conversations/{jsonable_encoder(conversation_id)}",
@@ -792,14 +841,7 @@ class RawAdvancedChatClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _data = typing.cast(
-                    DeleteConversationByAppAdvancedChatResponse,
-                    parse_obj_as(
-                        type_=DeleteConversationByAppAdvancedChatResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-                return HttpResponse(response=_response, data=_data)
+                return HttpResponse(response=_response, data=None)
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
@@ -978,6 +1020,42 @@ class RawAdvancedChatClient:
             raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
         raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
+    def get_app_web_app_settings_by_app_advanced_chat(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> HttpResponse[GetAppWebAppSettingsByAppAdvancedChatResponse]:
+        """
+        Used to get the WebApp settings of the application
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[GetAppWebAppSettingsByAppAdvancedChatResponse]
+            Successful response
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "site",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    GetAppWebAppSettingsByAppAdvancedChatResponse,
+                    parse_obj_as(
+                        type_=GetAppWebAppSettingsByAppAdvancedChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
     def get_annotations_list_by_app_advanced_chat(
         self,
         *,
@@ -1133,7 +1211,7 @@ class RawAdvancedChatClient:
 
     def delete_annotation_by_app_advanced_chat(
         self, annotation_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> HttpResponse[DeleteAnnotationByAppAdvancedChatResponse]:
+    ) -> HttpResponse[None]:
         """
         Delete a specific annotation
 
@@ -1147,8 +1225,7 @@ class RawAdvancedChatClient:
 
         Returns
         -------
-        HttpResponse[DeleteAnnotationByAppAdvancedChatResponse]
-            Successfully deleted annotation
+        HttpResponse[None]
         """
         _response = self._client_wrapper.httpx_client.request(
             f"apps/annotations/{jsonable_encoder(annotation_id)}",
@@ -1157,14 +1234,7 @@ class RawAdvancedChatClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _data = typing.cast(
-                    DeleteAnnotationByAppAdvancedChatResponse,
-                    parse_obj_as(
-                        type_=DeleteAnnotationByAppAdvancedChatResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-                return HttpResponse(response=_response, data=_data)
+                return HttpResponse(response=_response, data=None)
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
@@ -1804,6 +1874,56 @@ class AsyncRawAdvancedChatClient:
             raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
         raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
+    async def get_app_feedbacks_by_app_advanced_chat(
+        self,
+        *,
+        page: typing.Optional[int] = None,
+        limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AsyncHttpResponse[GetAppFeedbacksByAppAdvancedChatResponse]:
+        """
+        Get application's end user feedbacks and likes.
+
+        Parameters
+        ----------
+        page : typing.Optional[int]
+            (Optional) Pagination, default: 1
+
+        limit : typing.Optional[int]
+            (Optional) Items per page, default: 20
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[GetAppFeedbacksByAppAdvancedChatResponse]
+            Successful response
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "app/feedbacks",
+            method="GET",
+            params={
+                "page": page,
+                "limit": limit,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    GetAppFeedbacksByAppAdvancedChatResponse,
+                    parse_obj_as(
+                        type_=GetAppFeedbacksByAppAdvancedChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
     async def get_suggested_questions_by_app_advanced_chat(
         self, message_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
     ) -> AsyncHttpResponse[GetSuggestedQuestionsByAppAdvancedChatResponse]:
@@ -1973,7 +2093,7 @@ class AsyncRawAdvancedChatClient:
 
     async def delete_conversation_by_app_advanced_chat(
         self, conversation_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> AsyncHttpResponse[DeleteConversationByAppAdvancedChatResponse]:
+    ) -> AsyncHttpResponse[None]:
         """
         Delete a conversation.
 
@@ -1990,8 +2110,7 @@ class AsyncRawAdvancedChatClient:
 
         Returns
         -------
-        AsyncHttpResponse[DeleteConversationByAppAdvancedChatResponse]
-            Successful response
+        AsyncHttpResponse[None]
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"conversations/{jsonable_encoder(conversation_id)}",
@@ -2007,14 +2126,7 @@ class AsyncRawAdvancedChatClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _data = typing.cast(
-                    DeleteConversationByAppAdvancedChatResponse,
-                    parse_obj_as(
-                        type_=DeleteConversationByAppAdvancedChatResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-                return AsyncHttpResponse(response=_response, data=_data)
+                return AsyncHttpResponse(response=_response, data=None)
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
@@ -2193,6 +2305,42 @@ class AsyncRawAdvancedChatClient:
             raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
         raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
+    async def get_app_web_app_settings_by_app_advanced_chat(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> AsyncHttpResponse[GetAppWebAppSettingsByAppAdvancedChatResponse]:
+        """
+        Used to get the WebApp settings of the application
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[GetAppWebAppSettingsByAppAdvancedChatResponse]
+            Successful response
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "site",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    GetAppWebAppSettingsByAppAdvancedChatResponse,
+                    parse_obj_as(
+                        type_=GetAppWebAppSettingsByAppAdvancedChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
     async def get_annotations_list_by_app_advanced_chat(
         self,
         *,
@@ -2348,7 +2496,7 @@ class AsyncRawAdvancedChatClient:
 
     async def delete_annotation_by_app_advanced_chat(
         self, annotation_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> AsyncHttpResponse[DeleteAnnotationByAppAdvancedChatResponse]:
+    ) -> AsyncHttpResponse[None]:
         """
         Delete a specific annotation
 
@@ -2362,8 +2510,7 @@ class AsyncRawAdvancedChatClient:
 
         Returns
         -------
-        AsyncHttpResponse[DeleteAnnotationByAppAdvancedChatResponse]
-            Successfully deleted annotation
+        AsyncHttpResponse[None]
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"apps/annotations/{jsonable_encoder(annotation_id)}",
@@ -2372,14 +2519,7 @@ class AsyncRawAdvancedChatClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _data = typing.cast(
-                    DeleteAnnotationByAppAdvancedChatResponse,
-                    parse_obj_as(
-                        type_=DeleteAnnotationByAppAdvancedChatResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-                return AsyncHttpResponse(response=_response, data=_data)
+                return AsyncHttpResponse(response=_response, data=None)
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)

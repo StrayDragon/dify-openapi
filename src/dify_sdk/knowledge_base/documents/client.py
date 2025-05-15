@@ -12,7 +12,6 @@ from .types.create_document_by_file_response import CreateDocumentByFileResponse
 from .types.create_document_by_text_request_doc_form import CreateDocumentByTextRequestDocForm
 from .types.create_document_by_text_request_indexing_technique import CreateDocumentByTextRequestIndexingTechnique
 from .types.create_document_by_text_response import CreateDocumentByTextResponse
-from .types.delete_document_response import DeleteDocumentResponse
 from .types.get_document_indexing_status_response import GetDocumentIndexingStatusResponse
 from .types.get_document_list_response import GetDocumentListResponse
 from .types.update_document_by_file_response import UpdateDocumentByFileResponse
@@ -339,7 +338,7 @@ class DocumentsClient:
 
     def delete_document(
         self, dataset_id: str, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> DeleteDocumentResponse:
+    ) -> None:
         """
         Delete specified document
 
@@ -356,8 +355,7 @@ class DocumentsClient:
 
         Returns
         -------
-        DeleteDocumentResponse
-            Successfully deleted document
+        None
 
         Examples
         --------
@@ -735,7 +733,7 @@ class AsyncDocumentsClient:
 
     async def delete_document(
         self, dataset_id: str, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> DeleteDocumentResponse:
+    ) -> None:
         """
         Delete specified document
 
@@ -752,8 +750,7 @@ class AsyncDocumentsClient:
 
         Returns
         -------
-        DeleteDocumentResponse
-            Successfully deleted document
+        None
 
         Examples
         --------

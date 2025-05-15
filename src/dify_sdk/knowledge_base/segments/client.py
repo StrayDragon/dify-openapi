@@ -7,10 +7,6 @@ from ...core.request_options import RequestOptions
 from .raw_client import AsyncRawSegmentsClient, RawSegmentsClient
 from .types.create_segments_request_segments_item import CreateSegmentsRequestSegmentsItem
 from .types.create_segments_response import CreateSegmentsResponse
-from .types.delete_datasets_dataset_id_documents_document_id_segments_segment_id_child_chunks_child_chunk_id_response import (
-    DeleteDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse,
-)
-from .types.delete_segment_response import DeleteSegmentResponse
 from .types.get_datasets_dataset_id_documents_document_id_segments_segment_id_child_chunks_response import (
     GetDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse,
 )
@@ -255,7 +251,7 @@ class SegmentsClient:
         child_chunk_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> DeleteDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse:
+    ) -> None:
         """
         Delete a specified document child segment
 
@@ -278,8 +274,7 @@ class SegmentsClient:
 
         Returns
         -------
-        DeleteDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse
-            Successfully deleted child segment
+        None
 
         Examples
         --------
@@ -393,7 +388,7 @@ class SegmentsClient:
         segment_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> DeleteSegmentResponse:
+    ) -> None:
         """
         Delete specified document segment
 
@@ -413,8 +408,7 @@ class SegmentsClient:
 
         Returns
         -------
-        DeleteSegmentResponse
-            Successfully deleted segment
+        None
 
         Examples
         --------
@@ -667,7 +661,7 @@ class AsyncSegmentsClient:
         child_chunk_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> DeleteDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse:
+    ) -> None:
         """
         Delete a specified document child segment
 
@@ -690,8 +684,7 @@ class AsyncSegmentsClient:
 
         Returns
         -------
-        DeleteDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse
-            Successfully deleted child segment
+        None
 
         Examples
         --------
@@ -814,7 +807,7 @@ class AsyncSegmentsClient:
         segment_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> DeleteSegmentResponse:
+    ) -> None:
         """
         Delete specified document segment
 
@@ -834,8 +827,7 @@ class AsyncSegmentsClient:
 
         Returns
         -------
-        DeleteSegmentResponse
-            Successfully deleted segment
+        None
 
         Examples
         --------

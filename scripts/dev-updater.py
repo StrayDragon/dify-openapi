@@ -72,20 +72,23 @@ NOTE:
 - Another helpful context is a preset diff file between {v1} to {v2} change, you can find it in {diff_file_path}
 """.strip()
     for local_schema_path, upstream_mdx_doc_path in LOCAL_SCHEMA_PATH__UPSTREAM_MDX_DOC_PATH.items():
-        prompt = prompt_pattern.format(
+        common_format_args = dict(
             schema_path=local_schema_path,
-            dify_mdx_doc=APP_DOC_PATH_PREFIX + upstream_mdx_doc_path,
-            schema_overlay_en_path=SCHEMA_OVERLAY_PATH_PREFIX + LOCAL_SCHEMA_PATH__OVERLAY_EN_PATH[local_schema_path],
             v1=v1,
             v2=v2,
             diff_file_path=diff_file_path,
         )
+        prompt = prompt_pattern.format(
+            dify_mdx_doc=APP_DOC_PATH_PREFIX + upstream_mdx_doc_path,
+            schema_overlay_en_path=SCHEMA_OVERLAY_PATH_PREFIX + LOCAL_SCHEMA_PATH__OVERLAY_EN_PATH[local_schema_path],
+            **common_format_args,
+        )
         if "knowledge_base" in local_schema_path:
             prompt = prompt_pattern.format(
-                schema_path=local_schema_path,
                 dify_mdx_doc=KB_DOC_PATH_PREFIX + upstream_mdx_doc_path,
                 schema_overlay_en_path=SCHEMA_OVERLAY_PATH_PREFIX
                 + LOCAL_SCHEMA_PATH__OVERLAY_EN_PATH[local_schema_path],
+                **common_format_args,
             )
 
         print(
@@ -93,14 +96,35 @@ NOTE:
             end="\n\n",
         )
         CB.copy(prompt)
-        if input("Next? [yes]/no") == "no":
+        if input(f"{local_schema_path} Done. Next? [yes]/no") == "no":
             break
 
 
 def more_test_coverage_prompt(v1: str, v2: str):
-    return """
-I already update the @src/dify_sdk by `just gen-client`, maybe some tests is broken, please fix @tests/ base on original logic and test by `just test` for check result, after check and maybe fix, you need to based on @src/dify_sdk/ and @misc/official_api_doc_changes/{v1}__{v2}.diff write new tests
+    prompt = f"""
+I already update the @src/dify_sdk by `just gen-client`, maybe some tests is broken, please fix @tests/ base on original logic and test by `just test` for check result, after check and maybe fix, you need to based on @src/dify_sdk/ and @misc/official_api_doc_changes/{v1}__{v2}.diff write new tests, and you can see changed schema in last git commits
 """.strip()
+    print(
+        "\n" + prompt,
+        end="\n\n",
+    )
+    CB.copy(prompt)
+    return prompt
+
+
+def update_readme_prompt(v1: str, v2: str) -> str:
+    diff_file_path = f"misc/official_api_doc_changes/{v1}__{v2}.diff"
+    prompt = f"""
+please based on recently schema changed (by git diff) and tests to update README.md and README.zh.md support apis
+
+a short diff file between {v1} to {v2} change, you can find it in {diff_file_path}
+""".strip()
+    print(
+        "\n" + prompt,
+        end="\n\n",
+    )
+    CB.copy(prompt)
+    return prompt
 
 
 class SchemaGenerator:
@@ -555,6 +579,7 @@ def main():
     args = parser.parse_args()
     v1 = args.v1
     v2 = args.v2
+    print(v1, v2)
 
     if not all((v1, v2)):
         raise ValueError("必须提供版本号")
@@ -563,14 +588,9 @@ def main():
     v2 = str(v2).strip()
 
     if args.mode == "prompt":
-        schema_upgrade_prompt(
-            v1=v1,
-            v2=v2,
-        )
-        more_test_coverage_prompt(
-            v1=v1,
-            v2=v2,
-        )
+        schema_upgrade_prompt(v1=v1, v2=v2)
+        more_test_coverage_prompt(v1=v1, v2=v2)
+        update_readme_prompt(v1=v1, v2=v2)
     elif args.mode == "rag":
         rag_schema_generator(
             schema_key=args.schema,

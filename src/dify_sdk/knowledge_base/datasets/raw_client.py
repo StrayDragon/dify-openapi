@@ -16,6 +16,7 @@ from ..errors.forbidden_error import ForbiddenError
 from ..types.dataset import Dataset
 from ..types.dataset_list import DatasetList
 from ..types.error import Error
+from ..types.retrieval_model import RetrievalModel
 from .types.create_dataset_request_indexing_technique import CreateDatasetRequestIndexingTechnique
 from .types.create_dataset_request_permission import CreateDatasetRequestPermission
 from .types.create_dataset_request_provider import CreateDatasetRequestProvider
@@ -102,6 +103,9 @@ class RawDatasetsClient:
         provider: typing.Optional[CreateDatasetRequestProvider] = OMIT,
         external_knowledge_api_id: typing.Optional[str] = OMIT,
         external_knowledge_id: typing.Optional[str] = OMIT,
+        embedding_model: typing.Optional[str] = OMIT,
+        embedding_model_provider: typing.Optional[str] = OMIT,
+        retrieval_model: typing.Optional[RetrievalModel] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[Dataset]:
         """
@@ -137,6 +141,15 @@ class RawDatasetsClient:
         external_knowledge_id : typing.Optional[str]
             External knowledge ID (optional)
 
+        embedding_model : typing.Optional[str]
+            Embedding model name
+
+        embedding_model_provider : typing.Optional[str]
+            Embedding model provider
+
+        retrieval_model : typing.Optional[RetrievalModel]
+            Retrieval model configuration
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -156,6 +169,11 @@ class RawDatasetsClient:
                 "provider": provider,
                 "external_knowledge_api_id": external_knowledge_api_id,
                 "external_knowledge_id": external_knowledge_id,
+                "embedding_model": embedding_model,
+                "embedding_model_provider": embedding_model_provider,
+                "retrieval_model": convert_and_respect_annotation_metadata(
+                    object_=retrieval_model, annotation=RetrievalModel, direction="write"
+                ),
             },
             headers={
                 "content-type": "application/json",
@@ -576,6 +594,9 @@ class AsyncRawDatasetsClient:
         provider: typing.Optional[CreateDatasetRequestProvider] = OMIT,
         external_knowledge_api_id: typing.Optional[str] = OMIT,
         external_knowledge_id: typing.Optional[str] = OMIT,
+        embedding_model: typing.Optional[str] = OMIT,
+        embedding_model_provider: typing.Optional[str] = OMIT,
+        retrieval_model: typing.Optional[RetrievalModel] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[Dataset]:
         """
@@ -611,6 +632,15 @@ class AsyncRawDatasetsClient:
         external_knowledge_id : typing.Optional[str]
             External knowledge ID (optional)
 
+        embedding_model : typing.Optional[str]
+            Embedding model name
+
+        embedding_model_provider : typing.Optional[str]
+            Embedding model provider
+
+        retrieval_model : typing.Optional[RetrievalModel]
+            Retrieval model configuration
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -630,6 +660,11 @@ class AsyncRawDatasetsClient:
                 "provider": provider,
                 "external_knowledge_api_id": external_knowledge_api_id,
                 "external_knowledge_id": external_knowledge_id,
+                "embedding_model": embedding_model,
+                "embedding_model_provider": embedding_model_provider,
+                "retrieval_model": convert_and_respect_annotation_metadata(
+                    object_=retrieval_model, annotation=RetrievalModel, direction="write"
+                ),
             },
             headers={
                 "content-type": "application/json",

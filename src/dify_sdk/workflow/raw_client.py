@@ -23,6 +23,7 @@ from .types.chunk_workflow_message import ChunkWorkflowMessage
 from .types.error import Error
 from .types.get_app_info_response import GetAppInfoResponse
 from .types.get_app_parameters_response import GetAppParametersResponse
+from .types.get_app_site_response import GetAppSiteResponse
 from .types.get_workflow_execution_status_response import GetWorkflowExecutionStatusResponse
 from .types.get_workflow_logs_request_status import GetWorkflowLogsRequestStatus
 from .types.get_workflow_logs_response import GetWorkflowLogsResponse
@@ -694,6 +695,82 @@ class RawWorkflowClient:
             raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
         raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
+    def get_app_site(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> HttpResponse[GetAppSiteResponse]:
+        """
+        Used to get the WebApp settings of the application
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[GetAppSiteResponse]
+            Successfully retrieved application WebApp settings
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "site",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    GetAppSiteResponse,
+                    parse_obj_as(
+                        type_=GetAppSiteResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 500:
+                raise InternalServerError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
 
 class AsyncRawWorkflowClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
@@ -1306,6 +1383,82 @@ class AsyncRawWorkflowClient:
                     GetAppParametersResponse,
                     parse_obj_as(
                         type_=GetAppParametersResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 500:
+                raise InternalServerError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+    async def get_app_site(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> AsyncHttpResponse[GetAppSiteResponse]:
+        """
+        Used to get the WebApp settings of the application
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[GetAppSiteResponse]
+            Successfully retrieved application WebApp settings
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "site",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    GetAppSiteResponse,
+                    parse_obj_as(
+                        type_=GetAppSiteResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

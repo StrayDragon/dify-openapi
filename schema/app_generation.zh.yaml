@@ -5,8 +5,8 @@ info:
     Dify API 提供了一系列接口用于文本生成功能。
     支持文本生成型应用。
     所有 API 请求都需要在 Authorization HTTP Header 中包含应用级 API-Key。
-    官方原始文档见: https://github.com/langgenius/dify/blob/1.3.1/web/app/components/develop/template/template.zh.mdx
-  version: 1.3.1
+    官方原始文档见: https://github.com/langgenius/dify/blob/1.4.0/web/app/components/develop/template/template.zh.mdx
+  version: 1.4.0
 
 servers:
   - url: https://api.dify.ai/v1
@@ -683,6 +683,74 @@ paths:
                     enum: [success]
                     description: 固定返回 success
 
+  /app/feedbacks:
+    get:
+      operationId: getAppFeedbacksByAppGeneration
+      summary: 获取APP的消息点赞和反馈
+      description: 获取应用的终端用户反馈、点赞
+      parameters:
+        - name: page
+          in: query
+          description: （选填）分页，默认值：1
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: （选填）每页数量，默认值：20
+          required: false
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: 成功获取反馈列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: 反馈ID
+                        app_id:
+                          type: string
+                          description: 应用ID
+                        conversation_id:
+                          type: string
+                          description: 会话ID
+                        message_id:
+                          type: string
+                          description: 消息ID
+                        rating:
+                          type: string
+                          description: 评分类型
+                        content:
+                          type: string
+                          description: 反馈内容
+                        from_source:
+                          type: string
+                          description: 来源
+                        from_end_user_id:
+                          type: string
+                          description: 终端用户ID
+                        from_account_id:
+                          type: string
+                          nullable: true
+                          description: 账户ID
+                        created_at:
+                          type: string
+                          description: 创建时间
+                        updated_at:
+                          type: string
+                          description: 更新时间
+
   /text-to-audio:
     post:
       operationId: convertTextToAudioByAppGeneration
@@ -891,16 +959,8 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        "204":
           description: 成功删除标注
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    enum: [success]
 
   /apps/annotation-reply/{action}:
     post:
@@ -1011,3 +1071,60 @@ paths:
                               description: emoji
                         - type: string
                           description: 图标URL
+
+  /site:
+    get:
+      operationId: getAppSiteSettingsByAppGeneration
+      summary: 获取应用 WebApp 设置
+      description: 用于获取应用的 WebApp 设置
+      responses:
+        "200":
+          description: 成功响应
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    description: WebApp 名称
+                  chat_color_theme:
+                    type: string
+                    description: 聊天颜色主题, hex 格式
+                  chat_color_theme_inverted:
+                    type: boolean
+                    description: 聊天颜色主题是否反转
+                  icon_type:
+                    type: string
+                    description: 图标类型, `emoji`-表情, `image`-图片
+                  icon:
+                    type: string
+                    description: 图标, 如果是 `emoji` 类型, 则是 emoji 表情符号, 如果是 `image` 类型, 则是图片 URL
+                  icon_background:
+                    type: string
+                    description: hex 格式的背景色
+                  icon_url:
+                    type: string
+                    nullable: true
+                    description: 图标 URL
+                  description:
+                    type: string
+                    description: 描述
+                  copyright:
+                    type: string
+                    description: 版权信息
+                  privacy_policy:
+                    type: string
+                    description: 隐私政策链接
+                  custom_disclaimer:
+                    type: string
+                    description: 自定义免责声明
+                  default_language:
+                    type: string
+                    description: 默认语言
+                  show_workflow_steps:
+                    type: boolean
+                    description: 是否显示工作流详情
+                  use_icon_as_answer_icon:
+                    type: boolean
+                    description: 是否使用 WebApp 图标替换聊天中的 🤖

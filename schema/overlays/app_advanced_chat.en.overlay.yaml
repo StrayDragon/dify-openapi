@@ -12,7 +12,7 @@ actions:
         Chat applications support session persistence, allowing previous chat history to be used as context for responses, suitable for chat/customer service AI, etc.
         All API requests require an application-level API-Key in the Authorization HTTP Header.
         It is strongly recommended that developers store the API-Key on the backend rather than sharing or storing it on the client side to prevent API-Key leakage and financial loss.
-        official raw document: https://github.com/langgenius/dify/blob/1.3.0/web/app/components/develop/template/template_advanced_chat.en.mdx
+        official raw document: https://github.com/langgenius/dify/blob/1.4.0/web/app/components/develop/template/template_advanced_chat.en.mdx
 
   - target: $.servers[0]
     update:
@@ -463,6 +463,56 @@ actions:
   - target: $.paths['/messages/{message_id}/feedbacks'].post.responses['200'].content['application/json'].schema.properties.result.description
     update: "Fixed return value 'success'"
 
+  - target: $.paths['/app/feedbacks'].get
+    update:
+      summary: "Get App Feedbacks"
+      description: "Get application's end user feedbacks and likes."
+
+  - target: $.paths['/app/feedbacks'].get.parameters[0].description
+    update: "(Optional) Pagination, default: 1"
+
+  - target: $.paths['/app/feedbacks'].get.parameters[1].description
+    update: "(Optional) Items per page, default: 20"
+
+  - target: $.paths['/app/feedbacks'].get.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/app/feedbacks'].get.responses['200'].content['application/json'].schema.properties.data.description
+    update: "List of app feedbacks"
+
+  - target: $.paths['/app/feedbacks'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.id.description
+    update: "Feedback ID"
+
+  - target: $.paths['/app/feedbacks'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.app_id.description
+    update: "Application ID"
+
+  - target: $.paths['/app/feedbacks'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.conversation_id.description
+    update: "Conversation ID"
+
+  - target: $.paths['/app/feedbacks'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.message_id.description
+    update: "Message ID"
+
+  - target: $.paths['/app/feedbacks'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.rating.description
+    update: "Rating type"
+
+  - target: $.paths['/app/feedbacks'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.content.description
+    update: "Feedback content"
+
+  - target: $.paths['/app/feedbacks'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.from_source.description
+    update: "Source"
+
+  - target: $.paths['/app/feedbacks'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.from_end_user_id.description
+    update: "End user ID"
+
+  - target: $.paths['/app/feedbacks'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.from_account_id.description
+    update: "Account ID"
+
+  - target: $.paths['/app/feedbacks'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.created_at.description
+    update: "Creation time"
+
+  - target: $.paths['/app/feedbacks'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.updated_at.description
+    update: "Update time"
+
   - target: $.paths['/messages/{message_id}/suggested'].get
     update:
       summary: "Get Suggested Questions for Next Round"
@@ -618,11 +668,8 @@ actions:
   - target: $.paths['/conversations/{conversation_id}'].delete.requestBody.content['application/json'].schema.properties.user.description
     update: "User identifier, defined by the developer, must be unique within the application."
 
-  - target: $.paths['/conversations/{conversation_id}'].delete.responses['200'].description
-    update: "Successful response"
-
-  - target: $.paths['/conversations/{conversation_id}'].delete.responses['200'].content['application/json'].schema.properties.result.description
-    update: "Fixed return value 'success'"
+  - target: $.paths['/conversations/{conversation_id}'].delete.responses['204'].description
+    update: "Successful response, no content"
 
   - target: $.paths['/conversations/{conversation_id}/name'].post
     update:
@@ -729,6 +776,56 @@ actions:
 
   - target: $.paths['/meta'].get.responses['200'].content['application/json'].schema.properties.tool_icons.additionalProperties.oneOf[1].description
     update: "Icon URL"
+
+  - target: $.paths['/site'].get
+    update:
+      summary: "Get App WebApp Settings"
+      description: "Used to get the WebApp settings of the application"
+
+  - target: $.paths['/site'].get.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/site'].get.responses['200'].content['application/json'].schema.properties.title.description
+    update: "WebApp name"
+
+  - target: $.paths['/site'].get.responses['200'].content['application/json'].schema.properties.chat_color_theme.description
+    update: "Chat color theme, hex format"
+
+  - target: $.paths['/site'].get.responses['200'].content['application/json'].schema.properties.chat_color_theme_inverted.description
+    update: "Whether the chat color theme is inverted"
+
+  - target: $.paths['/site'].get.responses['200'].content['application/json'].schema.properties.icon_type.description
+    update: "Icon type, `emoji` or `image`"
+
+  - target: $.paths['/site'].get.responses['200'].content['application/json'].schema.properties.icon.description
+    update: "Icon, if type is `emoji`, this is an emoji character, if type is `image`, this is an image URL"
+
+  - target: $.paths['/site'].get.responses['200'].content['application/json'].schema.properties.icon_background.description
+    update: "Background color in hex format"
+
+  - target: $.paths['/site'].get.responses['200'].content['application/json'].schema.properties.icon_url.description
+    update: "Icon URL"
+
+  - target: $.paths['/site'].get.responses['200'].content['application/json'].schema.properties.description.description
+    update: "Description"
+
+  - target: $.paths['/site'].get.responses['200'].content['application/json'].schema.properties.copyright.description
+    update: "Copyright information"
+
+  - target: $.paths['/site'].get.responses['200'].content['application/json'].schema.properties.privacy_policy.description
+    update: "Privacy policy link"
+
+  - target: $.paths['/site'].get.responses['200'].content['application/json'].schema.properties.custom_disclaimer.description
+    update: "Custom disclaimer"
+
+  - target: $.paths['/site'].get.responses['200'].content['application/json'].schema.properties.default_language.description
+    update: "Default language"
+
+  - target: $.paths['/site'].get.responses['200'].content['application/json'].schema.properties.show_workflow_steps.description
+    update: "Whether to show workflow details"
+
+  - target: $.paths['/site'].get.responses['200'].content['application/json'].schema.properties.use_icon_as_answer_icon.description
+    update: "Whether to use the WebApp icon to replace the 🤖 in chat"
 
   - target: $.paths['/apps/annotations'].get
     update:
@@ -840,8 +937,8 @@ actions:
   - target: $.paths['/apps/annotations/{annotation_id}'].delete.parameters[0].description
     update: "Annotation ID"
 
-  - target: $.paths['/apps/annotations/{annotation_id}'].delete.responses['200'].description
-    update: "Successfully deleted annotation"
+  - target: $.paths['/apps/annotations/{annotation_id}'].delete.responses['204'].description
+    update: "Successfully deleted annotation, no content"
 
   - target: $.paths['/apps/annotation-reply/{action}'].post
     update:

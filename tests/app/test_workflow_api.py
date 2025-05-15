@@ -238,6 +238,17 @@ async def test_get_workflow_logs(app_workflow_client: AsyncWorkflowClient):
         assert log.id is not None
 
 
+async def test_get_app_site(app_workflow_client: AsyncWorkflowClient):
+    """测试获取应用WebApp设置"""
+    site_settings = await app_workflow_client.get_app_site()
+    assert site_settings is not None
+    assert hasattr(site_settings, "title")
+    assert hasattr(site_settings, "icon_type")
+    assert hasattr(site_settings, "description")
+    assert hasattr(site_settings, "default_language")
+    assert hasattr(site_settings, "show_workflow_steps")
+
+
 async def test_stop_workflow(app_workflow_client: AsyncWorkflowClient):
     """测试停止工作流执行"""
 
