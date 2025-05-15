@@ -13,8 +13,6 @@ from .configure_annotation_reply_by_app_advanced_chat_request_action import (
 from .configure_annotation_reply_by_app_advanced_chat_response import ConfigureAnnotationReplyByAppAdvancedChatResponse
 from .convert_audio_to_text_by_app_advanced_chat_response import ConvertAudioToTextByAppAdvancedChatResponse
 from .create_annotation_by_app_advanced_chat_response import CreateAnnotationByAppAdvancedChatResponse
-from .delete_annotation_by_app_advanced_chat_response import DeleteAnnotationByAppAdvancedChatResponse
-from .delete_conversation_by_app_advanced_chat_response import DeleteConversationByAppAdvancedChatResponse
 from .error import Error
 from .file_input import FileInput
 from .file_input_transfer_method import FileInputTransferMethod
@@ -27,12 +25,21 @@ from .get_annotations_list_by_app_advanced_chat_response import GetAnnotationsLi
 from .get_annotations_list_by_app_advanced_chat_response_data_item import (
     GetAnnotationsListByAppAdvancedChatResponseDataItem,
 )
+from .get_app_feedbacks_by_app_advanced_chat_response import GetAppFeedbacksByAppAdvancedChatResponse
+from .get_app_feedbacks_by_app_advanced_chat_response_data_item import GetAppFeedbacksByAppAdvancedChatResponseDataItem
+from .get_app_feedbacks_by_app_advanced_chat_response_data_item_rating import (
+    GetAppFeedbacksByAppAdvancedChatResponseDataItemRating,
+)
 from .get_app_meta_info_by_app_advanced_chat_response import GetAppMetaInfoByAppAdvancedChatResponse
 from .get_app_meta_info_by_app_advanced_chat_response_tool_icons_value import (
     GetAppMetaInfoByAppAdvancedChatResponseToolIconsValue,
 )
 from .get_app_meta_info_by_app_advanced_chat_response_tool_icons_value_background import (
     GetAppMetaInfoByAppAdvancedChatResponseToolIconsValueBackground,
+)
+from .get_app_web_app_settings_by_app_advanced_chat_response import GetAppWebAppSettingsByAppAdvancedChatResponse
+from .get_app_web_app_settings_by_app_advanced_chat_response_icon_type import (
+    GetAppWebAppSettingsByAppAdvancedChatResponseIconType,
 )
 from .get_application_info_by_app_advanced_chat_response import GetApplicationInfoByAppAdvancedChatResponse
 from .get_application_parameters_by_app_advanced_chat_response import GetApplicationParametersByAppAdvancedChatResponse
@@ -94,8 +101,6 @@ __all__ = [
     "ConfigureAnnotationReplyByAppAdvancedChatResponse",
     "ConvertAudioToTextByAppAdvancedChatResponse",
     "CreateAnnotationByAppAdvancedChatResponse",
-    "DeleteAnnotationByAppAdvancedChatResponse",
-    "DeleteConversationByAppAdvancedChatResponse",
     "Error",
     "FileInput",
     "FileInputTransferMethod",
@@ -104,9 +109,14 @@ __all__ = [
     "GetAnnotationReplyStatusByAppAdvancedChatResponse",
     "GetAnnotationsListByAppAdvancedChatResponse",
     "GetAnnotationsListByAppAdvancedChatResponseDataItem",
+    "GetAppFeedbacksByAppAdvancedChatResponse",
+    "GetAppFeedbacksByAppAdvancedChatResponseDataItem",
+    "GetAppFeedbacksByAppAdvancedChatResponseDataItemRating",
     "GetAppMetaInfoByAppAdvancedChatResponse",
     "GetAppMetaInfoByAppAdvancedChatResponseToolIconsValue",
     "GetAppMetaInfoByAppAdvancedChatResponseToolIconsValueBackground",
+    "GetAppWebAppSettingsByAppAdvancedChatResponse",
+    "GetAppWebAppSettingsByAppAdvancedChatResponseIconType",
     "GetApplicationInfoByAppAdvancedChatResponse",
     "GetApplicationParametersByAppAdvancedChatResponse",
     "GetApplicationParametersByAppAdvancedChatResponseAnnotationReply",

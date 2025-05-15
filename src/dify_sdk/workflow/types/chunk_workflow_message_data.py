@@ -98,6 +98,16 @@ class ChunkWorkflowMessageData(UniversalBaseModel):
     Total tokens used
     """
 
+    text: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Text content
+    """
+
+    from_variable_selector: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    """
+    Text source path, helping developers understand which node's variable generated the text
+    """
+
     created_at: typing.Optional[int] = pydantic.Field(default=None)
     """
     Start time

@@ -9,6 +9,7 @@ from .raw_client import AsyncRawWorkflowClient, RawWorkflowClient
 from .types.chunk_workflow_message import ChunkWorkflowMessage
 from .types.get_app_info_response import GetAppInfoResponse
 from .types.get_app_parameters_response import GetAppParametersResponse
+from .types.get_app_site_response import GetAppSiteResponse
 from .types.get_workflow_execution_status_response import GetWorkflowExecutionStatusResponse
 from .types.get_workflow_logs_request_status import GetWorkflowLogsRequestStatus
 from .types.get_workflow_logs_response import GetWorkflowLogsResponse
@@ -275,6 +276,29 @@ class WorkflowClient:
         client.workflow.get_app_parameters()
         """
         _response = self._raw_client.get_app_parameters(request_options=request_options)
+        return _response.data
+
+    def get_app_site(self, *, request_options: typing.Optional[RequestOptions] = None) -> GetAppSiteResponse:
+        """
+        Used to get the WebApp settings of the application
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetAppSiteResponse
+            Successfully retrieved application WebApp settings
+
+        Examples
+        --------
+        from dify import DifyApi
+        client = DifyApi(token="YOUR_TOKEN", )
+        client.workflow.get_app_site()
+        """
+        _response = self._raw_client.get_app_site(request_options=request_options)
         return _response.data
 
 
@@ -557,4 +581,30 @@ class AsyncWorkflowClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.get_app_parameters(request_options=request_options)
+        return _response.data
+
+    async def get_app_site(self, *, request_options: typing.Optional[RequestOptions] = None) -> GetAppSiteResponse:
+        """
+        Used to get the WebApp settings of the application
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetAppSiteResponse
+            Successfully retrieved application WebApp settings
+
+        Examples
+        --------
+        from dify import AsyncDifyApi
+        import asyncio
+        client = AsyncDifyApi(token="YOUR_TOKEN", )
+        async def main() -> None:
+            await client.workflow.get_app_site()
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.get_app_site(request_options=request_options)
         return _response.data

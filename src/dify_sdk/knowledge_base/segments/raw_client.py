@@ -15,10 +15,6 @@ from ..errors.forbidden_error import ForbiddenError
 from ..types.error import Error
 from .types.create_segments_request_segments_item import CreateSegmentsRequestSegmentsItem
 from .types.create_segments_response import CreateSegmentsResponse
-from .types.delete_datasets_dataset_id_documents_document_id_segments_segment_id_child_chunks_child_chunk_id_response import (
-    DeleteDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse,
-)
-from .types.delete_segment_response import DeleteSegmentResponse
 from .types.get_datasets_dataset_id_documents_document_id_segments_segment_id_child_chunks_response import (
     GetDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse,
 )
@@ -362,7 +358,7 @@ class RawSegmentsClient:
         child_chunk_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> HttpResponse[DeleteDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse]:
+    ) -> HttpResponse[None]:
         """
         Delete a specified document child segment
 
@@ -385,8 +381,7 @@ class RawSegmentsClient:
 
         Returns
         -------
-        HttpResponse[DeleteDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse]
-            Successfully deleted child segment
+        HttpResponse[None]
         """
         _response = self._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(dataset_id)}/documents/{jsonable_encoder(document_id)}/segments/{jsonable_encoder(segment_id)}/child_chunks/{jsonable_encoder(child_chunk_id)}",
@@ -395,14 +390,7 @@ class RawSegmentsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _data = typing.cast(
-                    DeleteDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse,
-                    parse_obj_as(
-                        type_=DeleteDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-                return HttpResponse(response=_response, data=_data)
+                return HttpResponse(response=_response, data=None)
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
@@ -602,7 +590,7 @@ class RawSegmentsClient:
         segment_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> HttpResponse[DeleteSegmentResponse]:
+    ) -> HttpResponse[None]:
         """
         Delete specified document segment
 
@@ -622,8 +610,7 @@ class RawSegmentsClient:
 
         Returns
         -------
-        HttpResponse[DeleteSegmentResponse]
-            Successfully deleted segment
+        HttpResponse[None]
         """
         _response = self._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(dataset_id)}/documents/{jsonable_encoder(document_id)}/segments/{jsonable_encoder(segment_id)}",
@@ -632,14 +619,7 @@ class RawSegmentsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _data = typing.cast(
-                    DeleteSegmentResponse,
-                    parse_obj_as(
-                        type_=DeleteSegmentResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-                return HttpResponse(response=_response, data=_data)
+                return HttpResponse(response=_response, data=None)
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
@@ -992,7 +972,7 @@ class AsyncRawSegmentsClient:
         child_chunk_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> AsyncHttpResponse[DeleteDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse]:
+    ) -> AsyncHttpResponse[None]:
         """
         Delete a specified document child segment
 
@@ -1015,8 +995,7 @@ class AsyncRawSegmentsClient:
 
         Returns
         -------
-        AsyncHttpResponse[DeleteDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse]
-            Successfully deleted child segment
+        AsyncHttpResponse[None]
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(dataset_id)}/documents/{jsonable_encoder(document_id)}/segments/{jsonable_encoder(segment_id)}/child_chunks/{jsonable_encoder(child_chunk_id)}",
@@ -1025,14 +1004,7 @@ class AsyncRawSegmentsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _data = typing.cast(
-                    DeleteDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse,
-                    parse_obj_as(
-                        type_=DeleteDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-                return AsyncHttpResponse(response=_response, data=_data)
+                return AsyncHttpResponse(response=_response, data=None)
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
@@ -1232,7 +1204,7 @@ class AsyncRawSegmentsClient:
         segment_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> AsyncHttpResponse[DeleteSegmentResponse]:
+    ) -> AsyncHttpResponse[None]:
         """
         Delete specified document segment
 
@@ -1252,8 +1224,7 @@ class AsyncRawSegmentsClient:
 
         Returns
         -------
-        AsyncHttpResponse[DeleteSegmentResponse]
-            Successfully deleted segment
+        AsyncHttpResponse[None]
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(dataset_id)}/documents/{jsonable_encoder(document_id)}/segments/{jsonable_encoder(segment_id)}",
@@ -1262,14 +1233,7 @@ class AsyncRawSegmentsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _data = typing.cast(
-                    DeleteSegmentResponse,
-                    parse_obj_as(
-                        type_=DeleteSegmentResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-                return AsyncHttpResponse(response=_response, data=_data)
+                return AsyncHttpResponse(response=_response, data=None)
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(

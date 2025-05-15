@@ -16,6 +16,7 @@ class ChunkWorkflowMessage(UniversalBaseModel):
     - `event: message` Message event, used to deliver simple text messages
     - `event: workflow_started` workflow execution starts
     - `event: node_started` node execution starts
+    - `event: text_chunk` Text fragment
     - `event: node_finished` node execution ends, success or failure with different statuses in the same event
     - `event: workflow_finished` workflow execution ends, success or failure with different statuses in the same event
     - `event: tts_message` TTS audio stream event, i.e., speech synthesis output. The content is an audio block in Mp3 format, encoded as a base64 string, which can be directly decoded when playing. (Only present when auto-play is enabled)

@@ -4,10 +4,14 @@ import typing
 
 import pydantic
 from ...core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from .get_app_feedbacks_by_app_advanced_chat_response_data_item import GetAppFeedbacksByAppAdvancedChatResponseDataItem
 
 
-class DeleteAnnotationByAppAdvancedChatResponse(UniversalBaseModel):
-    result: typing.Optional[typing.Literal["success"]] = None
+class GetAppFeedbacksByAppAdvancedChatResponse(UniversalBaseModel):
+    data: typing.Optional[typing.List[GetAppFeedbacksByAppAdvancedChatResponseDataItem]] = pydantic.Field(default=None)
+    """
+    List of app feedbacks
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

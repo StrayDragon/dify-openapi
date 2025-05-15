@@ -6,6 +6,7 @@ from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.request_options import RequestOptions
 from ..types.dataset import Dataset
 from ..types.dataset_list import DatasetList
+from ..types.retrieval_model import RetrievalModel
 from .raw_client import AsyncRawDatasetsClient, RawDatasetsClient
 from .types.create_dataset_request_indexing_technique import CreateDatasetRequestIndexingTechnique
 from .types.create_dataset_request_permission import CreateDatasetRequestPermission
@@ -79,6 +80,9 @@ class DatasetsClient:
         provider: typing.Optional[CreateDatasetRequestProvider] = OMIT,
         external_knowledge_api_id: typing.Optional[str] = OMIT,
         external_knowledge_id: typing.Optional[str] = OMIT,
+        embedding_model: typing.Optional[str] = OMIT,
+        embedding_model_provider: typing.Optional[str] = OMIT,
+        retrieval_model: typing.Optional[RetrievalModel] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Dataset:
         """
@@ -114,6 +118,15 @@ class DatasetsClient:
         external_knowledge_id : typing.Optional[str]
             External knowledge ID (optional)
 
+        embedding_model : typing.Optional[str]
+            Embedding model name
+
+        embedding_model_provider : typing.Optional[str]
+            Embedding model provider
+
+        retrieval_model : typing.Optional[RetrievalModel]
+            Retrieval model configuration
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -136,6 +149,9 @@ class DatasetsClient:
             provider=provider,
             external_knowledge_api_id=external_knowledge_api_id,
             external_knowledge_id=external_knowledge_id,
+            embedding_model=embedding_model,
+            embedding_model_provider=embedding_model_provider,
+            retrieval_model=retrieval_model,
             request_options=request_options,
         )
         return _response.data
@@ -380,6 +396,9 @@ class AsyncDatasetsClient:
         provider: typing.Optional[CreateDatasetRequestProvider] = OMIT,
         external_knowledge_api_id: typing.Optional[str] = OMIT,
         external_knowledge_id: typing.Optional[str] = OMIT,
+        embedding_model: typing.Optional[str] = OMIT,
+        embedding_model_provider: typing.Optional[str] = OMIT,
+        retrieval_model: typing.Optional[RetrievalModel] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Dataset:
         """
@@ -415,6 +434,15 @@ class AsyncDatasetsClient:
         external_knowledge_id : typing.Optional[str]
             External knowledge ID (optional)
 
+        embedding_model : typing.Optional[str]
+            Embedding model name
+
+        embedding_model_provider : typing.Optional[str]
+            Embedding model provider
+
+        retrieval_model : typing.Optional[RetrievalModel]
+            Retrieval model configuration
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -440,6 +468,9 @@ class AsyncDatasetsClient:
             provider=provider,
             external_knowledge_api_id=external_knowledge_api_id,
             external_knowledge_id=external_knowledge_id,
+            embedding_model=embedding_model,
+            embedding_model_provider=embedding_model_provider,
+            retrieval_model=retrieval_model,
             request_options=request_options,
         )
         return _response.data

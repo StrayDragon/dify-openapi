@@ -22,7 +22,6 @@ from .types.create_document_by_file_response import CreateDocumentByFileResponse
 from .types.create_document_by_text_request_doc_form import CreateDocumentByTextRequestDocForm
 from .types.create_document_by_text_request_indexing_technique import CreateDocumentByTextRequestIndexingTechnique
 from .types.create_document_by_text_response import CreateDocumentByTextResponse
-from .types.delete_document_response import DeleteDocumentResponse
 from .types.get_document_indexing_status_response import GetDocumentIndexingStatusResponse
 from .types.get_document_list_response import GetDocumentListResponse
 from .types.update_document_by_file_response import UpdateDocumentByFileResponse
@@ -582,7 +581,7 @@ class RawDocumentsClient:
 
     def delete_document(
         self, dataset_id: str, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> HttpResponse[DeleteDocumentResponse]:
+    ) -> HttpResponse[None]:
         """
         Delete specified document
 
@@ -599,8 +598,7 @@ class RawDocumentsClient:
 
         Returns
         -------
-        HttpResponse[DeleteDocumentResponse]
-            Successfully deleted document
+        HttpResponse[None]
         """
         _response = self._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(dataset_id)}/documents/{jsonable_encoder(document_id)}",
@@ -609,14 +607,7 @@ class RawDocumentsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _data = typing.cast(
-                    DeleteDocumentResponse,
-                    parse_obj_as(
-                        type_=DeleteDocumentResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-                return HttpResponse(response=_response, data=_data)
+                return HttpResponse(response=_response, data=None)
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
@@ -1253,7 +1244,7 @@ class AsyncRawDocumentsClient:
 
     async def delete_document(
         self, dataset_id: str, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> AsyncHttpResponse[DeleteDocumentResponse]:
+    ) -> AsyncHttpResponse[None]:
         """
         Delete specified document
 
@@ -1270,8 +1261,7 @@ class AsyncRawDocumentsClient:
 
         Returns
         -------
-        AsyncHttpResponse[DeleteDocumentResponse]
-            Successfully deleted document
+        AsyncHttpResponse[None]
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(dataset_id)}/documents/{jsonable_encoder(document_id)}",
@@ -1280,14 +1270,7 @@ class AsyncRawDocumentsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _data = typing.cast(
-                    DeleteDocumentResponse,
-                    parse_obj_as(
-                        type_=DeleteDocumentResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-                return AsyncHttpResponse(response=_response, data=_data)
+                return AsyncHttpResponse(response=_response, data=None)
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(

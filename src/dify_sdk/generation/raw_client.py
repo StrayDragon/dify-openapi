@@ -25,7 +25,6 @@ from .types.configure_annotation_reply_by_app_generation_request_action import (
 )
 from .types.configure_annotation_reply_by_app_generation_response import ConfigureAnnotationReplyByAppGenerationResponse
 from .types.create_annotation_by_app_generation_response import CreateAnnotationByAppGenerationResponse
-from .types.delete_annotation_by_app_generation_response import DeleteAnnotationByAppGenerationResponse
 from .types.error import Error
 from .types.file_input import FileInput
 from .types.get_annotation_reply_status_by_app_generation_request_action import (
@@ -35,7 +34,9 @@ from .types.get_annotation_reply_status_by_app_generation_response import (
     GetAnnotationReplyStatusByAppGenerationResponse,
 )
 from .types.get_annotations_list_by_app_generation_response import GetAnnotationsListByAppGenerationResponse
+from .types.get_app_feedbacks_by_app_generation_response import GetAppFeedbacksByAppGenerationResponse
 from .types.get_app_meta_info_by_app_generation_response import GetAppMetaInfoByAppGenerationResponse
+from .types.get_app_site_settings_by_app_generation_response import GetAppSiteSettingsByAppGenerationResponse
 from .types.get_application_info_by_app_generation_response import GetApplicationInfoByAppGenerationResponse
 from .types.get_application_parameters_by_app_generation_response import GetApplicationParametersByAppGenerationResponse
 from .types.send_completion_message_by_app_generation_request_inputs import (
@@ -446,6 +447,56 @@ class RawGenerationClient:
             raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
         raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
+    def get_app_feedbacks_by_app_generation(
+        self,
+        *,
+        page: typing.Optional[int] = None,
+        limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> HttpResponse[GetAppFeedbacksByAppGenerationResponse]:
+        """
+        Get end user feedbacks and likes for the application
+
+        Parameters
+        ----------
+        page : typing.Optional[int]
+            Page number (optional), default: 1
+
+        limit : typing.Optional[int]
+            Items per page (optional), default: 20
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[GetAppFeedbacksByAppGenerationResponse]
+            Successfully retrieved feedback list
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "app/feedbacks",
+            method="GET",
+            params={
+                "page": page,
+                "limit": limit,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    GetAppFeedbacksByAppGenerationResponse,
+                    parse_obj_as(
+                        type_=GetAppFeedbacksByAppGenerationResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
     @contextlib.contextmanager
     def convert_text_to_audio_by_app_generation(
         self,
@@ -669,7 +720,7 @@ class RawGenerationClient:
 
     def delete_annotation_by_app_generation(
         self, annotation_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> HttpResponse[DeleteAnnotationByAppGenerationResponse]:
+    ) -> HttpResponse[None]:
         """
         Delete a specific annotation
 
@@ -683,8 +734,7 @@ class RawGenerationClient:
 
         Returns
         -------
-        HttpResponse[DeleteAnnotationByAppGenerationResponse]
-            Successfully deleted annotation
+        HttpResponse[None]
         """
         _response = self._client_wrapper.httpx_client.request(
             f"apps/annotations/{jsonable_encoder(annotation_id)}",
@@ -693,14 +743,7 @@ class RawGenerationClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _data = typing.cast(
-                    DeleteAnnotationByAppGenerationResponse,
-                    parse_obj_as(
-                        type_=DeleteAnnotationByAppGenerationResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-                return HttpResponse(response=_response, data=_data)
+                return HttpResponse(response=_response, data=None)
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
@@ -842,6 +885,42 @@ class RawGenerationClient:
                     GetAppMetaInfoByAppGenerationResponse,
                     parse_obj_as(
                         type_=GetAppMetaInfoByAppGenerationResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+    def get_app_site_settings_by_app_generation(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> HttpResponse[GetAppSiteSettingsByAppGenerationResponse]:
+        """
+        Used to get the WebApp settings of the application
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[GetAppSiteSettingsByAppGenerationResponse]
+            Successful response
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "site",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    GetAppSiteSettingsByAppGenerationResponse,
+                    parse_obj_as(
+                        type_=GetAppSiteSettingsByAppGenerationResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -1245,6 +1324,56 @@ class AsyncRawGenerationClient:
             raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
         raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
+    async def get_app_feedbacks_by_app_generation(
+        self,
+        *,
+        page: typing.Optional[int] = None,
+        limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AsyncHttpResponse[GetAppFeedbacksByAppGenerationResponse]:
+        """
+        Get end user feedbacks and likes for the application
+
+        Parameters
+        ----------
+        page : typing.Optional[int]
+            Page number (optional), default: 1
+
+        limit : typing.Optional[int]
+            Items per page (optional), default: 20
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[GetAppFeedbacksByAppGenerationResponse]
+            Successfully retrieved feedback list
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "app/feedbacks",
+            method="GET",
+            params={
+                "page": page,
+                "limit": limit,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    GetAppFeedbacksByAppGenerationResponse,
+                    parse_obj_as(
+                        type_=GetAppFeedbacksByAppGenerationResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
     @contextlib.asynccontextmanager
     async def convert_text_to_audio_by_app_generation(
         self,
@@ -1469,7 +1598,7 @@ class AsyncRawGenerationClient:
 
     async def delete_annotation_by_app_generation(
         self, annotation_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> AsyncHttpResponse[DeleteAnnotationByAppGenerationResponse]:
+    ) -> AsyncHttpResponse[None]:
         """
         Delete a specific annotation
 
@@ -1483,8 +1612,7 @@ class AsyncRawGenerationClient:
 
         Returns
         -------
-        AsyncHttpResponse[DeleteAnnotationByAppGenerationResponse]
-            Successfully deleted annotation
+        AsyncHttpResponse[None]
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"apps/annotations/{jsonable_encoder(annotation_id)}",
@@ -1493,14 +1621,7 @@ class AsyncRawGenerationClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _data = typing.cast(
-                    DeleteAnnotationByAppGenerationResponse,
-                    parse_obj_as(
-                        type_=DeleteAnnotationByAppGenerationResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-                return AsyncHttpResponse(response=_response, data=_data)
+                return AsyncHttpResponse(response=_response, data=None)
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
@@ -1642,6 +1763,42 @@ class AsyncRawGenerationClient:
                     GetAppMetaInfoByAppGenerationResponse,
                     parse_obj_as(
                         type_=GetAppMetaInfoByAppGenerationResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+    async def get_app_site_settings_by_app_generation(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> AsyncHttpResponse[GetAppSiteSettingsByAppGenerationResponse]:
+        """
+        Used to get the WebApp settings of the application
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[GetAppSiteSettingsByAppGenerationResponse]
+            Successful response
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "site",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    GetAppSiteSettingsByAppGenerationResponse,
+                    parse_obj_as(
+                        type_=GetAppSiteSettingsByAppGenerationResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

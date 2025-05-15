@@ -15,8 +15,6 @@ from .types.configure_annotation_reply_by_app_advanced_chat_response import (
 )
 from .types.convert_audio_to_text_by_app_advanced_chat_response import ConvertAudioToTextByAppAdvancedChatResponse
 from .types.create_annotation_by_app_advanced_chat_response import CreateAnnotationByAppAdvancedChatResponse
-from .types.delete_annotation_by_app_advanced_chat_response import DeleteAnnotationByAppAdvancedChatResponse
-from .types.delete_conversation_by_app_advanced_chat_response import DeleteConversationByAppAdvancedChatResponse
 from .types.file_input import FileInput
 from .types.get_annotation_reply_status_by_app_advanced_chat_request_action import (
     GetAnnotationReplyStatusByAppAdvancedChatRequestAction,
@@ -25,7 +23,9 @@ from .types.get_annotation_reply_status_by_app_advanced_chat_response import (
     GetAnnotationReplyStatusByAppAdvancedChatResponse,
 )
 from .types.get_annotations_list_by_app_advanced_chat_response import GetAnnotationsListByAppAdvancedChatResponse
+from .types.get_app_feedbacks_by_app_advanced_chat_response import GetAppFeedbacksByAppAdvancedChatResponse
 from .types.get_app_meta_info_by_app_advanced_chat_response import GetAppMetaInfoByAppAdvancedChatResponse
+from .types.get_app_web_app_settings_by_app_advanced_chat_response import GetAppWebAppSettingsByAppAdvancedChatResponse
 from .types.get_application_info_by_app_advanced_chat_response import GetApplicationInfoByAppAdvancedChatResponse
 from .types.get_application_parameters_by_app_advanced_chat_response import (
     GetApplicationParametersByAppAdvancedChatResponse,
@@ -366,6 +366,43 @@ class AdvancedChatClient:
         )
         return _response.data
 
+    def get_app_feedbacks_by_app_advanced_chat(
+        self,
+        *,
+        page: typing.Optional[int] = None,
+        limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetAppFeedbacksByAppAdvancedChatResponse:
+        """
+        Get application's end user feedbacks and likes.
+
+        Parameters
+        ----------
+        page : typing.Optional[int]
+            (Optional) Pagination, default: 1
+
+        limit : typing.Optional[int]
+            (Optional) Items per page, default: 20
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetAppFeedbacksByAppAdvancedChatResponse
+            Successful response
+
+        Examples
+        --------
+        from dify import DifyApi
+        client = DifyApi(token="YOUR_TOKEN", )
+        client.advanced_chat.get_app_feedbacks_by_app_advanced_chat()
+        """
+        _response = self._raw_client.get_app_feedbacks_by_app_advanced_chat(
+            page=page, limit=limit, request_options=request_options
+        )
+        return _response.data
+
     def get_suggested_questions_by_app_advanced_chat(
         self, message_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
     ) -> GetSuggestedQuestionsByAppAdvancedChatResponse:
@@ -493,7 +530,7 @@ class AdvancedChatClient:
 
     def delete_conversation_by_app_advanced_chat(
         self, conversation_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> DeleteConversationByAppAdvancedChatResponse:
+    ) -> None:
         """
         Delete a conversation.
 
@@ -510,8 +547,7 @@ class AdvancedChatClient:
 
         Returns
         -------
-        DeleteConversationByAppAdvancedChatResponse
-            Successful response
+        None
 
         Examples
         --------
@@ -648,6 +684,31 @@ class AdvancedChatClient:
         _response = self._raw_client.get_app_meta_info_by_app_advanced_chat(request_options=request_options)
         return _response.data
 
+    def get_app_web_app_settings_by_app_advanced_chat(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> GetAppWebAppSettingsByAppAdvancedChatResponse:
+        """
+        Used to get the WebApp settings of the application
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetAppWebAppSettingsByAppAdvancedChatResponse
+            Successful response
+
+        Examples
+        --------
+        from dify import DifyApi
+        client = DifyApi(token="YOUR_TOKEN", )
+        client.advanced_chat.get_app_web_app_settings_by_app_advanced_chat()
+        """
+        _response = self._raw_client.get_app_web_app_settings_by_app_advanced_chat(request_options=request_options)
+        return _response.data
+
     def get_annotations_list_by_app_advanced_chat(
         self,
         *,
@@ -756,7 +817,7 @@ class AdvancedChatClient:
 
     def delete_annotation_by_app_advanced_chat(
         self, annotation_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> DeleteAnnotationByAppAdvancedChatResponse:
+    ) -> None:
         """
         Delete a specific annotation
 
@@ -770,8 +831,7 @@ class AdvancedChatClient:
 
         Returns
         -------
-        DeleteAnnotationByAppAdvancedChatResponse
-            Successfully deleted annotation
+        None
 
         Examples
         --------
@@ -1210,6 +1270,46 @@ class AsyncAdvancedChatClient:
         )
         return _response.data
 
+    async def get_app_feedbacks_by_app_advanced_chat(
+        self,
+        *,
+        page: typing.Optional[int] = None,
+        limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetAppFeedbacksByAppAdvancedChatResponse:
+        """
+        Get application's end user feedbacks and likes.
+
+        Parameters
+        ----------
+        page : typing.Optional[int]
+            (Optional) Pagination, default: 1
+
+        limit : typing.Optional[int]
+            (Optional) Items per page, default: 20
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetAppFeedbacksByAppAdvancedChatResponse
+            Successful response
+
+        Examples
+        --------
+        from dify import AsyncDifyApi
+        import asyncio
+        client = AsyncDifyApi(token="YOUR_TOKEN", )
+        async def main() -> None:
+            await client.advanced_chat.get_app_feedbacks_by_app_advanced_chat()
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.get_app_feedbacks_by_app_advanced_chat(
+            page=page, limit=limit, request_options=request_options
+        )
+        return _response.data
+
     async def get_suggested_questions_by_app_advanced_chat(
         self, message_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
     ) -> GetSuggestedQuestionsByAppAdvancedChatResponse:
@@ -1346,7 +1446,7 @@ class AsyncAdvancedChatClient:
 
     async def delete_conversation_by_app_advanced_chat(
         self, conversation_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> DeleteConversationByAppAdvancedChatResponse:
+    ) -> None:
         """
         Delete a conversation.
 
@@ -1363,8 +1463,7 @@ class AsyncAdvancedChatClient:
 
         Returns
         -------
-        DeleteConversationByAppAdvancedChatResponse
-            Successful response
+        None
 
         Examples
         --------
@@ -1513,6 +1612,36 @@ class AsyncAdvancedChatClient:
         _response = await self._raw_client.get_app_meta_info_by_app_advanced_chat(request_options=request_options)
         return _response.data
 
+    async def get_app_web_app_settings_by_app_advanced_chat(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> GetAppWebAppSettingsByAppAdvancedChatResponse:
+        """
+        Used to get the WebApp settings of the application
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetAppWebAppSettingsByAppAdvancedChatResponse
+            Successful response
+
+        Examples
+        --------
+        from dify import AsyncDifyApi
+        import asyncio
+        client = AsyncDifyApi(token="YOUR_TOKEN", )
+        async def main() -> None:
+            await client.advanced_chat.get_app_web_app_settings_by_app_advanced_chat()
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.get_app_web_app_settings_by_app_advanced_chat(
+            request_options=request_options
+        )
+        return _response.data
+
     async def get_annotations_list_by_app_advanced_chat(
         self,
         *,
@@ -1630,7 +1759,7 @@ class AsyncAdvancedChatClient:
 
     async def delete_annotation_by_app_advanced_chat(
         self, annotation_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> DeleteAnnotationByAppAdvancedChatResponse:
+    ) -> None:
         """
         Delete a specific annotation
 
@@ -1644,8 +1773,7 @@ class AsyncAdvancedChatClient:
 
         Returns
         -------
-        DeleteAnnotationByAppAdvancedChatResponse
-            Successfully deleted annotation
+        None
 
         Examples
         --------

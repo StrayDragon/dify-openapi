@@ -13,11 +13,12 @@ from .types.conversation import Conversation
 from .types.convert_audio_to_text_by_app_chat_response import ConvertAudioToTextByAppChatResponse
 from .types.create_annotation_by_app_chat_response import CreateAnnotationByAppChatResponse
 from .types.delete_annotation_by_app_chat_response import DeleteAnnotationByAppChatResponse
-from .types.delete_conversation_by_app_chat_response import DeleteConversationByAppChatResponse
 from .types.get_annotation_reply_status_by_app_chat_request_action import GetAnnotationReplyStatusByAppChatRequestAction
 from .types.get_annotation_reply_status_by_app_chat_response import GetAnnotationReplyStatusByAppChatResponse
 from .types.get_annotations_list_by_app_chat_response import GetAnnotationsListByAppChatResponse
+from .types.get_app_feedbacks_by_app_chat_response import GetAppFeedbacksByAppChatResponse
 from .types.get_app_meta_info_by_app_chat_response import GetAppMetaInfoByAppChatResponse
+from .types.get_app_site_settings_by_app_chat_response import GetAppSiteSettingsByAppChatResponse
 from .types.get_application_info_by_app_chat_response import GetApplicationInfoByAppChatResponse
 from .types.get_application_parameters_by_app_chat_response import GetApplicationParametersByAppChatResponse
 from .types.get_conversation_list_by_app_chat_request_sort_by import GetConversationListByAppChatRequestSortBy
@@ -167,7 +168,7 @@ class ChatClient:
 
     def delete_conversation_by_app_chat(
         self, conversation_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> DeleteConversationByAppChatResponse:
+    ) -> None:
         """
         Parameters
         ----------
@@ -182,8 +183,7 @@ class ChatClient:
 
         Returns
         -------
-        DeleteConversationByAppChatResponse
-            Successful response
+        None
 
         Examples
         --------
@@ -366,6 +366,43 @@ class ChatClient:
         """
         _response = self._raw_client.send_message_feedback_by_app_chat(
             message_id, rating=rating, user=user, content=content, request_options=request_options
+        )
+        return _response.data
+
+    def get_app_feedbacks_by_app_chat(
+        self,
+        *,
+        page: typing.Optional[int] = None,
+        limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetAppFeedbacksByAppChatResponse:
+        """
+        Get application's user feedbacks and likes
+
+        Parameters
+        ----------
+        page : typing.Optional[int]
+            (Optional) Pagination, default: 1
+
+        limit : typing.Optional[int]
+            (Optional) Records per page, default: 20
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetAppFeedbacksByAppChatResponse
+            Successful response
+
+        Examples
+        --------
+        from dify import DifyApi
+        client = DifyApi(token="YOUR_TOKEN", )
+        client.chat.get_app_feedbacks_by_app_chat()
+        """
+        _response = self._raw_client.get_app_feedbacks_by_app_chat(
+            page=page, limit=limit, request_options=request_options
         )
         return _response.data
 
@@ -611,6 +648,31 @@ class ChatClient:
         client.chat.get_app_meta_info_by_app_chat()
         """
         _response = self._raw_client.get_app_meta_info_by_app_chat(request_options=request_options)
+        return _response.data
+
+    def get_app_site_settings_by_app_chat(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> GetAppSiteSettingsByAppChatResponse:
+        """
+        Used to get the WebApp settings of the application
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetAppSiteSettingsByAppChatResponse
+            Successful response
+
+        Examples
+        --------
+        from dify import DifyApi
+        client = DifyApi(token="YOUR_TOKEN", )
+        client.chat.get_app_site_settings_by_app_chat()
+        """
+        _response = self._raw_client.get_app_site_settings_by_app_chat(request_options=request_options)
         return _response.data
 
     def get_annotations_list_by_app_chat(
@@ -972,7 +1034,7 @@ class AsyncChatClient:
 
     async def delete_conversation_by_app_chat(
         self, conversation_id: str, *, user: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> DeleteConversationByAppChatResponse:
+    ) -> None:
         """
         Parameters
         ----------
@@ -987,8 +1049,7 @@ class AsyncChatClient:
 
         Returns
         -------
-        DeleteConversationByAppChatResponse
-            Successful response
+        None
 
         Examples
         --------
@@ -1186,6 +1247,46 @@ class AsyncChatClient:
         """
         _response = await self._raw_client.send_message_feedback_by_app_chat(
             message_id, rating=rating, user=user, content=content, request_options=request_options
+        )
+        return _response.data
+
+    async def get_app_feedbacks_by_app_chat(
+        self,
+        *,
+        page: typing.Optional[int] = None,
+        limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetAppFeedbacksByAppChatResponse:
+        """
+        Get application's user feedbacks and likes
+
+        Parameters
+        ----------
+        page : typing.Optional[int]
+            (Optional) Pagination, default: 1
+
+        limit : typing.Optional[int]
+            (Optional) Records per page, default: 20
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetAppFeedbacksByAppChatResponse
+            Successful response
+
+        Examples
+        --------
+        from dify import AsyncDifyApi
+        import asyncio
+        client = AsyncDifyApi(token="YOUR_TOKEN", )
+        async def main() -> None:
+            await client.chat.get_app_feedbacks_by_app_chat()
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.get_app_feedbacks_by_app_chat(
+            page=page, limit=limit, request_options=request_options
         )
         return _response.data
 
@@ -1457,6 +1558,34 @@ class AsyncChatClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.get_app_meta_info_by_app_chat(request_options=request_options)
+        return _response.data
+
+    async def get_app_site_settings_by_app_chat(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> GetAppSiteSettingsByAppChatResponse:
+        """
+        Used to get the WebApp settings of the application
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetAppSiteSettingsByAppChatResponse
+            Successful response
+
+        Examples
+        --------
+        from dify import AsyncDifyApi
+        import asyncio
+        client = AsyncDifyApi(token="YOUR_TOKEN", )
+        async def main() -> None:
+            await client.chat.get_app_site_settings_by_app_chat()
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.get_app_site_settings_by_app_chat(request_options=request_options)
         return _response.data
 
     async def get_annotations_list_by_app_chat(
