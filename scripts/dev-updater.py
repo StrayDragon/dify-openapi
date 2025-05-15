@@ -101,9 +101,16 @@ NOTE:
 
 
 def more_test_coverage_prompt(v1: str, v2: str):
-    return f"""
-I already update the @src/dify_sdk by `just gen-client`, maybe some tests is broken, please fix @tests/ base on original logic and test by `just test` for check result, after check and maybe fix, you need to based on @src/dify_sdk/ and @misc/official_api_doc_changes/{v1}__{v2}.diff write new tests
+    prompt =  f"""
+I already update the @src/dify_sdk by `just gen-client`, maybe some tests is broken, please fix @tests/ base on original logic and test by `just test` for check result, after check and maybe fix, you need to based on @src/dify_sdk/ and @misc/official_api_doc_changes/{v1}__{v2}.diff write new tests, and you can see changed schema in last git commits
 """.strip()
+    print(
+        "\n" + prompt,
+        end="\n\n",
+    )
+    CB.copy(prompt)
+    return prompt
+
 
 
 class SchemaGenerator:
