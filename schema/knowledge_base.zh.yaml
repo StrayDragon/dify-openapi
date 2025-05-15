@@ -4,7 +4,7 @@ info:
   description: |
     Dify 知识库 API 提供了一系列接口用于管理知识库、文档和检索功能。
     所有 API 请求都需要在 Authorization HTTP Header 中包含知识库级 API-Key。
-  version: 1.3.1
+  version: 1.4.0
 
 servers:
   - url: https://api.dify.ai/v1
@@ -264,6 +264,14 @@ components:
         external_knowledge_id:
           type: string
           description: 外部知识库 ID（选填）
+        embedding_model:
+          type: string
+          description: Embedding 模型名称
+        embedding_model_provider:
+          type: string
+          description: Embedding 模型供应商
+        retrieval_model:
+          $ref: "#/components/schemas/RetrievalModel"
 
     RetrievalModel:
       type: object
@@ -1567,16 +1575,8 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        "204":
           description: 成功删除文档
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    enum: [success]
         "400":
           $ref: "#/components/responses/Error400"
         "403":
@@ -1879,16 +1879,8 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        "204":
           description: 成功删除子分段
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    enum: [success]
         "400":
           $ref: "#/components/responses/Error400"
         "403":
@@ -1978,16 +1970,8 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        "204":
           description: 成功删除分段
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    enum: [success]
         "400":
           $ref: "#/components/responses/Error400"
         "403":

@@ -1,7 +1,7 @@
 overlay: 1.0.0
 info:
   title: "English translation overlay for Dify Knowledge Base API"
-  version: "1.0.0"
+  version: "1.4.0"
 extends: ../knowledge_base.zh.yaml
 actions:
   - target: $.info
@@ -240,6 +240,18 @@ actions:
   - target: $.components.schemas.CreateDatasetRequest.properties.external_knowledge_id
     update:
       description: "External knowledge ID (optional)"
+
+  - target: $.components.schemas.CreateDatasetRequest.properties.embedding_model
+    update:
+      description: "Embedding model name"
+
+  - target: $.components.schemas.CreateDatasetRequest.properties.embedding_model_provider
+    update:
+      description: "Embedding model provider"
+
+  - target: $.components.schemas.CreateDatasetRequest.properties.retrieval_model
+    update:
+      description: "Retrieval model configuration"
 
   - target: $.components.schemas.RetrievalModel.properties.search_method
     update:
@@ -728,7 +740,7 @@ actions:
       summary: "Delete Document Child Segment"
       description: "Delete a specified document child segment"
 
-  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks/{child_chunk_id}'].delete.responses['200'].description
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks/{child_chunk_id}'].delete.responses['204'].description
     update: "Successfully deleted child segment"
 
   - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}/child_chunks/{child_chunk_id}'].delete.parameters[0].description
@@ -894,7 +906,7 @@ actions:
   - target: $.paths['/datasets/{dataset_id}/documents'].get.responses['200'].description
     update: "Successfully retrieved document list"
 
-  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}'].delete.responses['200'].description
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}'].delete.responses['204'].description
     update: "Successfully deleted document"
 
   - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments'].post.responses['200'].description
@@ -903,7 +915,7 @@ actions:
   - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments'].get.responses['200'].description
     update: "Successfully retrieved segment list"
 
-  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}'].delete.responses['200'].description
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}'].delete.responses['204'].description
     update: "Successfully deleted segment"
 
   - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}'].post.responses['200'].description

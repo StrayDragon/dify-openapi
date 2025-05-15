@@ -4,7 +4,7 @@ info:
   description: |
     Dify Knowledge Base API provides a series of interfaces for managing knowledge bases, documents, and retrieval functions.
     All API requests require a knowledge base level API-Key in the Authorization HTTP Header.
-  version: 1.3.1
+  version: 1.4.0
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -268,6 +268,15 @@ components:
         external_knowledge_id:
           type: string
           description: External knowledge ID (optional)
+        embedding_model:
+          type: string
+          description: Embedding model name
+        embedding_model_provider:
+          type: string
+          description: Embedding model provider
+        retrieval_model:
+          $ref: '#/components/schemas/RetrievalModel'
+          description: Retrieval model configuration
     RetrievalModel:
       type: object
       properties:
@@ -1611,17 +1620,8 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        '204':
           description: Successfully deleted document
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    enum:
-                      - success
         '400':
           $ref: '#/components/responses/Error400'
         '403':
@@ -1919,17 +1919,8 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        '204':
           description: Successfully deleted child segment
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    enum:
-                      - success
         '400':
           $ref: '#/components/responses/Error400'
         '403':
@@ -2017,17 +2008,8 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        '204':
           description: Successfully deleted segment
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    enum:
-                      - success
         '400':
           $ref: '#/components/responses/Error400'
         '403':
