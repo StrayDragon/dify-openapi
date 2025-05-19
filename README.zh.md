@@ -1,6 +1,6 @@
 # Dify x OpenAPI
 
-[![Python Version](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org)
+[![Dify Version Support](https://img.shields.io/badge/Support_Dify_Version-1.4.0-blue)](https://github.com/langgenius/dify)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Package Manager: uv](https://img.shields.io/badge/package%20manager-uv-black)](https://github.com/astral-sh/uv)
