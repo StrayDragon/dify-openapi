@@ -14,7 +14,7 @@
 </div>
 
 > [!warning]
-> 由于 Dify 官方提供了 OpenAPI 支持，本项目将不再维护。详见 https://docs.dify.ai/api-reference/chat/send-chat-message。你可以从官方文档中"复制" OpenAPI schema（好久没看官方文档, 几分钟前才发现这个新tab...）。
+> 由于 Dify 官方提供了 OpenAPI 支持，本项目将不再维护。详见 https://docs.dify.ai/api-reference/chat/send-chat-message  。你可以从官方文档中"复制" OpenAPI schema（好久没看官方文档, 几分钟前才发现这个新tab...）。
 
 提供 [Dify](https://github.com/langgenius/dify) API 的 OpenAPI Schema，可以使用 [OpenAPI UI](https://github.com/swagger-api/swagger-ui) 预览或使用 [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator) 生成客户端
 
