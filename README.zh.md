@@ -88,6 +88,8 @@
   - [x] GET /app/feedbacks - 获取应用反馈
   - [x] GET /site - 获取应用WebApp设置
   - [x] GET /conversations/{conversation_id}/variables - 获取对话变量
+  - [x] GET /info - 获取应用基本信息
+  - [x] GET /parameters - 获取应用参数（包含文字转语音设置）
 
 - 文本生成应用: [OpenAPI Schema(中文)](./schema/app_generation.zh.yaml) | [OpenAPI Schema(English)](./schema/app_generation.en.yaml) | [官方文档源码](https://github.com/langgenius/dify/tree/1.4.1/web/app/components/develop/template)
   - [x] POST /completion-messages - 发送消息

@@ -86,6 +86,9 @@ Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, whic
   - [x] GET /app/feedbacks - Get application feedbacks
   - [x] GET /site - Get application WebApp settings
   - [x] GET /conversations/{conversation_id}/variables - Get conversation variables
+  - [x] GET /info - Get application basic information
+  - [x] GET /parameters - Get application parameters
+
 
 - Text Generation Application: [OpenAPI Schema(中文)](./schema/app_generation.zh.yaml) | [OpenAPI Schema(English)](./schema/app_generation.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.4.1/web/app/components/develop/template)
   - [x] POST /completion-messages - Send message
