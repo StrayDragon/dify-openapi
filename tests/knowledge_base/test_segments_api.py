@@ -15,7 +15,7 @@ from dify_sdk.knowledge_base.segments import (
 )
 from dify_sdk.knowledge_base.types.dataset import Dataset
 from dify_sdk.knowledge_base.types.document import Document
-from dify_sdk_testing import RUNNING_IN_CI, KnowledgeBaseClient
+from dify_sdk_testing import KnowledgeBaseClient
 
 
 @pytest.fixture
@@ -77,9 +77,6 @@ async def document_for_seg1(kb_client: KnowledgeBaseClient, dataset_for_seg1: Da
     return doc_response.document
 
 
-@pytest.mark.skip(
-    reason="文档索引需要较长时间，测试可能会因为文档未完成索引而失败",
-)
 async def test_segments_workflow(
     kb_client: KnowledgeBaseClient, dataset_for_seg1: Dataset, document_for_seg1: Document
 ):

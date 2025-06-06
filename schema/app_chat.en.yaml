@@ -6,7 +6,7 @@ info:
     It supports conversational applications.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
     official raw document: https://github.com/langgenius/dify/blob/1.4.0/web/app/components/develop/template/template_chat.en.mdx
-  version: 1.4.0
+  version: 1.4.1
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -1218,6 +1218,25 @@ paths:
                       enabled:
                         type: boolean
                     description: Audio to text settings
+                  text_to_speech:
+                    type: object
+                    properties:
+                      enabled:
+                        type: boolean
+                        description: Whether enabled
+                      voice:
+                        type: string
+                        description: Voice type
+                      language:
+                        type: string
+                        description: Language
+                      autoPlay:
+                        type: string
+                        enum:
+                          - enabled
+                          - disabled
+                        description: Auto play
+                    description: Text to speech settings
                   retriever_resource:
                     type: object
                     properties:

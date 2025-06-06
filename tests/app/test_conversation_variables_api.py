@@ -1,17 +1,14 @@
-import asyncio
 import pytest
 import warnings
-from typing import Optional
 
 from dify_sdk.chat.client import AsyncChatClient
 from dify_sdk.advanced_chat.client import AsyncAdvancedChatClient
-from dify_sdk.chat import ChunkChatCompletionResponse
-from dify_sdk_testing import RUNNING_IN_CI
+from dify_sdk_testing import parse_stream_event
 
 LOGIN_USER_ID = "test123"
 
 
-async def create_conversation(client: AsyncChatClient | AsyncAdvancedChatClient) -> Optional[str]:
+async def create_conversation(client: AsyncChatClient | AsyncAdvancedChatClient) -> str | None:
     """创建一个对话并返回对话ID"""
     # 发送一条消息以创建对话
     if isinstance(client, AsyncChatClient):
@@ -31,10 +28,9 @@ async def create_conversation(client: AsyncChatClient | AsyncAdvancedChatClient)
 
     conversation_id = None
     async for event_ in response_iterator:
-        if isinstance(event_, str):
-            event = ChunkChatCompletionResponse.model_validate_json(event_)
-        else:
-            event = event_
+        event = parse_stream_event(event_, "chat" if isinstance(client, AsyncChatClient) else "advanced_chat")
+        if event is None:
+            continue
         if not conversation_id and event.conversation_id:
             conversation_id = event.conversation_id
             break
@@ -49,7 +45,7 @@ async def create_conversation(client: AsyncChatClient | AsyncAdvancedChatClient)
             conversations = await client.get_conversations_by_app_advanced_chat(
                 user=LOGIN_USER_ID, sort_by="created_at"
             )
-        
+
         if conversations and conversations.data and len(conversations.data) > 0:
             conversation_id = str(conversations.data[0].id)
 
@@ -69,13 +65,13 @@ async def test_get_conversation_variables_chat(app_chat_client: AsyncChatClient)
             conversation_id=conversation_id,
             user=LOGIN_USER_ID,
         )
-        
+
         # 验证响应结构
         assert variables is not None
         assert hasattr(variables, "limit")
         assert hasattr(variables, "has_more")
         assert hasattr(variables, "data")
-        
+
         # 数据可能为空，因为测试环境中可能没有设置变量
         if variables.data and len(variables.data) > 0:
             for variable in variables.data:
@@ -103,13 +99,13 @@ async def test_get_conversation_variables_advanced_chat(app_advanced_chat_client
             conversation_id=conversation_id,
             user=LOGIN_USER_ID,
         )
-        
+
         # 验证响应结构
         assert variables is not None
         assert hasattr(variables, "limit")
         assert hasattr(variables, "has_more")
         assert hasattr(variables, "data")
-        
+
         # 测试变量名过滤功能
         if variables.data and len(variables.data) > 0:
             variable_name = variables.data[0].name
@@ -120,7 +116,7 @@ async def test_get_conversation_variables_advanced_chat(app_advanced_chat_client
             )
             assert filtered_variables is not None
             assert filtered_variables.data is not None
-            
+
             # 验证过滤结果
             if filtered_variables.data:
                 for variable in filtered_variables.data:
@@ -145,10 +141,11 @@ async def test_conversation_variables_pagination(app_advanced_chat_client: Async
             user=LOGIN_USER_ID,
             limit=5,
         )
-        
+
         assert variables is not None
-        assert variables.limit <= 5
-        
+        if variables.limit is not None:
+            assert variables.limit <= 5
+
         # 如果有更多数据，测试last_id参数
         if variables.has_more and variables.data and len(variables.data) > 0:
             last_id = variables.data[-1].id
@@ -157,7 +154,7 @@ async def test_conversation_variables_pagination(app_advanced_chat_client: Async
                 user=LOGIN_USER_ID,
                 last_id=last_id,
             )
-            
+
             assert next_page is not None
             assert next_page.data is not None
     except Exception as e:

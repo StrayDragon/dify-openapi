@@ -302,6 +302,8 @@ class AdvancedChatClient:
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> GetApplicationParametersByAppAdvancedChatResponse:
         """
+        Used at the beginning of entering the page to get function switches, input parameter names, types and default values, etc.
+
         Parameters
         ----------
         request_options : typing.Optional[RequestOptions]
@@ -1198,6 +1200,8 @@ class AsyncAdvancedChatClient:
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> GetApplicationParametersByAppAdvancedChatResponse:
         """
+        Used at the beginning of entering the page to get function switches, input parameter names, types and default values, etc.
+
         Parameters
         ----------
         request_options : typing.Optional[RequestOptions]

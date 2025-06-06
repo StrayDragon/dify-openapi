@@ -7,6 +7,9 @@ from ...core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 from .get_application_parameters_by_app_advanced_chat_response_annotation_reply import (
     GetApplicationParametersByAppAdvancedChatResponseAnnotationReply,
 )
+from .get_application_parameters_by_app_advanced_chat_response_file_upload import (
+    GetApplicationParametersByAppAdvancedChatResponseFileUpload,
+)
 from .get_application_parameters_by_app_advanced_chat_response_retriever_resource import (
     GetApplicationParametersByAppAdvancedChatResponseRetrieverResource,
 )
@@ -15,6 +18,12 @@ from .get_application_parameters_by_app_advanced_chat_response_speech_to_text im
 )
 from .get_application_parameters_by_app_advanced_chat_response_suggested_questions_after_answer import (
     GetApplicationParametersByAppAdvancedChatResponseSuggestedQuestionsAfterAnswer,
+)
+from .get_application_parameters_by_app_advanced_chat_response_system_parameters import (
+    GetApplicationParametersByAppAdvancedChatResponseSystemParameters,
+)
+from .get_application_parameters_by_app_advanced_chat_response_text_to_speech import (
+    GetApplicationParametersByAppAdvancedChatResponseTextToSpeech,
 )
 
 
@@ -26,35 +35,42 @@ class GetApplicationParametersByAppAdvancedChatResponse(UniversalBaseModel):
 
     suggested_questions: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
     """
-    List of suggested opening questions
+    Opening recommended question list
     """
 
     suggested_questions_after_answer: typing.Optional[
         GetApplicationParametersByAppAdvancedChatResponseSuggestedQuestionsAfterAnswer
     ] = pydantic.Field(default=None)
     """
-    Settings for suggested questions after answer
+    Enable recommended questions after answer
     """
 
     speech_to_text: typing.Optional[GetApplicationParametersByAppAdvancedChatResponseSpeechToText] = pydantic.Field(
         default=None
     )
     """
-    Audio to text settings
+    Speech to text
+    """
+
+    text_to_speech: typing.Optional[GetApplicationParametersByAppAdvancedChatResponseTextToSpeech] = pydantic.Field(
+        default=None
+    )
+    """
+    Text to speech
     """
 
     retriever_resource: typing.Optional[GetApplicationParametersByAppAdvancedChatResponseRetrieverResource] = (
         pydantic.Field(default=None)
     )
     """
-    Citation and attribution settings
+    Citation and attribution
     """
 
     annotation_reply: typing.Optional[GetApplicationParametersByAppAdvancedChatResponseAnnotationReply] = (
         pydantic.Field(default=None)
     )
     """
-    Annotation reply settings
+    Annotation reply
     """
 
     user_input_form: typing.Optional[typing.List[typing.Dict[str, typing.Optional[typing.Any]]]] = pydantic.Field(
@@ -64,12 +80,16 @@ class GetApplicationParametersByAppAdvancedChatResponse(UniversalBaseModel):
     User input form configuration
     """
 
-    file_upload: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
+    file_upload: typing.Optional[GetApplicationParametersByAppAdvancedChatResponseFileUpload] = pydantic.Field(
+        default=None
+    )
     """
     File upload configuration
     """
 
-    system_parameters: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
+    system_parameters: typing.Optional[GetApplicationParametersByAppAdvancedChatResponseSystemParameters] = (
+        pydantic.Field(default=None)
+    )
     """
     System parameters
     """

@@ -1,15 +1,9 @@
-import warnings
 import pytest
 from pathlib import Path
 
-from dify_sdk.chat.client import AsyncChatClient, ChunkChatCompletionResponse
-from dify_sdk.generation.client import AsyncGenerationClient
-from dify_sdk.core.request_options import RequestOptions
-from dify_sdk.generation.types.send_completion_message_by_app_generation_request_inputs import (
-    SendCompletionMessageByAppGenerationRequestInputs,
-)
+from dify_sdk.chat.client import AsyncChatClient
 from dify_sdk.chat.types.send_chat_message_by_app_chat_request_files_item import SendChatMessageByAppChatRequestFilesItem
-from dify_sdk_testing import RUNNING_IN_CI
+from dify_sdk_testing import RUNNING_IN_CI, parse_stream_event
 
 LOGIN_USER_ID = "test123"
 
@@ -51,10 +45,9 @@ async def test_chat_messages(app_chat_client: AsyncChatClient) -> str | None:
     )
     message_id = None
     async for event_ in response_iterator:
-        if isinstance(event_, str):
-            event = ChunkChatCompletionResponse.model_validate_json(event_)
-        else:
-            event = event_
+        event = parse_stream_event(event_, "chat")
+        if event is None:
+            continue
         if not message_id and event.message_id:
             message_id = event.message_id
 
@@ -179,10 +172,9 @@ async def test_chat_with_suggested_questions(app_chat_client: AsyncChatClient):
     )
     message_id = None
     async for event_ in response_iterator:
-        if isinstance(event_, str):
-            event = ChunkChatCompletionResponse.model_validate_json(event_)
-        else:
-            event = event_
+        event = parse_stream_event(event_, "chat")
+        if event is None:
+            continue
         if not message_id and event.message_id:
             message_id = event.message_id
 
@@ -218,10 +210,9 @@ async def test_chat_with_file(app_chat_client: AsyncChatClient, test_file_path: 
     )
     message_id = None
     async for event_ in response_iterator:
-        if isinstance(event_, str):
-            event = ChunkChatCompletionResponse.model_validate_json(event_)
-        else:
-            event = event_
+        event = parse_stream_event(event_, "chat")
+        if event is None:
+            continue
         if not message_id and event.message_id:
             message_id = event.message_id
 

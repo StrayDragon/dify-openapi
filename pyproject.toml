@@ -1,12 +1,13 @@
 [project]
 name = "dify-openapi"
-version = "1.4.0"
+version = "1.4.1"
 description = "a client for testing and validating dify openapi schema"
 readme = "README.md"
 authors = [{ name = "straydragon", email = "straydragonl@foxmail.com" }]
 requires-python = ">=3.9"
 dependencies = [
     "httpx>=0.28.1",
+    "httpx-sse>=0.4.0",
     "pydantic>=2.10.6",
 ]
 
@@ -16,17 +17,8 @@ dev = [
     "pytest-asyncio>=0.25.3",
     "pytest-cov>=6.0.0",
     "ipython>=8.18.1",
-    "langchain[openai]>=0.3.20",
     "pyyaml>=6.0.2",
     "typer>=0.15.2",
-    "langchain-openai>=0.3.8",
-    "langchain-community>=0.3.19",
-    "langchain-text-splitters>=0.3.6",
-    "tiktoken>=0.9.0",
-    "faiss-cpu>=1.10.0",
-    "langgraph>=0.3.34",
-    "langsmith>=0.3.13",
-    "langchain-chroma>=0.2.3",
 ]
 
 [build-system]

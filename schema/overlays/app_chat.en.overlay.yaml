@@ -176,6 +176,9 @@ actions:
   - target: $.components.schemas.ChatHistoryMessage.properties.agent_thoughts.items.properties.message_files.description
     update: "File IDs associated with the current agent_thought"
 
+  - target: $.components.schemas.ChatHistoryMessage.properties.agent_thoughts.items.properties.message_files.items.properties.file_id.description
+    update: "File ID"
+
   - target: $.components.schemas.ChatHistoryMessage.properties.agent_thoughts.items.properties.conversation_id.description
     update: "Conversation ID"
 
@@ -794,6 +797,19 @@ actions:
   - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.speech_to_text
     update:
       description: "Audio to text settings"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.text_to_speech
+    update:
+      properties:
+        enabled:
+          description: "Whether enabled"
+        voice:
+          description: "Voice type"
+        language:
+          description: "Language"
+        autoPlay:
+          description: "Auto play"
+      description: "Text to speech settings"
 
   - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.retriever_resource
     update:

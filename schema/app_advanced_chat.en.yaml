@@ -6,8 +6,8 @@ info:
     Chat applications support session persistence, allowing previous chat history to be used as context for responses, suitable for chat/customer service AI, etc.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
     It is strongly recommended that developers store the API-Key on the backend rather than sharing or storing it on the client side to prevent API-Key leakage and financial loss.
-    official raw document: https://github.com/langgenius/dify/blob/1.4.0/web/app/components/develop/template/template_advanced_chat.en.mdx
-  version: 1.4.0
+    official raw document: https://github.com/langgenius/dify/blob/1.4.1/web/app/components/develop/template/template_advanced_chat.en.mdx
+  version: 1.4.1
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -548,6 +548,7 @@ paths:
     get:
       operationId: getApplicationParametersByAppAdvancedChat
       summary: Get Application Parameters
+      description: 'Used at the beginning of entering the page to get function switches, input parameter names, types and default values, etc.'
       responses:
         '200':
           description: Successful response
@@ -563,41 +564,54 @@ paths:
                     type: array
                     items:
                       type: string
-                    description: List of suggested opening questions
+                    description: Opening recommended question list
                   suggested_questions_after_answer:
                     type: object
                     properties:
                       enabled:
                         type: boolean
-                    description: Settings for suggested questions after answer
+                        description: Whether to enable
+                    description: Enable recommended questions after answer
                   speech_to_text:
                     type: object
                     properties:
                       enabled:
                         type: boolean
-                    description: Audio to text settings
+                        description: Whether to enable
+                    description: Speech to text
+                  text_to_speech:
+                    type: object
+                    properties:
+                      enabled:
+                        type: boolean
+                        description: Whether to enable
+                      voice:
+                        type: string
+                        description: Voice type
+                      language:
+                        type: string
+                        description: Language
+                      autoPlay:
+                        type: string
+                        enum:
+                          - enabled
+                          - disabled
+                        description: Auto play
+                    description: Text to speech
                   retriever_resource:
                     type: object
                     properties:
                       enabled:
                         type: boolean
-                    description: Citation and attribution settings
+                        description: Whether to enable
+                    description: Citation and attribution
                   annotation_reply:
                     type: object
-                    description: Annotation reply settings
                     properties:
                       enabled:
                         type: boolean
-                        description: Whether annotation reply is enabled
-                      score_threshold:
-                        type: number
-                        description: Similarity score threshold
-                      embedding_model_name:
-                        type: string
-                        description: Embedding model
-                      embedding_provider_name:
-                        type: string
-                        description: Embedding model provider
+                        description: Whether to enable
+                    description: Annotation reply
                   user_input_form:
                     type: array
                     items:
@@ -605,9 +619,42 @@ paths:
                     description: User input form configuration
                   file_upload:
                     type: object
+                    properties:
+                      image:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: Whether to enable
+                          number_limits:
+                            type: integer
+                            description: 'Image quantity limit, default 3'
+                            default: 3
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum:
+                                - remote_url
+                                - local_file
+                            description: 'Transfer method list, remote_url, local_file, one must be selected'
+                        description: 'Image settings. Currently only supports image types: png, jpg, jpeg, webp, gif'
                     description: File upload configuration
                   system_parameters:
                     type: object
+                    properties:
+                      file_size_limit:
+                        type: integer
+                        description: Document upload size limit (MB)
+                      image_file_size_limit:
+                        type: integer
+                        description: Image file upload size limit (MB)
+                      audio_file_size_limit:
+                        type: integer
+                        description: Audio file upload size limit (MB)
+                      video_file_size_limit:
+                        type: integer
+                        description: Video file upload size limit (MB)
                     description: System parameters
   '/messages/{message_id}/feedbacks':
     post:

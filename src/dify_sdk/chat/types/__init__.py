@@ -51,6 +51,12 @@ from .get_application_parameters_by_app_chat_response_suggested_questions_after_
 from .get_application_parameters_by_app_chat_response_system_parameters import (
     GetApplicationParametersByAppChatResponseSystemParameters,
 )
+from .get_application_parameters_by_app_chat_response_text_to_speech import (
+    GetApplicationParametersByAppChatResponseTextToSpeech,
+)
+from .get_application_parameters_by_app_chat_response_text_to_speech_auto_play import (
+    GetApplicationParametersByAppChatResponseTextToSpeechAutoPlay,
+)
 from .get_conversation_list_by_app_chat_request_sort_by import GetConversationListByAppChatRequestSortBy
 from .get_conversation_list_by_app_chat_response import GetConversationListByAppChatResponse
 from .get_conversation_messages_by_app_chat_response import GetConversationMessagesByAppChatResponse
@@ -108,6 +114,8 @@ __all__ = [
     "GetApplicationParametersByAppChatResponseSpeechToText",
     "GetApplicationParametersByAppChatResponseSuggestedQuestionsAfterAnswer",
     "GetApplicationParametersByAppChatResponseSystemParameters",
+    "GetApplicationParametersByAppChatResponseTextToSpeech",
+    "GetApplicationParametersByAppChatResponseTextToSpeechAutoPlay",
     "GetConversationListByAppChatRequestSortBy",
     "GetConversationListByAppChatResponse",
     "GetConversationMessagesByAppChatResponse",
