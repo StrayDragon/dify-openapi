@@ -46,6 +46,15 @@ from .get_application_parameters_by_app_advanced_chat_response import GetApplica
 from .get_application_parameters_by_app_advanced_chat_response_annotation_reply import (
     GetApplicationParametersByAppAdvancedChatResponseAnnotationReply,
 )
+from .get_application_parameters_by_app_advanced_chat_response_file_upload import (
+    GetApplicationParametersByAppAdvancedChatResponseFileUpload,
+)
+from .get_application_parameters_by_app_advanced_chat_response_file_upload_image import (
+    GetApplicationParametersByAppAdvancedChatResponseFileUploadImage,
+)
+from .get_application_parameters_by_app_advanced_chat_response_file_upload_image_transfer_methods_item import (
+    GetApplicationParametersByAppAdvancedChatResponseFileUploadImageTransferMethodsItem,
+)
 from .get_application_parameters_by_app_advanced_chat_response_retriever_resource import (
     GetApplicationParametersByAppAdvancedChatResponseRetrieverResource,
 )
@@ -54,6 +63,15 @@ from .get_application_parameters_by_app_advanced_chat_response_speech_to_text im
 )
 from .get_application_parameters_by_app_advanced_chat_response_suggested_questions_after_answer import (
     GetApplicationParametersByAppAdvancedChatResponseSuggestedQuestionsAfterAnswer,
+)
+from .get_application_parameters_by_app_advanced_chat_response_system_parameters import (
+    GetApplicationParametersByAppAdvancedChatResponseSystemParameters,
+)
+from .get_application_parameters_by_app_advanced_chat_response_text_to_speech import (
+    GetApplicationParametersByAppAdvancedChatResponseTextToSpeech,
+)
+from .get_application_parameters_by_app_advanced_chat_response_text_to_speech_auto_play import (
+    GetApplicationParametersByAppAdvancedChatResponseTextToSpeechAutoPlay,
 )
 from .get_conversation_messages_by_app_advanced_chat_response import GetConversationMessagesByAppAdvancedChatResponse
 from .get_conversation_messages_by_app_advanced_chat_response_data_item import (
@@ -120,9 +138,15 @@ __all__ = [
     "GetApplicationInfoByAppAdvancedChatResponse",
     "GetApplicationParametersByAppAdvancedChatResponse",
     "GetApplicationParametersByAppAdvancedChatResponseAnnotationReply",
+    "GetApplicationParametersByAppAdvancedChatResponseFileUpload",
+    "GetApplicationParametersByAppAdvancedChatResponseFileUploadImage",
+    "GetApplicationParametersByAppAdvancedChatResponseFileUploadImageTransferMethodsItem",
     "GetApplicationParametersByAppAdvancedChatResponseRetrieverResource",
     "GetApplicationParametersByAppAdvancedChatResponseSpeechToText",
     "GetApplicationParametersByAppAdvancedChatResponseSuggestedQuestionsAfterAnswer",
+    "GetApplicationParametersByAppAdvancedChatResponseSystemParameters",
+    "GetApplicationParametersByAppAdvancedChatResponseTextToSpeech",
+    "GetApplicationParametersByAppAdvancedChatResponseTextToSpeechAutoPlay",
     "GetConversationMessagesByAppAdvancedChatResponse",
     "GetConversationMessagesByAppAdvancedChatResponseDataItem",
     "GetConversationMessagesByAppAdvancedChatResponseDataItemFeedback",

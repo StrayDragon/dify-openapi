@@ -305,6 +305,8 @@ class RawGenerationClient:
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> HttpResponse[GetApplicationParametersByAppGenerationResponse]:
         """
+        Used at the beginning of entering the page to get function switches, input parameter names, types and default values, etc.
+
         Parameters
         ----------
         request_options : typing.Optional[RequestOptions]
@@ -1182,6 +1184,8 @@ class AsyncRawGenerationClient:
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> AsyncHttpResponse[GetApplicationParametersByAppGenerationResponse]:
         """
+        Used at the beginning of entering the page to get function switches, input parameter names, types and default values, etc.
+
         Parameters
         ----------
         request_options : typing.Optional[RequestOptions]

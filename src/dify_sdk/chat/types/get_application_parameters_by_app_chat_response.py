@@ -19,6 +19,9 @@ from .get_application_parameters_by_app_chat_response_suggested_questions_after_
 from .get_application_parameters_by_app_chat_response_system_parameters import (
     GetApplicationParametersByAppChatResponseSystemParameters,
 )
+from .get_application_parameters_by_app_chat_response_text_to_speech import (
+    GetApplicationParametersByAppChatResponseTextToSpeech,
+)
 
 
 class GetApplicationParametersByAppChatResponse(UniversalBaseModel):
@@ -44,6 +47,13 @@ class GetApplicationParametersByAppChatResponse(UniversalBaseModel):
     )
     """
     Audio to text settings
+    """
+
+    text_to_speech: typing.Optional[GetApplicationParametersByAppChatResponseTextToSpeech] = pydantic.Field(
+        default=None
+    )
+    """
+    Text to speech settings
     """
 
     retriever_resource: typing.Optional[GetApplicationParametersByAppChatResponseRetrieverResource] = pydantic.Field(

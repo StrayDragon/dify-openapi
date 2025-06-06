@@ -8,10 +8,13 @@ from ...core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 
 class GetApplicationParametersByAppAdvancedChatResponseRetrieverResource(UniversalBaseModel):
     """
-    Citation and attribution settings
+    Citation and attribution
     """
 
-    enabled: typing.Optional[bool] = None
+    enabled: typing.Optional[bool] = pydantic.Field(default=None)
+    """
+    Whether to enable
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

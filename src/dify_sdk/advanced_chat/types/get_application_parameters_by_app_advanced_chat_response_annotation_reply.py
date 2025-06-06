@@ -8,27 +8,12 @@ from ...core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 
 class GetApplicationParametersByAppAdvancedChatResponseAnnotationReply(UniversalBaseModel):
     """
-    Annotation reply settings
+    Annotation reply
     """
 
     enabled: typing.Optional[bool] = pydantic.Field(default=None)
     """
-    Whether annotation reply is enabled
-    """
-
-    score_threshold: typing.Optional[float] = pydantic.Field(default=None)
-    """
-    Similarity score threshold
-    """
-
-    embedding_model_name: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Embedding model
-    """
-
-    embedding_provider_name: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Embedding model provider
+    Whether to enable
     """
 
     if IS_PYDANTIC_V2:
