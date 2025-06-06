@@ -2,7 +2,6 @@
 测试注释API的更新
 """
 
-import pytest
 import warnings
 
 from dify_sdk.chat.client import AsyncChatClient
@@ -11,7 +10,6 @@ from dify_sdk.advanced_chat.client import AsyncAdvancedChatClient
 LOGIN_USER_ID = "test123"
 
 
-@pytest.mark.asyncio
 async def test_create_annotation_response_format(app_chat_client: AsyncChatClient):
     """测试创建注释API的响应格式（修复了多余的嵌套）"""
     # 创建标注
@@ -29,7 +27,6 @@ async def test_create_annotation_response_format(app_chat_client: AsyncChatClien
     assert annotation_response.created_at is not None
 
 
-@pytest.mark.asyncio
 async def test_update_annotation_http_method(app_chat_client: AsyncChatClient):
     """测试更新注释API的HTTP方法（从POST改为PUT）"""
     # 创建标注
@@ -54,7 +51,6 @@ async def test_update_annotation_http_method(app_chat_client: AsyncChatClient):
     assert "This is an updated answer" in str(updated_response.answer)
 
 
-@pytest.mark.asyncio
 async def test_configure_annotation_reply_parameter_names(app_advanced_chat_client: AsyncAdvancedChatClient):
     """测试配置注释回复API的参数名称变更"""
     try:
@@ -73,7 +69,6 @@ async def test_configure_annotation_reply_parameter_names(app_advanced_chat_clie
         warnings.warn(f"配置注释回复API测试失败，可能是因为测试环境中没有配置嵌入模型: {str(e)}")
 
 
-@pytest.mark.asyncio
 async def test_advanced_chat_annotation_response_format(app_advanced_chat_client: AsyncAdvancedChatClient):
     """测试高级聊天应用中注释API的响应格式"""
     # 创建标注

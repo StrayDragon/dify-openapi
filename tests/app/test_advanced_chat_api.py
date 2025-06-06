@@ -50,6 +50,9 @@ async def test_chat_messages(app_advanced_chat_client: AsyncAdvancedChatClient) 
 
     async for event_ in response_iterator:
         if isinstance(event_, str):
+            # 跳过空字符串
+            if not event_.strip():
+                continue
             event = ChunkChatCompletionResponse.model_validate_json(event_)
         else:
             event = event_
@@ -159,6 +162,9 @@ async def test_chat_with_suggested_questions(app_advanced_chat_client: AsyncAdva
     message_id = None
     async for event_ in response_iterator:
         if isinstance(event_, str):
+            # 跳过空字符串
+            if not event_.strip():
+                continue
             event = ChunkChatCompletionResponse.model_validate_json(event_)
         else:
             event = event_
@@ -205,6 +211,9 @@ async def test_chat_with_file(app_advanced_chat_client: AsyncAdvancedChatClient,
     message_id = None
     async for event_ in response_iterator:
         if isinstance(event_, str):
+            # 跳过空字符串
+            if not event_.strip():
+                continue
             event = ChunkChatCompletionResponse.model_validate_json(event_)
         else:
             event = event_
