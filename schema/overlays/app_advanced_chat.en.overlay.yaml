@@ -1,7 +1,7 @@
 overlay: 1.0.0
 info:
   title: "English translation overlay for Dify API - Advanced Chat Application"
-  version: "1.0.0"
+  version: "1.4.1"
 extends: ../app_advanced_chat.zh.yaml
 actions:
   - target: $.info
@@ -12,7 +12,7 @@ actions:
         Chat applications support session persistence, allowing previous chat history to be used as context for responses, suitable for chat/customer service AI, etc.
         All API requests require an application-level API-Key in the Authorization HTTP Header.
         It is strongly recommended that developers store the API-Key on the backend rather than sharing or storing it on the client side to prevent API-Key leakage and financial loss.
-        official raw document: https://github.com/langgenius/dify/blob/1.4.0/web/app/components/develop/template/template_advanced_chat.en.mdx
+        official raw document: https://github.com/langgenius/dify/blob/1.4.1/web/app/components/develop/template/template_advanced_chat.en.mdx
 
   - target: $.servers[0]
     update:
@@ -367,61 +367,88 @@ actions:
   - target: $.paths['/parameters'].get
     update:
       summary: "Get Application Parameters"
+      description: "Used at the beginning of entering the page to get function switches, input parameter names, types and default values, etc."
 
   - target: $.paths['/parameters'].get.responses['200'].description
     update: "Successful response"
 
-  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.opening_statement
-    update:
-      description: "Opening statement"
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.opening_statement.description
+    update: "Opening statement"
 
-  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.suggested_questions
-    update:
-      description: "List of suggested opening questions"
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.suggested_questions.description
+    update: "Opening recommended question list"
 
-  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.suggested_questions_after_answer
-    update:
-      description: "Settings for suggested questions after answer"
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.suggested_questions_after_answer.description
+    update: "Enable recommended questions after answer"
 
-  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.speech_to_text
-    update:
-      description: "Audio to text settings"
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.suggested_questions_after_answer.properties.enabled.description
+    update: "Whether to enable"
 
-  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.retriever_resource
-    update:
-      description: "Citation and attribution settings"
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.speech_to_text.description
+    update: "Speech to text"
 
-  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply
-    update:
-      description: "Annotation reply settings"
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.speech_to_text.properties.enabled.description
+    update: "Whether to enable"
 
-  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply.properties.enabled
-    update:
-      description: "Whether annotation reply is enabled"
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.text_to_speech.description
+    update: "Text to speech"
 
-  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply.properties.score_threshold
-    update:
-      description: "Similarity score threshold"
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.text_to_speech.properties.enabled.description
+    update: "Whether to enable"
 
-  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply.properties.embedding_model_name
-    update:
-      description: "Embedding model"
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.text_to_speech.properties.voice.description
+    update: "Voice type"
 
-  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply.properties.embedding_provider_name
-    update:
-      description: "Embedding model provider"
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.text_to_speech.properties.language.description
+    update: "Language"
 
-  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form
-    update:
-      description: "User input form configuration"
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.text_to_speech.properties.autoPlay.description
+    update: "Auto play"
 
-  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload
-    update:
-      description: "File upload configuration"
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.retriever_resource.description
+    update: "Citation and attribution"
 
-  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.system_parameters
-    update:
-      description: "System parameters"
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.retriever_resource.properties.enabled.description
+    update: "Whether to enable"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply.description
+    update: "Annotation reply"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.annotation_reply.properties.enabled.description
+    update: "Whether to enable"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.user_input_form.description
+    update: "User input form configuration"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.description
+    update: "File upload configuration"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.image.description
+    update: "Image settings. Currently only supports image types: png, jpg, jpeg, webp, gif"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.image.properties.enabled.description
+    update: "Whether to enable"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.image.properties.number_limits.description
+    update: "Image quantity limit, default 3"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.image.properties.transfer_methods.description
+    update: "Transfer method list, remote_url, local_file, one must be selected"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.system_parameters.description
+    update: "System parameters"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.system_parameters.properties.file_size_limit.description
+    update: "Document upload size limit (MB)"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.system_parameters.properties.image_file_size_limit.description
+    update: "Image file upload size limit (MB)"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.system_parameters.properties.audio_file_size_limit.description
+    update: "Audio file upload size limit (MB)"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.system_parameters.properties.video_file_size_limit.description
+    update: "Video file upload size limit (MB)"
 
   - target: $.paths['/meta'].get
     update:
@@ -439,6 +466,9 @@ actions:
 
   - target: $.paths['/meta'].get.responses['200'].content['application/json'].schema.properties.tool_icons.additionalProperties.oneOf[0].properties.content.description
     update: "Emoji"
+
+  - target: $.paths['/meta'].get.responses['200'].content['application/json'].schema.properties.tool_icons.additionalProperties.oneOf[1].description
+    update: "Icon URL"
 
   - target: $.paths['/messages/{message_id}/feedbacks'].post
     update:
@@ -773,9 +803,6 @@ actions:
 
   - target: $.paths['/conversations/{conversation_id}/variables'].get.responses['404'].content['application/json'].schema.properties.message.description
     update: "Error message"
-
-  - target: $.paths['/meta'].get.responses['200'].content['application/json'].schema.properties.tool_icons.additionalProperties.oneOf[1].description
-    update: "Icon URL"
 
   - target: $.paths['/site'].get
     update:

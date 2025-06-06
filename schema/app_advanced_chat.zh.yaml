@@ -6,8 +6,8 @@ info:
     对话应用支持会话持久化，可将之前的聊天记录作为上下文进行回答，可适用于聊天/客服 AI 等。
     所有 API 请求都需要在 Authorization HTTP Header 中包含应用级 API-Key。
     强烈建议开发者把 API-Key 放在后端存储，而非分享或者放在客户端存储，以免 API-Key 泄露，导致财产损失。
-    官方原始文档见: https://github.com/langgenius/dify/blob/1.4.0/web/app/components/develop/template/template_advanced_chat.zh.mdx
-  version: 1.4.0
+    官方原始文档见: https://github.com/langgenius/dify/blob/1.4.1/web/app/components/develop/template/template_advanced_chat.zh.mdx
+  version: 1.4.1
 
 servers:
   - url: https://api.dify.ai/v1
@@ -561,6 +561,7 @@ paths:
     get:
       operationId: getApplicationParametersByAppAdvancedChat
       summary: 获取应用参数
+      description: 用于进入页面一开始，获取功能开关、输入参数名称、类型及默认值等使用。
       responses:
         "200":
           description: 成功响应
@@ -582,35 +583,46 @@ paths:
                     properties:
                       enabled:
                         type: boolean
-                    description: 回答后推荐问题设置
+                        description: 是否开启
+                    description: 启用回答后给出推荐问题
                   speech_to_text:
                     type: object
                     properties:
                       enabled:
                         type: boolean
-                    description: 语音转文本设置
+                        description: 是否开启
+                    description: 语音转文本
+                  text_to_speech:
+                    type: object
+                    properties:
+                      enabled:
+                        type: boolean
+                        description: 是否开启
+                      voice:
+                        type: string
+                        description: 语音类型
+                      language:
+                        type: string
+                        description: 语言
+                      autoPlay:
+                        type: string
+                        enum: [enabled, disabled]
+                        description: 自动播放
+                    description: 文本转语音
                   retriever_resource:
                     type: object
                     properties:
                       enabled:
                         type: boolean
-                    description: 引用和归属设置
+                        description: 是否开启
+                    description: 引用和归属
                   annotation_reply:
                     type: object
-                    description: 标注回复配置
                     properties:
                       enabled:
                         type: boolean
-                        description: 是否启用标注回复
-                      score_threshold:
-                        type: number
-                        description: 相似度阈值
-                      embedding_model_name:
-                        type: string
-                        description: 嵌入模型
-                      embedding_provider_name:
-                        type: string
-                        description: 嵌入模型提供商
+                        description: 是否开启
+                    description: 标记回复
                   user_input_form:
                     type: array
                     items:
@@ -618,9 +630,40 @@ paths:
                     description: 用户输入表单配置
                   file_upload:
                     type: object
+                    properties:
+                      image:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: 是否开启
+                          number_limits:
+                            type: integer
+                            description: 图片数量限制，默认 3
+                            default: 3
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum: [remote_url, local_file]
+                            description: 传递方式列表，remote_url, local_file，必选一个
+                        description: 图片设置 当前仅支持图片类型：png, jpg, jpeg, webp, gif
                     description: 文件上传配置
                   system_parameters:
                     type: object
+                    properties:
+                      file_size_limit:
+                        type: integer
+                        description: Document upload size limit (MB)
+                      image_file_size_limit:
+                        type: integer
+                        description: Image file upload size limit (MB)
+                      audio_file_size_limit:
+                        type: integer
+                        description: Audio file upload size limit (MB)
+                      video_file_size_limit:
+                        type: integer
+                        description: Video file upload size limit (MB)
                     description: 系统参数
 
   /messages/{message_id}/feedbacks:
