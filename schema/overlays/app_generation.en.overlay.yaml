@@ -11,7 +11,7 @@ actions:
         Dify API provides a series of interfaces for text generation functionality.
         It supports text generation applications.
         All API requests require an application-level API-Key in the Authorization HTTP Header.
-        official raw document: https://github.com/langgenius/dify/blob/1.4.1/web/app/components/develop/template/template.en.mdx
+        official raw document: https://github.com/langgenius/dify/blob/1.4.2/web/app/components/develop/template/template.en.mdx
 
   - target: $.servers[0]
     update:
@@ -115,16 +115,16 @@ actions:
     update: "Message creation timestamp"
 
   - target: $.components.schemas.FileInput.properties.type.description
-    update: "File type"
+    update: "File type, currently only supports images"
 
   - target: $.components.schemas.FileInput.properties.transfer_method.description
     update: "Transfer method"
 
   - target: $.components.schemas.FileInput.properties.url.description
-    update: "Remote URL"
+    update: "Image URL (only when transfer method is remote_url)"
 
   - target: $.components.schemas.FileInput.properties.upload_file_id.description
-    update: "Upload file ID"
+    update: "Upload file ID (only when transfer method is local_file)"
 
   - target: $.components.schemas.ChunkChatCompletionResponse.properties.event.description
     update: "Event type"
@@ -252,8 +252,8 @@ actions:
     update:
       summary: "Upload File"
       description: |
-        Upload files for use when sending messages.
-        Supported file types depend on application type and configuration.
+        Upload files (currently only supports images) for use when sending messages, enabling multimodal image and text understanding.
+        Supports png, jpg, jpeg, webp, gif formats.
         Uploaded files are only available to the current end user.
 
   - target: $.paths['/files/upload'].post.requestBody.content['multipart/form-data'].schema.properties.file
@@ -262,7 +262,7 @@ actions:
 
   - target: $.paths['/files/upload'].post.requestBody.content['multipart/form-data'].schema.properties.user
     update:
-      description: "User identifier"
+      description: "User identifier, used to define the identity of the end user, must be consistent with the user passed in the message sending interface"
 
   - target: $.paths['/files/upload'].post.responses['200'].description
     update: "Successful response"
@@ -748,7 +748,7 @@ actions:
     update: "Action, can only be 'enable' or 'disable', and must be consistent with the action in the annotation reply initialization interface"
 
   - target: $.paths['/apps/annotation-reply/{action}/status/{job_id}'].get.parameters[1].description
-    update: "Job ID, returned from the annotation reply initialization interface"
+    update: "Job ID, from the job_id returned by the annotation reply initialization interface"
 
   - target: $.paths['/apps/annotation-reply/{action}/status/{job_id}'].get.responses['200'].description
     update: "Successfully retrieved job status"
@@ -761,3 +761,101 @@ actions:
 
   - target: $.paths['/apps/annotation-reply/{action}/status/{job_id}'].get.responses['200'].content['application/json'].schema.properties.error_msg.description
     update: "Error message"
+
+  # Error responses translations
+  - target: $.paths['/completion-messages'].post.responses['400'].description
+    update: "Request error"
+
+  - target: $.paths['/completion-messages'].post.responses['400'].content['application/json'].examples.invalid_param.summary
+    update: "Invalid parameter"
+
+  - target: $.paths['/completion-messages'].post.responses['400'].content['application/json'].examples.invalid_param.value.message
+    update: "Invalid parameter"
+
+  - target: $.paths['/completion-messages'].post.responses['400'].content['application/json'].examples.app_unavailable.summary
+    update: "App configuration unavailable"
+
+  - target: $.paths['/completion-messages'].post.responses['400'].content['application/json'].examples.app_unavailable.value.message
+    update: "App configuration unavailable"
+
+  - target: $.paths['/completion-messages'].post.responses['400'].content['application/json'].examples.provider_not_initialize.summary
+    update: "No available model credentials configured"
+
+  - target: $.paths['/completion-messages'].post.responses['400'].content['application/json'].examples.provider_not_initialize.value.message
+    update: "No available model credentials configured"
+
+  - target: $.paths['/completion-messages'].post.responses['400'].content['application/json'].examples.provider_quota_exceeded.summary
+    update: "Model quota exceeded"
+
+  - target: $.paths['/completion-messages'].post.responses['400'].content['application/json'].examples.provider_quota_exceeded.value.message
+    update: "Model quota exceeded"
+
+  - target: $.paths['/completion-messages'].post.responses['400'].content['application/json'].examples.model_currently_not_support.summary
+    update: "Current model not available"
+
+  - target: $.paths['/completion-messages'].post.responses['400'].content['application/json'].examples.model_currently_not_support.value.message
+    update: "Current model not available"
+
+  - target: $.paths['/completion-messages'].post.responses['400'].content['application/json'].examples.completion_request_error.summary
+    update: "Text generation failed"
+
+  - target: $.paths['/completion-messages'].post.responses['400'].content['application/json'].examples.completion_request_error.value.message
+    update: "Text generation failed"
+
+  - target: $.paths['/completion-messages'].post.responses['404'].description
+    update: "Conversation not found"
+
+  - target: $.paths['/completion-messages'].post.responses['500'].description
+    update: "Internal server error"
+
+  # File upload error responses
+  - target: $.paths['/files/upload'].post.responses['400'].description
+    update: "Request error"
+
+  - target: $.paths['/files/upload'].post.responses['400'].content['application/json'].examples.no_file_uploaded.summary
+    update: "Must provide file"
+
+  - target: $.paths['/files/upload'].post.responses['400'].content['application/json'].examples.no_file_uploaded.value.message
+    update: "Must provide file"
+
+  - target: $.paths['/files/upload'].post.responses['400'].content['application/json'].examples.too_many_files.summary
+    update: "Currently only accepts one file"
+
+  - target: $.paths['/files/upload'].post.responses['400'].content['application/json'].examples.too_many_files.value.message
+    update: "Currently only accepts one file"
+
+  - target: $.paths['/files/upload'].post.responses['400'].content['application/json'].examples.unsupported_preview.summary
+    update: "This file does not support preview"
+
+  - target: $.paths['/files/upload'].post.responses['400'].content['application/json'].examples.unsupported_preview.value.message
+    update: "This file does not support preview"
+
+  - target: $.paths['/files/upload'].post.responses['400'].content['application/json'].examples.unsupported_estimate.summary
+    update: "This file does not support estimation"
+
+  - target: $.paths['/files/upload'].post.responses['400'].content['application/json'].examples.unsupported_estimate.value.message
+    update: "This file does not support estimation"
+
+  - target: $.paths['/files/upload'].post.responses['413'].content['application/json'].example.message
+    update: "File too large"
+
+  - target: $.paths['/files/upload'].post.responses['415'].content['application/json'].example.message
+    update: "Unsupported file extension, currently only accepts document files"
+
+  - target: $.paths['/files/upload'].post.responses['503'].content['application/json'].examples.s3_connection_failed.summary
+    update: "Unable to connect to S3 service"
+
+  - target: $.paths['/files/upload'].post.responses['503'].content['application/json'].examples.s3_connection_failed.value.message
+    update: "Unable to connect to S3 service"
+
+  - target: $.paths['/files/upload'].post.responses['503'].content['application/json'].examples.s3_permission_denied.summary
+    update: "No permission to upload files to S3"
+
+  - target: $.paths['/files/upload'].post.responses['503'].content['application/json'].examples.s3_permission_denied.value.message
+    update: "No permission to upload files to S3"
+
+  - target: $.paths['/files/upload'].post.responses['503'].content['application/json'].examples.s3_file_too_large.summary
+    update: "File exceeds S3 size limit"
+
+  - target: $.paths['/files/upload'].post.responses['503'].content['application/json'].examples.s3_file_too_large.value.message
+    update: "File exceeds S3 size limit"

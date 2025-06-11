@@ -5,8 +5,8 @@ info:
     Dify API provides a series of interfaces for text generation functionality.
     It supports text generation applications.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
-    official raw document: https://github.com/langgenius/dify/blob/1.4.1/web/app/components/develop/template/template.en.mdx
-  version: 1.4.1
+    official raw document: https://github.com/langgenius/dify/blob/1.4.2/web/app/components/develop/template/template.en.mdx
+  version: 1.4.2
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -162,12 +162,8 @@ components:
         type:
           type: string
           enum:
-            - document
             - image
-            - audio
-            - video
-            - custom
-          description: File type
+          description: 'File type, currently only supports images'
         transfer_method:
           type: string
           enum:
@@ -176,10 +172,10 @@ components:
           description: Transfer method
         url:
           type: string
-          description: Remote URL
+          description: Image URL (only when transfer method is remote_url)
         upload_file_id:
           type: string
-          description: Upload file ID
+          description: Upload file ID (only when transfer method is local_file)
     ChunkChatCompletionResponse:
       type: object
       properties:
@@ -356,18 +352,67 @@ paths:
                     - `message` (string) Error message
                   - `event: ping` Ping event every 10s to keep the connection alive.
         '400':
-          $ref: '#/components/responses/Error400'
+          description: Request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalid_param:
+                  summary: Invalid parameter
+                  value:
+                    code: invalid_param
+                    status: 400
+                    message: Invalid parameter
+                app_unavailable:
+                  summary: App configuration unavailable
+                  value:
+                    code: app_unavailable
+                    status: 400
+                    message: App configuration unavailable
+                provider_not_initialize:
+                  summary: No available model credentials configured
+                  value:
+                    code: provider_not_initialize
+                    status: 400
+                    message: No available model credentials configured
+                provider_quota_exceeded:
+                  summary: Model quota exceeded
+                  value:
+                    code: provider_quota_exceeded
+                    status: 400
+                    message: Model quota exceeded
+                model_currently_not_support:
+                  summary: Current model not available
+                  value:
+                    code: model_currently_not_support
+                    status: 400
+                    message: Current model not available
+                completion_request_error:
+                  summary: Text generation failed
+                  value:
+                    code: completion_request_error
+                    status: 400
+                    message: Text generation failed
         '404':
-          $ref: '#/components/responses/Error404'
+          description: Conversation not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
-          $ref: '#/components/responses/Error500'
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /files/upload:
     post:
       operationId: uploadFileByAppGeneration
       summary: Upload File
       description: |
-        Upload files for use when sending messages.
-        Supported file types depend on application type and configuration.
+        Upload files (currently only supports images) for use when sending messages, enabling multimodal image and text understanding.
+        Supports png, jpg, jpeg, webp, gif formats.
         Uploaded files are only available to the current end user.
       requestBody:
         required: true
@@ -382,9 +427,10 @@ paths:
                   description: File to upload
                 user:
                   type: string
-                  description: User identifier
+                  description: 'User identifier, used to define the identity of the end user, must be consistent with the user passed in the message sending interface'
               required:
                 - file
+                - user
       responses:
         '200':
           description: Successful response
@@ -393,25 +439,81 @@ paths:
               schema:
                 $ref: '#/components/schemas/UploadedFile'
         '400':
-          $ref: '#/components/responses/Error400'
+          description: Request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                no_file_uploaded:
+                  summary: Must provide file
+                  value:
+                    code: no_file_uploaded
+                    status: 400
+                    message: Must provide file
+                too_many_files:
+                  summary: Currently only accepts one file
+                  value:
+                    code: too_many_files
+                    status: 400
+                    message: Currently only accepts one file
+                unsupported_preview:
+                  summary: This file does not support preview
+                  value:
+                    code: unsupported_preview
+                    status: 400
+                    message: This file does not support preview
+                unsupported_estimate:
+                  summary: This file does not support estimation
+                  value:
+                    code: unsupported_estimate
+                    status: 400
+                    message: This file does not support estimation
         '413':
           description: File too large
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                code: file_too_large
+                status: 413
+                message: File too large
         '415':
           description: Unsupported file type
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                code: unsupported_file_type
+                status: 415
+                message: 'Unsupported file extension, currently only accepts document files'
         '503':
           description: Storage service error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              examples:
+                s3_connection_failed:
+                  summary: Unable to connect to S3 service
+                  value:
+                    code: s3_connection_failed
+                    status: 503
+                    message: Unable to connect to S3 service
+                s3_permission_denied:
+                  summary: No permission to upload files to S3
+                  value:
+                    code: s3_permission_denied
+                    status: 503
+                    message: No permission to upload files to S3
+                s3_file_too_large:
+                  summary: File exceeds S3 size limit
+                  value:
+                    code: s3_file_too_large
+                    status: 503
+                    message: File exceeds S3 size limit
   /info:
     get:
       operationId: getApplicationInfoByAppGeneration
@@ -766,6 +868,7 @@ paths:
                 streaming:
                   type: boolean
                   description: Whether to use streaming mode to return audio data
+                  default: false
       responses:
         '200':
           description: Successful response
@@ -1010,7 +1113,7 @@ paths:
               - disable
         - name: job_id
           in: path
-          description: 'Job ID, returned from the annotation reply initialization interface'
+          description: 'Job ID, from the job_id returned by the annotation reply initialization interface'
           required: true
           schema:
             type: string
