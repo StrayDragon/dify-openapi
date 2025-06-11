@@ -28,6 +28,8 @@ tags:
     description: Operations for retrieving model information
   - name: Metadata
     description: Operations for managing metadata in knowledge bases
+  - name: Tags
+    description: Operations for managing knowledge base tags
 components:
   securitySchemes:
     bearerApiKeyAuth:
@@ -291,11 +293,11 @@ components:
             Search method:
             - keyword_search: Keyword search
             - semantic_search: Semantic search
-            - full_text_search: Full text search
+            - full_text_search: Full-text search
             - hybrid_search: Hybrid search
         reranking_enable:
           type: boolean
-          description: 'Whether to enable Reranking, optional, required if retrieval mode is semantic_search or hybrid_search'
+          description: Whether reranking is enabled (optional). Required if search mode is semantic_search or hybrid_search
         reranking_model:
           type: object
           properties:
@@ -305,21 +307,72 @@ components:
             reranking_model_name:
               type: string
               description: Rerank model name
-          description: 'Rerank model configuration, optional, required if reranking is enabled'
+          description: Rerank model configuration (optional). Required if reranking is enabled
         weights:
           type: number
           format: float
           description: Weight setting for semantic search in hybrid search mode
         top_k:
           type: integer
-          description: 'Number of results returned, optional'
+          description: Number of results to return (optional)
         score_threshold_enabled:
           type: boolean
-          description: Whether to enable score threshold
+          description: Whether score threshold is enabled
         score_threshold:
           type: number
           format: float
           description: Score threshold
+        metadata_filtering_conditions:
+          $ref: '#/components/schemas/MetadataFilteringConditions'
+          description: Metadata filtering conditions
+    MetadataFilteringConditions:
+      type: object
+      description: Metadata filtering conditions
+      properties:
+        logical_operator:
+          type: string
+          enum:
+            - and
+            - or
+          description: Logical operator
+        conditions:
+          type: array
+          description: List of conditions
+          items:
+            $ref: '#/components/schemas/MetadataCondition'
+    MetadataCondition:
+      type: object
+      description: Single metadata filtering condition
+      properties:
+        name:
+          type: string
+          description: Metadata field name
+        comparison_operator:
+          type: string
+          enum:
+            - contains
+            - not contains
+            - start with
+            - end with
+            - is
+            - is not
+            - empty
+            - not empty
+            - '='
+            - ≠
+            - '>'
+            - <
+            - ≥
+            - ≤
+            - before
+            - after
+          description: Comparison operator
+        value:
+          oneOf:
+            - type: string
+            - type: number
+            - type: 'null'
+          description: Comparison value
     ProcessRule:
       type: object
       required:
@@ -802,6 +855,23 @@ components:
         position:
           type: integer
           description: Position
+    KnowledgeTag:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Tag ID
+        name:
+          type: string
+          description: Tag name
+        type:
+          type: string
+          enum:
+            - knowledge
+          description: Tag type
+        binding_count:
+          type: integer
+          description: Binding count
   responses:
     Error400:
       description: Request parameter error
@@ -1057,166 +1127,6 @@ paths:
       responses:
         '204':
           description: Successfully deleted knowledge base
-        '400':
-          $ref: '#/components/responses/Error400'
-        '403':
-          $ref: '#/components/responses/Error403'
-  '/datasets/{dataset_id}/retrieve':
-    post:
-      summary: Retrieve Knowledge Base
-      description: Retrieve content from specified knowledge base
-      operationId: retrieveDataset
-      tags:
-        - Datasets
-      parameters:
-        - name: dataset_id
-          in: path
-          description: Knowledge Base ID
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - query
-              properties:
-                query:
-                  type: string
-                  description: Search keyword
-                retrieval_model:
-                  type: object
-                  description: Retrieval parameter configuration
-                  properties:
-                    search_method:
-                      type: string
-                      enum:
-                        - keyword_search
-                        - semantic_search
-                        - full_text_search
-                        - hybrid_search
-                      description: Search method
-                    reranking_enable:
-                      type: boolean
-                      description: Whether to enable Reranking
-                    reranking_model:
-                      type: object
-                      properties:
-                        reranking_provider_name:
-                          type: string
-                          description: Rerank model provider
-                        reranking_model_name:
-                          type: string
-                          description: Rerank model name
-                    weights:
-                      type: number
-                      format: float
-                      description: Weight setting for semantic search in hybrid search mode
-                    top_k:
-                      type: integer
-                      description: Number of results to return
-                    score_threshold_enabled:
-                      type: boolean
-                      description: Whether to enable score threshold
-                    score_threshold:
-                      type: number
-                      format: float
-                      description: Score threshold
-                external_retrieval_model:
-                  type: object
-                  description: Unused field
-      responses:
-        '200':
-          description: Retrieval successful
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  query:
-                    type: object
-                    properties:
-                      content:
-                        type: string
-                        description: Search keyword
-                  records:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        segment:
-                          type: object
-                          properties:
-                            id:
-                              type: string
-                            position:
-                              type: integer
-                            document_id:
-                              type: string
-                            content:
-                              type: string
-                            answer:
-                              type: string
-                              nullable: true
-                            word_count:
-                              type: integer
-                            tokens:
-                              type: integer
-                            keywords:
-                              type: array
-                              items:
-                                type: string
-                            index_node_id:
-                              type: string
-                            index_node_hash:
-                              type: string
-                            hit_count:
-                              type: integer
-                            enabled:
-                              type: boolean
-                            disabled_at:
-                              type: number
-                              nullable: true
-                            disabled_by:
-                              type: string
-                              nullable: true
-                            status:
-                              type: string
-                            created_by:
-                              type: string
-                            created_at:
-                              type: number
-                              nullable: true
-                            indexing_at:
-                              type: number
-                              nullable: true
-                            completed_at:
-                              type: number
-                              nullable: true
-                            error:
-                              type: string
-                              nullable: true
-                            stopped_at:
-                              type: number
-                              nullable: true
-                            document:
-                              type: object
-                              properties:
-                                id:
-                                  type: string
-                                data_source_type:
-                                  type: string
-                                name:
-                                  type: string
-                        score:
-                          type: number
-                          format: float
-                        tsne_position:
-                          type: object
-                          nullable: true
         '400':
           $ref: '#/components/responses/Error400'
         '403':
@@ -1982,6 +1892,59 @@ paths:
         '403':
           $ref: '#/components/responses/Error403'
   '/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}':
+    get:
+      summary: View Document Segment Detail
+      description: View the details of a specific document segment in the specified knowledge base
+      operationId: getSegmentDetail
+      tags:
+        - Segments
+      parameters:
+        - name: dataset_id
+          in: path
+          description: Knowledge Base ID
+          required: true
+          schema:
+            type: string
+        - name: document_id
+          in: path
+          description: Document ID
+          required: true
+          schema:
+            type: string
+        - name: segment_id
+          in: path
+          description: Segment ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved segment details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    allOf:
+                      - $ref: '#/components/schemas/Segment'
+                      - type: object
+                        properties:
+                          sign_content:
+                            type: string
+                            description: Signature content
+                          child_chunks:
+                            type: array
+                            description: Child segment list
+                            items:
+                              $ref: '#/components/schemas/ChildChunk'
+                  doc_form:
+                    type: string
+                    description: Document form
+        '400':
+          $ref: '#/components/responses/Error400'
+        '403':
+          $ref: '#/components/responses/Error403'
     delete:
       summary: Delete Document Segment
       description: Delete specified document segment
@@ -2111,6 +2074,89 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UploadFile'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '403':
+          $ref: '#/components/responses/Error403'
+  '/datasets/{dataset_id}/retrieve':
+    post:
+      summary: Retrieve Knowledge Base
+      description: Retrieve relevant content from the specified knowledge base
+      operationId: retrieveDataset
+      tags:
+        - Datasets
+      parameters:
+        - name: dataset_id
+          in: path
+          description: Knowledge Base ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - query
+              properties:
+                query:
+                  type: string
+                  description: Search keywords
+                retrieval_model:
+                  $ref: '#/components/schemas/RetrievalModel'
+                  description: Retrieval parameter configuration
+                external_retrieval_model:
+                  type: object
+                  description: External retrieval model (disabled field)
+      responses:
+        '200':
+          description: Successfully retrieved knowledge base
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  query:
+                    type: object
+                    properties:
+                      content:
+                        type: string
+                        description: Query content
+                  records:
+                    type: array
+                    description: Search result list
+                    items:
+                      type: object
+                      properties:
+                        segment:
+                          allOf:
+                            - $ref: '#/components/schemas/Segment'
+                            - type: object
+                              properties:
+                                document:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      description: Document ID
+                                    data_source_type:
+                                      type: string
+                                      description: Data source type
+                                    name:
+                                      type: string
+                                      description: Document name
+                        score:
+                          type: number
+                          format: float
+                          description: Relevance score
+                        tsne_position:
+                          type: array
+                          nullable: true
+                          description: t-SNE position
+                          items:
+                            type: number
         '400':
           $ref: '#/components/responses/Error400'
         '403':
@@ -2392,6 +2438,235 @@ paths:
       responses:
         '204':
           description: Successfully updated document metadata
+        '400':
+          $ref: '#/components/responses/Error400'
+  /datasets/tags:
+    post:
+      summary: Create Knowledge Base Tag
+      description: Create a new knowledge base tag
+      operationId: createKnowledgeTag
+      tags:
+        - Tags
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - name
+              properties:
+                name:
+                  type: string
+                  maxLength: 50
+                  description: 'Tag name, required, maximum length 50'
+      responses:
+        '200':
+          description: Successfully created tag
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgeTag'
+        '400':
+          $ref: '#/components/responses/Error400'
+    get:
+      summary: Get Knowledge Base Tags
+      description: Get all knowledge base tag list
+      operationId: getKnowledgeTags
+      tags:
+        - Tags
+      responses:
+        '200':
+          description: Successfully retrieved tag list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KnowledgeTag'
+        '400':
+          $ref: '#/components/responses/Error400'
+    patch:
+      summary: Update Knowledge Base Tag Name
+      description: Update the name of the specified knowledge base tag
+      operationId: updateKnowledgeTag
+      tags:
+        - Tags
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - tag_id
+                - name
+                - tag_id
+              properties:
+                name:
+                  type: string
+                  maxLength: 50
+                  description: 'Updated tag name, required, maximum length 50'
+                tag_id:
+                  type: string
+                  description: 'Tag ID, required'
+      responses:
+        '200':
+          description: Successfully updated tag name
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgeTag'
+        '400':
+          $ref: '#/components/responses/Error400'
+    delete:
+      summary: Delete Knowledge Base Tag
+      description: Delete the specified knowledge base tag
+      operationId: deleteKnowledgeTag
+      tags:
+        - Tags
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tag_id
+                - tag_id
+              properties:
+                tag_id:
+                  type: string
+                  description: 'Tag ID, required'
+      responses:
+        '200':
+          description: Successfully deleted tag
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: success
+        '400':
+          $ref: '#/components/responses/Error400'
+  /datasets/tags/binding:
+    post:
+      summary: Bind Knowledge Base to Tag
+      description: Bind knowledge base to specified knowledge base tags
+      operationId: bindDatasetToTag
+      tags:
+        - Tags
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tag_ids
+                - target_id
+                - tag_ids
+                - target_id
+              properties:
+                tag_ids:
+                  type: array
+                  description: 'Tag ID list, required'
+                  items:
+                    type: string
+                target_id:
+                  type: string
+                  description: 'Knowledge Base ID, required'
+      responses:
+        '200':
+          description: Successfully bound knowledge base to tags
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: success
+        '400':
+          $ref: '#/components/responses/Error400'
+  /datasets/tags/unbinding:
+    post:
+      summary: Unbind Knowledge Base from Tag
+      description: Remove the binding relationship between knowledge base and specified tag
+      operationId: unbindDatasetFromTag
+      tags:
+        - Tags
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tag_id
+                - target_id
+                - tag_id
+                - target_id
+              properties:
+                tag_id:
+                  type: string
+                  description: 'Tag ID, required'
+                target_id:
+                  type: string
+                  description: 'Knowledge Base ID, required'
+      responses:
+        '200':
+          description: Successfully unbound knowledge base from tag
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: success
+        '400':
+          $ref: '#/components/responses/Error400'
+  '/datasets/{dataset_id}/tags':
+    post:
+      summary: Query Knowledge Base Bound Tags
+      description: Get all tags bound to the specified knowledge base
+      operationId: getDatasetTags
+      tags:
+        - Tags
+      parameters:
+        - name: dataset_id
+          in: path
+          description: Knowledge Base ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved knowledge base bound tag list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Tag ID
+                        name:
+                          type: string
+                          description: Tag name
+                  total:
+                    type: integer
+                    description: Total count
         '400':
           $ref: '#/components/responses/Error400'
 

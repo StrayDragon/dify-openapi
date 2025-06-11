@@ -33,6 +33,8 @@ tags:
     description: 模型信息获取相关操作
   - name: Metadata
     description: 知识库元数据管理相关操作
+  - name: Tags
+    description: 知识库标签管理相关操作
 
 components:
   securitySchemes:
@@ -313,6 +315,43 @@ components:
           type: number
           format: float
           description: Score 阈值
+        metadata_filtering_conditions:
+          $ref: "#/components/schemas/MetadataFilteringConditions"
+
+    MetadataFilteringConditions:
+      type: object
+      description: 元数据过滤条件
+      properties:
+        logical_operator:
+          type: string
+          enum: [and, or]
+          description: 逻辑运算符
+        conditions:
+          type: array
+          description: 条件列表
+          items:
+            $ref: "#/components/schemas/MetadataCondition"
+
+    MetadataCondition:
+      type: object
+      description: 单个元数据过滤条件
+      properties:
+        name:
+          type: string
+          description: 元数据字段名
+        comparison_operator:
+          type: string
+          enum: [
+            contains, "not contains", "start with", "end with", is, "is not", empty, "not empty",
+            "=", "≠", ">", "<", "≥", "≤", before, after
+          ]
+          description: 比较运算符
+        value:
+          oneOf:
+            - type: string
+            - type: number
+            - type: "null"
+          description: 比较值
 
     ProcessRule:
       type: object
@@ -746,6 +785,23 @@ components:
           type: integer
           description: 位置序号
 
+    KnowledgeTag:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 标签 ID
+        name:
+          type: string
+          description: 标签名称
+        type:
+          type: string
+          enum: [knowledge]
+          description: 标签类型
+        binding_count:
+          type: integer
+          description: 绑定数量
+
   responses:
     Error400:
       description: 请求参数错误
@@ -1005,167 +1061,6 @@ paths:
       responses:
         "204":
           description: 成功删除知识库
-        "400":
-          $ref: "#/components/responses/Error400"
-        "403":
-          $ref: "#/components/responses/Error403"
-
-  /datasets/{dataset_id}/retrieve:
-    post:
-      summary: 检索知识库
-      description: 在指定知识库中进行内容检索
-      operationId: retrieveDataset
-      tags:
-        - Datasets
-      parameters:
-        - name: dataset_id
-          in: path
-          description: 知识库 ID
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - query
-              properties:
-                query:
-                  type: string
-                  description: 检索关键词
-                retrieval_model:
-                  type: object
-                  description: 检索参数配置
-                  properties:
-                    search_method:
-                      type: string
-                      enum:
-                        - keyword_search
-                        - semantic_search
-                        - full_text_search
-                        - hybrid_search
-                      description: 检索方法
-                    reranking_enable:
-                      type: boolean
-                      description: 是否启用 Reranking
-                    reranking_model:
-                      type: object
-                      properties:
-                        reranking_provider_name:
-                          type: string
-                          description: Rerank 模型提供商
-                        reranking_model_name:
-                          type: string
-                          description: Rerank 模型名称
-                    weights:
-                      type: number
-                      format: float
-                      description: 混合检索模式下语意检索的权重设置
-                    top_k:
-                      type: integer
-                      description: 返回结果数量
-                    score_threshold_enabled:
-                      type: boolean
-                      description: 是否开启 score 阈值
-                    score_threshold:
-                      type: number
-                      format: float
-                      description: Score 阈值
-                external_retrieval_model:
-                  type: object
-                  description: 未启用字段
-      responses:
-        "200":
-          description: 检索成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  query:
-                    type: object
-                    properties:
-                      content:
-                        type: string
-                        description: 检索关键词
-                  records:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        segment:
-                          type: object
-                          properties:
-                            id:
-                              type: string
-                            position:
-                              type: integer
-                            document_id:
-                              type: string
-                            content:
-                              type: string
-                            answer:
-                              type: string
-                              nullable: true
-                            word_count:
-                              type: integer
-                            tokens:
-                              type: integer
-                            keywords:
-                              type: array
-                              items:
-                                type: string
-                            index_node_id:
-                              type: string
-                            index_node_hash:
-                              type: string
-                            hit_count:
-                              type: integer
-                            enabled:
-                              type: boolean
-                            disabled_at:
-                              type: number
-                              nullable: true
-                            disabled_by:
-                              type: string
-                              nullable: true
-                            status:
-                              type: string
-                            created_by:
-                              type: string
-                            created_at:
-                              type: number
-                              nullable: true
-                            indexing_at:
-                              type: number
-                              nullable: true
-                            completed_at:
-                              type: number
-                              nullable: true
-                            error:
-                              type: string
-                              nullable: true
-                            stopped_at:
-                              type: number
-                              nullable: true
-                            document:
-                              type: object
-                              properties:
-                                id:
-                                  type: string
-                                data_source_type:
-                                  type: string
-                                name:
-                                  type: string
-                        score:
-                          type: number
-                          format: float
-                        tsne_position:
-                          type: object
-                          nullable: true
         "400":
           $ref: "#/components/responses/Error400"
         "403":
@@ -1944,6 +1839,60 @@ paths:
           $ref: "#/components/responses/Error403"
 
   /datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}:
+    get:
+      summary: 查看文档分段详情
+      description: 查看指定知识库中特定文档的分段详情
+      operationId: getSegmentDetail
+      tags:
+        - Segments
+      parameters:
+        - name: dataset_id
+          in: path
+          description: 知识库 ID
+          required: true
+          schema:
+            type: string
+        - name: document_id
+          in: path
+          description: 文档 ID
+          required: true
+          schema:
+            type: string
+        - name: segment_id
+          in: path
+          description: 分段 ID
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 成功获取分段详情
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    allOf:
+                      - $ref: "#/components/schemas/Segment"
+                      - type: object
+                        properties:
+                          sign_content:
+                            type: string
+                            description: 签名内容文本
+                          child_chunks:
+                            type: array
+                            description: 子分段列表
+                            items:
+                              $ref: "#/components/schemas/ChildChunk"
+                  doc_form:
+                    type: string
+                    description: 文档形式
+        "400":
+          $ref: "#/components/responses/Error400"
+        "403":
+          $ref: "#/components/responses/Error403"
+
     delete:
       summary: 删除文档分段
       description: 删除指定的文档分段
@@ -2075,6 +2024,89 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UploadFile"
+        "400":
+          $ref: "#/components/responses/Error400"
+        "403":
+          $ref: "#/components/responses/Error403"
+
+  /datasets/{dataset_id}/retrieve:
+    post:
+      summary: 检索知识库
+      description: 从指定知识库中检索相关内容
+      operationId: retrieveDataset
+      tags:
+        - Datasets
+      parameters:
+        - name: dataset_id
+          in: path
+          description: 知识库 ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - query
+              properties:
+                query:
+                  type: string
+                  description: 检索关键词
+                retrieval_model:
+                  $ref: "#/components/schemas/RetrievalModel"
+                external_retrieval_model:
+                  type: object
+                  description: 外部检索模型（未启用字段）
+      responses:
+        "200":
+          description: 成功检索知识库
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  query:
+                    type: object
+                    properties:
+                      content:
+                        type: string
+                        description: 查询内容
+                  records:
+                    type: array
+                    description: 检索结果列表
+                    items:
+                      type: object
+                      properties:
+                        segment:
+                          allOf:
+                            - $ref: "#/components/schemas/Segment"
+                            - type: object
+                              properties:
+                                document:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      description: 文档ID
+                                    data_source_type:
+                                      type: string
+                                      description: 数据源类型
+                                    name:
+                                      type: string
+                                      description: 文档名称
+                        score:
+                          type: number
+                          format: float
+                          description: 相关性分数
+                        tsne_position:
+                          type: array
+                          nullable: true
+                          description: t-SNE位置
+                          items:
+                            type: number
         "400":
           $ref: "#/components/responses/Error400"
         "403":
@@ -2361,5 +2393,233 @@ paths:
       responses:
         '204':
           description: 成功更新文档元数据
+        "400":
+          $ref: "#/components/responses/Error400"
+
+  /datasets/tags:
+    post:
+      summary: 新增知识库类型标签
+      description: 创建新的知识库类型标签
+      operationId: createKnowledgeTag
+      tags:
+        - Tags
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  maxLength: 50
+                  description: 新标签名称，必填，最大长度为 50
+      responses:
+        "200":
+          description: 成功创建标签
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KnowledgeTag"
+        "400":
+          $ref: "#/components/responses/Error400"
+
+    get:
+      summary: 获取知识库类型标签
+      description: 获取所有知识库类型标签列表
+      operationId: getKnowledgeTags
+      tags:
+        - Tags
+      responses:
+        "200":
+          description: 成功获取标签列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/KnowledgeTag"
+        "400":
+          $ref: "#/components/responses/Error400"
+
+    patch:
+      summary: 修改知识库类型标签名称
+      description: 修改指定知识库类型标签的名称
+      operationId: updateKnowledgeTag
+      tags:
+        - Tags
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - tag_id
+              properties:
+                name:
+                  type: string
+                  maxLength: 50
+                  description: 修改后的标签名称，必填，最大长度为 50
+                tag_id:
+                  type: string
+                  description: 标签 ID，必填
+      responses:
+        "200":
+          description: 成功修改标签名称
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KnowledgeTag"
+        "400":
+          $ref: "#/components/responses/Error400"
+
+    delete:
+      summary: 删除知识库类型标签
+      description: 删除指定的知识库类型标签
+      operationId: deleteKnowledgeTag
+      tags:
+        - Tags
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tag_id
+              properties:
+                tag_id:
+                  type: string
+                  description: 标签 ID，必填
+      responses:
+        "200":
+          description: 成功删除标签
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: success
+        "400":
+          $ref: "#/components/responses/Error400"
+
+  /datasets/tags/binding:
+    post:
+      summary: 绑定知识库到知识库类型标签
+      description: 将知识库绑定到指定的知识库类型标签
+      operationId: bindDatasetToTag
+      tags:
+        - Tags
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tag_ids
+                - target_id
+              properties:
+                tag_ids:
+                  type: array
+                  description: 标签 ID 列表，必填
+                  items:
+                    type: string
+                target_id:
+                  type: string
+                  description: 知识库 ID，必填
+      responses:
+        "200":
+          description: 成功绑定知识库到标签
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: success
+        "400":
+          $ref: "#/components/responses/Error400"
+
+  /datasets/tags/unbinding:
+    post:
+      summary: 解绑知识库和知识库类型标签
+      description: 解除知识库与指定标签的绑定关系
+      operationId: unbindDatasetFromTag
+      tags:
+        - Tags
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tag_id
+                - target_id
+              properties:
+                tag_id:
+                  type: string
+                  description: 标签 ID，必填
+                target_id:
+                  type: string
+                  description: 知识库 ID，必填
+      responses:
+        "200":
+          description: 成功解绑知识库和标签
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: success
+        "400":
+          $ref: "#/components/responses/Error400"
+
+  /datasets/{dataset_id}/tags:
+    post:
+      summary: 查询知识库已绑定的标签
+      description: 获取指定知识库已绑定的所有标签
+      operationId: getDatasetTags
+      tags:
+        - Tags
+      parameters:
+        - name: dataset_id
+          in: path
+          description: 知识库 ID
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 成功获取知识库绑定的标签列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: 标签 ID
+                        name:
+                          type: string
+                          description: 标签名称
+                  total:
+                    type: integer
+                    description: 总数量
         "400":
           $ref: "#/components/responses/Error400"

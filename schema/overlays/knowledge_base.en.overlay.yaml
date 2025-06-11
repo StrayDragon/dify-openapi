@@ -259,16 +259,16 @@ actions:
         Search method:
         - keyword_search: Keyword search
         - semantic_search: Semantic search
-        - full_text_search: Full text search
+        - full_text_search: Full-text search
         - hybrid_search: Hybrid search
 
   - target: $.components.schemas.RetrievalModel.properties.reranking_enable
     update:
-      description: "Whether to enable Reranking, optional, required if retrieval mode is semantic_search or hybrid_search"
+      description: "Whether reranking is enabled (optional). Required if search mode is semantic_search or hybrid_search"
 
   - target: $.components.schemas.RetrievalModel.properties.reranking_model
     update:
-      description: "Rerank model configuration, optional, required if reranking is enabled"
+      description: "Rerank model configuration (optional). Required if reranking is enabled"
 
   - target: $.components.schemas.RetrievalModel.properties.reranking_model.properties.reranking_provider_name
     update:
@@ -284,15 +284,19 @@ actions:
 
   - target: $.components.schemas.RetrievalModel.properties.top_k
     update:
-      description: "Number of results returned, optional"
+      description: "Number of results to return (optional)"
 
   - target: $.components.schemas.RetrievalModel.properties.score_threshold_enabled
     update:
-      description: "Whether to enable score threshold"
+      description: "Whether score threshold is enabled"
 
   - target: $.components.schemas.RetrievalModel.properties.score_threshold
     update:
       description: "Score threshold"
+
+  - target: $.components.schemas.RetrievalModel.properties.metadata_filtering_conditions
+    update:
+      description: "Metadata filtering conditions"
 
   - target: $.components.schemas.ProcessRule.properties.mode
     update:
@@ -812,37 +816,7 @@ actions:
     update:
       description: "Retrieval parameter configuration"
 
-  - target: $.paths['/datasets/{dataset_id}/retrieve'].post.requestBody.content['application/json'].schema.properties.retrieval_model.properties.search_method
-    update:
-      description: "Search method"
 
-  - target: $.paths['/datasets/{dataset_id}/retrieve'].post.requestBody.content['application/json'].schema.properties.retrieval_model.properties.reranking_enable
-    update:
-      description: "Whether to enable Reranking"
-
-  - target: $.paths['/datasets/{dataset_id}/retrieve'].post.requestBody.content['application/json'].schema.properties.retrieval_model.properties.reranking_model.properties.reranking_provider_name
-    update:
-      description: "Rerank model provider"
-
-  - target: $.paths['/datasets/{dataset_id}/retrieve'].post.requestBody.content['application/json'].schema.properties.retrieval_model.properties.reranking_model.properties.reranking_model_name
-    update:
-      description: "Rerank model name"
-
-  - target: $.paths['/datasets/{dataset_id}/retrieve'].post.requestBody.content['application/json'].schema.properties.retrieval_model.properties.weights
-    update:
-      description: "Weight setting for semantic search in hybrid search mode"
-
-  - target: $.paths['/datasets/{dataset_id}/retrieve'].post.requestBody.content['application/json'].schema.properties.retrieval_model.properties.top_k
-    update:
-      description: "Number of results to return"
-
-  - target: $.paths['/datasets/{dataset_id}/retrieve'].post.requestBody.content['application/json'].schema.properties.retrieval_model.properties.score_threshold_enabled
-    update:
-      description: "Whether to enable score threshold"
-
-  - target: $.paths['/datasets/{dataset_id}/retrieve'].post.requestBody.content['application/json'].schema.properties.retrieval_model.properties.score_threshold
-    update:
-      description: "Score threshold"
 
   - target: $.paths['/datasets/{dataset_id}/retrieve'].post.requestBody.content['application/json'].schema.properties.external_retrieval_model
     update:
@@ -1588,3 +1562,312 @@ actions:
     update:
       name: Metadata
       description: Operations for managing metadata in knowledge bases
+
+  - target: $.tags[5]
+    update:
+      name: Tags
+      description: Operations for managing knowledge base tags
+
+  # New GET endpoint for document segment detail
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}'].get.summary
+    update: "View Document Segment Detail"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}'].get.description
+    update: "View the details of a specific document segment in the specified knowledge base"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}'].get.parameters[0].description
+    update: "Knowledge Base ID"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}'].get.parameters[1].description
+    update: "Document ID"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}'].get.parameters[2].description
+    update: "Segment ID"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}'].get.responses['200'].description
+    update: "Successfully retrieved segment details"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}'].get.responses['200'].content['application/json'].schema.properties.data.allOf[1].properties.sign_content.description
+    update: "Signature content"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}'].get.responses['200'].content['application/json'].schema.properties.data.allOf[1].properties.child_chunks.description
+    update: "Child segment list"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}/segments/{segment_id}'].get.responses['200'].content['application/json'].schema.properties.doc_form.description
+    update: "Document form"
+
+  # Metadata filtering conditions schema
+  - target: $.components.schemas.MetadataFilteringConditions
+    update:
+      description: "Metadata filtering conditions"
+      properties:
+        logical_operator:
+          description: "Logical operator"
+        conditions:
+          description: "List of conditions"
+
+  - target: $.components.schemas.MetadataCondition
+    update:
+      description: "Single metadata filtering condition"
+      properties:
+        name:
+          description: "Metadata field name"
+        comparison_operator:
+          description: "Comparison operator"
+        value:
+          description: "Comparison value"
+
+  # Knowledge base retrieval API
+  - target: $.paths['/datasets/{dataset_id}/retrieve'].post.summary
+    update: "Retrieve Knowledge Base"
+
+  - target: $.paths['/datasets/{dataset_id}/retrieve'].post.description
+    update: "Retrieve relevant content from the specified knowledge base"
+
+  - target: $.paths['/datasets/{dataset_id}/retrieve'].post.parameters[0].description
+    update: "Knowledge Base ID"
+
+  - target: $.paths['/datasets/{dataset_id}/retrieve'].post.requestBody.content['application/json'].schema.properties.query.description
+    update: "Search keywords"
+
+  - target: $.paths['/datasets/{dataset_id}/retrieve'].post.requestBody.content['application/json'].schema.properties.external_retrieval_model.description
+    update: "External retrieval model (disabled field)"
+
+  - target: $.paths['/datasets/{dataset_id}/retrieve'].post.responses['200'].description
+    update: "Successfully retrieved knowledge base"
+
+  - target: $.paths['/datasets/{dataset_id}/retrieve'].post.responses['200'].content['application/json'].schema.properties.query.properties.content.description
+    update: "Query content"
+
+  - target: $.paths['/datasets/{dataset_id}/retrieve'].post.responses['200'].content['application/json'].schema.properties.records.description
+    update: "Search result list"
+
+  - target: $.paths['/datasets/{dataset_id}/retrieve'].post.responses['200'].content['application/json'].schema.properties.records.items.properties.segment.allOf[1].properties.document.properties.id.description
+    update: "Document ID"
+
+  - target: $.paths['/datasets/{dataset_id}/retrieve'].post.responses['200'].content['application/json'].schema.properties.records.items.properties.segment.allOf[1].properties.document.properties.data_source_type.description
+    update: "Data source type"
+
+  - target: $.paths['/datasets/{dataset_id}/retrieve'].post.responses['200'].content['application/json'].schema.properties.records.items.properties.segment.allOf[1].properties.document.properties.name.description
+    update: "Document name"
+
+  - target: $.paths['/datasets/{dataset_id}/retrieve'].post.responses['200'].content['application/json'].schema.properties.records.items.properties.score.description
+    update: "Relevance score"
+
+  - target: $.paths['/datasets/{dataset_id}/retrieve'].post.responses['200'].content['application/json'].schema.properties.records.items.properties.tsne_position.description
+    update: "t-SNE position"
+
+  # Knowledge tag schema
+  - target: $.components.schemas.KnowledgeTag
+    update:
+      properties:
+        id:
+          description: "Tag ID"
+        name:
+          description: "Tag name"
+        type:
+          description: "Tag type"
+        binding_count:
+          description: "Binding count"
+
+  # Knowledge tag management APIs
+  - target: $.paths['/datasets/tags'].post
+    update:
+      summary: "Create Knowledge Base Tag"
+      description: "Create a new knowledge base tag"
+      operationId: "createKnowledgeTag"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  maxLength: 50
+                  description: "Tag name, required, maximum length 50"
+      responses:
+        '200':
+          description: "Successfully created tag"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KnowledgeTag"
+        '400':
+          $ref: "#/components/responses/Error400"
+
+  - target: $.paths['/datasets/tags'].get
+    update:
+      summary: "Get Knowledge Base Tags"
+      description: "Get all knowledge base tag list"
+      operationId: "getKnowledgeTags"
+      responses:
+        '200':
+          description: "Successfully retrieved tag list"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/KnowledgeTag"
+        '400':
+          $ref: "#/components/responses/Error400"
+
+  - target: $.paths['/datasets/tags'].patch
+    update:
+      summary: "Update Knowledge Base Tag Name"
+      description: "Update the name of the specified knowledge base tag"
+      operationId: "updateKnowledgeTag"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - tag_id
+              properties:
+                name:
+                  type: string
+                  maxLength: 50
+                  description: "Updated tag name, required, maximum length 50"
+                tag_id:
+                  type: string
+                  description: "Tag ID, required"
+      responses:
+        '200':
+          description: "Successfully updated tag name"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KnowledgeTag"
+        '400':
+          $ref: "#/components/responses/Error400"
+
+  - target: $.paths['/datasets/tags'].delete
+    update:
+      summary: "Delete Knowledge Base Tag"
+      description: "Delete the specified knowledge base tag"
+      operationId: "deleteKnowledgeTag"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tag_id
+              properties:
+                tag_id:
+                  type: string
+                  description: "Tag ID, required"
+      responses:
+        '200':
+          description: "Successfully deleted tag"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: success
+        '400':
+          $ref: "#/components/responses/Error400"
+
+  - target: $.paths['/datasets/tags/binding'].post
+    update:
+      summary: "Bind Knowledge Base to Tag"
+      description: "Bind knowledge base to specified knowledge base tags"
+      operationId: "bindDatasetToTag"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tag_ids
+                - target_id
+              properties:
+                tag_ids:
+                  type: array
+                  description: "Tag ID list, required"
+                  items:
+                    type: string
+                target_id:
+                  type: string
+                  description: "Knowledge Base ID, required"
+      responses:
+        '200':
+          description: "Successfully bound knowledge base to tags"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: success
+        '400':
+          $ref: "#/components/responses/Error400"
+
+  - target: $.paths['/datasets/tags/unbinding'].post
+    update:
+      summary: "Unbind Knowledge Base from Tag"
+      description: "Remove the binding relationship between knowledge base and specified tag"
+      operationId: "unbindDatasetFromTag"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tag_id
+                - target_id
+              properties:
+                tag_id:
+                  type: string
+                  description: "Tag ID, required"
+                target_id:
+                  type: string
+                  description: "Knowledge Base ID, required"
+      responses:
+        '200':
+          description: "Successfully unbound knowledge base from tag"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: success
+        '400':
+          $ref: "#/components/responses/Error400"
+
+  - target: $.paths['/datasets/{dataset_id}/tags'].post.summary
+    update: "Query Knowledge Base Bound Tags"
+
+  - target: $.paths['/datasets/{dataset_id}/tags'].post.description
+    update: "Get all tags bound to the specified knowledge base"
+
+  - target: $.paths['/datasets/{dataset_id}/tags'].post.parameters[0].description
+    update: "Knowledge Base ID"
+
+  - target: $.paths['/datasets/{dataset_id}/tags'].post.responses['200'].description
+    update: "Successfully retrieved knowledge base bound tag list"
+
+  - target: $.paths['/datasets/{dataset_id}/tags'].post.responses['200'].content['application/json'].schema.properties.data.items.properties.id.description
+    update: "Tag ID"
+
+  - target: $.paths['/datasets/{dataset_id}/tags'].post.responses['200'].content['application/json'].schema.properties.data.items.properties.name.description
+    update: "Tag name"
+
+  - target: $.paths['/datasets/{dataset_id}/tags'].post.responses['200'].content['application/json'].schema.properties.total.description
+    update: "Total count"

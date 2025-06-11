@@ -20,9 +20,6 @@ servers:
     description: author of dify-openapi dev server
 security:
   - bearerApiKeyAuth: []
-tags:
-  - name: Workflow Application Operations
-    description: Workflow Application Operations
 components:
   securitySchemes:
     bearerApiKeyAuth:
