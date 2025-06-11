@@ -1,7 +1,7 @@
 overlay: 1.0.0
 info:
   title: "English translation overlay for Dify API - Advanced Chat Application"
-  version: "1.4.1"
+  version: "1.4.2"
 extends: ../app_advanced_chat.zh.yaml
 actions:
   - target: $.info
@@ -12,7 +12,7 @@ actions:
         Chat applications support session persistence, allowing previous chat history to be used as context for responses, suitable for chat/customer service AI, etc.
         All API requests require an application-level API-Key in the Authorization HTTP Header.
         It is strongly recommended that developers store the API-Key on the backend rather than sharing or storing it on the client side to prevent API-Key leakage and financial loss.
-        official raw document: https://github.com/langgenius/dify/blob/1.4.1/web/app/components/develop/template/template_advanced_chat.en.mdx
+        official raw document: https://github.com/langgenius/dify/blob/1.4.2/web/app/components/develop/template/template_advanced_chat.en.mdx
 
   - target: $.servers[0]
     update:

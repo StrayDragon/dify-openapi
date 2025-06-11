@@ -6,8 +6,8 @@ info:
     对话应用支持会话持久化，可将之前的聊天记录作为上下文进行回答，可适用于聊天/客服 AI 等。
     所有 API 请求都需要在 Authorization HTTP Header 中包含应用级 API-Key。
     强烈建议开发者把 API-Key 放在后端存储，而非分享或者放在客户端存储，以免 API-Key 泄露，导致财产损失。
-    官方原始文档见: https://github.com/langgenius/dify/blob/1.4.1/web/app/components/develop/template/template_advanced_chat.zh.mdx
-  version: 1.4.1
+    官方原始文档见: https://github.com/langgenius/dify/blob/1.4.2/web/app/components/develop/template/template_advanced_chat.zh.mdx
+  version: 1.4.2
 
 servers:
   - url: https://api.dify.ai/v1
@@ -305,7 +305,7 @@ components:
           type: string
           enum: [remote_url, local_file]
           description: |
-            传递方式:
+            传递方式：
             - `remote_url`: 图片地址。
             - `local_file`: 上传文件。
         url:
@@ -340,7 +340,7 @@ paths:
                   type: string
                   enum: [streaming, blocking]
                   description: |
-                    响应模式:
+                    响应模式：
                     - streaming: 流式模式（推荐），基于 SSE 实现类似打字机输出
                     - blocking: 阻塞模式，等待执行完毕后返回结果
                 user:
@@ -1466,10 +1466,10 @@ paths:
               properties:
                 embedding_provider_name:
                   type: string
-                  description: 指定的嵌入模型提供商, 必须先在系统内设定好接入的模型，对应的是provider字段
+                  description: 指定的嵌入模型提供商，必须先在系统内设定好接入的模型，对应的是 provider 字段
                 embedding_model_name:
                   type: string
-                  description: 指定的嵌入模型，对应的是model字段
+                  description: 指定的嵌入模型，对应的是 model 字段
                 score_threshold:
                   type: number
                   description: 相似度阈值，当相似度大于该阈值时，系统会自动回复，否则不回复
