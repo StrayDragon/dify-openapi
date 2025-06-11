@@ -6,8 +6,8 @@ info:
     Workflow applications have no session support and are suitable for translation/article writing/summarization AI, etc.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
     It is strongly recommended that developers store the API-Key on the backend rather than sharing or storing it on the client to prevent API-Key leakage and financial loss.
-    official raw document: https://github.com/langgenius/dify/blob/1.4.1/web/app/components/develop/template/template_workflow.en.mdx
-  version: 1.4.1
+    official raw document: https://github.com/langgenius/dify/blob/1.4.2/web/app/components/develop/template/template_workflow.en.mdx
+  version: 1.4.2
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -20,6 +20,9 @@ servers:
     description: author of dify-openapi dev server
 security:
   - bearerApiKeyAuth: []
+tags:
+  - name: Workflow Application Operations
+    description: Workflow Application Operations
 components:
   securitySchemes:
     bearerApiKeyAuth:

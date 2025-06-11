@@ -720,9 +720,6 @@ actions:
   - target: $.paths['/messages/{message_id}/suggested'].get.responses['200'].description
     update: "Successful response"
 
-  - target: $.paths['/messages/{message_id}/suggested'].get.responses['200'].content['application/json'].schema.properties.result.description
-    update: "Fixed return value: success"
-
   - target: $.paths['/messages/{message_id}/suggested'].get.responses['200'].content['application/json'].schema.properties.data.description
     update: "List of suggested questions"
 
