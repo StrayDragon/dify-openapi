@@ -853,13 +853,15 @@ paths:
   /messages/{message_id}/feedbacks:
     post:
       operationId: sendMessageFeedbackByAppChat
-      summary: 消息反馈
+      summary: 消息反馈（点赞）
+      description: 消息终端用户反馈、点赞，方便应用开发者优化输出预期
       parameters:
         - name: message_id
           in: path
           required: true
           schema:
             type: string
+          description: 消息 ID
       requestBody:
         required: true
         content:
@@ -867,19 +869,18 @@ paths:
             schema:
               type: object
               required:
-                - rating
                 - user
               properties:
                 rating:
                   type: string
                   enum: [like, dislike, null]
-                  description: 反馈类型
+                  description: 点赞 like, 点踩 dislike, 撤销点赞 null
                 user:
                   type: string
-                  description: 用户标识
+                  description: 用户标识，由开发者定义规则，需保证用户标识在应用内唯一
                 content:
                   type: string
-                  description: 反馈内容
+                  description: 消息反馈的具体信息
       responses:
         "200":
           description: 成功响应
@@ -891,6 +892,7 @@ paths:
                   result:
                     type: string
                     enum: [success]
+                    description: 固定返回 success
 
   /app/feedbacks:
     get:
@@ -900,18 +902,16 @@ paths:
       parameters:
         - name: page
           in: query
-          required: false
           schema:
             type: integer
             default: 1
-          description: （选填）分页，默认值：1
+          description: 分页，默认值：1
         - name: limit
           in: query
-          required: false
           schema:
             type: integer
             default: 20
-          description: （选填）每页数量，默认值：20
+          description: 每页数量，默认值：20
       responses:
         "200":
           description: 成功响应
@@ -922,7 +922,6 @@ paths:
                 properties:
                   data:
                     type: array
-                    description: 返回该APP的点赞、反馈列表
                     items:
                       type: object
                       properties:
@@ -940,7 +939,7 @@ paths:
                           description: 消息ID
                         rating:
                           type: string
-                          description: 评分类型（like/dislike）
+                          description: 评分
                         content:
                           type: string
                           description: 反馈内容
@@ -959,6 +958,7 @@ paths:
                         updated_at:
                           type: string
                           description: 更新时间
+                    description: 返回该APP的点赞、反馈列表
 
   /messages/{message_id}/suggested:
     get:
@@ -968,19 +968,19 @@ paths:
       parameters:
         - name: message_id
           in: path
-          description: Message ID
           required: true
           schema:
             type: string
+          description: Message ID
         - name: user
           in: query
-          description: 用户标识，由开发者定义规则，需保证用户标识在应用内唯一。
           required: true
           schema:
             type: string
+          description: 用户标识，由开发者定义规则，需保证用户标识在应用内唯一
       responses:
         "200":
-          description: 成功获取建议问题列表
+          description: 成功响应
           content:
             application/json:
               schema:
@@ -988,12 +988,12 @@ paths:
                 properties:
                   result:
                     type: string
-                    description: 固定返回 success
+                    enum: [success]
                   data:
                     type: array
-                    description: 建议问题列表
                     items:
                       type: string
+                    description: 建议问题列表
 
   /files/upload:
     post:
@@ -1280,12 +1280,12 @@ paths:
                           properties:
                             background:
                               type: string
-                              description: hex格式的背景色
+                              description: hex 格式的背景色
                             content:
                               type: string
                               description: emoji
                         - type: string
-                          description: 图标URL
+                          description: 图标 URL
 
   /site:
     get:
@@ -1305,16 +1305,16 @@ paths:
                     description: WebApp 名称
                   chat_color_theme:
                     type: string
-                    description: 聊天颜色主题, hex 格式
+                    description: 聊天颜色主题，hex 格式
                   chat_color_theme_inverted:
                     type: boolean
                     description: 聊天颜色主题是否反转
                   icon_type:
                     type: string
-                    description: 图标类型, emoji-表情, image-图片
+                    description: 图标类型，emoji-表情，image-图片
                   icon:
                     type: string
-                    description: 图标, 如果是 emoji 类型, 则是 emoji 表情符号, 如果是 image 类型, 则是图片 URL
+                    description: 图标，如果是 emoji 类型，则是 emoji 表情符号，如果是 image 类型，则是图片 URL
                   icon_background:
                     type: string
                     description: hex 格式的背景色

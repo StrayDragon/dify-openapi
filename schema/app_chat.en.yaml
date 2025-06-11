@@ -5,7 +5,7 @@ info:
     Dify API provides a series of interfaces for conversation functionality.
     It supports conversational applications.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
-    official raw document: https://github.com/langgenius/dify/blob/1.4.0/web/app/components/develop/template/template_chat.en.mdx
+    official raw document: https://github.com/langgenius/dify/blob/1.4.1/web/app/components/develop/template/template_chat.zh.mdx
   version: 1.4.1
 servers:
   - url: 'https://api.dify.ai/v1'
@@ -292,7 +292,7 @@ components:
               enum:
                 - like
                 - dislike
-              description: Like or dislike rating
+              description: Like or dislike
           description: Feedback information
         retriever_resources:
           type: array
@@ -869,7 +869,8 @@ paths:
   '/messages/{message_id}/feedbacks':
     post:
       operationId: sendMessageFeedbackByAppChat
-      summary: Message Feedback
+      summary: Message Feedback (Like/Dislike)
+      description: 'End-user feedback and rating for messages, helping application developers optimize expected outputs'
       parameters:
         - name: message_id
           in: path
@@ -884,7 +885,6 @@ paths:
             schema:
               type: object
               required:
-                - rating
                 - user
               properties:
                 rating:
@@ -893,13 +893,13 @@ paths:
                     - like
                     - dislike
                     - null
-                  description: Feedback type
+                  description: 'Rating: like, dislike, or null to cancel'
                 user:
                   type: string
-                  description: User identifier
+                  description: 'User identifier, defined by developer rules, must be unique within the application'
                 content:
                   type: string
-                  description: Feedback content
+                  description: Specific feedback information for the message
       responses:
         '200':
           description: Successful response
@@ -912,26 +912,25 @@ paths:
                     type: string
                     enum:
                       - success
+                    description: 'Fixed return value: success'
   /app/feedbacks:
     get:
       operationId: getAppFeedbacksByAppChat
-      summary: Get App Feedbacks
-      description: Get application's user feedbacks and likes
+      summary: Get APP Message Likes and Feedback
+      description: Get end-user feedback and likes for the application
       parameters:
         - name: page
           in: query
-          required: false
           schema:
             type: integer
             default: 1
-          description: '(Optional) Pagination, default: 1'
+          description: 'Page number, default: 1'
         - name: limit
           in: query
-          required: false
           schema:
             type: integer
             default: 20
-          description: '(Optional) Records per page, default: 20'
+          description: 'Number of items per page, default: 20'
       responses:
         '200':
           description: Successful response
@@ -942,7 +941,6 @@ paths:
                 properties:
                   data:
                     type: array
-                    description: Returns the app's likes and feedback list
                     items:
                       type: object
                       properties:
@@ -960,7 +958,7 @@ paths:
                           description: Message ID
                         rating:
                           type: string
-                          description: Rating type (like/dislike)
+                          description: Rating
                         content:
                           type: string
                           description: Feedback content
@@ -979,27 +977,28 @@ paths:
                         updated_at:
                           type: string
                           description: Update time
+                    description: Returns the list of likes and feedback for this APP
   '/messages/{message_id}/suggested':
     get:
       operationId: getSuggestedQuestionsByAppChat
-      summary: Get Suggested Questions
+      summary: Get Suggested Questions for Next Round
       description: Get suggested questions for the next round
       parameters:
         - name: message_id
           in: path
-          description: Message ID
           required: true
           schema:
             type: string
+          description: Message ID
         - name: user
           in: query
-          description: 'User identifier, defined by the developer, must be unique within the application'
           required: true
           schema:
             type: string
+          description: 'User identifier, defined by developer rules, must be unique within the application'
       responses:
         '200':
-          description: Successfully retrieved suggested questions
+          description: Successful response
           content:
             application/json:
               schema:
@@ -1007,12 +1006,13 @@ paths:
                 properties:
                   result:
                     type: string
-                    description: Fixed return value 'success'
+                    enum:
+                      - success
                   data:
                     type: array
-                    description: List of suggested questions
                     items:
                       type: string
+                    description: List of suggested questions
   /files/upload:
     post:
       operationId: uploadFileByAppChat
