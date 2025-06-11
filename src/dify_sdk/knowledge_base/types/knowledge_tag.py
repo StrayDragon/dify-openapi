@@ -3,23 +3,28 @@
 import typing
 
 import pydantic
-from ....core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from ...core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 
 
-class RetrieveDatasetResponseRecordsItemSegmentDocument(UniversalBaseModel):
+class KnowledgeTag(UniversalBaseModel):
     id: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Document ID
-    """
-
-    data_source_type: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Data source type
+    Tag ID
     """
 
     name: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Document name
+    Tag name
+    """
+
+    type: typing.Optional[typing.Literal["knowledge"]] = pydantic.Field(default=None)
+    """
+    Tag type
+    """
+
+    binding_count: typing.Optional[int] = pydantic.Field(default=None)
+    """
+    Binding count
     """
 
     if IS_PYDANTIC_V2:

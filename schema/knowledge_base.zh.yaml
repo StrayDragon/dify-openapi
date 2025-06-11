@@ -341,10 +341,25 @@ components:
           description: 元数据字段名
         comparison_operator:
           type: string
-          enum: [
-            contains, "not contains", "start with", "end with", is, "is not", empty, "not empty",
-            "=", "≠", ">", "<", "≥", "≤", before, after
-          ]
+          enum:
+            [
+              contains,
+              "not contains",
+              "start with",
+              "end with",
+              is,
+              "is not",
+              empty,
+              "not empty",
+              "=",
+              "!=",
+              ">",
+              "<",
+              ">=",
+              "<=",
+              before,
+              after,
+            ]
           description: 比较运算符
         value:
           oneOf:
@@ -415,7 +430,24 @@ components:
           description: 数据源类型
         display_status:
           type: string
-          enum: [indexing, index_failed, indexed, cleaning, clean_failed, cleaned, parsing, parse_failed, parsed, splitting, split_failed, splitted, embedding, embedding_failed, embedded]
+          enum:
+            [
+              indexing,
+              index_failed,
+              indexed,
+              cleaning,
+              clean_failed,
+              cleaned,
+              parsing,
+              parse_failed,
+              parsed,
+              splitting,
+              split_failed,
+              splitted,
+              embedding,
+              embedding_failed,
+              embedded,
+            ]
           description: 状态
         enabled:
           type: boolean
@@ -711,7 +743,16 @@ components:
           properties:
             type:
               type: string
-              enum: [upload_file, notion_import, notion_sync, web_page, web_site, notion_page, github_repository]
+              enum:
+                [
+                  upload_file,
+                  notion_import,
+                  notion_sync,
+                  web_page,
+                  web_site,
+                  notion_page,
+                  github_repository,
+                ]
               description: |
                 文档来源类型
                 - upload_file: 上传文件
@@ -2143,7 +2184,7 @@ paths:
                   type: string
                   description: 元数据名称
       responses:
-        '200':
+        "200":
           description: 成功创建元数据
           content:
             application/json:
@@ -2176,7 +2217,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: 成功获取元数据列表
           content:
             application/json:
@@ -2263,7 +2304,7 @@ paths:
                   type: string
                   description: 元数据名称
       responses:
-        '200':
+        "200":
           description: 成功更新元数据
           content:
             application/json:
@@ -2302,7 +2343,7 @@ paths:
           schema:
             type: string
       responses:
-        '204':
+        "204":
           description: 成功删除元数据
         "400":
           $ref: "#/components/responses/Error400"
@@ -2329,7 +2370,7 @@ paths:
             type: string
             enum: [enable, disable]
       responses:
-        '204':
+        "204":
           description: 成功启用/禁用内置元数据
         "400":
           $ref: "#/components/responses/Error400"
@@ -2391,7 +2432,7 @@ paths:
                               type: string
                               description: 元数据名称
       responses:
-        '204':
+        "204":
           description: 成功更新文档元数据
         "400":
           $ref: "#/components/responses/Error400"

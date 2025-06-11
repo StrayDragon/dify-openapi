@@ -10,6 +10,7 @@ from .types.create_segments_response import CreateSegmentsResponse
 from .types.get_datasets_dataset_id_documents_document_id_segments_segment_id_child_chunks_response import (
     GetDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse,
 )
+from .types.get_segment_detail_response import GetSegmentDetailResponse
 from .types.get_segments_response import GetSegmentsResponse
 from .types.patch_datasets_dataset_id_documents_document_id_segments_segment_id_child_chunks_child_chunk_id_response import (
     PatchDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse,
@@ -333,6 +334,47 @@ class SegmentsClient:
         """
         _response = self._raw_client.update_document_child_segment(
             dataset_id, document_id, segment_id, child_chunk_id, content=content, request_options=request_options
+        )
+        return _response.data
+
+    def get_segment_detail(
+        self,
+        dataset_id: str,
+        document_id: str,
+        segment_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetSegmentDetailResponse:
+        """
+        View the details of a specific document segment in the specified knowledge base
+
+        Parameters
+        ----------
+        dataset_id : str
+            Knowledge Base ID
+
+        document_id : str
+            Document ID
+
+        segment_id : str
+            Segment ID
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetSegmentDetailResponse
+            Successfully retrieved segment details
+
+        Examples
+        --------
+        from dify import DifyApi
+        client = DifyApi(token="YOUR_TOKEN", )
+        client.knowledge_base.segments.get_segment_detail(dataset_id='dataset_id', document_id='document_id', segment_id='segment_id', )
+        """
+        _response = self._raw_client.get_segment_detail(
+            dataset_id, document_id, segment_id, request_options=request_options
         )
         return _response.data
 
@@ -749,6 +791,50 @@ class AsyncSegmentsClient:
         """
         _response = await self._raw_client.update_document_child_segment(
             dataset_id, document_id, segment_id, child_chunk_id, content=content, request_options=request_options
+        )
+        return _response.data
+
+    async def get_segment_detail(
+        self,
+        dataset_id: str,
+        document_id: str,
+        segment_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetSegmentDetailResponse:
+        """
+        View the details of a specific document segment in the specified knowledge base
+
+        Parameters
+        ----------
+        dataset_id : str
+            Knowledge Base ID
+
+        document_id : str
+            Document ID
+
+        segment_id : str
+            Segment ID
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        GetSegmentDetailResponse
+            Successfully retrieved segment details
+
+        Examples
+        --------
+        from dify import AsyncDifyApi
+        import asyncio
+        client = AsyncDifyApi(token="YOUR_TOKEN", )
+        async def main() -> None:
+            await client.knowledge_base.segments.get_segment_detail(dataset_id='dataset_id', document_id='document_id', segment_id='segment_id', )
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.get_segment_detail(
+            dataset_id, document_id, segment_id, request_options=request_options
         )
         return _response.data
 

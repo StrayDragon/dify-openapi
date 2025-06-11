@@ -359,11 +359,11 @@ components:
             - empty
             - not empty
             - '='
-            - ≠
+            - '!='
             - '>'
             - <
-            - ≥
-            - ≤
+            - '>='
+            - <=
             - before
             - after
           description: Comparison operator

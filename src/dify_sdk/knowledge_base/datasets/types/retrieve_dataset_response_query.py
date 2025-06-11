@@ -9,7 +9,7 @@ from ....core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 class RetrieveDatasetResponseQuery(UniversalBaseModel):
     content: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Search keyword
+    Query content
     """
 
     if IS_PYDANTIC_V2:

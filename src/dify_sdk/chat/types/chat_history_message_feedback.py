@@ -14,7 +14,7 @@ class ChatHistoryMessageFeedback(UniversalBaseModel):
 
     rating: typing.Optional[ChatHistoryMessageFeedbackRating] = pydantic.Field(default=None)
     """
-    Like or dislike rating
+    Like or dislike
     """
 
     if IS_PYDANTIC_V2:

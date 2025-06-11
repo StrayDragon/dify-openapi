@@ -4,12 +4,20 @@ import typing
 
 import pydantic
 from ....core.pydantic_utilities import IS_PYDANTIC_V2
+from ...types.child_chunk import ChildChunk
 from ...types.segment import Segment
-from .retrieve_dataset_response_records_item_segment_document import RetrieveDatasetResponseRecordsItemSegmentDocument
 
 
-class RetrieveDatasetResponseRecordsItemSegment(Segment):
-    document: typing.Optional[RetrieveDatasetResponseRecordsItemSegmentDocument] = None
+class GetSegmentDetailResponseData(Segment):
+    sign_content: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Signature content
+    """
+
+    child_chunks: typing.Optional[typing.List[ChildChunk]] = pydantic.Field(default=None)
+    """
+    Child segment list
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

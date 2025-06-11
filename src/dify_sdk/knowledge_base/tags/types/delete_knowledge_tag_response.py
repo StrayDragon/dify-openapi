@@ -6,16 +6,8 @@ import pydantic
 from ....core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 
 
-class RetrieveDatasetRequestRetrievalModelRerankingModel(UniversalBaseModel):
-    reranking_provider_name: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Rerank model provider
-    """
-
-    reranking_model_name: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Rerank model name
-    """
+class DeleteKnowledgeTagResponse(UniversalBaseModel):
+    result: typing.Optional[str] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

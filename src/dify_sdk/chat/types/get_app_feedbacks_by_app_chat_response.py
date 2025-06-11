@@ -10,7 +10,7 @@ from .get_app_feedbacks_by_app_chat_response_data_item import GetAppFeedbacksByA
 class GetAppFeedbacksByAppChatResponse(UniversalBaseModel):
     data: typing.Optional[typing.List[GetAppFeedbacksByAppChatResponseDataItem]] = pydantic.Field(default=None)
     """
-    Returns the app's likes and feedback list
+    Returns the list of likes and feedback for this APP
     """
 
     if IS_PYDANTIC_V2:

@@ -18,6 +18,7 @@ from .types.create_segments_response import CreateSegmentsResponse
 from .types.get_datasets_dataset_id_documents_document_id_segments_segment_id_child_chunks_response import (
     GetDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse,
 )
+from .types.get_segment_detail_response import GetSegmentDetailResponse
 from .types.get_segments_response import GetSegmentsResponse
 from .types.patch_datasets_dataset_id_documents_document_id_segments_segment_id_child_chunks_child_chunk_id_response import (
     PatchDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse,
@@ -472,6 +473,76 @@ class RawSegmentsClient:
                     PatchDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse,
                     parse_obj_as(
                         type_=PatchDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+    def get_segment_detail(
+        self,
+        dataset_id: str,
+        document_id: str,
+        segment_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> HttpResponse[GetSegmentDetailResponse]:
+        """
+        View the details of a specific document segment in the specified knowledge base
+
+        Parameters
+        ----------
+        dataset_id : str
+            Knowledge Base ID
+
+        document_id : str
+            Document ID
+
+        segment_id : str
+            Segment ID
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[GetSegmentDetailResponse]
+            Successfully retrieved segment details
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(dataset_id)}/documents/{jsonable_encoder(document_id)}/segments/{jsonable_encoder(segment_id)}",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    GetSegmentDetailResponse,
+                    parse_obj_as(
+                        type_=GetSegmentDetailResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -1086,6 +1157,76 @@ class AsyncRawSegmentsClient:
                     PatchDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse,
                     parse_obj_as(
                         type_=PatchDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+    async def get_segment_detail(
+        self,
+        dataset_id: str,
+        document_id: str,
+        segment_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AsyncHttpResponse[GetSegmentDetailResponse]:
+        """
+        View the details of a specific document segment in the specified knowledge base
+
+        Parameters
+        ----------
+        dataset_id : str
+            Knowledge Base ID
+
+        document_id : str
+            Document ID
+
+        segment_id : str
+            Segment ID
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[GetSegmentDetailResponse]
+            Successfully retrieved segment details
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(dataset_id)}/documents/{jsonable_encoder(document_id)}/segments/{jsonable_encoder(segment_id)}",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    GetSegmentDetailResponse,
+                    parse_obj_as(
+                        type_=GetSegmentDetailResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

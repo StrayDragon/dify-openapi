@@ -170,15 +170,11 @@ class RawGenerationClient:
             yield stream()
 
     def upload_file_by_app_generation(
-        self,
-        *,
-        file: core.File,
-        user: typing.Optional[str] = OMIT,
-        request_options: typing.Optional[RequestOptions] = None,
+        self, *, file: core.File, user: str, request_options: typing.Optional[RequestOptions] = None
     ) -> HttpResponse[UploadedFile]:
         """
-        Upload files for use when sending messages.
-        Supported file types depend on application type and configuration.
+        Upload files (currently only supports images) for use when sending messages, enabling multimodal image and text understanding.
+        Supports png, jpg, jpeg, webp, gif formats.
         Uploaded files are only available to the current end user.
 
         Parameters
@@ -186,8 +182,8 @@ class RawGenerationClient:
         file : core.File
             See core.File for more documentation
 
-        user : typing.Optional[str]
-            User identifier
+        user : str
+            User identifier, used to define the identity of the end user, must be consistent with the user passed in the message sending interface
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -830,7 +826,7 @@ class RawGenerationClient:
             Action, can only be 'enable' or 'disable', and must be consistent with the action in the annotation reply initialization interface
 
         job_id : str
-            Job ID, returned from the annotation reply initialization interface
+            Job ID, from the job_id returned by the annotation reply initialization interface
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1049,15 +1045,11 @@ class AsyncRawGenerationClient:
             yield await stream()
 
     async def upload_file_by_app_generation(
-        self,
-        *,
-        file: core.File,
-        user: typing.Optional[str] = OMIT,
-        request_options: typing.Optional[RequestOptions] = None,
+        self, *, file: core.File, user: str, request_options: typing.Optional[RequestOptions] = None
     ) -> AsyncHttpResponse[UploadedFile]:
         """
-        Upload files for use when sending messages.
-        Supported file types depend on application type and configuration.
+        Upload files (currently only supports images) for use when sending messages, enabling multimodal image and text understanding.
+        Supports png, jpg, jpeg, webp, gif formats.
         Uploaded files are only available to the current end user.
 
         Parameters
@@ -1065,8 +1057,8 @@ class AsyncRawGenerationClient:
         file : core.File
             See core.File for more documentation
 
-        user : typing.Optional[str]
-            User identifier
+        user : str
+            User identifier, used to define the identity of the end user, must be consistent with the user passed in the message sending interface
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1710,7 +1702,7 @@ class AsyncRawGenerationClient:
             Action, can only be 'enable' or 'disable', and must be consistent with the action in the annotation reply initialization interface
 
         job_id : str
-            Job ID, returned from the annotation reply initialization interface
+            Job ID, from the job_id returned by the annotation reply initialization interface
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.

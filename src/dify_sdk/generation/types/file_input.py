@@ -5,13 +5,12 @@ import typing
 import pydantic
 from ...core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 from .file_input_transfer_method import FileInputTransferMethod
-from .file_input_type import FileInputType
 
 
 class FileInput(UniversalBaseModel):
-    type: typing.Optional[FileInputType] = pydantic.Field(default=None)
+    type: typing.Optional[typing.Literal["image"]] = pydantic.Field(default=None)
     """
-    File type
+    File type, currently only supports images
     """
 
     transfer_method: typing.Optional[FileInputTransferMethod] = pydantic.Field(default=None)
@@ -21,12 +20,12 @@ class FileInput(UniversalBaseModel):
 
     url: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Remote URL
+    Image URL (only when transfer method is remote_url)
     """
 
     upload_file_id: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Upload file ID
+    Upload file ID (only when transfer method is local_file)
     """
 
     if IS_PYDANTIC_V2:

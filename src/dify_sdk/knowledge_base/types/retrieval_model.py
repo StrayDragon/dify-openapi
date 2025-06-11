@@ -4,6 +4,7 @@ import typing
 
 import pydantic
 from ...core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from .metadata_filtering_conditions import MetadataFilteringConditions
 from .retrieval_model_reranking_model import RetrievalModelRerankingModel
 from .retrieval_model_search_method import RetrievalModelSearchMethod
 
@@ -14,18 +15,18 @@ class RetrievalModel(UniversalBaseModel):
     Search method:
     - keyword_search: Keyword search
     - semantic_search: Semantic search
-    - full_text_search: Full text search
+    - full_text_search: Full-text search
     - hybrid_search: Hybrid search
     """
 
     reranking_enable: typing.Optional[bool] = pydantic.Field(default=None)
     """
-    Whether to enable Reranking, optional, required if retrieval mode is semantic_search or hybrid_search
+    Whether reranking is enabled (optional). Required if search mode is semantic_search or hybrid_search
     """
 
     reranking_model: typing.Optional[RetrievalModelRerankingModel] = pydantic.Field(default=None)
     """
-    Rerank model configuration, optional, required if reranking is enabled
+    Rerank model configuration (optional). Required if reranking is enabled
     """
 
     weights: typing.Optional[float] = pydantic.Field(default=None)
@@ -35,17 +36,22 @@ class RetrievalModel(UniversalBaseModel):
 
     top_k: typing.Optional[int] = pydantic.Field(default=None)
     """
-    Number of results returned, optional
+    Number of results to return (optional)
     """
 
     score_threshold_enabled: typing.Optional[bool] = pydantic.Field(default=None)
     """
-    Whether to enable score threshold
+    Whether score threshold is enabled
     """
 
     score_threshold: typing.Optional[float] = pydantic.Field(default=None)
     """
     Score threshold
+    """
+
+    metadata_filtering_conditions: typing.Optional[MetadataFilteringConditions] = pydantic.Field(default=None)
+    """
+    Metadata filtering conditions
     """
 
     if IS_PYDANTIC_V2:

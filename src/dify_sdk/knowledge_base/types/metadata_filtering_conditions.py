@@ -4,21 +4,23 @@ import typing
 
 import pydantic
 from ...core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from .metadata_condition import MetadataCondition
+from .metadata_filtering_conditions_logical_operator import MetadataFilteringConditionsLogicalOperator
 
 
-class RetrievalModelRerankingModel(UniversalBaseModel):
+class MetadataFilteringConditions(UniversalBaseModel):
     """
-    Rerank model configuration (optional). Required if reranking is enabled
-    """
-
-    reranking_provider_name: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Rerank model provider
+    Metadata filtering conditions
     """
 
-    reranking_model_name: typing.Optional[str] = pydantic.Field(default=None)
+    logical_operator: typing.Optional[MetadataFilteringConditionsLogicalOperator] = pydantic.Field(default=None)
     """
-    Rerank model name
+    Logical operator
+    """
+
+    conditions: typing.Optional[typing.List[MetadataCondition]] = pydantic.Field(default=None)
+    """
+    List of conditions
     """
 
     if IS_PYDANTIC_V2:
