@@ -56,7 +56,8 @@ After done, try to use `just apply-i18n-overlay-to-openapi-schema` to generate t
 Except for the just commands permitted by me above, please DO NOT run any other commands (like `just test` or `just gen-client`). Once everything is completed, please provide a brief summary report.
 
 NOTE:
-- If you want to invoke `filesystem` tool, you need call shell cmd `pwd` get the current working directory at first and use it as the above given path prefix
+- If you want to invoke `filesystem` tool or something like tools, i tell you some current working directory info:
+  - Project root: {PROJECT_ROOT}
 - Prefer using increasing edit mode to adjust code, if you got large context write problem, try using another way to finish
 - Another helpful context is a preset diff file between {v1} to {v2} change, you can find it in {diff_file_path}
 """.strip()
@@ -66,6 +67,7 @@ NOTE:
             v1=v1,
             v2=v2,
             diff_file_path=diff_file_path,
+            PROJECT_ROOT=PROJECT_ROOT,
         )
         prompt = prompt_pattern.format(
             dify_mdx_doc=APP_DOC_PATH_PREFIX + upstream_mdx_doc_path,
