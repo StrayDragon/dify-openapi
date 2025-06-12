@@ -98,17 +98,10 @@ from .segments import (
     UpdateSegmentRequestSegment,
     UpdateSegmentResponse,
 )
-from .tags import (
-    BindDatasetToTagResponse,
-    DeleteKnowledgeTagResponse,
-    GetDatasetTagsResponse,
-    GetDatasetTagsResponseDataItem,
-    UnbindDatasetFromTagResponse,
-)
+from .tags import GetDatasetTagsResponse, GetDatasetTagsResponseDataItem
 
 __all__ = [
     "BadRequestError",
-    "BindDatasetToTagResponse",
     "ChildChunk",
     "ConflictError",
     "ContentTooLargeError",
@@ -134,7 +127,6 @@ __all__ = [
     "DatasetProvider",
     "DatasetRetrievalModelDict",
     "DatasetRetrievalModelDictRerankingModel",
-    "DeleteKnowledgeTagResponse",
     "Document",
     "DocumentDisplayStatus",
     "DocumentSegment",
@@ -185,7 +177,6 @@ __all__ = [
     "RetrieveDatasetResponseRecordsItemSegmentDocument",
     "Segment",
     "ToggleBuiltInMetadataRequestAction",
-    "UnbindDatasetFromTagResponse",
     "UnsupportedMediaTypeError",
     "UpdateDocumentByFileResponse",
     "UpdateDocumentByTextRequestDocForm",

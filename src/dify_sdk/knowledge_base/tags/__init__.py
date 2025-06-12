@@ -2,18 +2,6 @@
 
 # isort: skip_file
 
-from .types import (
-    BindDatasetToTagResponse,
-    DeleteKnowledgeTagResponse,
-    GetDatasetTagsResponse,
-    GetDatasetTagsResponseDataItem,
-    UnbindDatasetFromTagResponse,
-)
+from .types import GetDatasetTagsResponse, GetDatasetTagsResponseDataItem
 
-__all__ = [
-    "BindDatasetToTagResponse",
-    "DeleteKnowledgeTagResponse",
-    "GetDatasetTagsResponse",
-    "GetDatasetTagsResponseDataItem",
-    "UnbindDatasetFromTagResponse",
-]
+__all__ = ["GetDatasetTagsResponse", "GetDatasetTagsResponseDataItem"]

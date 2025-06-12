@@ -6,10 +6,7 @@ from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.request_options import RequestOptions
 from ..types.knowledge_tag import KnowledgeTag
 from .raw_client import AsyncRawTagsClient, RawTagsClient
-from .types.bind_dataset_to_tag_response import BindDatasetToTagResponse
-from .types.delete_knowledge_tag_response import DeleteKnowledgeTagResponse
 from .types.get_dataset_tags_response import GetDatasetTagsResponse
-from .types.unbind_dataset_from_tag_response import UnbindDatasetFromTagResponse
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -83,9 +80,7 @@ class TagsClient:
         _response = self._raw_client.create_knowledge_tag(name=name, request_options=request_options)
         return _response.data
 
-    def delete_knowledge_tag(
-        self, *, tag_id: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> DeleteKnowledgeTagResponse:
+    def delete_knowledge_tag(self, *, tag_id: str, request_options: typing.Optional[RequestOptions] = None) -> None:
         """
         Delete the specified knowledge base tag
 
@@ -99,8 +94,7 @@ class TagsClient:
 
         Returns
         -------
-        DeleteKnowledgeTagResponse
-            Successfully deleted tag
+        None
 
         Examples
         --------
@@ -144,7 +138,7 @@ class TagsClient:
 
     def bind_dataset_to_tag(
         self, *, tag_ids: typing.Sequence[str], target_id: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> BindDatasetToTagResponse:
+    ) -> None:
         """
         Bind knowledge base to specified knowledge base tags
 
@@ -161,8 +155,7 @@ class TagsClient:
 
         Returns
         -------
-        BindDatasetToTagResponse
-            Successfully bound knowledge base to tags
+        None
 
         Examples
         --------
@@ -177,7 +170,7 @@ class TagsClient:
 
     def unbind_dataset_from_tag(
         self, *, tag_id: str, target_id: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> UnbindDatasetFromTagResponse:
+    ) -> None:
         """
         Remove the binding relationship between knowledge base and specified tag
 
@@ -194,8 +187,7 @@ class TagsClient:
 
         Returns
         -------
-        UnbindDatasetFromTagResponse
-            Successfully unbound knowledge base from tag
+        None
 
         Examples
         --------
@@ -313,7 +305,7 @@ class AsyncTagsClient:
 
     async def delete_knowledge_tag(
         self, *, tag_id: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> DeleteKnowledgeTagResponse:
+    ) -> None:
         """
         Delete the specified knowledge base tag
 
@@ -327,8 +319,7 @@ class AsyncTagsClient:
 
         Returns
         -------
-        DeleteKnowledgeTagResponse
-            Successfully deleted tag
+        None
 
         Examples
         --------
@@ -380,7 +371,7 @@ class AsyncTagsClient:
 
     async def bind_dataset_to_tag(
         self, *, tag_ids: typing.Sequence[str], target_id: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> BindDatasetToTagResponse:
+    ) -> None:
         """
         Bind knowledge base to specified knowledge base tags
 
@@ -397,8 +388,7 @@ class AsyncTagsClient:
 
         Returns
         -------
-        BindDatasetToTagResponse
-            Successfully bound knowledge base to tags
+        None
 
         Examples
         --------
@@ -416,7 +406,7 @@ class AsyncTagsClient:
 
     async def unbind_dataset_from_tag(
         self, *, tag_id: str, target_id: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> UnbindDatasetFromTagResponse:
+    ) -> None:
         """
         Remove the binding relationship between knowledge base and specified tag
 
@@ -433,8 +423,7 @@ class AsyncTagsClient:
 
         Returns
         -------
-        UnbindDatasetFromTagResponse
-            Successfully unbound knowledge base from tag
+        None
 
         Examples
         --------

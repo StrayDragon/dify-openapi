@@ -2,16 +2,7 @@
 
 # isort: skip_file
 
-from .bind_dataset_to_tag_response import BindDatasetToTagResponse
-from .delete_knowledge_tag_response import DeleteKnowledgeTagResponse
 from .get_dataset_tags_response import GetDatasetTagsResponse
 from .get_dataset_tags_response_data_item import GetDatasetTagsResponseDataItem
-from .unbind_dataset_from_tag_response import UnbindDatasetFromTagResponse
 
-__all__ = [
-    "BindDatasetToTagResponse",
-    "DeleteKnowledgeTagResponse",
-    "GetDatasetTagsResponse",
-    "GetDatasetTagsResponseDataItem",
-    "UnbindDatasetFromTagResponse",
-]
+__all__ = ["GetDatasetTagsResponse", "GetDatasetTagsResponseDataItem"]

@@ -12,10 +12,7 @@ from ...core.request_options import RequestOptions
 from ..errors.bad_request_error import BadRequestError
 from ..types.error import Error
 from ..types.knowledge_tag import KnowledgeTag
-from .types.bind_dataset_to_tag_response import BindDatasetToTagResponse
-from .types.delete_knowledge_tag_response import DeleteKnowledgeTagResponse
 from .types.get_dataset_tags_response import GetDatasetTagsResponse
-from .types.unbind_dataset_from_tag_response import UnbindDatasetFromTagResponse
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -129,7 +126,7 @@ class RawTagsClient:
 
     def delete_knowledge_tag(
         self, *, tag_id: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> HttpResponse[DeleteKnowledgeTagResponse]:
+    ) -> HttpResponse[None]:
         """
         Delete the specified knowledge base tag
 
@@ -143,8 +140,7 @@ class RawTagsClient:
 
         Returns
         -------
-        HttpResponse[DeleteKnowledgeTagResponse]
-            Successfully deleted tag
+        HttpResponse[None]
         """
         _response = self._client_wrapper.httpx_client.request(
             "datasets/tags",
@@ -160,14 +156,7 @@ class RawTagsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _data = typing.cast(
-                    DeleteKnowledgeTagResponse,
-                    parse_obj_as(
-                        type_=DeleteKnowledgeTagResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-                return HttpResponse(response=_response, data=_data)
+                return HttpResponse(response=_response, data=None)
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
@@ -245,7 +234,7 @@ class RawTagsClient:
 
     def bind_dataset_to_tag(
         self, *, tag_ids: typing.Sequence[str], target_id: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> HttpResponse[BindDatasetToTagResponse]:
+    ) -> HttpResponse[None]:
         """
         Bind knowledge base to specified knowledge base tags
 
@@ -262,8 +251,7 @@ class RawTagsClient:
 
         Returns
         -------
-        HttpResponse[BindDatasetToTagResponse]
-            Successfully bound knowledge base to tags
+        HttpResponse[None]
         """
         _response = self._client_wrapper.httpx_client.request(
             "datasets/tags/binding",
@@ -280,14 +268,7 @@ class RawTagsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _data = typing.cast(
-                    BindDatasetToTagResponse,
-                    parse_obj_as(
-                        type_=BindDatasetToTagResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-                return HttpResponse(response=_response, data=_data)
+                return HttpResponse(response=_response, data=None)
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
@@ -305,7 +286,7 @@ class RawTagsClient:
 
     def unbind_dataset_from_tag(
         self, *, tag_id: str, target_id: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> HttpResponse[UnbindDatasetFromTagResponse]:
+    ) -> HttpResponse[None]:
         """
         Remove the binding relationship between knowledge base and specified tag
 
@@ -322,8 +303,7 @@ class RawTagsClient:
 
         Returns
         -------
-        HttpResponse[UnbindDatasetFromTagResponse]
-            Successfully unbound knowledge base from tag
+        HttpResponse[None]
         """
         _response = self._client_wrapper.httpx_client.request(
             "datasets/tags/unbinding",
@@ -340,14 +320,7 @@ class RawTagsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _data = typing.cast(
-                    UnbindDatasetFromTagResponse,
-                    parse_obj_as(
-                        type_=UnbindDatasetFromTagResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-                return HttpResponse(response=_response, data=_data)
+                return HttpResponse(response=_response, data=None)
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
@@ -384,7 +357,7 @@ class RawTagsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(dataset_id)}/tags",
-            method="POST",
+            method="GET",
             request_options=request_options,
         )
         try:
@@ -521,7 +494,7 @@ class AsyncRawTagsClient:
 
     async def delete_knowledge_tag(
         self, *, tag_id: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> AsyncHttpResponse[DeleteKnowledgeTagResponse]:
+    ) -> AsyncHttpResponse[None]:
         """
         Delete the specified knowledge base tag
 
@@ -535,8 +508,7 @@ class AsyncRawTagsClient:
 
         Returns
         -------
-        AsyncHttpResponse[DeleteKnowledgeTagResponse]
-            Successfully deleted tag
+        AsyncHttpResponse[None]
         """
         _response = await self._client_wrapper.httpx_client.request(
             "datasets/tags",
@@ -552,14 +524,7 @@ class AsyncRawTagsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _data = typing.cast(
-                    DeleteKnowledgeTagResponse,
-                    parse_obj_as(
-                        type_=DeleteKnowledgeTagResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-                return AsyncHttpResponse(response=_response, data=_data)
+                return AsyncHttpResponse(response=_response, data=None)
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
@@ -637,7 +602,7 @@ class AsyncRawTagsClient:
 
     async def bind_dataset_to_tag(
         self, *, tag_ids: typing.Sequence[str], target_id: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> AsyncHttpResponse[BindDatasetToTagResponse]:
+    ) -> AsyncHttpResponse[None]:
         """
         Bind knowledge base to specified knowledge base tags
 
@@ -654,8 +619,7 @@ class AsyncRawTagsClient:
 
         Returns
         -------
-        AsyncHttpResponse[BindDatasetToTagResponse]
-            Successfully bound knowledge base to tags
+        AsyncHttpResponse[None]
         """
         _response = await self._client_wrapper.httpx_client.request(
             "datasets/tags/binding",
@@ -672,14 +636,7 @@ class AsyncRawTagsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _data = typing.cast(
-                    BindDatasetToTagResponse,
-                    parse_obj_as(
-                        type_=BindDatasetToTagResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-                return AsyncHttpResponse(response=_response, data=_data)
+                return AsyncHttpResponse(response=_response, data=None)
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
@@ -697,7 +654,7 @@ class AsyncRawTagsClient:
 
     async def unbind_dataset_from_tag(
         self, *, tag_id: str, target_id: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> AsyncHttpResponse[UnbindDatasetFromTagResponse]:
+    ) -> AsyncHttpResponse[None]:
         """
         Remove the binding relationship between knowledge base and specified tag
 
@@ -714,8 +671,7 @@ class AsyncRawTagsClient:
 
         Returns
         -------
-        AsyncHttpResponse[UnbindDatasetFromTagResponse]
-            Successfully unbound knowledge base from tag
+        AsyncHttpResponse[None]
         """
         _response = await self._client_wrapper.httpx_client.request(
             "datasets/tags/unbinding",
@@ -732,14 +688,7 @@ class AsyncRawTagsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _data = typing.cast(
-                    UnbindDatasetFromTagResponse,
-                    parse_obj_as(
-                        type_=UnbindDatasetFromTagResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-                return AsyncHttpResponse(response=_response, data=_data)
+                return AsyncHttpResponse(response=_response, data=None)
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
@@ -776,7 +725,7 @@ class AsyncRawTagsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(dataset_id)}/tags",
-            method="POST",
+            method="GET",
             request_options=request_options,
         )
         try:
