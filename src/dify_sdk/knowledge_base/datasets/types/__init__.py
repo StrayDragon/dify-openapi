@@ -7,9 +7,6 @@ from .create_dataset_request_permission import CreateDatasetRequestPermission
 from .create_dataset_request_provider import CreateDatasetRequestProvider
 from .patch_datasets_dataset_id_request_indexing_technique import PatchDatasetsDatasetIdRequestIndexingTechnique
 from .patch_datasets_dataset_id_request_permission import PatchDatasetsDatasetIdRequestPermission
-from .retrieve_dataset_request_retrieval_model import RetrieveDatasetRequestRetrievalModel
-from .retrieve_dataset_request_retrieval_model_reranking_model import RetrieveDatasetRequestRetrievalModelRerankingModel
-from .retrieve_dataset_request_retrieval_model_search_method import RetrieveDatasetRequestRetrievalModelSearchMethod
 from .retrieve_dataset_response import RetrieveDatasetResponse
 from .retrieve_dataset_response_query import RetrieveDatasetResponseQuery
 from .retrieve_dataset_response_records_item import RetrieveDatasetResponseRecordsItem
@@ -22,9 +19,6 @@ __all__ = [
     "CreateDatasetRequestProvider",
     "PatchDatasetsDatasetIdRequestIndexingTechnique",
     "PatchDatasetsDatasetIdRequestPermission",
-    "RetrieveDatasetRequestRetrievalModel",
-    "RetrieveDatasetRequestRetrievalModelRerankingModel",
-    "RetrieveDatasetRequestRetrievalModelSearchMethod",
     "RetrieveDatasetResponse",
     "RetrieveDatasetResponseQuery",
     "RetrieveDatasetResponseRecordsItem",

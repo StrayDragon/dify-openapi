@@ -7,6 +7,7 @@ from .metadata.client import AsyncMetadataClient, MetadataClient
 from .models.client import AsyncModelsClient, ModelsClient
 from .raw_client import AsyncRawKnowledgeBaseClient, RawKnowledgeBaseClient
 from .segments.client import AsyncSegmentsClient, SegmentsClient
+from .tags.client import AsyncTagsClient, TagsClient
 
 
 class KnowledgeBaseClient:
@@ -21,6 +22,8 @@ class KnowledgeBaseClient:
         self.metadata = MetadataClient(client_wrapper=client_wrapper)
 
         self.models = ModelsClient(client_wrapper=client_wrapper)
+
+        self.tags = TagsClient(client_wrapper=client_wrapper)
 
     @property
     def with_raw_response(self) -> RawKnowledgeBaseClient:
@@ -46,6 +49,8 @@ class AsyncKnowledgeBaseClient:
         self.metadata = AsyncMetadataClient(client_wrapper=client_wrapper)
 
         self.models = AsyncModelsClient(client_wrapper=client_wrapper)
+
+        self.tags = AsyncTagsClient(client_wrapper=client_wrapper)
 
     @property
     def with_raw_response(self) -> AsyncRawKnowledgeBaseClient:

@@ -474,25 +474,27 @@ class RawChatClient:
         self,
         message_id: str,
         *,
-        rating: str,
         user: str,
+        rating: typing.Optional[str] = OMIT,
         content: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[SendMessageFeedbackByAppChatResponse]:
         """
+        End-user feedback and rating for messages, helping application developers optimize expected outputs
+
         Parameters
         ----------
         message_id : str
             Message ID
 
-        rating : str
-            Feedback type
-
         user : str
-            User identifier
+            User identifier, defined by developer rules, must be unique within the application
+
+        rating : typing.Optional[str]
+            Rating: like, dislike, or null to cancel
 
         content : typing.Optional[str]
-            Feedback content
+            Specific feedback information for the message
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -539,15 +541,15 @@ class RawChatClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[GetAppFeedbacksByAppChatResponse]:
         """
-        Get application's user feedbacks and likes
+        Get end-user feedback and likes for the application
 
         Parameters
         ----------
         page : typing.Optional[int]
-            (Optional) Pagination, default: 1
+            Page number, default: 1
 
         limit : typing.Optional[int]
-            (Optional) Records per page, default: 20
+            Number of items per page, default: 20
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -593,7 +595,7 @@ class RawChatClient:
             Message ID
 
         user : str
-            User identifier, defined by the developer, must be unique within the application
+            User identifier, defined by developer rules, must be unique within the application
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -601,7 +603,7 @@ class RawChatClient:
         Returns
         -------
         HttpResponse[GetSuggestedQuestionsByAppChatResponse]
-            Successfully retrieved suggested questions
+            Successful response
         """
         _response = self._client_wrapper.httpx_client.request(
             f"messages/{jsonable_encoder(message_id)}/suggested",
@@ -1757,25 +1759,27 @@ class AsyncRawChatClient:
         self,
         message_id: str,
         *,
-        rating: str,
         user: str,
+        rating: typing.Optional[str] = OMIT,
         content: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[SendMessageFeedbackByAppChatResponse]:
         """
+        End-user feedback and rating for messages, helping application developers optimize expected outputs
+
         Parameters
         ----------
         message_id : str
             Message ID
 
-        rating : str
-            Feedback type
-
         user : str
-            User identifier
+            User identifier, defined by developer rules, must be unique within the application
+
+        rating : typing.Optional[str]
+            Rating: like, dislike, or null to cancel
 
         content : typing.Optional[str]
-            Feedback content
+            Specific feedback information for the message
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1822,15 +1826,15 @@ class AsyncRawChatClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[GetAppFeedbacksByAppChatResponse]:
         """
-        Get application's user feedbacks and likes
+        Get end-user feedback and likes for the application
 
         Parameters
         ----------
         page : typing.Optional[int]
-            (Optional) Pagination, default: 1
+            Page number, default: 1
 
         limit : typing.Optional[int]
-            (Optional) Records per page, default: 20
+            Number of items per page, default: 20
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1876,7 +1880,7 @@ class AsyncRawChatClient:
             Message ID
 
         user : str
-            User identifier, defined by the developer, must be unique within the application
+            User identifier, defined by developer rules, must be unique within the application
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1884,7 +1888,7 @@ class AsyncRawChatClient:
         Returns
         -------
         AsyncHttpResponse[GetSuggestedQuestionsByAppChatResponse]
-            Successfully retrieved suggested questions
+            Successful response
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"messages/{jsonable_encoder(message_id)}/suggested",

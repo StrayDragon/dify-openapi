@@ -29,7 +29,7 @@ class GetAppFeedbacksByAppChatResponseDataItem(UniversalBaseModel):
 
     rating: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Rating type (like/dislike)
+    Rating
     """
 
     content: typing.Optional[str] = pydantic.Field(default=None)

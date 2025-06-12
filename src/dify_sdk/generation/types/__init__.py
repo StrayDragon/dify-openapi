@@ -15,7 +15,6 @@ from .create_annotation_by_app_generation_response import CreateAnnotationByAppG
 from .error import Error
 from .file_input import FileInput
 from .file_input_transfer_method import FileInputTransferMethod
-from .file_input_type import FileInputType
 from .get_annotation_reply_status_by_app_generation_request_action import (
     GetAnnotationReplyStatusByAppGenerationRequestAction,
 )
@@ -102,7 +101,6 @@ __all__ = [
     "Error",
     "FileInput",
     "FileInputTransferMethod",
-    "FileInputType",
     "GetAnnotationReplyStatusByAppGenerationRequestAction",
     "GetAnnotationReplyStatusByAppGenerationResponse",
     "GetAnnotationsListByAppGenerationResponse",

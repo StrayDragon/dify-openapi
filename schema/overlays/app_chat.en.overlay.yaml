@@ -4,8 +4,6 @@ info:
   version: "1.0.0"
 extends: ../app_chat.zh.yaml
 actions:
-  - target: $.tags[0].description
-    update: "Chat Application Operations"
   - target: $.info
     update:
       title: "Dify API - Chat Application"
@@ -13,7 +11,7 @@ actions:
         Dify API provides a series of interfaces for conversation functionality.
         It supports conversational applications.
         All API requests require an application-level API-Key in the Authorization HTTP Header.
-        official raw document: https://github.com/langgenius/dify/blob/1.4.0/web/app/components/develop/template/template_chat.en.mdx
+        official raw document: https://github.com/langgenius/dify/blob/1.4.1/web/app/components/develop/template/template_chat.en.mdx
 
   - target: $.servers[0]
     update:
@@ -176,8 +174,8 @@ actions:
   - target: $.components.schemas.ChatHistoryMessage.properties.agent_thoughts.items.properties.message_files.description
     update: "File IDs associated with the current agent_thought"
 
-  - target: $.components.schemas.ChatHistoryMessage.properties.agent_thoughts.items.properties.message_files.items.properties.file_id.description
-    update: "File ID"
+  - target: $.components.schemas.ChatHistoryMessage.properties.agent_thoughts.items.properties.message_files.description
+    update: "File IDs associated with the current agent_thought"
 
   - target: $.components.schemas.ChatHistoryMessage.properties.agent_thoughts.items.properties.conversation_id.description
     update: "Conversation ID"
@@ -192,7 +190,7 @@ actions:
     update: "Feedback information"
 
   - target: $.components.schemas.ChatHistoryMessage.properties.feedback.properties.rating.description
-    update: "Like or dislike rating"
+    update: "Like or dislike"
 
   - target: $.components.schemas.ChatHistoryMessage.properties.retriever_resources.description
     update: "Citation and attribution segment list"
@@ -637,43 +635,43 @@ actions:
 
   - target: $.paths['/messages/{message_id}/feedbacks'].post
     update:
-      summary: "Message Feedback"
+      summary: "Message Feedback (Like/Dislike)"
+      description: "End-user feedback and rating for messages, helping application developers optimize expected outputs"
 
-  - target: $.paths['/messages/{message_id}/feedbacks'].post.parameters[0]
-    update:
-      description: "Message ID"
+  - target: $.paths['/messages/{message_id}/feedbacks'].post.parameters[0].description
+    update: "Message ID"
 
-  - target: $.paths['/messages/{message_id}/feedbacks'].post.requestBody.content['application/json'].schema.properties.rating
-    update:
-      description: "Feedback type"
+  - target: $.paths['/messages/{message_id}/feedbacks'].post.requestBody.content['application/json'].schema.properties.rating.description
+    update: "Rating: like, dislike, or null to cancel"
 
-  - target: $.paths['/messages/{message_id}/feedbacks'].post.requestBody.content['application/json'].schema.properties.user
-    update:
-      description: "User identifier"
+  - target: $.paths['/messages/{message_id}/feedbacks'].post.requestBody.content['application/json'].schema.properties.user.description
+    update: "User identifier, defined by developer rules, must be unique within the application"
 
-  - target: $.paths['/messages/{message_id}/feedbacks'].post.requestBody.content['application/json'].schema.properties.content
-    update:
-      description: "Feedback content"
+  - target: $.paths['/messages/{message_id}/feedbacks'].post.requestBody.content['application/json'].schema.properties.content.description
+    update: "Specific feedback information for the message"
 
   - target: $.paths['/messages/{message_id}/feedbacks'].post.responses['200'].description
     update: "Successful response"
 
+  - target: $.paths['/messages/{message_id}/feedbacks'].post.responses['200'].content['application/json'].schema.properties.result.description
+    update: "Fixed return value: success"
+
   - target: $.paths['/app/feedbacks'].get
     update:
-      summary: "Get App Feedbacks"
-      description: "Get application's user feedbacks and likes"
+      summary: "Get APP Message Likes and Feedback"
+      description: "Get end-user feedback and likes for the application"
 
   - target: $.paths['/app/feedbacks'].get.parameters[0].description
-    update: "(Optional) Pagination, default: 1"
+    update: "Page number, default: 1"
 
   - target: $.paths['/app/feedbacks'].get.parameters[1].description
-    update: "(Optional) Records per page, default: 20"
+    update: "Number of items per page, default: 20"
 
   - target: $.paths['/app/feedbacks'].get.responses['200'].description
     update: "Successful response"
 
   - target: $.paths['/app/feedbacks'].get.responses['200'].content['application/json'].schema.properties.data.description
-    update: "Returns the app's likes and feedback list"
+    update: "Returns the list of likes and feedback for this APP"
 
   - target: $.paths['/app/feedbacks'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.id.description
     update: "Feedback ID"
@@ -688,7 +686,7 @@ actions:
     update: "Message ID"
 
   - target: $.paths['/app/feedbacks'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.rating.description
-    update: "Rating type (like/dislike)"
+    update: "Rating"
 
   - target: $.paths['/app/feedbacks'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.content.description
     update: "Feedback content"
@@ -710,20 +708,17 @@ actions:
 
   - target: $.paths['/messages/{message_id}/suggested'].get
     update:
-      summary: "Get Suggested Questions"
+      summary: "Get Suggested Questions for Next Round"
       description: "Get suggested questions for the next round"
 
   - target: $.paths['/messages/{message_id}/suggested'].get.parameters[0].description
     update: "Message ID"
 
   - target: $.paths['/messages/{message_id}/suggested'].get.parameters[1].description
-    update: "User identifier, defined by the developer, must be unique within the application"
+    update: "User identifier, defined by developer rules, must be unique within the application"
 
   - target: $.paths['/messages/{message_id}/suggested'].get.responses['200'].description
-    update: "Successfully retrieved suggested questions"
-
-  - target: $.paths['/messages/{message_id}/suggested'].get.responses['200'].content['application/json'].schema.properties.result.description
-    update: "Fixed return value 'success'"
+    update: "Successful response"
 
   - target: $.paths['/messages/{message_id}/suggested'].get.responses['200'].content['application/json'].schema.properties.data.description
     update: "List of suggested questions"

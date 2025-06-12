@@ -3,13 +3,19 @@
 import typing
 
 import pydantic
-from ....core.pydantic_utilities import IS_PYDANTIC_V2
-from ...types.segment import Segment
-from .retrieve_dataset_response_records_item_segment_document import RetrieveDatasetResponseRecordsItemSegmentDocument
+from ....core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 
 
-class RetrieveDatasetResponseRecordsItemSegment(Segment):
-    document: typing.Optional[RetrieveDatasetResponseRecordsItemSegmentDocument] = None
+class GetDatasetTagsResponseDataItem(UniversalBaseModel):
+    id: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Tag ID
+    """
+
+    name: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Tag name
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

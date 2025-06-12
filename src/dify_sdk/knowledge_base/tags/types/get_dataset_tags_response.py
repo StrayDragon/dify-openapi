@@ -3,13 +3,16 @@
 import typing
 
 import pydantic
-from ....core.pydantic_utilities import IS_PYDANTIC_V2
-from ...types.segment import Segment
-from .retrieve_dataset_response_records_item_segment_document import RetrieveDatasetResponseRecordsItemSegmentDocument
+from ....core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from .get_dataset_tags_response_data_item import GetDatasetTagsResponseDataItem
 
 
-class RetrieveDatasetResponseRecordsItemSegment(Segment):
-    document: typing.Optional[RetrieveDatasetResponseRecordsItemSegmentDocument] = None
+class GetDatasetTagsResponse(UniversalBaseModel):
+    data: typing.Optional[typing.List[GetDatasetTagsResponseDataItem]] = None
+    total: typing.Optional[int] = pydantic.Field(default=None)
+    """
+    Total count
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

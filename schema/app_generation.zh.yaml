@@ -5,8 +5,8 @@ info:
     Dify API 提供了一系列接口用于文本生成功能。
     支持文本生成型应用。
     所有 API 请求都需要在 Authorization HTTP Header 中包含应用级 API-Key。
-    官方原始文档见: https://github.com/langgenius/dify/blob/1.4.1/web/app/components/develop/template/template.zh.mdx
-  version: 1.4.1
+    官方原始文档见: https://github.com/langgenius/dify/blob/1.4.2/web/app/components/develop/template/template.zh.mdx
+  version: 1.4.2
 
 servers:
   - url: https://api.dify.ai/v1
@@ -175,18 +175,18 @@ components:
       properties:
         type:
           type: string
-          enum: [document, image, audio, video, custom]
-          description: 文件类型
+          enum: [image]
+          description: 文件类型，目前仅支持图片
         transfer_method:
           type: string
           enum: [remote_url, local_file]
           description: 传递方式
         url:
           type: string
-          description: 远程URL
+          description: 图片地址（仅当传递方式为 remote_url 时）
         upload_file_id:
           type: string
-          description: 上传文件ID
+          description: 上传文件 ID（仅当传递方式为 local_file 时）
 
     ChunkChatCompletionResponse:
       type: object
@@ -366,19 +366,68 @@ paths:
                     - `message` (string) 错误消息
                   - `event: ping` 每 10s 一次的 ping 事件，保持连接存活。
         "400":
-          $ref: "#/components/responses/Error400"
+          description: 请求错误
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                invalid_param:
+                  summary: 传入参数异常
+                  value:
+                    code: "invalid_param"
+                    status: 400
+                    message: "传入参数异常"
+                app_unavailable:
+                  summary: App 配置不可用
+                  value:
+                    code: "app_unavailable"
+                    status: 400
+                    message: "App 配置不可用"
+                provider_not_initialize:
+                  summary: 无可用模型凭据配置
+                  value:
+                    code: "provider_not_initialize"
+                    status: 400
+                    message: "无可用模型凭据配置"
+                provider_quota_exceeded:
+                  summary: 模型调用额度不足
+                  value:
+                    code: "provider_quota_exceeded"
+                    status: 400
+                    message: "模型调用额度不足"
+                model_currently_not_support:
+                  summary: 当前模型不可用
+                  value:
+                    code: "model_currently_not_support"
+                    status: 400
+                    message: "当前模型不可用"
+                completion_request_error:
+                  summary: 文本生成失败
+                  value:
+                    code: "completion_request_error"
+                    status: 400
+                    message: "文本生成失败"
         "404":
-          $ref: "#/components/responses/Error404"
+          description: 对话不存在
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         "500":
-          $ref: "#/components/responses/Error500"
+          description: 服务内部异常
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   /files/upload:
     post:
       operationId: uploadFileByAppGeneration
       summary: 上传文件
       description: |
-        上传文件并在发送消息时使用。
-        支持的文件类型取决于应用类型和配置。
+        上传文件（目前仅支持图片）并在发送消息时使用，可实现图文多模态理解。
+        支持 png, jpg, jpeg, webp, gif 格式。
         上传的文件仅供当前终端用户使用。
       requestBody:
         required: true
@@ -393,9 +442,10 @@ paths:
                   description: 要上传的文件
                 user:
                   type: string
-                  description: 用户标识
+                  description: 用户标识，用于定义终端用户的身份，必须和发送消息接口传入 user 保持一致
               required:
                 - file
+                - user
       responses:
         "200":
           description: 成功响应
@@ -404,25 +454,81 @@ paths:
               schema:
                 $ref: "#/components/schemas/UploadedFile"
         "400":
-          $ref: "#/components/responses/Error400"
+          description: 请求错误
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                no_file_uploaded:
+                  summary: 必须提供文件
+                  value:
+                    code: "no_file_uploaded"
+                    status: 400
+                    message: "必须提供文件"
+                too_many_files:
+                  summary: 目前只接受一个文件
+                  value:
+                    code: "too_many_files"
+                    status: 400
+                    message: "目前只接受一个文件"
+                unsupported_preview:
+                  summary: 该文件不支持预览
+                  value:
+                    code: "unsupported_preview"
+                    status: 400
+                    message: "该文件不支持预览"
+                unsupported_estimate:
+                  summary: 该文件不支持估算
+                  value:
+                    code: "unsupported_estimate"
+                    status: 400
+                    message: "该文件不支持估算"
         "413":
           description: 文件太大
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+              example:
+                code: "file_too_large"
+                status: 413
+                message: "文件太大"
         "415":
           description: 不支持的文件类型
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+              example:
+                code: "unsupported_file_type"
+                status: 415
+                message: "不支持的扩展名，当前只接受文档类文件"
         "503":
           description: 存储服务错误
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+              examples:
+                s3_connection_failed:
+                  summary: 无法连接到 S3 服务
+                  value:
+                    code: "s3_connection_failed"
+                    status: 503
+                    message: "无法连接到 S3 服务"
+                s3_permission_denied:
+                  summary: 无权限上传文件到 S3
+                  value:
+                    code: "s3_permission_denied"
+                    status: 503
+                    message: "无权限上传文件到 S3"
+                s3_file_too_large:
+                  summary: 文件超出 S3 大小限制
+                  value:
+                    code: "s3_file_too_large"
+                    status: 503
+                    message: "文件超出 S3 大小限制"
 
   /info:
     get:
@@ -776,6 +882,7 @@ paths:
                 streaming:
                   type: boolean
                   description: 是否使用流式模式返回音频数据
+                  default: false
       responses:
         "200":
           description: 成功响应

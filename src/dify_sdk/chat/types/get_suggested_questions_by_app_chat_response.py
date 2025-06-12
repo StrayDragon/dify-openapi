@@ -7,11 +7,7 @@ from ...core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 
 
 class GetSuggestedQuestionsByAppChatResponse(UniversalBaseModel):
-    result: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Fixed return value 'success'
-    """
-
+    result: typing.Optional[typing.Literal["success"]] = None
     data: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
     """
     List of suggested questions

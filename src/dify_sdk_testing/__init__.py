@@ -10,6 +10,7 @@ from dify_sdk.knowledge_base.documents.client import AsyncDocumentsClient
 from dify_sdk.knowledge_base.metadata.client import AsyncMetadataClient
 from dify_sdk.knowledge_base.models.client import AsyncModelsClient
 from dify_sdk.knowledge_base.segments.client import AsyncSegmentsClient
+from dify_sdk.knowledge_base.tags.client import AsyncTagsClient
 from dify_sdk.chat.types.chunk_chat_completion_response import ChunkChatCompletionResponse as ChatChunkResponse
 from dify_sdk.advanced_chat.types.chunk_chat_completion_response import (
     ChunkChatCompletionResponse as AdvancedChatChunkResponse,
@@ -47,6 +48,7 @@ class KnowledgeBaseClient:
     segment: AsyncSegmentsClient
     metadata: AsyncMetadataClient
     models: AsyncModelsClient
+    tags: AsyncTagsClient
 
 
 async def wait_for_document_indexing_completed(

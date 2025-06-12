@@ -22,7 +22,6 @@ from .types.create_dataset_request_permission import CreateDatasetRequestPermiss
 from .types.create_dataset_request_provider import CreateDatasetRequestProvider
 from .types.patch_datasets_dataset_id_request_indexing_technique import PatchDatasetsDatasetIdRequestIndexingTechnique
 from .types.patch_datasets_dataset_id_request_permission import PatchDatasetsDatasetIdRequestPermission
-from .types.retrieve_dataset_request_retrieval_model import RetrieveDatasetRequestRetrievalModel
 from .types.retrieve_dataset_response import RetrieveDatasetResponse
 
 # this is used as the default value for optional parameters
@@ -439,12 +438,12 @@ class RawDatasetsClient:
         dataset_id: str,
         *,
         query: str,
-        retrieval_model: typing.Optional[RetrieveDatasetRequestRetrievalModel] = OMIT,
+        retrieval_model: typing.Optional[RetrievalModel] = OMIT,
         external_retrieval_model: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[RetrieveDatasetResponse]:
         """
-        Retrieve content from specified knowledge base
+        Retrieve relevant content from the specified knowledge base
 
         Parameters
         ----------
@@ -452,13 +451,13 @@ class RawDatasetsClient:
             Knowledge Base ID
 
         query : str
-            Search keyword
+            Search keywords
 
-        retrieval_model : typing.Optional[RetrieveDatasetRequestRetrievalModel]
+        retrieval_model : typing.Optional[RetrievalModel]
             Retrieval parameter configuration
 
         external_retrieval_model : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Unused field
+            External retrieval model (disabled field)
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -466,7 +465,7 @@ class RawDatasetsClient:
         Returns
         -------
         HttpResponse[RetrieveDatasetResponse]
-            Retrieval successful
+            Successfully retrieved knowledge base
         """
         _response = self._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(dataset_id)}/retrieve",
@@ -474,7 +473,7 @@ class RawDatasetsClient:
             json={
                 "query": query,
                 "retrieval_model": convert_and_respect_annotation_metadata(
-                    object_=retrieval_model, annotation=RetrieveDatasetRequestRetrievalModel, direction="write"
+                    object_=retrieval_model, annotation=RetrievalModel, direction="write"
                 ),
                 "external_retrieval_model": external_retrieval_model,
             },
@@ -930,12 +929,12 @@ class AsyncRawDatasetsClient:
         dataset_id: str,
         *,
         query: str,
-        retrieval_model: typing.Optional[RetrieveDatasetRequestRetrievalModel] = OMIT,
+        retrieval_model: typing.Optional[RetrievalModel] = OMIT,
         external_retrieval_model: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[RetrieveDatasetResponse]:
         """
-        Retrieve content from specified knowledge base
+        Retrieve relevant content from the specified knowledge base
 
         Parameters
         ----------
@@ -943,13 +942,13 @@ class AsyncRawDatasetsClient:
             Knowledge Base ID
 
         query : str
-            Search keyword
+            Search keywords
 
-        retrieval_model : typing.Optional[RetrieveDatasetRequestRetrievalModel]
+        retrieval_model : typing.Optional[RetrievalModel]
             Retrieval parameter configuration
 
         external_retrieval_model : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Unused field
+            External retrieval model (disabled field)
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -957,7 +956,7 @@ class AsyncRawDatasetsClient:
         Returns
         -------
         AsyncHttpResponse[RetrieveDatasetResponse]
-            Retrieval successful
+            Successfully retrieved knowledge base
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(dataset_id)}/retrieve",
@@ -965,7 +964,7 @@ class AsyncRawDatasetsClient:
             json={
                 "query": query,
                 "retrieval_model": convert_and_respect_annotation_metadata(
-                    object_=retrieval_model, annotation=RetrieveDatasetRequestRetrievalModel, direction="write"
+                    object_=retrieval_model, annotation=RetrievalModel, direction="write"
                 ),
                 "external_retrieval_model": external_retrieval_model,
             },

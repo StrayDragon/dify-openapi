@@ -15,7 +15,7 @@ from dify_sdk.knowledge_base.segments import (
 )
 from dify_sdk.knowledge_base.types.dataset import Dataset
 from dify_sdk.knowledge_base.types.document import Document
-from dify_sdk_testing import KnowledgeBaseClient
+from dify_sdk_testing import RUNNING_IN_CI, KnowledgeBaseClient
 
 
 @pytest.fixture
@@ -77,6 +77,10 @@ async def document_for_seg1(kb_client: KnowledgeBaseClient, dataset_for_seg1: Da
     return doc_response.document
 
 
+@pytest.mark.skipif(
+    RUNNING_IN_CI,
+    reason="这个测试中有些功能需要付费账号才能使用(CI中使用官方服务器, 测试账号受限), 请使用本地服务测试",
+)
 async def test_segments_workflow(
     kb_client: KnowledgeBaseClient, dataset_for_seg1: Dataset, document_for_seg1: Document
 ):
@@ -193,3 +197,46 @@ async def test_segments_workflow(
     )
     # 204 No Content响应，delete_response应该为None
     assert delete_response is None
+
+
+async def test_get_segment_detail_basic(
+    kb_client: KnowledgeBaseClient, dataset_for_seg1: Dataset, document_for_seg1: Document
+):
+    """测试获取文档分段详情功能 (1.4.2新增)"""
+
+    dataset_id = str(dataset_for_seg1.id)
+    document_id = str(document_for_seg1.id)
+
+    # 等待文档处理完成
+    await asyncio.sleep(10)
+
+    # 获取分段列表
+    segments_response = await kb_client.segment.get_segments(
+        dataset_id=dataset_id,
+        document_id=document_id,
+    )
+
+    assert segments_response is not None
+    if segments_response.data and len(segments_response.data) > 0:
+        # 获取第一个分段的详情 (新功能)
+        first_segment = segments_response.data[0]
+        segment_id = str(first_segment.id)
+
+        segment_detail = await kb_client.segment.get_segment_detail(
+            dataset_id=dataset_id,
+            document_id=document_id,
+            segment_id=segment_id,
+        )
+
+        # 验证分段详情
+        assert segment_detail is not None
+        assert segment_detail.data is not None
+
+        detail_data = segment_detail.data
+        assert detail_data.id == segment_id
+        assert detail_data.document_id == document_id
+        assert detail_data.content is not None
+        assert len(detail_data.content) > 0
+        print(f"分段详情测试成功: {segment_id}")
+    else:
+        pytest.skip("没有找到文档分段，跳过分段详情测试")

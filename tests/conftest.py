@@ -3,7 +3,6 @@ import warnings
 import httpx
 import pytest
 from collections.abc import AsyncGenerator
-
 from dify_sdk.client import AsyncDifyApi
 from dify_sdk.chat.client import AsyncChatClient
 from dify_sdk.advanced_chat.client import AsyncAdvancedChatClient
@@ -96,4 +95,5 @@ async def kb_client() -> AsyncGenerator[KnowledgeBaseClient]:
         segment=client.knowledge_base.segments,
         metadata=client.knowledge_base.metadata,
         models=client.knowledge_base.models,
+        tags=client.knowledge_base.tags,
     )

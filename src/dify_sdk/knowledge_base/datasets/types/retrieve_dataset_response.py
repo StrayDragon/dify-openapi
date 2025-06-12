@@ -10,7 +10,10 @@ from .retrieve_dataset_response_records_item import RetrieveDatasetResponseRecor
 
 class RetrieveDatasetResponse(UniversalBaseModel):
     query: typing.Optional[RetrieveDatasetResponseQuery] = None
-    records: typing.Optional[typing.List[RetrieveDatasetResponseRecordsItem]] = None
+    records: typing.Optional[typing.List[RetrieveDatasetResponseRecordsItem]] = pydantic.Field(default=None)
+    """
+    Search result list
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

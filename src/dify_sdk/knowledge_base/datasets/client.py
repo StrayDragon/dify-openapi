@@ -13,7 +13,6 @@ from .types.create_dataset_request_permission import CreateDatasetRequestPermiss
 from .types.create_dataset_request_provider import CreateDatasetRequestProvider
 from .types.patch_datasets_dataset_id_request_indexing_technique import PatchDatasetsDatasetIdRequestIndexingTechnique
 from .types.patch_datasets_dataset_id_request_permission import PatchDatasetsDatasetIdRequestPermission
-from .types.retrieve_dataset_request_retrieval_model import RetrieveDatasetRequestRetrievalModel
 from .types.retrieve_dataset_response import RetrieveDatasetResponse
 
 # this is used as the default value for optional parameters
@@ -288,12 +287,12 @@ class DatasetsClient:
         dataset_id: str,
         *,
         query: str,
-        retrieval_model: typing.Optional[RetrieveDatasetRequestRetrievalModel] = OMIT,
+        retrieval_model: typing.Optional[RetrievalModel] = OMIT,
         external_retrieval_model: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> RetrieveDatasetResponse:
         """
-        Retrieve content from specified knowledge base
+        Retrieve relevant content from the specified knowledge base
 
         Parameters
         ----------
@@ -301,13 +300,13 @@ class DatasetsClient:
             Knowledge Base ID
 
         query : str
-            Search keyword
+            Search keywords
 
-        retrieval_model : typing.Optional[RetrieveDatasetRequestRetrievalModel]
+        retrieval_model : typing.Optional[RetrievalModel]
             Retrieval parameter configuration
 
         external_retrieval_model : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Unused field
+            External retrieval model (disabled field)
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -315,7 +314,7 @@ class DatasetsClient:
         Returns
         -------
         RetrieveDatasetResponse
-            Retrieval successful
+            Successfully retrieved knowledge base
 
         Examples
         --------
@@ -616,12 +615,12 @@ class AsyncDatasetsClient:
         dataset_id: str,
         *,
         query: str,
-        retrieval_model: typing.Optional[RetrieveDatasetRequestRetrievalModel] = OMIT,
+        retrieval_model: typing.Optional[RetrievalModel] = OMIT,
         external_retrieval_model: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> RetrieveDatasetResponse:
         """
-        Retrieve content from specified knowledge base
+        Retrieve relevant content from the specified knowledge base
 
         Parameters
         ----------
@@ -629,13 +628,13 @@ class AsyncDatasetsClient:
             Knowledge Base ID
 
         query : str
-            Search keyword
+            Search keywords
 
-        retrieval_model : typing.Optional[RetrieveDatasetRequestRetrievalModel]
+        retrieval_model : typing.Optional[RetrievalModel]
             Retrieval parameter configuration
 
         external_retrieval_model : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Unused field
+            External retrieval model (disabled field)
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -643,7 +642,7 @@ class AsyncDatasetsClient:
         Returns
         -------
         RetrieveDatasetResponse
-            Retrieval successful
+            Successfully retrieved knowledge base
 
         Examples
         --------

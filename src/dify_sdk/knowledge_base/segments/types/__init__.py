@@ -7,6 +7,8 @@ from .create_segments_response import CreateSegmentsResponse
 from .get_datasets_dataset_id_documents_document_id_segments_segment_id_child_chunks_response import (
     GetDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse,
 )
+from .get_segment_detail_response import GetSegmentDetailResponse
+from .get_segment_detail_response_data import GetSegmentDetailResponseData
 from .get_segments_response import GetSegmentsResponse
 from .patch_datasets_dataset_id_documents_document_id_segments_segment_id_child_chunks_child_chunk_id_response import (
     PatchDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse,
@@ -21,6 +23,8 @@ __all__ = [
     "CreateSegmentsRequestSegmentsItem",
     "CreateSegmentsResponse",
     "GetDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse",
+    "GetSegmentDetailResponse",
+    "GetSegmentDetailResponseData",
     "GetSegmentsResponse",
     "PatchDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksChildChunkIdResponse",
     "PostDatasetsDatasetIdDocumentsDocumentIdSegmentsSegmentIdChildChunksResponse",

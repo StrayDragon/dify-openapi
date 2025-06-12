@@ -3,18 +3,20 @@
 import typing
 
 import pydantic
-from ....core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from ....core.pydantic_utilities import IS_PYDANTIC_V2
+from ...types.child_chunk import ChildChunk
+from ...types.segment import Segment
 
 
-class RetrieveDatasetRequestRetrievalModelRerankingModel(UniversalBaseModel):
-    reranking_provider_name: typing.Optional[str] = pydantic.Field(default=None)
+class GetSegmentDetailResponseData(Segment):
+    sign_content: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Rerank model provider
+    Signature content
     """
 
-    reranking_model_name: typing.Optional[str] = pydantic.Field(default=None)
+    child_chunks: typing.Optional[typing.List[ChildChunk]] = pydantic.Field(default=None)
     """
-    Rerank model name
+    Child segment list
     """
 
     if IS_PYDANTIC_V2:

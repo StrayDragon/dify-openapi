@@ -3,13 +3,16 @@
 import typing
 
 import pydantic
-from ....core.pydantic_utilities import IS_PYDANTIC_V2
-from ...types.segment import Segment
-from .retrieve_dataset_response_records_item_segment_document import RetrieveDatasetResponseRecordsItemSegmentDocument
+from ....core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from .get_segment_detail_response_data import GetSegmentDetailResponseData
 
 
-class RetrieveDatasetResponseRecordsItemSegment(Segment):
-    document: typing.Optional[RetrieveDatasetResponseRecordsItemSegmentDocument] = None
+class GetSegmentDetailResponse(UniversalBaseModel):
+    data: typing.Optional[GetSegmentDetailResponseData] = None
+    doc_form: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Document form
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

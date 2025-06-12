@@ -9,8 +9,15 @@ from .retrieve_dataset_response_records_item_segment import RetrieveDatasetRespo
 
 class RetrieveDatasetResponseRecordsItem(UniversalBaseModel):
     segment: typing.Optional[RetrieveDatasetResponseRecordsItemSegment] = None
-    score: typing.Optional[float] = None
-    tsne_position: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = None
+    score: typing.Optional[float] = pydantic.Field(default=None)
+    """
+    Relevance score
+    """
+
+    tsne_position: typing.Optional[typing.List[float]] = pydantic.Field(default=None)
+    """
+    t-SNE position
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

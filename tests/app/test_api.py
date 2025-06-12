@@ -37,22 +37,39 @@ async def test_get_app_info_error_handling(app_chat_client: AsyncChatClient):
 
 async def test_chat_messages(app_chat_client: AsyncChatClient) -> str | None:
     """测试对话消息接口"""
-    response_iterator = app_chat_client.send_chat_message_by_app_chat(
-        query="ping",
-        response_mode="streaming",
-        user=LOGIN_USER_ID,
-        inputs=None,
-    )
-    message_id = None
-    async for event_ in response_iterator:
-        event = parse_stream_event(event_, "chat")
-        if event is None:
-            continue
-        if not message_id and event.message_id:
-            message_id = event.message_id
+    import httpx
+    import asyncio
 
-    assert message_id is not None, "无法获取 message_id"
-    return message_id
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            response_iterator = app_chat_client.send_chat_message_by_app_chat(
+                query="ping",
+                response_mode="streaming",
+                user=LOGIN_USER_ID,
+                inputs=None,
+            )
+            message_id = None
+            async for event_ in response_iterator:
+                event = parse_stream_event(event_, "chat")
+                if event is None:
+                    continue
+                if not message_id and event.message_id:
+                    message_id = event.message_id
+
+            assert message_id is not None, "无法获取 message_id"
+            return message_id
+
+        except httpx.RemoteProtocolError:
+            if attempt == max_retries - 1:
+                # 如果是最后一次尝试，重新抛出异常
+                raise
+            # 等待一段时间后重试
+            await asyncio.sleep(1 * (attempt + 1))
+            continue
+        except Exception:
+            # 对于其他类型的异常，直接抛出
+            raise
 
 
 
@@ -163,20 +180,40 @@ async def test_file_upload(app_chat_client: AsyncChatClient, test_file_path: Pat
 
 async def test_chat_with_suggested_questions(app_chat_client: AsyncChatClient):
     """测试对话并获取下一轮建议问题"""
-    # 1. 发送对话消息
-    response_iterator = app_chat_client.send_chat_message_by_app_chat(
-        query="dify-openapi 测试问题",
-        response_mode="streaming",
-        user=LOGIN_USER_ID,
-        inputs=None,
-    )
+    import httpx
+    import asyncio
+
+    max_retries = 3
     message_id = None
-    async for event_ in response_iterator:
-        event = parse_stream_event(event_, "chat")
-        if event is None:
+
+    # 1. 发送对话消息
+    for attempt in range(max_retries):
+        try:
+            response_iterator = app_chat_client.send_chat_message_by_app_chat(
+                query="dify-openapi 测试问题",
+                response_mode="streaming",
+                user=LOGIN_USER_ID,
+                inputs=None,
+            )
+            message_id = None
+            async for event_ in response_iterator:
+                event = parse_stream_event(event_, "chat")
+                if event is None:
+                    continue
+                if not message_id and event.message_id:
+                    message_id = event.message_id
+            break
+
+        except httpx.RemoteProtocolError:
+            if attempt == max_retries - 1:
+                # 如果是最后一次尝试，重新抛出异常
+                raise
+            # 等待一段时间后重试
+            await asyncio.sleep(1 * (attempt + 1))
             continue
-        if not message_id and event.message_id:
-            message_id = event.message_id
+        except Exception:
+            # 对于其他类型的异常，直接抛出
+            raise
 
     assert message_id is not None, "无法获取 message_id"
 
@@ -191,6 +228,9 @@ async def test_chat_with_suggested_questions(app_chat_client: AsyncChatClient):
 
 async def test_chat_with_file(app_chat_client: AsyncChatClient, test_file_path: Path):
     """测试带文件的对话"""
+    import httpx
+    import asyncio
+
     # 1. 先上传文件
     file_id = await test_file_upload(app_chat_client, test_file_path)
 
@@ -201,20 +241,37 @@ async def test_chat_with_file(app_chat_client: AsyncChatClient, test_file_path: 
         upload_file_id=file_id,
     )
 
-    response_iterator = app_chat_client.send_chat_message_by_app_chat(
-        query="dify-openapi 测试问题 - 请分析上传的文件",
-        response_mode="streaming",
-        user=LOGIN_USER_ID,
-        files=[file_input],
-        inputs=None,
-    )
+    max_retries = 3
     message_id = None
-    async for event_ in response_iterator:
-        event = parse_stream_event(event_, "chat")
-        if event is None:
+
+    for attempt in range(max_retries):
+        try:
+            response_iterator = app_chat_client.send_chat_message_by_app_chat(
+                query="dify-openapi 测试问题 - 请分析上传的文件",
+                response_mode="streaming",
+                user=LOGIN_USER_ID,
+                files=[file_input],
+                inputs=None,
+            )
+            message_id = None
+            async for event_ in response_iterator:
+                event = parse_stream_event(event_, "chat")
+                if event is None:
+                    continue
+                if not message_id and event.message_id:
+                    message_id = event.message_id
+            break
+
+        except httpx.RemoteProtocolError:
+            if attempt == max_retries - 1:
+                # 如果是最后一次尝试，重新抛出异常
+                raise
+            # 等待一段时间后重试
+            await asyncio.sleep(1 * (attempt + 1))
             continue
-        if not message_id and event.message_id:
-            message_id = event.message_id
+        except Exception:
+            # 对于其他类型的异常，直接抛出
+            raise
 
     assert message_id is not None, "无法获取 message_id"
 

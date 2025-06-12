@@ -104,15 +104,11 @@ class GenerationClient:
             yield from r.data
 
     def upload_file_by_app_generation(
-        self,
-        *,
-        file: core.File,
-        user: typing.Optional[str] = OMIT,
-        request_options: typing.Optional[RequestOptions] = None,
+        self, *, file: core.File, user: str, request_options: typing.Optional[RequestOptions] = None
     ) -> UploadedFile:
         """
-        Upload files for use when sending messages.
-        Supported file types depend on application type and configuration.
+        Upload files (currently only supports images) for use when sending messages, enabling multimodal image and text understanding.
+        Supports png, jpg, jpeg, webp, gif formats.
         Uploaded files are only available to the current end user.
 
         Parameters
@@ -120,8 +116,8 @@ class GenerationClient:
         file : core.File
             See core.File for more documentation
 
-        user : typing.Optional[str]
-            User identifier
+        user : str
+            User identifier, used to define the identity of the end user, must be consistent with the user passed in the message sending interface
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -135,7 +131,7 @@ class GenerationClient:
         --------
         from dify import DifyApi
         client = DifyApi(token="YOUR_TOKEN", )
-        client.generation.upload_file_by_app_generation()
+        client.generation.upload_file_by_app_generation(user='user', )
         """
         _response = self._raw_client.upload_file_by_app_generation(
             file=file, user=user, request_options=request_options
@@ -542,7 +538,7 @@ class GenerationClient:
             Action, can only be 'enable' or 'disable', and must be consistent with the action in the annotation reply initialization interface
 
         job_id : str
-            Job ID, returned from the annotation reply initialization interface
+            Job ID, from the job_id returned by the annotation reply initialization interface
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -682,15 +678,11 @@ class AsyncGenerationClient:
                 yield data
 
     async def upload_file_by_app_generation(
-        self,
-        *,
-        file: core.File,
-        user: typing.Optional[str] = OMIT,
-        request_options: typing.Optional[RequestOptions] = None,
+        self, *, file: core.File, user: str, request_options: typing.Optional[RequestOptions] = None
     ) -> UploadedFile:
         """
-        Upload files for use when sending messages.
-        Supported file types depend on application type and configuration.
+        Upload files (currently only supports images) for use when sending messages, enabling multimodal image and text understanding.
+        Supports png, jpg, jpeg, webp, gif formats.
         Uploaded files are only available to the current end user.
 
         Parameters
@@ -698,8 +690,8 @@ class AsyncGenerationClient:
         file : core.File
             See core.File for more documentation
 
-        user : typing.Optional[str]
-            User identifier
+        user : str
+            User identifier, used to define the identity of the end user, must be consistent with the user passed in the message sending interface
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -715,7 +707,7 @@ class AsyncGenerationClient:
         import asyncio
         client = AsyncDifyApi(token="YOUR_TOKEN", )
         async def main() -> None:
-            await client.generation.upload_file_by_app_generation()
+            await client.generation.upload_file_by_app_generation(user='user', )
         asyncio.run(main())
         """
         _response = await self._raw_client.upload_file_by_app_generation(
@@ -1156,7 +1148,7 @@ class AsyncGenerationClient:
             Action, can only be 'enable' or 'disable', and must be consistent with the action in the annotation reply initialization interface
 
         job_id : str
-            Job ID, returned from the annotation reply initialization interface
+            Job ID, from the job_id returned by the annotation reply initialization interface
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.

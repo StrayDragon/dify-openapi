@@ -330,25 +330,27 @@ class ChatClient:
         self,
         message_id: str,
         *,
-        rating: str,
         user: str,
+        rating: typing.Optional[str] = OMIT,
         content: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> SendMessageFeedbackByAppChatResponse:
         """
+        End-user feedback and rating for messages, helping application developers optimize expected outputs
+
         Parameters
         ----------
         message_id : str
             Message ID
 
-        rating : str
-            Feedback type
-
         user : str
-            User identifier
+            User identifier, defined by developer rules, must be unique within the application
+
+        rating : typing.Optional[str]
+            Rating: like, dislike, or null to cancel
 
         content : typing.Optional[str]
-            Feedback content
+            Specific feedback information for the message
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -362,10 +364,10 @@ class ChatClient:
         --------
         from dify import DifyApi
         client = DifyApi(token="YOUR_TOKEN", )
-        client.chat.send_message_feedback_by_app_chat(message_id='message_id', rating='rating', user='user', )
+        client.chat.send_message_feedback_by_app_chat(message_id='message_id', user='user', )
         """
         _response = self._raw_client.send_message_feedback_by_app_chat(
-            message_id, rating=rating, user=user, content=content, request_options=request_options
+            message_id, user=user, rating=rating, content=content, request_options=request_options
         )
         return _response.data
 
@@ -377,15 +379,15 @@ class ChatClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GetAppFeedbacksByAppChatResponse:
         """
-        Get application's user feedbacks and likes
+        Get end-user feedback and likes for the application
 
         Parameters
         ----------
         page : typing.Optional[int]
-            (Optional) Pagination, default: 1
+            Page number, default: 1
 
         limit : typing.Optional[int]
-            (Optional) Records per page, default: 20
+            Number of items per page, default: 20
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -418,7 +420,7 @@ class ChatClient:
             Message ID
 
         user : str
-            User identifier, defined by the developer, must be unique within the application
+            User identifier, defined by developer rules, must be unique within the application
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -426,7 +428,7 @@ class ChatClient:
         Returns
         -------
         GetSuggestedQuestionsByAppChatResponse
-            Successfully retrieved suggested questions
+            Successful response
 
         Examples
         --------
@@ -1208,25 +1210,27 @@ class AsyncChatClient:
         self,
         message_id: str,
         *,
-        rating: str,
         user: str,
+        rating: typing.Optional[str] = OMIT,
         content: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> SendMessageFeedbackByAppChatResponse:
         """
+        End-user feedback and rating for messages, helping application developers optimize expected outputs
+
         Parameters
         ----------
         message_id : str
             Message ID
 
-        rating : str
-            Feedback type
-
         user : str
-            User identifier
+            User identifier, defined by developer rules, must be unique within the application
+
+        rating : typing.Optional[str]
+            Rating: like, dislike, or null to cancel
 
         content : typing.Optional[str]
-            Feedback content
+            Specific feedback information for the message
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1242,11 +1246,11 @@ class AsyncChatClient:
         import asyncio
         client = AsyncDifyApi(token="YOUR_TOKEN", )
         async def main() -> None:
-            await client.chat.send_message_feedback_by_app_chat(message_id='message_id', rating='rating', user='user', )
+            await client.chat.send_message_feedback_by_app_chat(message_id='message_id', user='user', )
         asyncio.run(main())
         """
         _response = await self._raw_client.send_message_feedback_by_app_chat(
-            message_id, rating=rating, user=user, content=content, request_options=request_options
+            message_id, user=user, rating=rating, content=content, request_options=request_options
         )
         return _response.data
 
@@ -1258,15 +1262,15 @@ class AsyncChatClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GetAppFeedbacksByAppChatResponse:
         """
-        Get application's user feedbacks and likes
+        Get end-user feedback and likes for the application
 
         Parameters
         ----------
         page : typing.Optional[int]
-            (Optional) Pagination, default: 1
+            Page number, default: 1
 
         limit : typing.Optional[int]
-            (Optional) Records per page, default: 20
+            Number of items per page, default: 20
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1302,7 +1306,7 @@ class AsyncChatClient:
             Message ID
 
         user : str
-            User identifier, defined by the developer, must be unique within the application
+            User identifier, defined by developer rules, must be unique within the application
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1310,7 +1314,7 @@ class AsyncChatClient:
         Returns
         -------
         GetSuggestedQuestionsByAppChatResponse
-            Successfully retrieved suggested questions
+            Successful response
 
         Examples
         --------

@@ -27,6 +27,12 @@ from .embedding_model_models_item import EmbeddingModelModelsItem
 from .embedding_model_models_item_label import EmbeddingModelModelsItemLabel
 from .embedding_model_models_item_model_properties import EmbeddingModelModelsItemModelProperties
 from .error import Error
+from .knowledge_tag import KnowledgeTag
+from .metadata_condition import MetadataCondition
+from .metadata_condition_comparison_operator import MetadataConditionComparisonOperator
+from .metadata_condition_value import MetadataConditionValue
+from .metadata_filtering_conditions import MetadataFilteringConditions
+from .metadata_filtering_conditions_logical_operator import MetadataFilteringConditionsLogicalOperator
 from .process_rule import ProcessRule
 from .process_rule_mode import ProcessRuleMode
 from .process_rule_rules import ProcessRuleRules
@@ -68,6 +74,12 @@ __all__ = [
     "EmbeddingModelModelsItemLabel",
     "EmbeddingModelModelsItemModelProperties",
     "Error",
+    "KnowledgeTag",
+    "MetadataCondition",
+    "MetadataConditionComparisonOperator",
+    "MetadataConditionValue",
+    "MetadataFilteringConditions",
+    "MetadataFilteringConditionsLogicalOperator",
     "ProcessRule",
     "ProcessRuleMode",
     "ProcessRuleRules",
