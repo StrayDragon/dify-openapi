@@ -4,8 +4,6 @@ info:
   version: "1.0.0"
 extends: ../app_workflow.zh.yaml
 actions:
-  - target: $.tags[0].description
-    update: "Workflow Application Operations"
   - target: $.info
     update:
       title: "Dify API - Workflow Application"

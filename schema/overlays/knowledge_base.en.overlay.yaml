@@ -1766,16 +1766,8 @@ actions:
                   type: string
                   description: "Tag ID, required"
       responses:
-        '200':
+        '204':
           description: "Successfully deleted tag"
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    example: success
         '400':
           $ref: "#/components/responses/Error400"
 
@@ -1803,16 +1795,8 @@ actions:
                   type: string
                   description: "Knowledge Base ID, required"
       responses:
-        '200':
+        '204':
           description: "Successfully bound knowledge base to tags"
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    example: success
         '400':
           $ref: "#/components/responses/Error400"
 
@@ -1838,36 +1822,28 @@ actions:
                   type: string
                   description: "Knowledge Base ID, required"
       responses:
-        '200':
+        '204':
           description: "Successfully unbound knowledge base from tag"
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    example: success
         '400':
           $ref: "#/components/responses/Error400"
 
-  - target: $.paths['/datasets/{dataset_id}/tags'].post.summary
+  - target: $.paths['/datasets/{dataset_id}/tags'].get.summary
     update: "Query Knowledge Base Bound Tags"
 
-  - target: $.paths['/datasets/{dataset_id}/tags'].post.description
+  - target: $.paths['/datasets/{dataset_id}/tags'].get.description
     update: "Get all tags bound to the specified knowledge base"
 
-  - target: $.paths['/datasets/{dataset_id}/tags'].post.parameters[0].description
+  - target: $.paths['/datasets/{dataset_id}/tags'].get.parameters[0].description
     update: "Knowledge Base ID"
 
-  - target: $.paths['/datasets/{dataset_id}/tags'].post.responses['200'].description
+  - target: $.paths['/datasets/{dataset_id}/tags'].get.responses['200'].description
     update: "Successfully retrieved knowledge base bound tag list"
 
-  - target: $.paths['/datasets/{dataset_id}/tags'].post.responses['200'].content['application/json'].schema.properties.data.items.properties.id.description
+  - target: $.paths['/datasets/{dataset_id}/tags'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.id.description
     update: "Tag ID"
 
-  - target: $.paths['/datasets/{dataset_id}/tags'].post.responses['200'].content['application/json'].schema.properties.data.items.properties.name.description
+  - target: $.paths['/datasets/{dataset_id}/tags'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.name.description
     update: "Tag name"
 
-  - target: $.paths['/datasets/{dataset_id}/tags'].post.responses['200'].content['application/json'].schema.properties.total.description
+  - target: $.paths['/datasets/{dataset_id}/tags'].get.responses['200'].content['application/json'].schema.properties.total.description
     update: "Total count"

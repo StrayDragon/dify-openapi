@@ -2541,16 +2541,8 @@ paths:
                   type: string
                   description: 'Tag ID, required'
       responses:
-        '200':
+        '204':
           description: Successfully deleted tag
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    example: success
         '400':
           $ref: '#/components/responses/Error400'
   /datasets/tags/binding:
@@ -2581,16 +2573,8 @@ paths:
                   type: string
                   description: 'Knowledge Base ID, required'
       responses:
-        '200':
+        '204':
           description: Successfully bound knowledge base to tags
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    example: success
         '400':
           $ref: '#/components/responses/Error400'
   /datasets/tags/unbinding:
@@ -2619,20 +2603,12 @@ paths:
                   type: string
                   description: 'Knowledge Base ID, required'
       responses:
-        '200':
+        '204':
           description: Successfully unbound knowledge base from tag
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    example: success
         '400':
           $ref: '#/components/responses/Error400'
   '/datasets/{dataset_id}/tags':
-    post:
+    get:
       summary: Query Knowledge Base Bound Tags
       description: Get all tags bound to the specified knowledge base
       operationId: getDatasetTags

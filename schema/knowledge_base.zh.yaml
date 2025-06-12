@@ -2537,16 +2537,8 @@ paths:
                   type: string
                   description: 标签 ID，必填
       responses:
-        "200":
+        "204":
           description: 成功删除标签
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    example: success
         "400":
           $ref: "#/components/responses/Error400"
 
@@ -2576,16 +2568,8 @@ paths:
                   type: string
                   description: 知识库 ID，必填
       responses:
-        "200":
+        "204":
           description: 成功绑定知识库到标签
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    example: success
         "400":
           $ref: "#/components/responses/Error400"
 
@@ -2613,21 +2597,13 @@ paths:
                   type: string
                   description: 知识库 ID，必填
       responses:
-        "200":
+        "204":
           description: 成功解绑知识库和标签
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    example: success
         "400":
           $ref: "#/components/responses/Error400"
 
   /datasets/{dataset_id}/tags:
-    post:
+    get:
       summary: 查询知识库已绑定的标签
       description: 获取指定知识库已绑定的所有标签
       operationId: getDatasetTags
