@@ -60,6 +60,15 @@ Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, whic
   - [x] DELETE /datasets/{dataset_id}/metadata/{metadata_id} - Delete metadata
   - [x] POST /datasets/{dataset_id}/metadata/built-in/{action} - Enable/disable built-in metadata
   - [x] POST /datasets/{dataset_id}/documents/metadata - Update document metadata
+  - [x] GET /datasets/{dataset_id}/documents/{document_id}/segments/{segment_id} - View document segment detail
+  - [x] POST /datasets/tags - Create knowledge base tag
+  - [x] GET /datasets/tags - Get knowledge base tags
+  - [x] PATCH /datasets/tags - Update knowledge base tag name
+  - [x] DELETE /datasets/tags - Delete knowledge base tag
+  - [x] POST /datasets/tags/binding - Bind dataset to tag
+  - [x] POST /datasets/tags/unbinding - Unbind dataset from tag
+  - [x] POST /datasets/{dataset_id}/tags - Query dataset bound tags
+  - [x] POST /datasets/{dataset_id}/retrieval - Retrieve with metadata filtering conditions
 
 - Chat Application: [OpenAPI Schema(中文)](./schema/app_chat.zh.yaml) | [OpenAPI Schema(English)](./schema/app_chat.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.4.2/web/app/components/develop/template)
   - [x] POST /chat-messages - Send conversation message

@@ -62,6 +62,15 @@
   - [x] DELETE /datasets/{dataset_id}/metadata/{metadata_id} - 删除元数据
   - [x] POST /datasets/{dataset_id}/metadata/built-in/{action} - 启用/禁用内置元数据
   - [x] POST /datasets/{dataset_id}/documents/metadata - 更新文档元数据
+  - [x] GET /datasets/{dataset_id}/documents/{document_id}/segments/{segment_id} - 查看文档分段详情
+  - [x] POST /datasets/tags - 新增知识库类型标签
+  - [x] GET /datasets/tags - 获取知识库类型标签
+  - [x] PATCH /datasets/tags - 修改知识库类型标签名称
+  - [x] DELETE /datasets/tags - 删除知识库类型标签
+  - [x] POST /datasets/tags/binding - 绑定知识库到知识库类型标签
+  - [x] POST /datasets/tags/unbinding - 解绑知识库和知识库类型标签
+  - [x] POST /datasets/{dataset_id}/tags - 查询知识库已绑定的标签
+  - [x] POST /datasets/{dataset_id}/retrieval - 带元数据过滤条件的检索
 
 - 聊天应用: [OpenAPI Schema(中文)](./schema/app_chat.zh.yaml) | [OpenAPI Schema(English)](./schema/app_chat.en.yaml) | [官方文档源码](https://github.com/langgenius/dify/tree/1.4.2/web/app/components/develop/template)
   - [x] POST /chat-messages - 发送对话消息
