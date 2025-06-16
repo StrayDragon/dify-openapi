@@ -5,8 +5,8 @@ info:
     Dify API provides a series of interfaces for conversation functionality.
     It supports conversational applications.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
-    official raw document: https://github.com/langgenius/dify/blob/1.4.1/web/app/components/develop/template/template_chat.en.mdx
-  version: 1.4.2
+    official raw document: https://github.com/langgenius/dify/blob/1.4.3/web/app/components/develop/template/template_chat.en.mdx
+  version: 1.4.3
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -447,7 +447,7 @@ paths:
                     Note: Blocking mode is not allowed in Agent mode
                 user:
                   type: string
-                  description: 'User identifier for defining end user identity, facilitating retrieval and statistics. Defined by developer rules, must be unique within the application.'
+                  description: 'User identifier for defining end user identity, facilitating retrieval and statistics. Defined by developer rules, must be unique within the application. Service API will not share conversations created by WebApp.'
                 conversation_id:
                   type: string
                   description: '(Optional) Conversation ID. Required when continuing a conversation based on previous chat history, must pass the conversation_id from previous messages'
@@ -749,7 +749,7 @@ paths:
             type: string
         - name: user
           in: query
-          description: 'User identifier, defined by developer rules, must be unique within the application'
+          description: 'User identifier, defined by developer rules, must be unique within the application. Service API will not share conversations created by WebApp.'
           required: true
           schema:
             type: string
@@ -896,7 +896,7 @@ paths:
                   description: 'Rating: like, dislike, or null to cancel'
                 user:
                   type: string
-                  description: 'User identifier, defined by developer rules, must be unique within the application'
+                  description: 'User identifier, defined by developer rules, must be unique within the application. Service API will not share conversations created by WebApp.'
                 content:
                   type: string
                   description: Specific feedback information for the message
@@ -995,7 +995,7 @@ paths:
           required: true
           schema:
             type: string
-          description: 'User identifier, defined by developer rules, must be unique within the application'
+          description: 'User identifier, defined by developer rules, must be unique within the application. Service API will not share conversations created by WebApp.'
       responses:
         '200':
           description: Successful response
@@ -1087,6 +1087,12 @@ paths:
                     items:
                       type: string
                     description: Application tags
+                  mode:
+                    type: string
+                    description: Application mode
+                  author_name:
+                    type: string
+                    description: Author name
   '/chat-messages/{task_id}/stop':
     post:
       operationId: stopChatResponseByAppChat
@@ -1110,7 +1116,7 @@ paths:
               properties:
                 user:
                   type: string
-                  description: 'User identifier, must be consistent with the user passed in the message sending interface'
+                  description: 'User identifier for defining end user identity, must be consistent with the user passed in the message sending interface. API cannot access sessions created by WebApp.'
       responses:
         '200':
           description: Successfully stopped the response
@@ -1176,7 +1182,7 @@ paths:
                   description: 'Text content for speech generation. If message_id is not provided, this field will be used'
                 user:
                   type: string
-                  description: 'User identifier, defined by developer rules, must be unique within the application'
+                  description: 'User identifier, defined by developer rules, must be unique within the application. Service API will not share conversations created by WebApp.'
       responses:
         '200':
           description: Successful response

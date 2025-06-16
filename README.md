@@ -1,6 +1,6 @@
 # Dify x OpenAPI
 
-[![Dify Version Support](https://img.shields.io/badge/Support_Dify_Version-1.4.2-blue)](https://github.com/langgenius/dify)
+[![Dify Version Support](https://img.shields.io/badge/Support_Dify_Version-1.4.3-blue)](https://github.com/langgenius/dify)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Package Manager: uv](https://img.shields.io/badge/package%20manager-uv-black)](https://github.com/astral-sh/uv)
@@ -39,7 +39,7 @@ Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, whic
 > [!tip]
 > This indicates that the API has passed at least one test case request. If you find any API errors, feel free to submit an issue or PR!
 
-- Knowledge Base: [OpenAPI Schema(中文)](./schema/knowledge_base.zh.yaml) | [OpenAPI Schema(English)](./schema/knowledge_base.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.4.2/web/app/(commonLayout)/datasets/template)
+- Knowledge Base: [OpenAPI Schema(中文)](./schema/knowledge_base.zh.yaml) | [OpenAPI Schema(English)](./schema/knowledge_base.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.4.3/web/app/(commonLayout)/datasets/template)
   - [x] POST /datasets - Create empty knowledge base
   - [x] POST /datasets/{dataset_id} - Update knowledge base
   - [x] GET /datasets/{dataset_id}/documents - Get document list
@@ -70,7 +70,7 @@ Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, whic
   - [x] POST /datasets/{dataset_id}/tags - Query dataset bound tags
   - [x] POST /datasets/{dataset_id}/retrieval - Retrieve with metadata filtering conditions
 
-- Chat Application: [OpenAPI Schema(中文)](./schema/app_chat.zh.yaml) | [OpenAPI Schema(English)](./schema/app_chat.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.4.2/web/app/components/develop/template)
+- Chat Application: [OpenAPI Schema(中文)](./schema/app_chat.zh.yaml) | [OpenAPI Schema(English)](./schema/app_chat.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.4.3/web/app/components/develop/template)
   - [x] POST /chat-messages - Send conversation message
   - [x] POST /files/upload - Upload file
   - [x] POST /messages/{message_id}/feedbacks - Message feedback
@@ -83,7 +83,7 @@ Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, whic
   - [x] GET /info - Get application basic information
   - [x] GET /parameters - Get application parameters
 
-- Advanced Chat Application: [OpenAPI Schema(中文)](./schema/app_advanced_chat.zh.yaml) | [OpenAPI Schema(English)](./schema/app_advanced_chat.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.4.2/web/app/components/develop/template)
+- Advanced Chat Application: [OpenAPI Schema(中文)](./schema/app_advanced_chat.zh.yaml) | [OpenAPI Schema(English)](./schema/app_advanced_chat.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.4.3/web/app/components/develop/template)
   - [x] POST /audio-to-text - Speech to text
   - [x] POST /text-to-audio - Text to speech
   - [x] GET /apps/annotations - Get annotation list
@@ -99,10 +99,10 @@ Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, whic
   - [x] GET /parameters - Get application parameters
 
 
-- Text Generation Application: [OpenAPI Schema(中文)](./schema/app_generation.zh.yaml) | [OpenAPI Schema(English)](./schema/app_generation.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.4.2/web/app/components/develop/template)
+- Text Generation Application: [OpenAPI Schema(中文)](./schema/app_generation.zh.yaml) | [OpenAPI Schema(English)](./schema/app_generation.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.4.3/web/app/components/develop/template)
   - [x] POST /completion-messages - Send message
 
-- Workflow Application: [OpenAPI Schema(中文)](./schema/app_workflow.zh.yaml) | [OpenAPI Schema(English)](./schema/app_workflow.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.4.2/web/app/components/develop/template)
+- Workflow Application: [OpenAPI Schema(中文)](./schema/app_workflow.zh.yaml) | [OpenAPI Schema(English)](./schema/app_workflow.en.yaml) | [Official Documentation Source](https://github.com/langgenius/dify/tree/1.4.3/web/app/components/develop/template)
   - [x] POST /workflows/run - Execute workflow
   - [x] GET /workflows/run/{workflow_run_id} - Get workflow execution status
   - [x] POST /workflows/tasks/{task_id}/stop - Stop response

@@ -11,7 +11,7 @@ actions:
         Dify API provides a series of interfaces for conversation functionality.
         It supports conversational applications.
         All API requests require an application-level API-Key in the Authorization HTTP Header.
-        official raw document: https://github.com/langgenius/dify/blob/1.4.1/web/app/components/develop/template/template_chat.en.mdx
+        official raw document: https://github.com/langgenius/dify/blob/1.4.3/web/app/components/develop/template/template_chat.en.mdx
 
   - target: $.servers[0]
     update:
@@ -332,7 +332,7 @@ actions:
 
   - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.user
     update:
-      description: "User identifier for defining end user identity, facilitating retrieval and statistics. Defined by developer rules, must be unique within the application."
+      description: "User identifier for defining end user identity, facilitating retrieval and statistics. Defined by developer rules, must be unique within the application. Service API will not share conversations created by WebApp."
 
   - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.conversation_id
     update:
@@ -560,7 +560,7 @@ actions:
     update: "ID of the conversation to retrieve variables from"
 
   - target: $.paths['/conversations/{conversation_id}/variables'].get.parameters[1].description
-    update: "User identifier, defined by developer rules, must be unique within the application"
+    update: "User identifier, defined by developer rules, must be unique within the application. Service API will not share conversations created by WebApp."
 
   - target: $.paths['/conversations/{conversation_id}/variables'].get.parameters[2].description
     update: "(Optional) ID of the last record on the current page, default null"
@@ -645,7 +645,7 @@ actions:
     update: "Rating: like, dislike, or null to cancel"
 
   - target: $.paths['/messages/{message_id}/feedbacks'].post.requestBody.content['application/json'].schema.properties.user.description
-    update: "User identifier, defined by developer rules, must be unique within the application"
+    update: "User identifier, defined by developer rules, must be unique within the application. Service API will not share conversations created by WebApp."
 
   - target: $.paths['/messages/{message_id}/feedbacks'].post.requestBody.content['application/json'].schema.properties.content.description
     update: "Specific feedback information for the message"
@@ -715,7 +715,7 @@ actions:
     update: "Message ID"
 
   - target: $.paths['/messages/{message_id}/suggested'].get.parameters[1].description
-    update: "User identifier, defined by developer rules, must be unique within the application"
+    update: "User identifier, defined by developer rules, must be unique within the application. Service API will not share conversations created by WebApp."
 
   - target: $.paths['/messages/{message_id}/suggested'].get.responses['200'].description
     update: "Successful response"
@@ -769,6 +769,14 @@ actions:
   - target: $.paths['/info'].get.responses['200'].content['application/json'].schema.properties.tags
     update:
       description: "Application tags"
+
+  - target: $.paths['/info'].get.responses['200'].content['application/json'].schema.properties.mode
+    update:
+      description: "Application mode"
+
+  - target: $.paths['/info'].get.responses['200'].content['application/json'].schema.properties.author_name
+    update:
+      description: "Author name"
 
   - target: $.paths['/parameters'].get
     update:
@@ -844,7 +852,7 @@ actions:
     update: "Task ID, can be obtained from the streaming response chunks"
 
   - target: $.paths['/chat-messages/{task_id}/stop'].post.requestBody.content['application/json'].schema.properties.user.description
-    update: "User identifier, must be consistent with the user passed in the message sending interface"
+    update: "User identifier for defining end user identity, must be consistent with the user passed in the message sending interface. API cannot access sessions created by WebApp."
 
   - target: $.paths['/chat-messages/{task_id}/stop'].post.responses['200'].description
     update: "Successfully stopped the response"
@@ -887,7 +895,7 @@ actions:
 
   - target: $.paths['/text-to-audio'].post.requestBody.content['application/json'].schema.properties.user
     update:
-      description: "User identifier, defined by developer rules, must be unique within the application"
+      description: "User identifier, defined by developer rules, must be unique within the application. Service API will not share conversations created by WebApp."
 
   - target: $.paths['/text-to-audio'].post.responses['200'].description
     update: "Successful response"

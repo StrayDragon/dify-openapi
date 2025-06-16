@@ -77,7 +77,7 @@ class GenerationClient:
             - blocking: Blocking mode, returns result after execution is complete
 
         user : typing.Optional[str]
-            User identifier
+            User identifier, used to define the identity of the end user for easy retrieval and statistics. Developer-defined rules must ensure that the user identifier is unique within the application
 
         files : typing.Optional[typing.Sequence[FileInput]]
 
@@ -117,7 +117,7 @@ class GenerationClient:
             See core.File for more documentation
 
         user : str
-            User identifier, used to define the identity of the end user, must be consistent with the user passed in the message sending interface
+            User identifier, used to define the identity of the end user, must be consistent with the user passed in the message sending interface. Service API does not share sessions created by WebApp
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -198,7 +198,7 @@ class GenerationClient:
             Task ID, can be obtained from the streaming response chunks
 
         user : str
-            User identifier, must be consistent with the user passed in the message sending interface
+            User identifier, used to define the identity of the end user, must be consistent with the user passed in the message sending interface. API cannot access sessions created by WebApp
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -240,7 +240,7 @@ class GenerationClient:
             Like (like), dislike (dislike), or cancel rating (null)
 
         user : str
-            User identifier, defined by developer rules, must be unique within the application
+            User identifier, defined by developer rules, must be unique within the application. Service API does not share sessions created by WebApp
 
         content : typing.Optional[str]
             Specific feedback information
@@ -322,7 +322,7 @@ class GenerationClient:
             Text content for speech generation. If message_id is not provided, this field will be used
 
         user : typing.Optional[str]
-            User identifier, defined by developer rules, must be unique within the application
+            User identifier, defined by developer rules, must be unique within the application. Service API does not share sessions created by WebApp
 
         streaming : typing.Optional[bool]
             Whether to use streaming mode to return audio data
@@ -647,7 +647,7 @@ class AsyncGenerationClient:
             - blocking: Blocking mode, returns result after execution is complete
 
         user : typing.Optional[str]
-            User identifier
+            User identifier, used to define the identity of the end user for easy retrieval and statistics. Developer-defined rules must ensure that the user identifier is unique within the application
 
         files : typing.Optional[typing.Sequence[FileInput]]
 
@@ -691,7 +691,7 @@ class AsyncGenerationClient:
             See core.File for more documentation
 
         user : str
-            User identifier, used to define the identity of the end user, must be consistent with the user passed in the message sending interface
+            User identifier, used to define the identity of the end user, must be consistent with the user passed in the message sending interface. Service API does not share sessions created by WebApp
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -781,7 +781,7 @@ class AsyncGenerationClient:
             Task ID, can be obtained from the streaming response chunks
 
         user : str
-            User identifier, must be consistent with the user passed in the message sending interface
+            User identifier, used to define the identity of the end user, must be consistent with the user passed in the message sending interface. API cannot access sessions created by WebApp
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -826,7 +826,7 @@ class AsyncGenerationClient:
             Like (like), dislike (dislike), or cancel rating (null)
 
         user : str
-            User identifier, defined by developer rules, must be unique within the application
+            User identifier, defined by developer rules, must be unique within the application. Service API does not share sessions created by WebApp
 
         content : typing.Optional[str]
             Specific feedback information
@@ -914,7 +914,7 @@ class AsyncGenerationClient:
             Text content for speech generation. If message_id is not provided, this field will be used
 
         user : typing.Optional[str]
-            User identifier, defined by developer rules, must be unique within the application
+            User identifier, defined by developer rules, must be unique within the application. Service API does not share sessions created by WebApp
 
         streaming : typing.Optional[bool]
             Whether to use streaming mode to return audio data

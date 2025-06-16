@@ -11,7 +11,7 @@ actions:
         Dify API provides a series of interfaces for text generation functionality.
         It supports text generation applications.
         All API requests require an application-level API-Key in the Authorization HTTP Header.
-        official raw document: https://github.com/langgenius/dify/blob/1.4.2/web/app/components/develop/template/template.en.mdx
+        official raw document: https://github.com/langgenius/dify/blob/1.4.3/web/app/components/develop/template/template.en.mdx
 
   - target: $.servers[0]
     update:
@@ -192,7 +192,7 @@ actions:
 
   - target: $.paths['/completion-messages'].post.requestBody.content['application/json'].schema.properties.user
     update:
-      description: "User identifier"
+      description: "User identifier, used to define the identity of the end user for easy retrieval and statistics. Developer-defined rules must ensure that the user identifier is unique within the application"
 
   - target: $.paths['/completion-messages'].post.responses['200'].description
     update: "Successful response"
@@ -262,7 +262,7 @@ actions:
 
   - target: $.paths['/files/upload'].post.requestBody.content['multipart/form-data'].schema.properties.user
     update:
-      description: "User identifier, used to define the identity of the end user, must be consistent with the user passed in the message sending interface"
+      description: "User identifier, used to define the identity of the end user, must be consistent with the user passed in the message sending interface. Service API does not share sessions created by WebApp"
 
   - target: $.paths['/files/upload'].post.responses['200'].description
     update: "Successful response"
@@ -294,6 +294,14 @@ actions:
   - target: $.paths['/info'].get.responses['200'].content['application/json'].schema.properties.tags
     update:
       description: "Application tags"
+
+  - target: $.paths['/info'].get.responses['200'].content['application/json'].schema.properties.mode
+    update:
+      description: "Application mode"
+
+  - target: $.paths['/info'].get.responses['200'].content['application/json'].schema.properties.author_name
+    update:
+      description: "Author name"
 
   - target: $.paths['/parameters'].get
     update:
@@ -496,7 +504,7 @@ actions:
     update: "Task ID, can be obtained from the streaming response chunks"
 
   - target: $.paths['/completion-messages/{task_id}/stop'].post.requestBody.content['application/json'].schema.properties.user.description
-    update: "User identifier, must be consistent with the user passed in the message sending interface"
+    update: "User identifier, used to define the identity of the end user, must be consistent with the user passed in the message sending interface. API cannot access sessions created by WebApp"
 
   - target: $.paths['/completion-messages/{task_id}/stop'].post.responses['200'].description
     update: "Successfully stopped the response"
@@ -516,7 +524,7 @@ actions:
     update: "Like (like), dislike (dislike), or cancel rating (null)"
 
   - target: $.paths['/messages/{message_id}/feedbacks'].post.requestBody.content['application/json'].schema.properties.user.description
-    update: "User identifier, defined by developer rules, must be unique within the application"
+    update: "User identifier, defined by developer rules, must be unique within the application. Service API does not share sessions created by WebApp"
 
   - target: $.paths['/messages/{message_id}/feedbacks'].post.requestBody.content['application/json'].schema.properties.content.description
     update: "Specific feedback information"
@@ -586,7 +594,7 @@ actions:
     update: "Text content for speech generation. If message_id is not provided, this field will be used"
 
   - target: $.paths['/text-to-audio'].post.requestBody.content['application/json'].schema.properties.user.description
-    update: "User identifier, defined by developer rules, must be unique within the application"
+    update: "User identifier, defined by developer rules, must be unique within the application. Service API does not share sessions created by WebApp"
 
   - target: $.paths['/text-to-audio'].post.requestBody.content['application/json'].schema.properties.streaming.description
     update: "Whether to use streaming mode to return audio data"

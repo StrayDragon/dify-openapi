@@ -6,8 +6,8 @@ info:
     Workflow applications have no session support and are suitable for translation/article writing/summarization AI, etc.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
     It is strongly recommended that developers store the API-Key on the backend rather than sharing or storing it on the client to prevent API-Key leakage and financial loss.
-    official raw document: https://github.com/langgenius/dify/blob/1.4.2/web/app/components/develop/template/template_workflow.en.mdx
-  version: 1.4.2
+    official raw document: https://github.com/langgenius/dify/blob/1.4.3/web/app/components/develop/template/template_workflow.en.mdx
+  version: 1.4.3
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -397,7 +397,7 @@ paths:
                   type: string
                   description: |
                     User identifier, used to define the identity of the end user, for easy retrieval and statistics.
-                    Rules defined by the developer, the user identifier must be unique within the application.
+                    Rules defined by the developer, the user identifier must be unique within the application. API cannot access sessions created by WebApp.
       responses:
         '200':
           description: Successful response
@@ -589,7 +589,7 @@ paths:
               properties:
                 user:
                   type: string
-                  description: 'User identifier, must be consistent with the user passed in the message sending interface'
+                  description: 'User identifier, must be consistent with the user passed in the message sending interface. API cannot access sessions created by WebApp.'
       responses:
         '200':
           description: Successfully stopped the response
@@ -848,6 +848,12 @@ paths:
                     items:
                       type: string
                     description: Application tags
+                  mode:
+                    type: string
+                    description: Application mode
+                  author_name:
+                    type: string
+                    description: Author name
         '400':
           $ref: '#/components/responses/Error400'
         '401':

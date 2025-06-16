@@ -4,7 +4,7 @@ info:
   description: |
     Dify 知识库 API 提供了一系列接口用于管理知识库、文档和检索功能。
     所有 API 请求都需要在 Authorization HTTP Header 中包含知识库级 API-Key。
-  version: 1.4.2
+  version: 1.4.3
 
 servers:
   - url: https://api.dify.ai/v1
