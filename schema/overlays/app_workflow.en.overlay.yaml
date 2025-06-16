@@ -12,7 +12,7 @@ actions:
         Workflow applications have no session support and are suitable for translation/article writing/summarization AI, etc.
         All API requests require an application-level API-Key in the Authorization HTTP Header.
         It is strongly recommended that developers store the API-Key on the backend rather than sharing or storing it on the client to prevent API-Key leakage and financial loss.
-        official raw document: https://github.com/langgenius/dify/blob/1.4.2/web/app/components/develop/template/template_workflow.en.mdx
+        official raw document: https://github.com/langgenius/dify/blob/1.4.3/web/app/components/develop/template/template_workflow.en.mdx
 
   - target: $.servers[0]
     update:
@@ -297,7 +297,7 @@ actions:
   - target: $.paths['/workflows/run'].post.requestBody.content['application/json'].schema.properties.user.description
     update: |
       User identifier, used to define the identity of the end user, for easy retrieval and statistics.
-      Rules defined by the developer, the user identifier must be unique within the application.
+      Rules defined by the developer, the user identifier must be unique within the application. API cannot access sessions created by WebApp.
 
   - target: $.paths['/workflows/run'].post.responses['200'].description
     update: "Successful response"
@@ -444,7 +444,7 @@ actions:
     update: "Task ID, can be obtained from the streaming response chunks"
 
   - target: $.paths['/workflows/tasks/{task_id}/stop'].post.requestBody.content['application/json'].schema.properties.user.description
-    update: "User identifier, must be consistent with the user passed in the message sending interface"
+    update: "User identifier, must be consistent with the user passed in the message sending interface. API cannot access sessions created by WebApp."
 
   - target: $.paths['/workflows/tasks/{task_id}/stop'].post.responses['200'].description
     update: "Successfully stopped the response"
@@ -737,3 +737,9 @@ actions:
 
   - target: $.paths['/site'].get.responses['200'].content['application/json'].schema.properties.show_workflow_steps.description
     update: "Whether to show workflow details"
+
+  - target: $.paths['/info'].get.responses['200'].content['application/json'].schema.properties.mode.description
+    update: "Application mode"
+
+  - target: $.paths['/info'].get.responses['200'].content['application/json'].schema.properties.author_name.description
+    update: "Author name"

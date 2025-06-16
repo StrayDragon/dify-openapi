@@ -407,7 +407,7 @@ paths:
                   type: string
                   description: |
                     用户标识，用于定义终端用户的身份，方便检索、统计。
-                    由开发者定义规则，需保证用户标识在应用内唯一。
+                    由开发者定义规则，需保证用户标识在应用内唯一。API 无法访问 WebApp 创建的会话。
 
       responses:
         "200":
@@ -600,7 +600,7 @@ paths:
               properties:
                 user:
                   type: string
-                  description: 用户标识，用于定义终端用户的身份，必须和发送消息接口传入 user 保持一致
+                  description: 用户标识，用于定义终端用户的身份，必须和发送消息接口传入 user 保持一致。API 无法访问 WebApp 创建的会话。
       responses:
         '200':
           description: 成功停止响应
@@ -776,7 +776,7 @@ paths:
                   description: 要上传的文件
                 user:
                   type: string
-                  description: 用户标识，用于定义终端用户的身份，必须和发送消息接口传入 user 保持一致
+                  description: 用户标识，用于定义终端用户的身份，必须和发送消息接口传入 user 保持一致。服务 API 不会共享 WebApp 创建的对话。
       responses:
         '201':
           description: 成功上传文件
@@ -858,6 +858,12 @@ paths:
                     items:
                       type: string
                     description: 应用标签
+                  mode:
+                    type: string
+                    description: 应用模式
+                  author_name:
+                    type: string
+                    description: 作者名称
         '400':
           $ref: "#/components/responses/Error400"
         '401':
