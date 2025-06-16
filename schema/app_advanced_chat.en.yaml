@@ -544,6 +544,12 @@ paths:
                     items:
                       type: string
                     description: Application tags
+                  mode:
+                    type: string
+                    description: Application mode
+                  author_name:
+                    type: string
+                    description: Author name
   /parameters:
     get:
       operationId: getApplicationParametersByAppAdvancedChat
