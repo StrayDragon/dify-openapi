@@ -75,7 +75,7 @@ class RawWorkflowClient:
 
         user : str
             User identifier, used to define the identity of the end user, for easy retrieval and statistics.
-            Rules defined by the developer, the user identifier must be unique within the application.
+            Rules defined by the developer, the user identifier must be unique within the application. API cannot access sessions created by WebApp.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -254,7 +254,7 @@ class RawWorkflowClient:
             Task ID, can be obtained from the streaming response chunks
 
         user : str
-            User identifier, must be consistent with the user passed in the message sending interface
+            User identifier, must be consistent with the user passed in the message sending interface. API cannot access sessions created by WebApp.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -812,7 +812,7 @@ class AsyncRawWorkflowClient:
 
         user : str
             User identifier, used to define the identity of the end user, for easy retrieval and statistics.
-            Rules defined by the developer, the user identifier must be unique within the application.
+            Rules defined by the developer, the user identifier must be unique within the application. API cannot access sessions created by WebApp.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -991,7 +991,7 @@ class AsyncRawWorkflowClient:
             Task ID, can be obtained from the streaming response chunks
 
         user : str
-            User identifier, must be consistent with the user passed in the message sending interface
+            User identifier, must be consistent with the user passed in the message sending interface. API cannot access sessions created by WebApp.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.

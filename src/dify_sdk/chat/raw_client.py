@@ -86,7 +86,7 @@ class RawChatClient:
             Note: Blocking mode is not allowed in Agent mode
 
         user : typing.Optional[str]
-            User identifier for defining end user identity, facilitating retrieval and statistics. Defined by developer rules, must be unique within the application.
+            User identifier for defining end user identity, facilitating retrieval and statistics. Defined by developer rules, must be unique within the application. Service API will not share conversations created by WebApp.
 
         conversation_id : typing.Optional[str]
             (Optional) Conversation ID. Required when continuing a conversation based on previous chat history, must pass the conversation_id from previous messages
@@ -361,7 +361,7 @@ class RawChatClient:
             ID of the conversation to retrieve variables from
 
         user : str
-            User identifier, defined by developer rules, must be unique within the application
+            User identifier, defined by developer rules, must be unique within the application. Service API will not share conversations created by WebApp.
 
         last_id : typing.Optional[str]
             (Optional) ID of the last record on the current page, default null
@@ -488,7 +488,7 @@ class RawChatClient:
             Message ID
 
         user : str
-            User identifier, defined by developer rules, must be unique within the application
+            User identifier, defined by developer rules, must be unique within the application. Service API will not share conversations created by WebApp.
 
         rating : typing.Optional[str]
             Rating: like, dislike, or null to cancel
@@ -595,7 +595,7 @@ class RawChatClient:
             Message ID
 
         user : str
-            User identifier, defined by developer rules, must be unique within the application
+            User identifier, defined by developer rules, must be unique within the application. Service API will not share conversations created by WebApp.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -772,7 +772,7 @@ class RawChatClient:
             Task ID, can be obtained from the streaming response chunks
 
         user : str
-            User identifier, must be consistent with the user passed in the message sending interface
+            User identifier for defining end user identity, must be consistent with the user passed in the message sending interface. API cannot access sessions created by WebApp.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -886,7 +886,7 @@ class RawChatClient:
             Text content for speech generation. If message_id is not provided, this field will be used
 
         user : typing.Optional[str]
-            User identifier, defined by developer rules, must be unique within the application
+            User identifier, defined by developer rules, must be unique within the application. Service API will not share conversations created by WebApp.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration. You can pass in configuration such as `chunk_size`, and more to customize the request and response.
@@ -1371,7 +1371,7 @@ class AsyncRawChatClient:
             Note: Blocking mode is not allowed in Agent mode
 
         user : typing.Optional[str]
-            User identifier for defining end user identity, facilitating retrieval and statistics. Defined by developer rules, must be unique within the application.
+            User identifier for defining end user identity, facilitating retrieval and statistics. Defined by developer rules, must be unique within the application. Service API will not share conversations created by WebApp.
 
         conversation_id : typing.Optional[str]
             (Optional) Conversation ID. Required when continuing a conversation based on previous chat history, must pass the conversation_id from previous messages
@@ -1646,7 +1646,7 @@ class AsyncRawChatClient:
             ID of the conversation to retrieve variables from
 
         user : str
-            User identifier, defined by developer rules, must be unique within the application
+            User identifier, defined by developer rules, must be unique within the application. Service API will not share conversations created by WebApp.
 
         last_id : typing.Optional[str]
             (Optional) ID of the last record on the current page, default null
@@ -1773,7 +1773,7 @@ class AsyncRawChatClient:
             Message ID
 
         user : str
-            User identifier, defined by developer rules, must be unique within the application
+            User identifier, defined by developer rules, must be unique within the application. Service API will not share conversations created by WebApp.
 
         rating : typing.Optional[str]
             Rating: like, dislike, or null to cancel
@@ -1880,7 +1880,7 @@ class AsyncRawChatClient:
             Message ID
 
         user : str
-            User identifier, defined by developer rules, must be unique within the application
+            User identifier, defined by developer rules, must be unique within the application. Service API will not share conversations created by WebApp.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -2057,7 +2057,7 @@ class AsyncRawChatClient:
             Task ID, can be obtained from the streaming response chunks
 
         user : str
-            User identifier, must be consistent with the user passed in the message sending interface
+            User identifier for defining end user identity, must be consistent with the user passed in the message sending interface. API cannot access sessions created by WebApp.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -2171,7 +2171,7 @@ class AsyncRawChatClient:
             Text content for speech generation. If message_id is not provided, this field will be used
 
         user : typing.Optional[str]
-            User identifier, defined by developer rules, must be unique within the application
+            User identifier, defined by developer rules, must be unique within the application. Service API will not share conversations created by WebApp.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration. You can pass in configuration such as `chunk_size`, and more to customize the request and response.

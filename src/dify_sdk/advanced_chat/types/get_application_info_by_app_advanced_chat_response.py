@@ -22,6 +22,16 @@ class GetApplicationInfoByAppAdvancedChatResponse(UniversalBaseModel):
     Application tags
     """
 
+    mode: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Application mode
+    """
+
+    author_name: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Author name
+    """
+
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
     else:
