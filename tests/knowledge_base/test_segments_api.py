@@ -202,7 +202,7 @@ async def test_segments_workflow(
 async def test_get_segment_detail_basic(
     kb_client: KnowledgeBaseClient, dataset_for_seg1: Dataset, document_for_seg1: Document
 ):
-    """测试获取文档分段详情功能 (1.4.2新增)"""
+    """测试获取文档分段详情功能 """
 
     dataset_id = str(dataset_for_seg1.id)
     document_id = str(document_for_seg1.id)

@@ -126,7 +126,7 @@ async def test_datasets_workflow(kb_client: KnowledgeBaseClient, test_text_file:
 
 
 async def test_metadata_filtering_conditions(kb_client: KnowledgeBaseClient, test_text_file: Path):
-    """测试元数据过滤条件功能 (1.4.2新增)"""
+    """测试元数据过滤条件功能 """
 
     # 1. 创建测试数据集
     dataset = await kb_client.dataset.create_empty_dataset(
@@ -206,7 +206,7 @@ async def test_metadata_filtering_conditions(kb_client: KnowledgeBaseClient, tes
 
 
 async def test_multiple_metadata_conditions(kb_client: KnowledgeBaseClient):
-    """测试多个元数据过滤条件 (1.4.2新增)"""
+    """测试多个元数据过滤条件 """
 
     # 创建测试数据集
     dataset = await kb_client.dataset.create_empty_dataset(
