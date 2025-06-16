@@ -457,7 +457,7 @@ paths:
                     注：Agent模式下不允许blocking
                 user:
                   type: string
-                  description: 用户标识，用于定义终端用户的身份，方便检索、统计。由开发者定义规则，需保证用户标识在应用内唯一。
+                  description: 用户标识，用于定义终端用户的身份，方便检索、统计。由开发者定义规则，需保证用户标识在应用内唯一。服务 API 不会共享 WebApp 创建的对话。
                 conversation_id:
                   type: string
                   description: （选填）会话 ID，需要基于之前的聊天记录继续对话，必须传之前消息的 conversation_id
@@ -877,7 +877,7 @@ paths:
                   description: 点赞 like, 点踩 dislike, 撤销点赞 null
                 user:
                   type: string
-                  description: 用户标识，由开发者定义规则，需保证用户标识在应用内唯一
+                  description: 用户标识，由开发者定义规则，需保证用户标识在应用内唯一。服务 API 不会共享 WebApp 创建的对话。
                 content:
                   type: string
                   description: 消息反馈的具体信息
@@ -977,7 +977,7 @@ paths:
           required: true
           schema:
             type: string
-          description: 用户标识，由开发者定义规则，需保证用户标识在应用内唯一
+          description: 用户标识，由开发者定义规则，需保证用户标识在应用内唯一。服务 API 不会共享 WebApp 创建的对话。
       responses:
         "200":
           description: 成功响应
@@ -1070,6 +1070,12 @@ paths:
                     items:
                       type: string
                     description: 应用标签
+                  mode:
+                    type: string
+                    description: 应用模式
+                  author_name:
+                    type: string
+                    description: 作者名称
 
   /chat-messages/{task_id}/stop:
     post:
@@ -1094,7 +1100,7 @@ paths:
               properties:
                 user:
                   type: string
-                  description: 用户标识，必须和发送消息接口传入 user 保持一致
+                  description: 用户标识，用于定义终端用户的身份，必须和发送消息接口传入 user 保持一致。API 无法访问 WebApp 创建的会话。
       responses:
         "200":
           description: 成功响应
@@ -1161,7 +1167,7 @@ paths:
                   description: 语音生成内容。如果没有传 message_id 的话，则会使用这个字段的内容
                 user:
                   type: string
-                  description: 用户标识，由开发者定义规则，需保证用户标识在应用内唯一
+                  description: 用户标识，由开发者定义规则，需保证用户标识在应用内唯一。服务 API 不会共享 WebApp 创建的对话。
       responses:
         "200":
           description: 成功响应
