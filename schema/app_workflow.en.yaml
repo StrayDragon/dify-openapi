@@ -285,9 +285,6 @@ components:
                 currency:
                   type: string
                   description: 'Currency, such as USD / RMB'
-            sequence_number:
-              type: integer
-              description: 'Auto-incrementing sequence number, starting from 1 within the App'
             total_steps:
               type: integer
               description: Total steps
@@ -425,7 +422,6 @@ paths:
                     - `data` (object) Detailed content
                       - `id` (string) workflow execution ID
                       - `workflow_id` (string) Associated Workflow ID
-                      - `sequence_number` (int) Auto-incrementing sequence number, starting from 1 within the App
                       - `created_at` (timestamp) Start time
                   - `event: node_started` node execution starts
                     - `task_id` (string) Task ID, used for request tracking and stopping response

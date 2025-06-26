@@ -293,9 +293,6 @@ components:
                 currency:
                   type: string
                   description: 货币，如 USD / RMB
-            sequence_number:
-              type: integer
-              description: 自增序号，App 内自增，从 1 开始
             total_steps:
               type: integer
               description: 总步数
@@ -436,7 +433,6 @@ paths:
                     - `data` (object) 详细内容
                       - `id` (string) workflow 执行 ID
                       - `workflow_id` (string) 关联 Workflow ID
-                      - `sequence_number` (int) 自增序号，App 内自增，从 1 开始
                       - `created_at` (timestamp) 开始时间
                   - `event: node_started` node 开始执行
                     - `task_id` (string) 任务 ID，用于请求跟踪和下方的停止响应接口

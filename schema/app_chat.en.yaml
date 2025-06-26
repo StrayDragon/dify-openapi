@@ -560,7 +560,6 @@ paths:
                     - data (object) Detailed content
                       - id (string) workflow execution ID
                       - workflow_id (string) Associated Workflow ID
-                      - sequence_number (int) Auto-increment sequence number, starts from 1 within the App
                       - created_at (timestamp) Start time
                   - event: node_started node execution started
                     - task_id (string) Task ID for request tracking and stopping responses
