@@ -4,7 +4,7 @@ info:
   description: |
     Dify Knowledge Base API provides a series of interfaces for managing knowledge bases, documents, and retrieval functions.
     All API requests require a knowledge base level API-Key in the Authorization HTTP Header.
-  version: 1.4.3
+  version: 1.5.0
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -1532,6 +1532,71 @@ paths:
       responses:
         '204':
           description: Successfully deleted document
+        '400':
+          $ref: '#/components/responses/Error400'
+        '403':
+          $ref: '#/components/responses/Error403'
+  '/datasets/{dataset_id}/documents/status/{action}':
+    patch:
+      summary: Update Document Status
+      description: Batch update the status of documents in the specified knowledge base
+      operationId: batchUpdateDocumentStatus
+      tags:
+        - Documents
+      parameters:
+        - name: dataset_id
+          in: path
+          description: Knowledge Base ID
+          required: true
+          schema:
+            type: string
+        - name: action
+          in: path
+          description: Action to perform
+          required: true
+          schema:
+            type: string
+            enum:
+              - enable
+              - disable
+              - archive
+              - un_archive
+            description: |
+              Action type:
+              - enable: Enable documents
+              - disable: Disable documents
+              - archive: Archive documents
+              - un_archive: Unarchive documents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - document_ids
+              properties:
+                document_ids:
+                  type: array
+                  items:
+                    type: string
+                  description: List of document IDs
+                  minItems: 1
+                  example:
+                    - doc-id-1
+                    - doc-id-2
+      responses:
+        '200':
+          description: Successfully updated document status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: success
+                    description: Operation result
         '400':
           $ref: '#/components/responses/Error400'
         '403':

@@ -4,7 +4,7 @@ info:
   description: |
     Dify 知识库 API 提供了一系列接口用于管理知识库、文档和检索功能。
     所有 API 请求都需要在 Authorization HTTP Header 中包含知识库级 API-Key。
-  version: 1.4.3
+  version: 1.5.0
 
 servers:
   - url: https://api.dify.ai/v1
@@ -1513,6 +1513,66 @@ paths:
       responses:
         "204":
           description: 成功删除文档
+        "400":
+          $ref: "#/components/responses/Error400"
+        "403":
+          $ref: "#/components/responses/Error403"
+
+  /datasets/{dataset_id}/documents/status/{action}:
+    patch:
+      summary: 更新文档状态
+      description: 批量更新指定知识库中文档的状态
+      operationId: batchUpdateDocumentStatus
+      tags:
+        - Documents
+      parameters:
+        - name: dataset_id
+          in: path
+          description: 知识库 ID
+          required: true
+          schema:
+            type: string
+        - name: action
+          in: path
+          description: 要执行的操作
+          required: true
+          schema:
+            type: string
+            enum: [enable, disable, archive, un_archive]
+            description: |
+              操作类型：
+              - enable: 启用文档
+              - disable: 禁用文档
+              - archive: 归档文档
+              - un_archive: 取消归档文档
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - document_ids
+              properties:
+                document_ids:
+                  type: array
+                  items:
+                    type: string
+                  description: 文档ID列表
+                  minItems: 1
+                  example: ["doc-id-1", "doc-id-2"]
+      responses:
+        "200":
+          description: 成功更新文档状态
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "success"
+                    description: 操作结果
         "400":
           $ref: "#/components/responses/Error400"
         "403":

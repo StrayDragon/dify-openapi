@@ -1847,3 +1847,33 @@ actions:
 
   - target: $.paths['/datasets/{dataset_id}/tags'].get.responses['200'].content['application/json'].schema.properties.total.description
     update: "Total count"
+
+  # Batch update document status API translations
+  - target: $.paths['/datasets/{dataset_id}/documents/status/{action}'].patch.summary
+    update: "Update Document Status"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/status/{action}'].patch.description
+    update: "Batch update the status of documents in the specified knowledge base"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/status/{action}'].patch.parameters[0].description
+    update: "Knowledge Base ID"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/status/{action}'].patch.parameters[1].description
+    update: "Action to perform"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/status/{action}'].patch.parameters[1].schema.description
+    update: |
+      Action type:
+      - enable: Enable documents
+      - disable: Disable documents
+      - archive: Archive documents
+      - un_archive: Unarchive documents
+
+  - target: $.paths['/datasets/{dataset_id}/documents/status/{action}'].patch.requestBody.content['application/json'].schema.properties.document_ids.description
+    update: "List of document IDs"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/status/{action}'].patch.responses['200'].description
+    update: "Successfully updated document status"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/status/{action}'].patch.responses['200'].content['application/json'].schema.properties.result.description
+    update: "Operation result"
