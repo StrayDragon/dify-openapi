@@ -11,7 +11,7 @@ actions:
         Dify API provides a series of interfaces for text generation functionality.
         It supports text generation applications.
         All API requests require an application-level API-Key in the Authorization HTTP Header.
-        official raw document: https://github.com/langgenius/dify/blob/1.4.3/web/app/components/develop/template/template.en.mdx
+        official raw document: https://github.com/langgenius/dify/blob/1.5.0/web/app/components/develop/template/template.en.mdx
 
   - target: $.servers[0]
     update:
