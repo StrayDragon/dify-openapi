@@ -31,6 +31,9 @@ from .types.send_completion_message_by_app_generation_request_inputs import (
 from .types.send_completion_message_by_app_generation_request_response_mode import (
     SendCompletionMessageByAppGenerationRequestResponseMode,
 )
+from .types.send_message_feedback_by_app_generation_request_rating import (
+    SendMessageFeedbackByAppGenerationRequestRating,
+)
 from .types.send_message_feedback_by_app_generation_response import SendMessageFeedbackByAppGenerationResponse
 from .types.stop_completion_response_by_app_generation_response import StopCompletionResponseByAppGenerationResponse
 from .types.update_annotation_by_app_generation_response import UpdateAnnotationByAppGenerationResponse
@@ -223,8 +226,8 @@ class GenerationClient:
         self,
         message_id: str,
         *,
-        rating: str,
         user: str,
+        rating: typing.Optional[SendMessageFeedbackByAppGenerationRequestRating] = OMIT,
         content: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> SendMessageFeedbackByAppGenerationResponse:
@@ -236,11 +239,11 @@ class GenerationClient:
         message_id : str
             Message ID
 
-        rating : str
-            Like (like), dislike (dislike), or cancel rating (null)
-
         user : str
             User identifier, defined by developer rules, must be unique within the application. Service API does not share sessions created by WebApp
+
+        rating : typing.Optional[SendMessageFeedbackByAppGenerationRequestRating]
+            Like (like), dislike (dislike), or cancel rating (null)
 
         content : typing.Optional[str]
             Specific feedback information
@@ -257,10 +260,10 @@ class GenerationClient:
         --------
         from dify import DifyApi
         client = DifyApi(token="YOUR_TOKEN", )
-        client.generation.send_message_feedback_by_app_generation(message_id='message_id', rating='rating', user='user', )
+        client.generation.send_message_feedback_by_app_generation(message_id='message_id', user='user', )
         """
         _response = self._raw_client.send_message_feedback_by_app_generation(
-            message_id, rating=rating, user=user, content=content, request_options=request_options
+            message_id, user=user, rating=rating, content=content, request_options=request_options
         )
         return _response.data
 
@@ -809,8 +812,8 @@ class AsyncGenerationClient:
         self,
         message_id: str,
         *,
-        rating: str,
         user: str,
+        rating: typing.Optional[SendMessageFeedbackByAppGenerationRequestRating] = OMIT,
         content: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> SendMessageFeedbackByAppGenerationResponse:
@@ -822,11 +825,11 @@ class AsyncGenerationClient:
         message_id : str
             Message ID
 
-        rating : str
-            Like (like), dislike (dislike), or cancel rating (null)
-
         user : str
             User identifier, defined by developer rules, must be unique within the application. Service API does not share sessions created by WebApp
+
+        rating : typing.Optional[SendMessageFeedbackByAppGenerationRequestRating]
+            Like (like), dislike (dislike), or cancel rating (null)
 
         content : typing.Optional[str]
             Specific feedback information
@@ -845,11 +848,11 @@ class AsyncGenerationClient:
         import asyncio
         client = AsyncDifyApi(token="YOUR_TOKEN", )
         async def main() -> None:
-            await client.generation.send_message_feedback_by_app_generation(message_id='message_id', rating='rating', user='user', )
+            await client.generation.send_message_feedback_by_app_generation(message_id='message_id', user='user', )
         asyncio.run(main())
         """
         _response = await self._raw_client.send_message_feedback_by_app_generation(
-            message_id, rating=rating, user=user, content=content, request_options=request_options
+            message_id, user=user, rating=rating, content=content, request_options=request_options
         )
         return _response.data
 

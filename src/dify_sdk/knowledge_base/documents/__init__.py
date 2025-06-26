@@ -3,6 +3,8 @@
 # isort: skip_file
 
 from .types import (
+    BatchUpdateDocumentStatusRequestAction,
+    BatchUpdateDocumentStatusResponse,
     CreateDocumentByFileResponse,
     CreateDocumentByTextRequestDocForm,
     CreateDocumentByTextRequestIndexingTechnique,
@@ -17,6 +19,8 @@ from .types import (
 )
 
 __all__ = [
+    "BatchUpdateDocumentStatusRequestAction",
+    "BatchUpdateDocumentStatusResponse",
     "CreateDocumentByFileResponse",
     "CreateDocumentByTextRequestDocForm",
     "CreateDocumentByTextRequestIndexingTechnique",

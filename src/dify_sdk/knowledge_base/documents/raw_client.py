@@ -18,6 +18,8 @@ from ..errors.unsupported_media_type_error import UnsupportedMediaTypeError
 from ..types.error import Error
 from ..types.process_rule import ProcessRule
 from ..types.upload_file import UploadFile
+from .types.batch_update_document_status_request_action import BatchUpdateDocumentStatusRequestAction
+from .types.batch_update_document_status_response import BatchUpdateDocumentStatusResponse
 from .types.create_document_by_file_response import CreateDocumentByFileResponse
 from .types.create_document_by_text_request_doc_form import CreateDocumentByTextRequestDocForm
 from .types.create_document_by_text_request_indexing_technique import CreateDocumentByTextRequestIndexingTechnique
@@ -608,6 +610,83 @@ class RawDocumentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return HttpResponse(response=_response, data=None)
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+    def batch_update_document_status(
+        self,
+        dataset_id: str,
+        action: BatchUpdateDocumentStatusRequestAction,
+        *,
+        document_ids: typing.Sequence[str],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> HttpResponse[BatchUpdateDocumentStatusResponse]:
+        """
+        Batch update the status of documents in the specified knowledge base
+
+        Parameters
+        ----------
+        dataset_id : str
+            Knowledge Base ID
+
+        action : BatchUpdateDocumentStatusRequestAction
+            Action to perform
+
+        document_ids : typing.Sequence[str]
+            List of document IDs
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[BatchUpdateDocumentStatusResponse]
+            Successfully updated document status
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(dataset_id)}/documents/status/{jsonable_encoder(action)}",
+            method="PATCH",
+            json={
+                "document_ids": document_ids,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    BatchUpdateDocumentStatusResponse,
+                    parse_obj_as(
+                        type_=BatchUpdateDocumentStatusResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
@@ -1271,6 +1350,83 @@ class AsyncRawDocumentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return AsyncHttpResponse(response=_response, data=None)
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+    async def batch_update_document_status(
+        self,
+        dataset_id: str,
+        action: BatchUpdateDocumentStatusRequestAction,
+        *,
+        document_ids: typing.Sequence[str],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AsyncHttpResponse[BatchUpdateDocumentStatusResponse]:
+        """
+        Batch update the status of documents in the specified knowledge base
+
+        Parameters
+        ----------
+        dataset_id : str
+            Knowledge Base ID
+
+        action : BatchUpdateDocumentStatusRequestAction
+            Action to perform
+
+        document_ids : typing.Sequence[str]
+            List of document IDs
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[BatchUpdateDocumentStatusResponse]
+            Successfully updated document status
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(dataset_id)}/documents/status/{jsonable_encoder(action)}",
+            method="PATCH",
+            json={
+                "document_ids": document_ids,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    BatchUpdateDocumentStatusResponse,
+                    parse_obj_as(
+                        type_=BatchUpdateDocumentStatusResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(

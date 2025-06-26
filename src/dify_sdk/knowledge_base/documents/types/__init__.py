@@ -2,6 +2,8 @@
 
 # isort: skip_file
 
+from .batch_update_document_status_request_action import BatchUpdateDocumentStatusRequestAction
+from .batch_update_document_status_response import BatchUpdateDocumentStatusResponse
 from .create_document_by_file_response import CreateDocumentByFileResponse
 from .create_document_by_text_request_doc_form import CreateDocumentByTextRequestDocForm
 from .create_document_by_text_request_indexing_technique import CreateDocumentByTextRequestIndexingTechnique
@@ -15,6 +17,8 @@ from .update_document_by_text_request_indexing_technique import UpdateDocumentBy
 from .update_document_by_text_response import UpdateDocumentByTextResponse
 
 __all__ = [
+    "BatchUpdateDocumentStatusRequestAction",
+    "BatchUpdateDocumentStatusResponse",
     "CreateDocumentByFileResponse",
     "CreateDocumentByTextRequestDocForm",
     "CreateDocumentByTextRequestIndexingTechnique",

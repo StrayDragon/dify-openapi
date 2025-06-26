@@ -64,6 +64,8 @@ from .datasets import (
     RetrieveDatasetResponseRecordsItemSegmentDocument,
 )
 from .documents import (
+    BatchUpdateDocumentStatusRequestAction,
+    BatchUpdateDocumentStatusResponse,
     CreateDocumentByFileResponse,
     CreateDocumentByTextRequestDocForm,
     CreateDocumentByTextRequestIndexingTechnique,
@@ -102,6 +104,8 @@ from .tags import GetDatasetTagsResponse, GetDatasetTagsResponseDataItem
 
 __all__ = [
     "BadRequestError",
+    "BatchUpdateDocumentStatusRequestAction",
+    "BatchUpdateDocumentStatusResponse",
     "ChildChunk",
     "ConflictError",
     "ContentTooLargeError",

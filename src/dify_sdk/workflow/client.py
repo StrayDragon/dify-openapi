@@ -161,6 +161,8 @@ class WorkflowClient:
         status: typing.Optional[GetWorkflowLogsRequestStatus] = None,
         page: typing.Optional[int] = None,
         limit: typing.Optional[int] = None,
+        created_by_end_user_session_id: typing.Optional[str] = None,
+        created_by_account: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GetWorkflowLogsResponse:
         """
@@ -180,6 +182,12 @@ class WorkflowClient:
         limit : typing.Optional[int]
             Items per page, default 20
 
+        created_by_end_user_session_id : typing.Optional[str]
+            Created by which end user session, e.g., `abc-123`
+
+        created_by_account : typing.Optional[str]
+            Created by which email account, e.g., lizb@test.com
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -195,7 +203,13 @@ class WorkflowClient:
         client.workflow.get_workflow_logs()
         """
         _response = self._raw_client.get_workflow_logs(
-            keyword=keyword, status=status, page=page, limit=limit, request_options=request_options
+            keyword=keyword,
+            status=status,
+            page=page,
+            limit=limit,
+            created_by_end_user_session_id=created_by_end_user_session_id,
+            created_by_account=created_by_account,
+            request_options=request_options,
         )
         return _response.data
 
@@ -454,6 +468,8 @@ class AsyncWorkflowClient:
         status: typing.Optional[GetWorkflowLogsRequestStatus] = None,
         page: typing.Optional[int] = None,
         limit: typing.Optional[int] = None,
+        created_by_end_user_session_id: typing.Optional[str] = None,
+        created_by_account: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GetWorkflowLogsResponse:
         """
@@ -473,6 +489,12 @@ class AsyncWorkflowClient:
         limit : typing.Optional[int]
             Items per page, default 20
 
+        created_by_end_user_session_id : typing.Optional[str]
+            Created by which end user session, e.g., `abc-123`
+
+        created_by_account : typing.Optional[str]
+            Created by which email account, e.g., lizb@test.com
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -491,7 +513,13 @@ class AsyncWorkflowClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.get_workflow_logs(
-            keyword=keyword, status=status, page=page, limit=limit, request_options=request_options
+            keyword=keyword,
+            status=status,
+            page=page,
+            limit=limit,
+            created_by_end_user_session_id=created_by_end_user_session_id,
+            created_by_account=created_by_account,
+            request_options=request_options,
         )
         return _response.data
 

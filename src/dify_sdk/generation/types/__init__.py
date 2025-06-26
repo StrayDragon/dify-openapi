@@ -83,6 +83,7 @@ from .send_completion_message_by_app_generation_request_inputs import SendComple
 from .send_completion_message_by_app_generation_request_response_mode import (
     SendCompletionMessageByAppGenerationRequestResponseMode,
 )
+from .send_message_feedback_by_app_generation_request_rating import SendMessageFeedbackByAppGenerationRequestRating
 from .send_message_feedback_by_app_generation_response import SendMessageFeedbackByAppGenerationResponse
 from .stop_completion_response_by_app_generation_response import StopCompletionResponseByAppGenerationResponse
 from .update_annotation_by_app_generation_response import UpdateAnnotationByAppGenerationResponse
@@ -131,6 +132,7 @@ __all__ = [
     "RetrieverResource",
     "SendCompletionMessageByAppGenerationRequestInputs",
     "SendCompletionMessageByAppGenerationRequestResponseMode",
+    "SendMessageFeedbackByAppGenerationRequestRating",
     "SendMessageFeedbackByAppGenerationResponse",
     "StopCompletionResponseByAppGenerationResponse",
     "UpdateAnnotationByAppGenerationResponse",
