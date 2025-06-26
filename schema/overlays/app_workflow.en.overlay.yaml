@@ -12,7 +12,7 @@ actions:
         Workflow applications have no session support and are suitable for translation/article writing/summarization AI, etc.
         All API requests require an application-level API-Key in the Authorization HTTP Header.
         It is strongly recommended that developers store the API-Key on the backend rather than sharing or storing it on the client to prevent API-Key leakage and financial loss.
-        official raw document: https://github.com/langgenius/dify/blob/1.4.3/web/app/components/develop/template/template_workflow.en.mdx
+        official raw document: https://github.com/langgenius/dify/blob/1.5.0/web/app/components/develop/template/template_workflow.en.mdx
 
   - target: $.servers[0]
     update:
@@ -223,9 +223,6 @@ actions:
 
   - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.execution_metadata.properties.currency.description
     update: "Currency, such as USD / RMB"
-
-  - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.sequence_number.description
-    update: "Auto-incrementing sequence number, starting from 1 within the App"
 
   - target: $.components.schemas.ChunkWorkflowMessage.properties.data.properties.total_steps.description
     update: "Total steps"
@@ -468,6 +465,12 @@ actions:
 
   - target: $.paths['/workflows/logs'].get.parameters[3].description
     update: "Items per page, default 20"
+
+  - target: $.paths['/workflows/logs'].get.parameters[4].description
+    update: "Created by which end user session, e.g., `abc-123`"
+
+  - target: $.paths['/workflows/logs'].get.parameters[5].description
+    update: "Created by which email account, e.g., lizb@test.com"
 
   - target: $.paths['/workflows/logs'].get.responses['200'].description
     update: "Successfully retrieved workflow logs"
