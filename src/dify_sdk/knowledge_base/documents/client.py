@@ -8,6 +8,8 @@ from ...core.request_options import RequestOptions
 from ..types.process_rule import ProcessRule
 from ..types.upload_file import UploadFile
 from .raw_client import AsyncRawDocumentsClient, RawDocumentsClient
+from .types.batch_update_document_status_request_action import BatchUpdateDocumentStatusRequestAction
+from .types.batch_update_document_status_response import BatchUpdateDocumentStatusResponse
 from .types.create_document_by_file_response import CreateDocumentByFileResponse
 from .types.create_document_by_text_request_doc_form import CreateDocumentByTextRequestDocForm
 from .types.create_document_by_text_request_indexing_technique import CreateDocumentByTextRequestIndexingTechnique
@@ -364,6 +366,47 @@ class DocumentsClient:
         client.knowledge_base.documents.delete_document(dataset_id='dataset_id', document_id='document_id', )
         """
         _response = self._raw_client.delete_document(dataset_id, document_id, request_options=request_options)
+        return _response.data
+
+    def batch_update_document_status(
+        self,
+        dataset_id: str,
+        action: BatchUpdateDocumentStatusRequestAction,
+        *,
+        document_ids: typing.Sequence[str],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> BatchUpdateDocumentStatusResponse:
+        """
+        Batch update the status of documents in the specified knowledge base
+
+        Parameters
+        ----------
+        dataset_id : str
+            Knowledge Base ID
+
+        action : BatchUpdateDocumentStatusRequestAction
+            Action to perform
+
+        document_ids : typing.Sequence[str]
+            List of document IDs
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        BatchUpdateDocumentStatusResponse
+            Successfully updated document status
+
+        Examples
+        --------
+        from dify import DifyApi
+        client = DifyApi(token="YOUR_TOKEN", )
+        client.knowledge_base.documents.batch_update_document_status(dataset_id='dataset_id', action="enable", document_ids=['doc-id-1', 'doc-id-2'], )
+        """
+        _response = self._raw_client.batch_update_document_status(
+            dataset_id, action, document_ids=document_ids, request_options=request_options
+        )
         return _response.data
 
     def get_upload_file(
@@ -762,6 +805,50 @@ class AsyncDocumentsClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.delete_document(dataset_id, document_id, request_options=request_options)
+        return _response.data
+
+    async def batch_update_document_status(
+        self,
+        dataset_id: str,
+        action: BatchUpdateDocumentStatusRequestAction,
+        *,
+        document_ids: typing.Sequence[str],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> BatchUpdateDocumentStatusResponse:
+        """
+        Batch update the status of documents in the specified knowledge base
+
+        Parameters
+        ----------
+        dataset_id : str
+            Knowledge Base ID
+
+        action : BatchUpdateDocumentStatusRequestAction
+            Action to perform
+
+        document_ids : typing.Sequence[str]
+            List of document IDs
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        BatchUpdateDocumentStatusResponse
+            Successfully updated document status
+
+        Examples
+        --------
+        from dify import AsyncDifyApi
+        import asyncio
+        client = AsyncDifyApi(token="YOUR_TOKEN", )
+        async def main() -> None:
+            await client.knowledge_base.documents.batch_update_document_status(dataset_id='dataset_id', action="enable", document_ids=['doc-id-1', 'doc-id-2'], )
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.batch_update_document_status(
+            dataset_id, action, document_ids=document_ids, request_options=request_options
+        )
         return _response.data
 
     async def get_upload_file(

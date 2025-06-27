@@ -6,8 +6,8 @@ info:
     Workflow applications have no session support and are suitable for translation/article writing/summarization AI, etc.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
     It is strongly recommended that developers store the API-Key on the backend rather than sharing or storing it on the client to prevent API-Key leakage and financial loss.
-    official raw document: https://github.com/langgenius/dify/blob/1.4.3/web/app/components/develop/template/template_workflow.en.mdx
-  version: 1.4.3
+    official raw document: https://github.com/langgenius/dify/blob/1.5.0/web/app/components/develop/template/template_workflow.en.mdx
+  version: 1.5.0
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -285,9 +285,6 @@ components:
                 currency:
                   type: string
                   description: 'Currency, such as USD / RMB'
-            sequence_number:
-              type: integer
-              description: 'Auto-incrementing sequence number, starting from 1 within the App'
             total_steps:
               type: integer
               description: Total steps
@@ -645,6 +642,18 @@ paths:
           schema:
             type: integer
             default: 20
+        - name: created_by_end_user_session_id
+          in: query
+          description: 'Created by which end user session, e.g., `abc-123`'
+          required: false
+          schema:
+            type: string
+        - name: created_by_account
+          in: query
+          description: 'Created by which email account, e.g., lizb@test.com'
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: Successfully retrieved workflow logs

@@ -83,11 +83,6 @@ class ChunkWorkflowMessageData(UniversalBaseModel):
     Metadata
     """
 
-    sequence_number: typing.Optional[int] = pydantic.Field(default=None)
-    """
-    Auto-incrementing sequence number, starting from 1 within the App
-    """
-
     total_steps: typing.Optional[int] = pydantic.Field(default=None)
     """
     Total steps

@@ -338,6 +338,8 @@ class RawWorkflowClient:
         status: typing.Optional[GetWorkflowLogsRequestStatus] = None,
         page: typing.Optional[int] = None,
         limit: typing.Optional[int] = None,
+        created_by_end_user_session_id: typing.Optional[str] = None,
+        created_by_account: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[GetWorkflowLogsResponse]:
         """
@@ -357,6 +359,12 @@ class RawWorkflowClient:
         limit : typing.Optional[int]
             Items per page, default 20
 
+        created_by_end_user_session_id : typing.Optional[str]
+            Created by which end user session, e.g., `abc-123`
+
+        created_by_account : typing.Optional[str]
+            Created by which email account, e.g., lizb@test.com
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -373,6 +381,8 @@ class RawWorkflowClient:
                 "status": status,
                 "page": page,
                 "limit": limit,
+                "created_by_end_user_session_id": created_by_end_user_session_id,
+                "created_by_account": created_by_account,
             },
             request_options=request_options,
         )
@@ -1075,6 +1085,8 @@ class AsyncRawWorkflowClient:
         status: typing.Optional[GetWorkflowLogsRequestStatus] = None,
         page: typing.Optional[int] = None,
         limit: typing.Optional[int] = None,
+        created_by_end_user_session_id: typing.Optional[str] = None,
+        created_by_account: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[GetWorkflowLogsResponse]:
         """
@@ -1094,6 +1106,12 @@ class AsyncRawWorkflowClient:
         limit : typing.Optional[int]
             Items per page, default 20
 
+        created_by_end_user_session_id : typing.Optional[str]
+            Created by which end user session, e.g., `abc-123`
+
+        created_by_account : typing.Optional[str]
+            Created by which email account, e.g., lizb@test.com
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -1110,6 +1128,8 @@ class AsyncRawWorkflowClient:
                 "status": status,
                 "page": page,
                 "limit": limit,
+                "created_by_end_user_session_id": created_by_end_user_session_id,
+                "created_by_account": created_by_account,
             },
             request_options=request_options,
         )
