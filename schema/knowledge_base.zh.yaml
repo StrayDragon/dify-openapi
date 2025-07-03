@@ -482,6 +482,206 @@ components:
           type: integer
           description: 命中次数
 
+    DocumentDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 文档ID
+        position:
+          type: integer
+          description: 文档位置
+        data_source_type:
+          type: string
+          description: 数据源类型
+        data_source_info:
+          type: object
+          description: 数据源信息
+          properties:
+            upload_file:
+              type: object
+              description: 上传文件信息
+        dataset_process_rule_id:
+          type: string
+          description: 数据集处理规则ID
+        dataset_process_rule:
+          type: object
+          description: 数据集处理规则
+          properties:
+            mode:
+              type: string
+              description: 处理模式
+            rules:
+              type: object
+              description: 规则详情
+              properties:
+                pre_processing_rules:
+                  type: array
+                  description: 预处理规则列表
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: 规则ID
+                      enabled:
+                        type: boolean
+                        description: 是否启用
+                segmentation:
+                  type: object
+                  description: 分段规则
+                  properties:
+                    separator:
+                      type: string
+                      description: 分隔符
+                    max_tokens:
+                      type: integer
+                      description: 最大token数
+                    chunk_overlap:
+                      type: integer
+                      description: 块重叠数
+                parent_mode:
+                  type: string
+                  description: 父级模式
+                subchunk_segmentation:
+                  type: object
+                  description: 子块分段
+                  properties:
+                    separator:
+                      type: string
+                      description: 分隔符
+                    max_tokens:
+                      type: integer
+                      description: 最大token数
+                    chunk_overlap:
+                      type: integer
+                      description: 块重叠数
+        document_process_rule:
+          type: object
+          description: 文档处理规则
+          properties:
+            id:
+              type: string
+              description: 规则ID
+            dataset_id:
+              type: string
+              description: 数据集ID
+            mode:
+              type: string
+              description: 处理模式
+            rules:
+              type: object
+              description: 规则详情
+              properties:
+                pre_processing_rules:
+                  type: array
+                  description: 预处理规则列表
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: 规则ID
+                      enabled:
+                        type: boolean
+                        description: 是否启用
+                segmentation:
+                  type: object
+                  description: 分段规则
+                  properties:
+                    separator:
+                      type: string
+                      description: 分隔符
+                    max_tokens:
+                      type: integer
+                      description: 最大token数
+                    chunk_overlap:
+                      type: integer
+                      description: 块重叠数
+                parent_mode:
+                  type: string
+                  description: 父级模式
+                subchunk_segmentation:
+                  type: object
+                  description: 子块分段
+                  properties:
+                    separator:
+                      type: string
+                      description: 分隔符
+                    max_tokens:
+                      type: integer
+                      description: 最大token数
+                    chunk_overlap:
+                      type: integer
+                      description: 块重叠数
+        name:
+          type: string
+          description: 文档名称
+        created_from:
+          type: string
+          description: 创建来源
+        created_by:
+          type: string
+          description: 创建者
+        created_at:
+          type: number
+          description: 创建时间戳
+        tokens:
+          type: integer
+          nullable: true
+          description: token数量
+        indexing_status:
+          type: string
+          description: 索引状态
+        completed_at:
+          type: number
+          nullable: true
+          description: 完成时间戳
+        updated_at:
+          type: number
+          description: 更新时间戳
+        indexing_latency:
+          type: number
+          nullable: true
+          description: 索引延迟
+        error:
+          type: string
+          nullable: true
+          description: 错误信息
+        enabled:
+          type: boolean
+          description: 是否启用
+        disabled_at:
+          type: number
+          nullable: true
+          description: 禁用时间戳
+        disabled_by:
+          type: string
+          nullable: true
+          description: 禁用者
+        archived:
+          type: boolean
+          description: 是否归档
+        segment_count:
+          type: integer
+          description: 分段数量
+        average_segment_length:
+          type: number
+          description: 平均分段长度
+        hit_count:
+          type: integer
+          nullable: true
+          description: 命中次数
+        display_status:
+          type: string
+          description: 显示状态
+        doc_form:
+          type: string
+          description: 文档形式
+        doc_language:
+          type: string
+          description: 文档语言
+
     Segment:
       type: object
       properties:
@@ -1491,6 +1691,52 @@ paths:
           $ref: "#/components/responses/Error400"
 
   /datasets/{dataset_id}/documents/{document_id}:
+    get:
+      summary: 获取文档详情
+      description: 获取文档详情
+      operationId: getDocumentDetail
+      tags:
+        - Documents
+      parameters:
+        - name: dataset_id
+          in: path
+          description: 知识库 ID
+          required: true
+          schema:
+            type: string
+        - name: document_id
+          in: path
+          description: 文档 ID
+          required: true
+          schema:
+            type: string
+        - name: metadata
+          in: query
+          description: metadata 过滤条件
+          required: false
+          schema:
+            type: string
+            enum: [all, only, without]
+            default: all
+            description: |
+              过滤条件：
+              - all: 包含所有信息
+              - only: 仅元数据
+              - without: 不包含元数据
+      responses:
+        "200":
+          description: 成功获取文档详情
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DocumentDetail"
+        "400":
+          $ref: "#/components/responses/Error400"
+        "403":
+          $ref: "#/components/responses/Error403"
+        "404":
+          $ref: "#/components/responses/Error404"
+
     delete:
       summary: 删除文档
       description: 删除指定的文档
