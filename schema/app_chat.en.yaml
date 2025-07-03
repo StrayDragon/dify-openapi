@@ -5,8 +5,8 @@ info:
     Dify API provides a series of interfaces for conversation functionality.
     It supports conversational applications.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
-    official raw document: https://github.com/langgenius/dify/blob/1.5.0/web/app/components/develop/template/template_chat.en.mdx
-  version: 1.5.0
+    official raw document: https://github.com/langgenius/dify/blob/1.4.3/web/app/components/develop/template/template_chat.en.mdx
+  version: 1.5.1
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server

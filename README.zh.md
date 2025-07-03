@@ -1,6 +1,6 @@
 # Dify x OpenAPI
 
-[![Dify Version Support](https://img.shields.io/badge/Support_Dify_Version-1.5.0-blue)](https://github.com/langgenius/dify)
+[![Dify Version Support](https://img.shields.io/badge/Support_Dify_Version-1.5.1-blue)](https://github.com/langgenius/dify)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Package Manager: uv](https://img.shields.io/badge/package%20manager-uv-black)](https://github.com/astral-sh/uv)
@@ -41,7 +41,7 @@
 > [!tip]
 > 这里指至少可以通过一次测试用例请求, 如果你发现有哪些API错误, 欢迎提issue或者pr!
 
-- 知识库: [OpenAPI Schema(中文)](./schema/knowledge_base.zh.yaml) | [OpenAPI Schema(English)](./schema/knowledge_base.en.yaml) | [官方文档源码](https://github.com/langgenius/dify/tree/1.5.0/web/app/(commonLayout)/datasets/template)
+- 知识库: [OpenAPI Schema(中文)](./schema/knowledge_base.zh.yaml) | [OpenAPI Schema(English)](./schema/knowledge_base.en.yaml) | [官方文档源码](https://github.com/langgenius/dify/tree/1.5.1/web/app/(commonLayout)/datasets/template)
   - [x] POST /datasets - 创建空知识库
   - [x] POST /datasets/{dataset_id} - 更新知识库
   - [x] GET /datasets/{dataset_id}/documents - 获取文档列表
@@ -73,7 +73,7 @@
   - [x] POST /datasets/{dataset_id}/tags - 查询知识库已绑定的标签
   - [x] POST /datasets/{dataset_id}/retrieval - 带元数据过滤条件的检索
 
-- 聊天应用: [OpenAPI Schema(中文)](./schema/app_chat.zh.yaml) | [OpenAPI Schema(English)](./schema/app_chat.en.yaml) | [官方文档源码](https://github.com/langgenius/dify/tree/1.5.0/web/app/components/develop/template)
+- 聊天应用: [OpenAPI Schema(中文)](./schema/app_chat.zh.yaml) | [OpenAPI Schema(English)](./schema/app_chat.en.yaml) | [官方文档源码](https://github.com/langgenius/dify/tree/1.5.1/web/app/components/develop/template)
   - [x] POST /chat-messages - 发送对话消息
   - [x] POST /files/upload - 上传文件
   - [x] POST /messages/{message_id}/feedbacks - 消息反馈
@@ -86,7 +86,7 @@
   - [x] GET /info - 获取应用基本信息
   - [x] GET /parameters - 获取应用参数
 
-- 高级聊天应用: [OpenAPI Schema(中文)](./schema/app_advanced_chat.zh.yaml) | [OpenAPI Schema(English)](./schema/app_advanced_chat.en.yaml) | [官方文档源码](https://github.com/langgenius/dify/tree/1.5.0/web/app/components/develop/template)
+- 高级聊天应用: [OpenAPI Schema(中文)](./schema/app_advanced_chat.zh.yaml) | [OpenAPI Schema(English)](./schema/app_advanced_chat.en.yaml) | [官方文档源码](https://github.com/langgenius/dify/tree/1.5.1/web/app/components/develop/template)
   - [x] POST /audio-to-text - 语音转文字
   - [x] POST /text-to-audio - 文字转语音
   - [x] GET /apps/annotations - 获取标注列表
@@ -101,10 +101,10 @@
   - [x] GET /info - 获取应用基本信息
   - [x] GET /parameters - 获取应用参数（包含文字转语音设置）
 
-- 文本生成应用: [OpenAPI Schema(中文)](./schema/app_generation.zh.yaml) | [OpenAPI Schema(English)](./schema/app_generation.en.yaml) | [官方文档源码](https://github.com/langgenius/dify/tree/1.5.0/web/app/components/develop/template)
+- 文本生成应用: [OpenAPI Schema(中文)](./schema/app_generation.zh.yaml) | [OpenAPI Schema(English)](./schema/app_generation.en.yaml) | [官方文档源码](https://github.com/langgenius/dify/tree/1.5.1/web/app/components/develop/template)
   - [x] POST /completion-messages - 发送消息
 
-- 工作流应用: [OpenAPI Schema(中文)](./schema/app_workflow.zh.yaml) | [OpenAPI Schema(English)](./schema/app_workflow.en.yaml) | [官方文档源码](https://github.com/langgenius/dify/tree/1.5.0/web/app/components/develop/template)
+- 工作流应用: [OpenAPI Schema(中文)](./schema/app_workflow.zh.yaml) | [OpenAPI Schema(English)](./schema/app_workflow.en.yaml) | [官方文档源码](https://github.com/langgenius/dify/tree/1.5.1/web/app/components/develop/template)
   - [x] POST /workflows/run - 执行工作流
   - [x] GET /workflows/run/{workflow_run_id} - 获取工作流执行状态
   - [x] POST /workflows/tasks/{task_id}/stop - 停止响应
