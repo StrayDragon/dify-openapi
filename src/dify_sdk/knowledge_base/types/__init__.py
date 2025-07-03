@@ -16,6 +16,26 @@ from .dataset_provider import DatasetProvider
 from .dataset_retrieval_model_dict import DatasetRetrievalModelDict
 from .dataset_retrieval_model_dict_reranking_model import DatasetRetrievalModelDictRerankingModel
 from .document import Document
+from .document_detail import DocumentDetail
+from .document_detail_data_source_info import DocumentDetailDataSourceInfo
+from .document_detail_dataset_process_rule import DocumentDetailDatasetProcessRule
+from .document_detail_dataset_process_rule_rules import DocumentDetailDatasetProcessRuleRules
+from .document_detail_dataset_process_rule_rules_pre_processing_rules_item import (
+    DocumentDetailDatasetProcessRuleRulesPreProcessingRulesItem,
+)
+from .document_detail_dataset_process_rule_rules_segmentation import DocumentDetailDatasetProcessRuleRulesSegmentation
+from .document_detail_dataset_process_rule_rules_subchunk_segmentation import (
+    DocumentDetailDatasetProcessRuleRulesSubchunkSegmentation,
+)
+from .document_detail_document_process_rule import DocumentDetailDocumentProcessRule
+from .document_detail_document_process_rule_rules import DocumentDetailDocumentProcessRuleRules
+from .document_detail_document_process_rule_rules_pre_processing_rules_item import (
+    DocumentDetailDocumentProcessRuleRulesPreProcessingRulesItem,
+)
+from .document_detail_document_process_rule_rules_segmentation import DocumentDetailDocumentProcessRuleRulesSegmentation
+from .document_detail_document_process_rule_rules_subchunk_segmentation import (
+    DocumentDetailDocumentProcessRuleRulesSubchunkSegmentation,
+)
 from .document_display_status import DocumentDisplayStatus
 from .document_segment import DocumentSegment
 from .document_segment_status import DocumentSegmentStatus
@@ -63,6 +83,18 @@ __all__ = [
     "DatasetRetrievalModelDict",
     "DatasetRetrievalModelDictRerankingModel",
     "Document",
+    "DocumentDetail",
+    "DocumentDetailDataSourceInfo",
+    "DocumentDetailDatasetProcessRule",
+    "DocumentDetailDatasetProcessRuleRules",
+    "DocumentDetailDatasetProcessRuleRulesPreProcessingRulesItem",
+    "DocumentDetailDatasetProcessRuleRulesSegmentation",
+    "DocumentDetailDatasetProcessRuleRulesSubchunkSegmentation",
+    "DocumentDetailDocumentProcessRule",
+    "DocumentDetailDocumentProcessRuleRules",
+    "DocumentDetailDocumentProcessRuleRulesPreProcessingRulesItem",
+    "DocumentDetailDocumentProcessRuleRulesSegmentation",
+    "DocumentDetailDocumentProcessRuleRulesSubchunkSegmentation",
     "DocumentDisplayStatus",
     "DocumentSegment",
     "DocumentSegmentStatus",

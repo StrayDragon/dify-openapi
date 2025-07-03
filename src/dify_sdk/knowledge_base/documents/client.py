@@ -5,6 +5,7 @@ import typing
 from ... import core
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.request_options import RequestOptions
+from ..types.document_detail import DocumentDetail
 from ..types.process_rule import ProcessRule
 from ..types.upload_file import UploadFile
 from .raw_client import AsyncRawDocumentsClient, RawDocumentsClient
@@ -14,6 +15,7 @@ from .types.create_document_by_file_response import CreateDocumentByFileResponse
 from .types.create_document_by_text_request_doc_form import CreateDocumentByTextRequestDocForm
 from .types.create_document_by_text_request_indexing_technique import CreateDocumentByTextRequestIndexingTechnique
 from .types.create_document_by_text_response import CreateDocumentByTextResponse
+from .types.get_document_detail_request_metadata import GetDocumentDetailRequestMetadata
 from .types.get_document_indexing_status_response import GetDocumentIndexingStatusResponse
 from .types.get_document_list_response import GetDocumentListResponse
 from .types.update_document_by_file_response import UpdateDocumentByFileResponse
@@ -335,6 +337,47 @@ class DocumentsClient:
         """
         _response = self._raw_client.get_document_list(
             dataset_id, keyword=keyword, page=page, limit=limit, request_options=request_options
+        )
+        return _response.data
+
+    def get_document_detail(
+        self,
+        dataset_id: str,
+        document_id: str,
+        *,
+        metadata: typing.Optional[GetDocumentDetailRequestMetadata] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> DocumentDetail:
+        """
+        Get document detail
+
+        Parameters
+        ----------
+        dataset_id : str
+            Knowledge Base ID
+
+        document_id : str
+            Document ID
+
+        metadata : typing.Optional[GetDocumentDetailRequestMetadata]
+            metadata filter condition
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        DocumentDetail
+            Successfully retrieved document detail
+
+        Examples
+        --------
+        from dify import DifyApi
+        client = DifyApi(token="YOUR_TOKEN", )
+        client.knowledge_base.documents.get_document_detail(dataset_id='dataset_id', document_id='document_id', )
+        """
+        _response = self._raw_client.get_document_detail(
+            dataset_id, document_id, metadata=metadata, request_options=request_options
         )
         return _response.data
 
@@ -771,6 +814,50 @@ class AsyncDocumentsClient:
         """
         _response = await self._raw_client.get_document_list(
             dataset_id, keyword=keyword, page=page, limit=limit, request_options=request_options
+        )
+        return _response.data
+
+    async def get_document_detail(
+        self,
+        dataset_id: str,
+        document_id: str,
+        *,
+        metadata: typing.Optional[GetDocumentDetailRequestMetadata] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> DocumentDetail:
+        """
+        Get document detail
+
+        Parameters
+        ----------
+        dataset_id : str
+            Knowledge Base ID
+
+        document_id : str
+            Document ID
+
+        metadata : typing.Optional[GetDocumentDetailRequestMetadata]
+            metadata filter condition
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        DocumentDetail
+            Successfully retrieved document detail
+
+        Examples
+        --------
+        from dify import AsyncDifyApi
+        import asyncio
+        client = AsyncDifyApi(token="YOUR_TOKEN", )
+        async def main() -> None:
+            await client.knowledge_base.documents.get_document_detail(dataset_id='dataset_id', document_id='document_id', )
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.get_document_detail(
+            dataset_id, document_id, metadata=metadata, request_options=request_options
         )
         return _response.data
 
