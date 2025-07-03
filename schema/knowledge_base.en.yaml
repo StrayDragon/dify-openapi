@@ -1126,6 +1126,23 @@ components:
                 code: archived_document_immutable
                 status: 403
                 message: The archived document is not editable.
+    Error404:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            document_not_found:
+              value:
+                code: document_not_found
+                status: 404
+                message: Document not found.
+            dataset_not_found:
+              value:
+                code: dataset_not_found
+                status: 404
+                message: Dataset not found.
     Error409:
       description: Resource conflict
       content:

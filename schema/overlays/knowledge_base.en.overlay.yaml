@@ -2078,3 +2078,7 @@ actions:
 
   - target: $.components.schemas.DocumentDetail.properties.doc_language.description
     update: "Document language"
+
+  # Error404 response translations
+  - target: $.components.responses.Error404.description
+    update: "Resource not found"

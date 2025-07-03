@@ -1100,6 +1100,24 @@ components:
                 status: 403
                 message: The archived document is not editable.
 
+    Error404:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          examples:
+            document_not_found:
+              value:
+                code: document_not_found
+                status: 404
+                message: Document not found.
+            dataset_not_found:
+              value:
+                code: dataset_not_found
+                status: 404
+                message: Dataset not found.
+
     Error409:
       description: 资源冲突
       content:
