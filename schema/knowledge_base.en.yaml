@@ -4,7 +4,7 @@ info:
   description: |
     Dify Knowledge Base API provides a series of interfaces for managing knowledge bases, documents, and retrieval functions.
     All API requests require a knowledge base level API-Key in the Authorization HTTP Header.
-  version: 1.5.0
+  version: 1.5.1
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -484,6 +484,205 @@ components:
         hit_count:
           type: integer
           description: Hit count
+    DocumentDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Document ID
+        position:
+          type: integer
+          description: Document position
+        data_source_type:
+          type: string
+          description: Data source type
+        data_source_info:
+          type: object
+          description: Data source information
+          properties:
+            upload_file:
+              type: object
+              description: Upload file information
+        dataset_process_rule_id:
+          type: string
+          description: Dataset process rule ID
+        dataset_process_rule:
+          type: object
+          description: Dataset process rule
+          properties:
+            mode:
+              type: string
+              description: Process mode
+            rules:
+              type: object
+              description: Rule details
+              properties:
+                pre_processing_rules:
+                  type: array
+                  description: Pre-processing rules list
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: Rule ID
+                      enabled:
+                        type: boolean
+                        description: Whether enabled
+                segmentation:
+                  type: object
+                  description: Segmentation rules
+                  properties:
+                    separator:
+                      type: string
+                      description: Separator
+                    max_tokens:
+                      type: integer
+                      description: Maximum tokens
+                    chunk_overlap:
+                      type: integer
+                      description: Chunk overlap
+                parent_mode:
+                  type: string
+                  description: Parent mode
+                subchunk_segmentation:
+                  type: object
+                  description: Sub-chunk segmentation
+                  properties:
+                    separator:
+                      type: string
+                      description: Separator
+                    max_tokens:
+                      type: integer
+                      description: Maximum tokens
+                    chunk_overlap:
+                      type: integer
+                      description: Chunk overlap
+        document_process_rule:
+          type: object
+          description: Document process rule
+          properties:
+            id:
+              type: string
+              description: Rule ID
+            dataset_id:
+              type: string
+              description: Dataset ID
+            mode:
+              type: string
+              description: Process mode
+            rules:
+              type: object
+              description: Rule details
+              properties:
+                pre_processing_rules:
+                  type: array
+                  description: Pre-processing rules list
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: Rule ID
+                      enabled:
+                        type: boolean
+                        description: Whether enabled
+                segmentation:
+                  type: object
+                  description: Segmentation rules
+                  properties:
+                    separator:
+                      type: string
+                      description: Separator
+                    max_tokens:
+                      type: integer
+                      description: Maximum tokens
+                    chunk_overlap:
+                      type: integer
+                      description: Chunk overlap
+                parent_mode:
+                  type: string
+                  description: Parent mode
+                subchunk_segmentation:
+                  type: object
+                  description: Sub-chunk segmentation
+                  properties:
+                    separator:
+                      type: string
+                      description: Separator
+                    max_tokens:
+                      type: integer
+                      description: Maximum tokens
+                    chunk_overlap:
+                      type: integer
+                      description: Chunk overlap
+        name:
+          type: string
+          description: Document name
+        created_from:
+          type: string
+          description: Creation source
+        created_by:
+          type: string
+          description: Creator
+        created_at:
+          type: number
+          description: Creation timestamp
+        tokens:
+          type: integer
+          nullable: true
+          description: Token count
+        indexing_status:
+          type: string
+          description: Indexing status
+        completed_at:
+          type: number
+          nullable: true
+          description: Completion timestamp
+        updated_at:
+          type: number
+          description: Update timestamp
+        indexing_latency:
+          type: number
+          nullable: true
+          description: Indexing latency
+        error:
+          type: string
+          nullable: true
+          description: Error message
+        enabled:
+          type: boolean
+          description: Whether enabled
+        disabled_at:
+          type: number
+          nullable: true
+          description: Disabled timestamp
+        disabled_by:
+          type: string
+          nullable: true
+          description: Disabled by
+        archived:
+          type: boolean
+          description: Whether archived
+        segment_count:
+          type: integer
+          description: Segment count
+        average_segment_length:
+          type: number
+          description: Average segment length
+        hit_count:
+          type: integer
+          nullable: true
+          description: Hit count
+        display_status:
+          type: string
+          description: Display status
+        doc_form:
+          type: string
+          description: Document form
+        doc_language:
+          type: string
+          description: Document language
     Segment:
       type: object
       properties:
@@ -927,6 +1126,23 @@ components:
                 code: archived_document_immutable
                 status: 403
                 message: The archived document is not editable.
+    Error404:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            document_not_found:
+              value:
+                code: document_not_found
+                status: 404
+                message: Document not found.
+            dataset_not_found:
+              value:
+                code: dataset_not_found
+                status: 404
+                message: Dataset not found.
     Error409:
       description: Resource conflict
       content:
@@ -1510,6 +1726,54 @@ paths:
         '400':
           $ref: '#/components/responses/Error400'
   '/datasets/{dataset_id}/documents/{document_id}':
+    get:
+      summary: Get Document Detail
+      description: Get document detail
+      operationId: getDocumentDetail
+      tags:
+        - Documents
+      parameters:
+        - name: dataset_id
+          in: path
+          description: Knowledge Base ID
+          required: true
+          schema:
+            type: string
+        - name: document_id
+          in: path
+          description: Document ID
+          required: true
+          schema:
+            type: string
+        - name: metadata
+          in: query
+          description: metadata filter condition
+          required: false
+          schema:
+            type: string
+            enum:
+              - all
+              - only
+              - without
+            default: all
+            description: |
+              Filter conditions:
+              - all: Include all information
+              - only: Metadata only
+              - without: Without metadata
+      responses:
+        '200':
+          description: Successfully retrieved document detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentDetail'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
     delete:
       summary: Delete Document
       description: Delete specified document

@@ -14,7 +14,9 @@ from ...core.serialization import convert_and_respect_annotation_metadata
 from ..errors.bad_request_error import BadRequestError
 from ..errors.content_too_large_error import ContentTooLargeError
 from ..errors.forbidden_error import ForbiddenError
+from ..errors.not_found_error import NotFoundError
 from ..errors.unsupported_media_type_error import UnsupportedMediaTypeError
+from ..types.document_detail import DocumentDetail
 from ..types.error import Error
 from ..types.process_rule import ProcessRule
 from ..types.upload_file import UploadFile
@@ -24,6 +26,7 @@ from .types.create_document_by_file_response import CreateDocumentByFileResponse
 from .types.create_document_by_text_request_doc_form import CreateDocumentByTextRequestDocForm
 from .types.create_document_by_text_request_indexing_technique import CreateDocumentByTextRequestIndexingTechnique
 from .types.create_document_by_text_response import CreateDocumentByTextResponse
+from .types.get_document_detail_request_metadata import GetDocumentDetailRequestMetadata
 from .types.get_document_indexing_status_response import GetDocumentIndexingStatusResponse
 from .types.get_document_list_response import GetDocumentListResponse
 from .types.update_document_by_file_response import UpdateDocumentByFileResponse
@@ -572,6 +575,89 @@ class RawDocumentsClient:
                         Error,
                         parse_obj_as(
                             type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+    def get_document_detail(
+        self,
+        dataset_id: str,
+        document_id: str,
+        *,
+        metadata: typing.Optional[GetDocumentDetailRequestMetadata] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> HttpResponse[DocumentDetail]:
+        """
+        Get document detail
+
+        Parameters
+        ----------
+        dataset_id : str
+            Knowledge Base ID
+
+        document_id : str
+            Document ID
+
+        metadata : typing.Optional[GetDocumentDetailRequestMetadata]
+            metadata filter condition
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[DocumentDetail]
+            Successfully retrieved document detail
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(dataset_id)}/documents/{jsonable_encoder(document_id)}",
+            method="GET",
+            params={
+                "metadata": metadata,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    DocumentDetail,
+                    parse_obj_as(
+                        type_=DocumentDetail,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1312,6 +1398,89 @@ class AsyncRawDocumentsClient:
                         Error,
                         parse_obj_as(
                             type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+    async def get_document_detail(
+        self,
+        dataset_id: str,
+        document_id: str,
+        *,
+        metadata: typing.Optional[GetDocumentDetailRequestMetadata] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AsyncHttpResponse[DocumentDetail]:
+        """
+        Get document detail
+
+        Parameters
+        ----------
+        dataset_id : str
+            Knowledge Base ID
+
+        document_id : str
+            Document ID
+
+        metadata : typing.Optional[GetDocumentDetailRequestMetadata]
+            metadata filter condition
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[DocumentDetail]
+            Successfully retrieved document detail
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(dataset_id)}/documents/{jsonable_encoder(document_id)}",
+            method="GET",
+            params={
+                "metadata": metadata,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    DocumentDetail,
+                    parse_obj_as(
+                        type_=DocumentDetail,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    typing.cast(
+                        Error,
+                        parse_obj_as(
+                            type_=Error,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )

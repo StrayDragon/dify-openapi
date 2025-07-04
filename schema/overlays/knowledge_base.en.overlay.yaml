@@ -1877,3 +1877,208 @@ actions:
 
   - target: $.paths['/datasets/{dataset_id}/documents/status/{action}'].patch.responses['200'].content['application/json'].schema.properties.result.description
     update: "Operation result"
+
+  # Get document detail API translations
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}'].get.summary
+    update: "Get Document Detail"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}'].get.description
+    update: "Get document detail"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}'].get.parameters[0].description
+    update: "Knowledge Base ID"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}'].get.parameters[1].description
+    update: "Document ID"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}'].get.parameters[2].description
+    update: "metadata filter condition"
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}'].get.parameters[2].schema.description
+    update: |
+      Filter conditions:
+      - all: Include all information
+      - only: Metadata only
+      - without: Without metadata
+
+  - target: $.paths['/datasets/{dataset_id}/documents/{document_id}'].get.responses['200'].description
+    update: "Successfully retrieved document detail"
+
+  # Document detail schema translations
+  - target: $.components.schemas.DocumentDetail.properties.id.description
+    update: "Document ID"
+
+  - target: $.components.schemas.DocumentDetail.properties.position.description
+    update: "Document position"
+
+  - target: $.components.schemas.DocumentDetail.properties.data_source_type.description
+    update: "Data source type"
+
+  - target: $.components.schemas.DocumentDetail.properties.data_source_info.description
+    update: "Data source information"
+
+  - target: $.components.schemas.DocumentDetail.properties.data_source_info.properties.upload_file.description
+    update: "Upload file information"
+
+  - target: $.components.schemas.DocumentDetail.properties.dataset_process_rule_id.description
+    update: "Dataset process rule ID"
+
+  - target: $.components.schemas.DocumentDetail.properties.dataset_process_rule.description
+    update: "Dataset process rule"
+
+  - target: $.components.schemas.DocumentDetail.properties.dataset_process_rule.properties.mode.description
+    update: "Process mode"
+
+  - target: $.components.schemas.DocumentDetail.properties.dataset_process_rule.properties.rules.description
+    update: "Rule details"
+
+  - target: $.components.schemas.DocumentDetail.properties.dataset_process_rule.properties.rules.properties.pre_processing_rules.description
+    update: "Pre-processing rules list"
+
+  - target: $.components.schemas.DocumentDetail.properties.dataset_process_rule.properties.rules.properties.pre_processing_rules.items.properties.id.description
+    update: "Rule ID"
+
+  - target: $.components.schemas.DocumentDetail.properties.dataset_process_rule.properties.rules.properties.pre_processing_rules.items.properties.enabled.description
+    update: "Whether enabled"
+
+  - target: $.components.schemas.DocumentDetail.properties.dataset_process_rule.properties.rules.properties.segmentation.description
+    update: "Segmentation rules"
+
+  - target: $.components.schemas.DocumentDetail.properties.dataset_process_rule.properties.rules.properties.segmentation.properties.separator.description
+    update: "Separator"
+
+  - target: $.components.schemas.DocumentDetail.properties.dataset_process_rule.properties.rules.properties.segmentation.properties.max_tokens.description
+    update: "Maximum tokens"
+
+  - target: $.components.schemas.DocumentDetail.properties.dataset_process_rule.properties.rules.properties.segmentation.properties.chunk_overlap.description
+    update: "Chunk overlap"
+
+  - target: $.components.schemas.DocumentDetail.properties.dataset_process_rule.properties.rules.properties.parent_mode.description
+    update: "Parent mode"
+
+  - target: $.components.schemas.DocumentDetail.properties.dataset_process_rule.properties.rules.properties.subchunk_segmentation.description
+    update: "Sub-chunk segmentation"
+
+  - target: $.components.schemas.DocumentDetail.properties.dataset_process_rule.properties.rules.properties.subchunk_segmentation.properties.separator.description
+    update: "Separator"
+
+  - target: $.components.schemas.DocumentDetail.properties.dataset_process_rule.properties.rules.properties.subchunk_segmentation.properties.max_tokens.description
+    update: "Maximum tokens"
+
+  - target: $.components.schemas.DocumentDetail.properties.dataset_process_rule.properties.rules.properties.subchunk_segmentation.properties.chunk_overlap.description
+    update: "Chunk overlap"
+
+  - target: $.components.schemas.DocumentDetail.properties.document_process_rule.description
+    update: "Document process rule"
+
+  - target: $.components.schemas.DocumentDetail.properties.document_process_rule.properties.id.description
+    update: "Rule ID"
+
+  - target: $.components.schemas.DocumentDetail.properties.document_process_rule.properties.dataset_id.description
+    update: "Dataset ID"
+
+  - target: $.components.schemas.DocumentDetail.properties.document_process_rule.properties.mode.description
+    update: "Process mode"
+
+  - target: $.components.schemas.DocumentDetail.properties.document_process_rule.properties.rules.description
+    update: "Rule details"
+
+  - target: $.components.schemas.DocumentDetail.properties.document_process_rule.properties.rules.properties.pre_processing_rules.description
+    update: "Pre-processing rules list"
+
+  - target: $.components.schemas.DocumentDetail.properties.document_process_rule.properties.rules.properties.pre_processing_rules.items.properties.id.description
+    update: "Rule ID"
+
+  - target: $.components.schemas.DocumentDetail.properties.document_process_rule.properties.rules.properties.pre_processing_rules.items.properties.enabled.description
+    update: "Whether enabled"
+
+  - target: $.components.schemas.DocumentDetail.properties.document_process_rule.properties.rules.properties.segmentation.description
+    update: "Segmentation rules"
+
+  - target: $.components.schemas.DocumentDetail.properties.document_process_rule.properties.rules.properties.segmentation.properties.separator.description
+    update: "Separator"
+
+  - target: $.components.schemas.DocumentDetail.properties.document_process_rule.properties.rules.properties.segmentation.properties.max_tokens.description
+    update: "Maximum tokens"
+
+  - target: $.components.schemas.DocumentDetail.properties.document_process_rule.properties.rules.properties.segmentation.properties.chunk_overlap.description
+    update: "Chunk overlap"
+
+  - target: $.components.schemas.DocumentDetail.properties.document_process_rule.properties.rules.properties.parent_mode.description
+    update: "Parent mode"
+
+  - target: $.components.schemas.DocumentDetail.properties.document_process_rule.properties.rules.properties.subchunk_segmentation.description
+    update: "Sub-chunk segmentation"
+
+  - target: $.components.schemas.DocumentDetail.properties.document_process_rule.properties.rules.properties.subchunk_segmentation.properties.separator.description
+    update: "Separator"
+
+  - target: $.components.schemas.DocumentDetail.properties.document_process_rule.properties.rules.properties.subchunk_segmentation.properties.max_tokens.description
+    update: "Maximum tokens"
+
+  - target: $.components.schemas.DocumentDetail.properties.document_process_rule.properties.rules.properties.subchunk_segmentation.properties.chunk_overlap.description
+    update: "Chunk overlap"
+
+  - target: $.components.schemas.DocumentDetail.properties.name.description
+    update: "Document name"
+
+  - target: $.components.schemas.DocumentDetail.properties.created_from.description
+    update: "Creation source"
+
+  - target: $.components.schemas.DocumentDetail.properties.created_by.description
+    update: "Creator"
+
+  - target: $.components.schemas.DocumentDetail.properties.created_at.description
+    update: "Creation timestamp"
+
+  - target: $.components.schemas.DocumentDetail.properties.tokens.description
+    update: "Token count"
+
+  - target: $.components.schemas.DocumentDetail.properties.indexing_status.description
+    update: "Indexing status"
+
+  - target: $.components.schemas.DocumentDetail.properties.completed_at.description
+    update: "Completion timestamp"
+
+  - target: $.components.schemas.DocumentDetail.properties.updated_at.description
+    update: "Update timestamp"
+
+  - target: $.components.schemas.DocumentDetail.properties.indexing_latency.description
+    update: "Indexing latency"
+
+  - target: $.components.schemas.DocumentDetail.properties.error.description
+    update: "Error message"
+
+  - target: $.components.schemas.DocumentDetail.properties.enabled.description
+    update: "Whether enabled"
+
+  - target: $.components.schemas.DocumentDetail.properties.disabled_at.description
+    update: "Disabled timestamp"
+
+  - target: $.components.schemas.DocumentDetail.properties.disabled_by.description
+    update: "Disabled by"
+
+  - target: $.components.schemas.DocumentDetail.properties.archived.description
+    update: "Whether archived"
+
+  - target: $.components.schemas.DocumentDetail.properties.segment_count.description
+    update: "Segment count"
+
+  - target: $.components.schemas.DocumentDetail.properties.average_segment_length.description
+    update: "Average segment length"
+
+  - target: $.components.schemas.DocumentDetail.properties.hit_count.description
+    update: "Hit count"
+
+  - target: $.components.schemas.DocumentDetail.properties.display_status.description
+    update: "Display status"
+
+  - target: $.components.schemas.DocumentDetail.properties.doc_form.description
+    update: "Document form"
+
+  - target: $.components.schemas.DocumentDetail.properties.doc_language.description
+    update: "Document language"
+
+  # Error404 response translations
+  - target: $.components.responses.Error404.description
+    update: "Resource not found"

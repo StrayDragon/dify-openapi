@@ -8,6 +8,7 @@ from .create_document_by_file_response import CreateDocumentByFileResponse
 from .create_document_by_text_request_doc_form import CreateDocumentByTextRequestDocForm
 from .create_document_by_text_request_indexing_technique import CreateDocumentByTextRequestIndexingTechnique
 from .create_document_by_text_response import CreateDocumentByTextResponse
+from .get_document_detail_request_metadata import GetDocumentDetailRequestMetadata
 from .get_document_indexing_status_response import GetDocumentIndexingStatusResponse
 from .get_document_indexing_status_response_data_item import GetDocumentIndexingStatusResponseDataItem
 from .get_document_list_response import GetDocumentListResponse
@@ -23,6 +24,7 @@ __all__ = [
     "CreateDocumentByTextRequestDocForm",
     "CreateDocumentByTextRequestIndexingTechnique",
     "CreateDocumentByTextResponse",
+    "GetDocumentDetailRequestMetadata",
     "GetDocumentIndexingStatusResponse",
     "GetDocumentIndexingStatusResponseDataItem",
     "GetDocumentListResponse",

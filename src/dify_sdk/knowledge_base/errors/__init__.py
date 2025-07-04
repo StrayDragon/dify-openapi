@@ -6,6 +6,14 @@ from .bad_request_error import BadRequestError
 from .conflict_error import ConflictError
 from .content_too_large_error import ContentTooLargeError
 from .forbidden_error import ForbiddenError
+from .not_found_error import NotFoundError
 from .unsupported_media_type_error import UnsupportedMediaTypeError
 
-__all__ = ["BadRequestError", "ConflictError", "ContentTooLargeError", "ForbiddenError", "UnsupportedMediaTypeError"]
+__all__ = [
+    "BadRequestError",
+    "ConflictError",
+    "ContentTooLargeError",
+    "ForbiddenError",
+    "NotFoundError",
+    "UnsupportedMediaTypeError",
+]
