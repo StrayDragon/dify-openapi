@@ -7,7 +7,7 @@ info:
     All API requests require an application-level API-Key in the Authorization HTTP Header.
     It is strongly recommended that developers store the API-Key on the backend rather than sharing or storing it on the client to prevent API-Key leakage and financial loss.
     official raw document: https://github.com/langgenius/dify/blob/1.5.0/web/app/components/develop/template/template_workflow.en.mdx
-  version: 1.5.1
+  version: 1.6.0
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
