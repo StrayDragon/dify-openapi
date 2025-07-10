@@ -5,8 +5,8 @@ info:
     Dify API 提供了一系列接口用于对话功能。
     支持对话型应用。
     所有 API 请求都需要在 Authorization HTTP Header 中包含应用级 API-Key。
-    官方原始文档见: https://github.com/langgenius/dify/blob/1.5.1/web/app/components/develop/template/template_chat.zh.mdx
-  version: 1.5.1
+    官方原始文档见: https://github.com/langgenius/dify/blob/1.6.0/web/app/components/develop/template/template_chat.zh.mdx
+  version: 1.6.0
 
 servers:
   - url: https://api.dify.ai/v1
