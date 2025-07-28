@@ -11,7 +11,7 @@ actions:
         Dify API provides a series of interfaces for conversation functionality.
         It supports conversational applications.
         All API requests require an application-level API-Key in the Authorization HTTP Header.
-        official raw document: https://github.com/langgenius/dify/blob/1.4.3/web/app/components/develop/template/template_chat.en.mdx
+        official raw document: https://github.com/langgenius/dify/blob/1.7.0/web/app/components/develop/template/template_chat.en.mdx
 
   - target: $.servers[0]
     update:
@@ -357,6 +357,14 @@ actions:
   - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.auto_generate_name
     update:
       description: "(Optional) Whether to automatically generate title, default is true. If set to false, you can call the conversation rename interface and set auto_generate to true to generate a title asynchronously."
+
+  - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.trace_id
+    update:
+      description: |
+        (Optional) Trace ID for linking with existing trace components in business systems, enabling end-to-end distributed tracing scenarios. If not specified, the system will automatically generate a trace_id. Supports the following three transmission methods, in order of priority:
+        - Header: Passed through HTTP Header X-Trace-Id, highest priority.
+        - Query parameter: Passed through URL query parameter trace_id.
+        - Request Body: Passed through request body field trace_id (this field).
 
   - target: $.paths['/chat-messages'].post.responses['200'].description
     update: "Successful response"
@@ -829,6 +837,52 @@ actions:
   - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload
     update:
       description: "File upload configuration"
+      properties:
+        document:
+          description: "Document settings. Currently supports document types: txt, md, markdown, pdf, html, xlsx, xls, docx, csv, eml, msg, pptx, ppt, xml, epub."
+          properties:
+            enabled:
+              description: "Whether enabled"
+            number_limits:
+              description: "Document quantity limit, default is 3"
+            transfer_methods:
+              description: "Transfer method list: remote_url, local_file, must choose one."
+        image:
+          description: "Image settings. Currently supports image types: png, jpg, jpeg, webp, gif."
+          properties:
+            enabled:
+              description: "Whether enabled"
+            number_limits:
+              description: "Image quantity limit, default is 3"
+            transfer_methods:
+              description: "Transfer method list: remote_url, local_file, must choose one."
+        audio:
+          description: "Audio settings. Currently supports audio types: mp3, m4a, wav, webm, amr."
+          properties:
+            enabled:
+              description: "Whether enabled"
+            number_limits:
+              description: "Audio quantity limit, default is 3"
+            transfer_methods:
+              description: "Transfer method list: remote_url, local_file, must choose one."
+        video:
+          description: "Video settings. Currently supports video types: mp4, mov, mpeg, mpga."
+          properties:
+            enabled:
+              description: "Whether enabled"
+            number_limits:
+              description: "Video quantity limit, default is 3"
+            transfer_methods:
+              description: "Transfer method list: remote_url, local_file, must choose one."
+        custom:
+          description: "Custom settings"
+          properties:
+            enabled:
+              description: "Whether enabled"
+            number_limits:
+              description: "Custom quantity limit, default is 3"
+            transfer_methods:
+              description: "Transfer method list: remote_url, local_file, must choose one."
 
   - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.system_parameters
     update:

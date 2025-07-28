@@ -4,7 +4,7 @@ info:
   description: |
     Dify 知识库 API 提供了一系列接口用于管理知识库、文档和检索功能。
     所有 API 请求都需要在 Authorization HTTP Header 中包含知识库级 API-Key。
-  version: 1.6.0
+  version: 1.7.0
 
 servers:
   - url: https://api.dify.ai/v1
@@ -291,6 +291,13 @@ components:
         reranking_enable:
           type: boolean
           description: 是否启用 Reranking，非必填，如果检索模式为 semantic_search 模式或者 hybrid_search 则传值
+        reranking_mode:
+          type: string
+          enum: [weighted_score, reranking_model]
+          description: |
+            Rerank 模式
+            - weighted_score: 权重设置
+            - reranking_model: Rerank 模型
         reranking_model:
           type: object
           properties:
@@ -375,11 +382,12 @@ components:
       properties:
         mode:
           type: string
-          enum: [automatic, custom]
+          enum: [automatic, custom, hierarchical]
           description: |
             清洗、分段模式
             - automatic: 自动
             - custom: 自定义
+            - hierarchical: 父子
         rules:
           type: object
           properties:
@@ -411,6 +419,26 @@ components:
                 chunk_overlap:
                   type: integer
                   description: 分段重叠
+            parent_mode:
+              type: string
+              enum: [full-doc, paragraph]
+              description: |
+                父分段的召回模式
+                - full-doc: 全文召回
+                - paragraph: 段落召回
+            subchunk_segmentation:
+              type: object
+              description: 子分段规则
+              properties:
+                separator:
+                  type: string
+                  description: 分段标识符，目前仅允许设置一个分隔符。默认为 ***
+                max_tokens:
+                  type: integer
+                  description: 最大长度 (token) 需要校验小于父级的长度
+                chunk_overlap:
+                  type: integer
+                  description: 分段重叠指的是在对数据进行分段时，段与段之间存在一定的重叠部分（选填）
 
     Document:
       type: object
@@ -916,14 +944,21 @@ components:
         indexing_technique:
           type: string
           enum: [high_quality, economy]
-          description: 索引方式
+          description: |
+            索引方式
+            - high_quality: 高质量：使用 Embedding 模型进行嵌入，构建为向量数据库索引
+            - economy: 经济：使用 keyword table index 的倒排索引进行构建
         doc_form:
           type: string
           enum: [text_model, hierarchical_model, qa_model]
-          description: 索引内容形式
+          description: |
+            索引内容形式
+            - text_model: text 文档直接 embedding，经济模式默认为该模式
+            - hierarchical_model: parent-child 模式
+            - qa_model: Q&A 模式：为分片文档生成 Q&A 对，然后对问题进行 embedding
         doc_language:
           type: string
-          description: 文档语言（Q&A模式必填）
+          description: 在 Q&A 模式下，指定文档的语言，例如：English、Chinese
         process_rule:
           $ref: "#/components/schemas/ProcessRule"
         retrieval_model:
@@ -1285,8 +1320,7 @@ paths:
                   type: string
                   description: 嵌入模型（选填）
                 retrieval_model:
-                  type: string
-                  description: 检索模型（选填）
+                  $ref: "#/components/schemas/RetrievalModel"
                 partial_member_list:
                   type: array
                   description: 部分团队成员 ID 列表（选填）

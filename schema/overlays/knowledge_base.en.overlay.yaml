@@ -1,7 +1,7 @@
 overlay: 1.0.0
 info:
   title: "English translation overlay for Dify Knowledge Base API"
-  version: "1.4.0"
+  version: "1.7.0"
 extends: ../knowledge_base.zh.yaml
 actions:
   - target: $.info
@@ -266,6 +266,13 @@ actions:
     update:
       description: "Whether reranking is enabled (optional). Required if search mode is semantic_search or hybrid_search"
 
+  - target: $.components.schemas.RetrievalModel.properties.reranking_mode
+    update:
+      description: |
+        Rerank mode
+        - weighted_score: Weight setting
+        - reranking_model: Rerank model
+
   - target: $.components.schemas.RetrievalModel.properties.reranking_model
     update:
       description: "Rerank model configuration (optional). Required if reranking is enabled"
@@ -334,6 +341,32 @@ actions:
     update:
       description: "Maximum length (tokens)"
 
+  - target: $.components.schemas.ProcessRule.properties.rules.properties.segmentation.properties.chunk_overlap
+    update:
+      description: "Segment overlap"
+
+  - target: $.components.schemas.ProcessRule.properties.rules.properties.parent_mode
+    update:
+      description: |
+        Parent segment recall mode
+        - full-doc: Full document recall
+        - paragraph: Paragraph recall
+
+  - target: $.components.schemas.ProcessRule.properties.rules.properties.subchunk_segmentation
+    update:
+      description: "Sub-chunk segmentation rules"
+
+  - target: $.components.schemas.ProcessRule.properties.rules.properties.subchunk_segmentation.properties.separator
+    update:
+      description: "Segmentation identifier, only one separator is allowed. Default is ***"
+
+  - target: $.components.schemas.ProcessRule.properties.rules.properties.subchunk_segmentation.properties.max_tokens
+    update:
+      description: "Maximum length (tokens), must be less than parent level"
+
+  - target: $.components.schemas.ProcessRule.properties.rules.properties.subchunk_segmentation.properties.chunk_overlap
+    update:
+      description: "Segment overlap refers to a certain overlap between segments when segmenting data (optional)"
 
   - target: $.components.schemas.ProcessRule.properties.rules.properties.pre_processing_rules.items.properties.name
     update:
@@ -535,15 +568,22 @@ actions:
 
   - target: $.components.schemas.CreateDocumentByFileRequestData.properties.indexing_technique
     update:
-      description: "Indexing technique"
+      description: |
+        Indexing technique
+        - high_quality: High quality: Use Embedding model for embedding, build as vector database index
+        - economy: Economy: Build using keyword table index inverted index
 
   - target: $.components.schemas.CreateDocumentByFileRequestData.properties.doc_form
     update:
-      description: "Document form"
+      description: |
+        Document form
+        - text_model: Direct text document embedding, default mode for economy
+        - hierarchical_model: Parent-child mode
+        - qa_model: Q&A mode: Generate Q&A pairs for segmented documents, then embed questions
 
   - target: $.components.schemas.CreateDocumentByFileRequestData.properties.doc_language
     update:
-      description: "Document language (required for Q&A mode)"
+      description: "In Q&A mode, specify the document language, e.g.: English, Chinese"
 
   - target: $.components.schemas.CreateDocumentByFileRequestData.properties.process_rule
     update:
@@ -612,8 +652,7 @@ actions:
   - target: $.paths['/datasets/{dataset_id}'].patch.requestBody.content['application/json'].schema.properties.embedding_model.description
     update: "Embedding model (optional)"
 
-  - target: $.paths['/datasets/{dataset_id}'].patch.requestBody.content['application/json'].schema.properties.retrieval_model.description
-    update: "Retrieval model (optional)"
+
 
   - target: $.paths['/datasets/{dataset_id}'].patch.requestBody.content['application/json'].schema.properties.partial_member_list.description
     update: "Partial team members ID list (optional)"

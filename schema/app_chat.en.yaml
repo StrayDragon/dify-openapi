@@ -5,8 +5,8 @@ info:
     Dify API provides a series of interfaces for conversation functionality.
     It supports conversational applications.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
-    official raw document: https://github.com/langgenius/dify/blob/1.4.3/web/app/components/develop/template/template_chat.en.mdx
-  version: 1.6.0
+    official raw document: https://github.com/langgenius/dify/blob/1.7.0/web/app/components/develop/template/template_chat.en.mdx
+  version: 1.7.0
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -478,6 +478,13 @@ paths:
                   type: boolean
                   description: '(Optional) Whether to automatically generate title, default is true. If set to false, you can call the conversation rename interface and set auto_generate to true to generate a title asynchronously.'
                   default: true
+                trace_id:
+                  type: string
+                  description: |
+                    (Optional) Trace ID for linking with existing trace components in business systems, enabling end-to-end distributed tracing scenarios. If not specified, the system will automatically generate a trace_id. Supports the following three transmission methods, in order of priority:
+                    - Header: Passed through HTTP Header X-Trace-Id, highest priority.
+                    - Query parameter: Passed through URL query parameter trace_id.
+                    - Request Body: Passed through request body field trace_id (this field).
       responses:
         '200':
           description: Successful response
@@ -1263,6 +1270,102 @@ paths:
                   file_upload:
                     type: object
                     description: File upload configuration
+                    properties:
+                      document:
+                        type: object
+                        description: 'Document settings. Currently supports document types: txt, md, markdown, pdf, html, xlsx, xls, docx, csv, eml, msg, pptx, ppt, xml, epub.'
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: Whether enabled
+                          number_limits:
+                            type: integer
+                            description: 'Document quantity limit, default is 3'
+                            default: 3
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum:
+                                - remote_url
+                                - local_file
+                            description: 'Transfer method list: remote_url, local_file, must choose one.'
+                      image:
+                        type: object
+                        description: 'Image settings. Currently supports image types: png, jpg, jpeg, webp, gif.'
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: Whether enabled
+                          number_limits:
+                            type: integer
+                            description: 'Image quantity limit, default is 3'
+                            default: 3
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum:
+                                - remote_url
+                                - local_file
+                            description: 'Transfer method list: remote_url, local_file, must choose one.'
+                      audio:
+                        type: object
+                        description: 'Audio settings. Currently supports audio types: mp3, m4a, wav, webm, amr.'
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: Whether enabled
+                          number_limits:
+                            type: integer
+                            description: 'Audio quantity limit, default is 3'
+                            default: 3
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum:
+                                - remote_url
+                                - local_file
+                            description: 'Transfer method list: remote_url, local_file, must choose one.'
+                      video:
+                        type: object
+                        description: 'Video settings. Currently supports video types: mp4, mov, mpeg, mpga.'
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: Whether enabled
+                          number_limits:
+                            type: integer
+                            description: 'Video quantity limit, default is 3'
+                            default: 3
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum:
+                                - remote_url
+                                - local_file
+                            description: 'Transfer method list: remote_url, local_file, must choose one.'
+                      custom:
+                        type: object
+                        description: Custom settings
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: Whether enabled
+                          number_limits:
+                            type: integer
+                            description: 'Custom quantity limit, default is 3'
+                            default: 3
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum:
+                                - remote_url
+                                - local_file
+                            description: 'Transfer method list: remote_url, local_file, must choose one.'
                   system_parameters:
                     type: object
                     properties:

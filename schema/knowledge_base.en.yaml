@@ -4,7 +4,7 @@ info:
   description: |
     Dify Knowledge Base API provides a series of interfaces for managing knowledge bases, documents, and retrieval functions.
     All API requests require a knowledge base level API-Key in the Authorization HTTP Header.
-  version: 1.6.0
+  version: 1.7.0
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -298,6 +298,15 @@ components:
         reranking_enable:
           type: boolean
           description: Whether reranking is enabled (optional). Required if search mode is semantic_search or hybrid_search
+        reranking_mode:
+          type: string
+          enum:
+            - weighted_score
+            - reranking_model
+          description: |
+            Rerank mode
+            - weighted_score: Weight setting
+            - reranking_model: Rerank model
         reranking_model:
           type: object
           properties:
@@ -383,6 +392,7 @@ components:
           enum:
             - automatic
             - custom
+            - hierarchical
           description: Cleaning and segmentation mode
         rules:
           type: object
@@ -416,6 +426,28 @@ components:
                 chunk_overlap:
                   type: integer
                   description: Segment overlap
+            parent_mode:
+              type: string
+              enum:
+                - full-doc
+                - paragraph
+              description: |
+                Parent segment recall mode
+                - full-doc: Full document recall
+                - paragraph: Paragraph recall
+            subchunk_segmentation:
+              type: object
+              description: Sub-chunk segmentation rules
+              properties:
+                separator:
+                  type: string
+                  description: 'Segmentation identifier, only one separator is allowed. Default is ***'
+                max_tokens:
+                  type: integer
+                  description: 'Maximum length (tokens), must be less than parent level'
+                chunk_overlap:
+                  type: integer
+                  description: Segment overlap refers to a certain overlap between segments when segmenting data (optional)
           description: Custom rules (empty for automatic mode)
     Document:
       type: object
@@ -940,17 +972,24 @@ components:
           enum:
             - high_quality
             - economy
-          description: Indexing technique
+          description: |
+            Indexing technique
+            - high_quality: High quality: Use Embedding model for embedding, build as vector database index
+            - economy: Economy: Build using keyword table index inverted index
         doc_form:
           type: string
           enum:
             - text_model
             - hierarchical_model
             - qa_model
-          description: Document form
+          description: |
+            Document form
+            - text_model: Direct text document embedding, default mode for economy
+            - hierarchical_model: Parent-child mode
+            - qa_model: Q&A mode: Generate Q&A pairs for segmented documents, then embed questions
         doc_language:
           type: string
-          description: Document language (required for Q&A mode)
+          description: 'In Q&A mode, specify the document language, e.g.: English, Chinese'
         process_rule:
           $ref: '#/components/schemas/ProcessRule'
           description: Processing rules
@@ -1309,8 +1348,7 @@ paths:
                   type: string
                   description: Embedding model (optional)
                 retrieval_model:
-                  type: string
-                  description: Retrieval model (optional)
+                  $ref: '#/components/schemas/RetrievalModel'
                 partial_member_list:
                   type: array
                   description: Partial team members ID list (optional)

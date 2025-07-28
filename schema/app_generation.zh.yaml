@@ -5,8 +5,8 @@ info:
     Dify API 提供了一系列接口用于文本生成功能。
     支持文本生成型应用。
     所有 API 请求都需要在 Authorization HTTP Header 中包含应用级 API-Key。
-    官方原始文档见: https://github.com/langgenius/dify/blob/1.6.0/web/app/components/develop/template/template.zh.mdx
-  version: 1.6.0
+    官方原始文档见: https://github.com/langgenius/dify/blob/1.7.0/web/app/components/develop/template/template.zh.mdx
+  version: 1.7.0
 
 servers:
   - url: https://api.dify.ai/v1
@@ -175,15 +175,21 @@ components:
       properties:
         type:
           type: string
-          enum: [image]
-          description: 文件类型，目前仅支持图片
+          enum: [document, image, audio, video, custom]
+          description: |
+            文件类型：
+            - document: 文档类型（txt, md, markdown, pdf, html, xlsx, xls, docx, csv, eml, msg, pptx, ppt, xml, epub）
+            - image: 图片类型（png, jpg, jpeg, webp, gif）
+            - audio: 音频类型（mp3, m4a, wav, webm, amr）
+            - video: 视频类型（mp4, mov, mpeg, mpga）
+            - custom: 自定义类型
         transfer_method:
           type: string
           enum: [remote_url, local_file]
           description: 传递方式
         url:
           type: string
-          description: 图片地址（仅当传递方式为 remote_url 时）
+          description: 文件地址（仅当传递方式为 remote_url 时）
         upload_file_id:
           type: string
           description: 上传文件 ID（仅当传递方式为 local_file 时）
@@ -308,6 +314,14 @@ paths:
                   type: array
                   items:
                     $ref: "#/components/schemas/FileInput"
+                trace_id:
+                  type: string
+                  description: |
+                    （选填）链路追踪ID。适用于与业务系统已有的trace组件打通，实现端到端分布式追踪等场景。
+                    如果未指定，系统会自动生成trace_id。支持以下三种方式传递，具体优先级依次为：
+                    - Header：通过 HTTP Header X-Trace-Id 传递，优先级最高
+                    - Query 参数：通过 URL 查询参数 trace_id 传递
+                    - Request Body：通过请求体字段 trace_id 传递（即本字段）
       responses:
         "200":
           description: 成功响应
@@ -680,22 +694,94 @@ paths:
                   file_upload:
                     type: object
                     properties:
-                      image:
+                      document:
                         type: object
                         properties:
                           enabled:
                             type: boolean
-                            description: 是否开启
+                            description: 是否启用
                           number_limits:
                             type: integer
-                            description: 图片数量限制，默认 3
+                            description: 文档数量限制，默认为 3
                           transfer_methods:
                             type: array
                             items:
                               type: string
                               enum: [remote_url, local_file]
-                            description: 传递方式列表
-                        description: 图片设置
+                            description: 传输方式列表，必须选择一个
+                        description: |
+                          文档设置
+                          当前仅支持文档类型：txt, md, markdown, pdf, html, xlsx, xls, docx, csv, eml, msg, pptx, ppt, xml, epub
+                      image:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: 是否启用
+                          number_limits:
+                            type: integer
+                            description: 图片数量限制，默认为 3
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum: [remote_url, local_file]
+                            description: 传输方式列表，必须选择一个
+                        description: |
+                          图片设置
+                          当前仅支持图片类型：png, jpg, jpeg, webp, gif
+                      audio:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: 是否启用
+                          number_limits:
+                            type: integer
+                            description: 音频数量限制，默认为 3
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum: [remote_url, local_file]
+                            description: 传输方式列表，必须选择一个
+                        description: |
+                          音频设置
+                          当前仅支持音频类型：mp3, m4a, wav, webm, amr
+                      video:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: 是否启用
+                          number_limits:
+                            type: integer
+                            description: 视频数量限制，默认为 3
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum: [remote_url, local_file]
+                            description: 传输方式列表，必须选择一个
+                        description: |
+                          视频设置
+                          当前仅支持视频类型：mp4, mov, mpeg, mpga
+                      custom:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: 是否启用
+                          number_limits:
+                            type: integer
+                            description: 自定义数量限制，默认为 3
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum: [remote_url, local_file]
+                            description: 传输方式列表，必须选择一个
+                        description: 自定义设置
                     description: 文件上传配置
                   system_parameters:
                     type: object
