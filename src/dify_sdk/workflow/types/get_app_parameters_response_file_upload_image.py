@@ -28,7 +28,7 @@ class GetAppParametersResponseFileUploadImage(UniversalBaseModel):
         pydantic.Field(default=None)
     )
     """
-    Transfer method list
+    Transfer method list: `remote_url`, `local_file`, must choose one
     """
 
     if IS_PYDANTIC_V2:

@@ -62,6 +62,7 @@ class ChatClient:
         conversation_id: typing.Optional[str] = OMIT,
         files: typing.Optional[typing.Sequence[SendChatMessageByAppChatRequestFilesItem]] = OMIT,
         auto_generate_name: typing.Optional[bool] = OMIT,
+        trace_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Iterator[ChunkChatCompletionResponse]:
         """
@@ -93,6 +94,12 @@ class ChatClient:
         auto_generate_name : typing.Optional[bool]
             (Optional) Whether to automatically generate title, default is true. If set to false, you can call the conversation rename interface and set auto_generate to true to generate a title asynchronously.
 
+        trace_id : typing.Optional[str]
+            (Optional) Trace ID for linking with existing trace components in business systems, enabling end-to-end distributed tracing scenarios. If not specified, the system will automatically generate a trace_id. Supports the following three transmission methods, in order of priority:
+            - Header: Passed through HTTP Header X-Trace-Id, highest priority.
+            - Query parameter: Passed through URL query parameter trace_id.
+            - Request Body: Passed through request body field trace_id (this field).
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -117,6 +124,7 @@ class ChatClient:
             conversation_id=conversation_id,
             files=files,
             auto_generate_name=auto_generate_name,
+            trace_id=trace_id,
             request_options=request_options,
         ) as r:
             yield from r.data
@@ -923,6 +931,7 @@ class AsyncChatClient:
         conversation_id: typing.Optional[str] = OMIT,
         files: typing.Optional[typing.Sequence[SendChatMessageByAppChatRequestFilesItem]] = OMIT,
         auto_generate_name: typing.Optional[bool] = OMIT,
+        trace_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.AsyncIterator[ChunkChatCompletionResponse]:
         """
@@ -954,6 +963,12 @@ class AsyncChatClient:
         auto_generate_name : typing.Optional[bool]
             (Optional) Whether to automatically generate title, default is true. If set to false, you can call the conversation rename interface and set auto_generate to true to generate a title asynchronously.
 
+        trace_id : typing.Optional[str]
+            (Optional) Trace ID for linking with existing trace components in business systems, enabling end-to-end distributed tracing scenarios. If not specified, the system will automatically generate a trace_id. Supports the following three transmission methods, in order of priority:
+            - Header: Passed through HTTP Header X-Trace-Id, highest priority.
+            - Query parameter: Passed through URL query parameter trace_id.
+            - Request Body: Passed through request body field trace_id (this field).
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -981,6 +996,7 @@ class AsyncChatClient:
             conversation_id=conversation_id,
             files=files,
             auto_generate_name=auto_generate_name,
+            trace_id=trace_id,
             request_options=request_options,
         ) as r:
             async for data in r.data:

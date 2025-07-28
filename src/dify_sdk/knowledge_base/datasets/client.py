@@ -217,7 +217,7 @@ class DatasetsClient:
         permission: typing.Optional[PatchDatasetsDatasetIdRequestPermission] = OMIT,
         embedding_model_provider: typing.Optional[str] = OMIT,
         embedding_model: typing.Optional[str] = OMIT,
-        retrieval_model: typing.Optional[str] = OMIT,
+        retrieval_model: typing.Optional[RetrievalModel] = OMIT,
         partial_member_list: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Dataset:
@@ -249,8 +249,7 @@ class DatasetsClient:
         embedding_model : typing.Optional[str]
             Embedding model (optional)
 
-        retrieval_model : typing.Optional[str]
-            Retrieval model (optional)
+        retrieval_model : typing.Optional[RetrievalModel]
 
         partial_member_list : typing.Optional[typing.Sequence[str]]
             Partial team members ID list (optional)
@@ -542,7 +541,7 @@ class AsyncDatasetsClient:
         permission: typing.Optional[PatchDatasetsDatasetIdRequestPermission] = OMIT,
         embedding_model_provider: typing.Optional[str] = OMIT,
         embedding_model: typing.Optional[str] = OMIT,
-        retrieval_model: typing.Optional[str] = OMIT,
+        retrieval_model: typing.Optional[RetrievalModel] = OMIT,
         partial_member_list: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Dataset:
@@ -574,8 +573,7 @@ class AsyncDatasetsClient:
         embedding_model : typing.Optional[str]
             Embedding model (optional)
 
-        retrieval_model : typing.Optional[str]
-            Retrieval model (optional)
+        retrieval_model : typing.Optional[RetrievalModel]
 
         partial_member_list : typing.Optional[typing.Sequence[str]]
             Partial team members ID list (optional)

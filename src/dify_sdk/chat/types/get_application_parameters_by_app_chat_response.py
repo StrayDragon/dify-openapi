@@ -7,6 +7,9 @@ from ...core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 from .get_application_parameters_by_app_chat_response_annotation_reply import (
     GetApplicationParametersByAppChatResponseAnnotationReply,
 )
+from .get_application_parameters_by_app_chat_response_file_upload import (
+    GetApplicationParametersByAppChatResponseFileUpload,
+)
 from .get_application_parameters_by_app_chat_response_retriever_resource import (
     GetApplicationParametersByAppChatResponseRetrieverResource,
 )
@@ -77,7 +80,7 @@ class GetApplicationParametersByAppChatResponse(UniversalBaseModel):
     User input form configuration
     """
 
-    file_upload: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
+    file_upload: typing.Optional[GetApplicationParametersByAppChatResponseFileUpload] = pydantic.Field(default=None)
     """
     File upload configuration
     """

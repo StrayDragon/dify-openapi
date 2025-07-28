@@ -5,6 +5,7 @@ import typing
 import pydantic
 from ...core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 from .metadata_filtering_conditions import MetadataFilteringConditions
+from .retrieval_model_reranking_mode import RetrievalModelRerankingMode
 from .retrieval_model_reranking_model import RetrievalModelRerankingModel
 from .retrieval_model_search_method import RetrievalModelSearchMethod
 
@@ -22,6 +23,13 @@ class RetrievalModel(UniversalBaseModel):
     reranking_enable: typing.Optional[bool] = pydantic.Field(default=None)
     """
     Whether reranking is enabled (optional). Required if search mode is semantic_search or hybrid_search
+    """
+
+    reranking_mode: typing.Optional[RetrievalModelRerankingMode] = pydantic.Field(default=None)
+    """
+    Rerank mode
+    - weighted_score: Weight setting
+    - reranking_model: Rerank model
     """
 
     reranking_model: typing.Optional[RetrievalModelRerankingModel] = pydantic.Field(default=None)

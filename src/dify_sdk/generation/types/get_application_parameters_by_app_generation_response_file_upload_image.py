@@ -12,6 +12,7 @@ from .get_application_parameters_by_app_generation_response_file_upload_image_tr
 class GetApplicationParametersByAppGenerationResponseFileUploadImage(UniversalBaseModel):
     """
     Image settings
+    Currently only supports image types: png, jpg, jpeg, webp, gif
     """
 
     enabled: typing.Optional[bool] = pydantic.Field(default=None)
@@ -28,7 +29,7 @@ class GetApplicationParametersByAppGenerationResponseFileUploadImage(UniversalBa
         typing.List[GetApplicationParametersByAppGenerationResponseFileUploadImageTransferMethodsItem]
     ] = pydantic.Field(default=None)
     """
-    Transfer method list
+    Transfer method list, must choose one
     """
 
     if IS_PYDANTIC_V2:

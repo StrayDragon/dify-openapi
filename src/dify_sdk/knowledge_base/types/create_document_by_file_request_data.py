@@ -28,16 +28,21 @@ class CreateDocumentByFileRequestData(UniversalBaseModel):
     indexing_technique: typing.Optional[CreateDocumentByFileRequestDataIndexingTechnique] = pydantic.Field(default=None)
     """
     Indexing technique
+    - high_quality: High quality: Use Embedding model for embedding, build as vector database index
+    - economy: Economy: Build using keyword table index inverted index
     """
 
     doc_form: typing.Optional[CreateDocumentByFileRequestDataDocForm] = pydantic.Field(default=None)
     """
     Document form
+    - text_model: Direct text document embedding, default mode for economy
+    - hierarchical_model: Parent-child mode
+    - qa_model: Q&A mode: Generate Q&A pairs for segmented documents, then embed questions
     """
 
     doc_language: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Document language (required for Q&A mode)
+    In Q&A mode, specify the document language, e.g.: English, Chinese
     """
 
     process_rule: typing.Optional[ProcessRule] = pydantic.Field(default=None)
