@@ -6,8 +6,8 @@ info:
     Workflow 应用无会话支持，适合用于翻译/文章写作/总结 AI 等等。
     所有 API 请求都需要在 Authorization HTTP Header 中包含应用级 API-Key。
     强烈建议开发者把 API-Key 放在后端存储，而非分享或者放在客户端存储，以免 API-Key 泄露，导致财产损失。
-    官方原始文档见: https://github.com/langgenius/dify/blob/1.6.0/web/app/components/develop/template/template_workflow.zh.mdx
-  version: 1.6.0
+    官方原始文档见: https://github.com/langgenius/dify/blob/1.7.0/web/app/components/develop/template/template_workflow.zh.mdx
+  version: 1.7.0
 
 servers:
   - url: https://api.dify.ai/v1
@@ -405,6 +405,18 @@ paths:
                   description: |
                     用户标识，用于定义终端用户的身份，方便检索、统计。
                     由开发者定义规则，需保证用户标识在应用内唯一。API 无法访问 WebApp 创建的会话。
+                files:
+                  type: array
+                  items:
+                    type: object
+                  description: 可选文件列表
+                trace_id:
+                  type: string
+                  description: |
+                    链路追踪ID。适用于与业务系统已有的trace组件打通，实现端到端分布式追踪等场景。如果未指定，系统将自动生成 `trace_id`。支持以下三种方式传递，具体优先级依次为：
+                    1. Header：推荐通过 HTTP Header `X-Trace-Id` 传递，优先级最高。
+                    2. Query 参数：通过 URL 查询参数 `trace_id` 传递。
+                    3. Request Body：通过请求体字段 `trace_id` 传递（即本字段）。
 
       responses:
         "200":
@@ -958,22 +970,86 @@ paths:
                     type: object
                     description: 文件上传配置
                     properties:
+                      document:
+                        type: object
+                        description: 文档设置
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: 是否启用
+                          number_limits:
+                            type: integer
+                            description: 文档数量限制，默认为 3
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum: [remote_url, local_file]
+                            description: 传输方式列表：`remote_url`, `local_file`，必须选择一个
                       image:
                         type: object
                         description: 图片设置
                         properties:
                           enabled:
                             type: boolean
-                            description: 是否开启
+                            description: 是否启用
                           number_limits:
                             type: integer
-                            description: 图片数量限制，默认 3
+                            description: 图片数量限制，默认为 3
                           transfer_methods:
                             type: array
                             items:
                               type: string
                               enum: [remote_url, local_file]
-                            description: 传递方式列表
+                            description: 传输方式列表：`remote_url`, `local_file`，必须选择一个
+                      audio:
+                        type: object
+                        description: 音频设置
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: 是否启用
+                          number_limits:
+                            type: integer
+                            description: 音频数量限制，默认为 3
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum: [remote_url, local_file]
+                            description: 传输方式列表：`remote_url`, `local_file`，必须选择一个
+                      video:
+                        type: object
+                        description: 视频设置
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: 是否启用
+                          number_limits:
+                            type: integer
+                            description: 视频数量限制，默认为 3
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum: [remote_url, local_file]
+                            description: 传输方式列表：`remote_url`, `local_file`，必须选择一个
+                      custom:
+                        type: object
+                        description: 自定义设置
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: 是否启用
+                          number_limits:
+                            type: integer
+                            description: 自定义数量限制，默认为 3
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum: [remote_url, local_file]
+                            description: 传输方式列表：`remote_url`, `local_file`，必须选择一个
                   system_parameters:
                     type: object
                     description: 系统参数

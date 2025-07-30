@@ -28,7 +28,7 @@ class GetApplicationParametersByAppAdvancedChatResponseFileUploadImage(Universal
         typing.List[GetApplicationParametersByAppAdvancedChatResponseFileUploadImageTransferMethodsItem]
     ] = pydantic.Field(default=None)
     """
-    Transfer method list, remote_url, local_file, one must be selected
+    Transfer method list: remote_url, local_file, one must be selected
     """
 
     if IS_PYDANTIC_V2:

@@ -46,6 +46,8 @@ class RawWorkflowClient:
         inputs: typing.Dict[str, typing.Optional[typing.Any]],
         response_mode: RunWorkflowRequestResponseMode,
         user: str,
+        files: typing.Optional[typing.Sequence[typing.Dict[str, typing.Optional[typing.Any]]]] = OMIT,
+        trace_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Iterator[HttpResponse[typing.Iterator[ChunkWorkflowMessage]]]:
         """
@@ -77,6 +79,15 @@ class RawWorkflowClient:
             User identifier, used to define the identity of the end user, for easy retrieval and statistics.
             Rules defined by the developer, the user identifier must be unique within the application. API cannot access sessions created by WebApp.
 
+        files : typing.Optional[typing.Sequence[typing.Dict[str, typing.Optional[typing.Any]]]]
+            Optional file list
+
+        trace_id : typing.Optional[str]
+            Tracing ID. Suitable for integrating with existing trace components in business systems to achieve end-to-end distributed tracing. If not specified, the system will automatically generate a `trace_id`. Supports the following three transmission methods, with priorities as follows:
+            1. Header: Recommended to pass through HTTP Header `X-Trace-Id`, highest priority.
+            2. Query parameter: Pass through URL query parameter `trace_id`.
+            3. Request Body: Pass through request body field `trace_id` (this field).
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -92,6 +103,8 @@ class RawWorkflowClient:
                 "inputs": inputs,
                 "response_mode": response_mode,
                 "user": user,
+                "files": files,
+                "trace_id": trace_id,
             },
             headers={
                 "content-type": "application/json",
@@ -793,6 +806,8 @@ class AsyncRawWorkflowClient:
         inputs: typing.Dict[str, typing.Optional[typing.Any]],
         response_mode: RunWorkflowRequestResponseMode,
         user: str,
+        files: typing.Optional[typing.Sequence[typing.Dict[str, typing.Optional[typing.Any]]]] = OMIT,
+        trace_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[ChunkWorkflowMessage]]]:
         """
@@ -824,6 +839,15 @@ class AsyncRawWorkflowClient:
             User identifier, used to define the identity of the end user, for easy retrieval and statistics.
             Rules defined by the developer, the user identifier must be unique within the application. API cannot access sessions created by WebApp.
 
+        files : typing.Optional[typing.Sequence[typing.Dict[str, typing.Optional[typing.Any]]]]
+            Optional file list
+
+        trace_id : typing.Optional[str]
+            Tracing ID. Suitable for integrating with existing trace components in business systems to achieve end-to-end distributed tracing. If not specified, the system will automatically generate a `trace_id`. Supports the following three transmission methods, with priorities as follows:
+            1. Header: Recommended to pass through HTTP Header `X-Trace-Id`, highest priority.
+            2. Query parameter: Pass through URL query parameter `trace_id`.
+            3. Request Body: Pass through request body field `trace_id` (this field).
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -839,6 +863,8 @@ class AsyncRawWorkflowClient:
                 "inputs": inputs,
                 "response_mode": response_mode,
                 "user": user,
+                "files": files,
+                "trace_id": trace_id,
             },
             headers={
                 "content-type": "application/json",

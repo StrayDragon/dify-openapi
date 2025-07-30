@@ -2,4 +2,4 @@
 
 import typing
 
-ProcessRuleMode = typing.Union[typing.Literal["automatic", "custom"], typing.Any]
+ProcessRuleMode = typing.Union[typing.Literal["automatic", "custom", "hierarchical"], typing.Any]

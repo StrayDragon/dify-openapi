@@ -6,7 +6,7 @@ info:
     It supports text generation applications.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
     official raw document: https://github.com/langgenius/dify/blob/1.5.0/web/app/components/develop/template/template.en.mdx
-  version: 1.6.0
+  version: 1.7.0
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -162,8 +162,18 @@ components:
         type:
           type: string
           enum:
+            - document
             - image
-          description: 'File type, currently only supports images'
+            - audio
+            - video
+            - custom
+          description: |
+            File type:
+            - document: Document types (txt, md, markdown, pdf, html, xlsx, xls, docx, csv, eml, msg, pptx, ppt, xml, epub)
+            - image: Image types (png, jpg, jpeg, webp, gif)
+            - audio: Audio types (mp3, m4a, wav, webm, amr)
+            - video: Video types (mp4, mov, mpeg, mpga)
+            - custom: Custom types
         transfer_method:
           type: string
           enum:
@@ -172,7 +182,7 @@ components:
           description: Transfer method
         url:
           type: string
-          description: Image URL (only when transfer method is remote_url)
+          description: File URL (only when transfer method is remote_url)
         upload_file_id:
           type: string
           description: Upload file ID (only when transfer method is local_file)
@@ -294,6 +304,14 @@ paths:
                   type: array
                   items:
                     $ref: '#/components/schemas/FileInput'
+                trace_id:
+                  type: string
+                  description: |
+                    (Optional) Trace ID for linking with existing trace components in business systems to achieve end-to-end distributed tracing scenarios.
+                    If not specified, the system will automatically generate a trace_id. Supports the following three transmission methods with priority order:
+                    - Header: Pass through HTTP Header X-Trace-Id, highest priority
+                    - Query parameter: Pass through URL query parameter trace_id
+                    - Request Body: Pass through request body field trace_id (this field)
       responses:
         '200':
           description: Successful response
@@ -663,6 +681,26 @@ paths:
                   file_upload:
                     type: object
                     properties:
+                      document:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: Whether enabled
+                          number_limits:
+                            type: integer
+                            description: 'Document quantity limit, default 3'
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum:
+                                - remote_url
+                                - local_file
+                            description: 'Transfer method list, must choose one'
+                        description: |
+                          Document settings
+                          Currently only supports document types: txt, md, markdown, pdf, html, xlsx, xls, docx, csv, eml, msg, pptx, ppt, xml, epub
                       image:
                         type: object
                         properties:
@@ -679,8 +717,68 @@ paths:
                               enum:
                                 - remote_url
                                 - local_file
-                            description: Transfer method list
-                        description: Image settings
+                            description: 'Transfer method list, must choose one'
+                        description: |
+                          Image settings
+                          Currently only supports image types: png, jpg, jpeg, webp, gif
+                      audio:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: Whether enabled
+                          number_limits:
+                            type: integer
+                            description: 'Audio quantity limit, default 3'
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum:
+                                - remote_url
+                                - local_file
+                            description: 'Transfer method list, must choose one'
+                        description: |
+                          Audio settings
+                          Currently only supports audio types: mp3, m4a, wav, webm, amr
+                      video:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: Whether enabled
+                          number_limits:
+                            type: integer
+                            description: 'Video quantity limit, default 3'
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum:
+                                - remote_url
+                                - local_file
+                            description: 'Transfer method list, must choose one'
+                        description: |
+                          Video settings
+                          Currently only supports video types: mp4, mov, mpeg, mpga
+                      custom:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: Whether enabled
+                          number_limits:
+                            type: integer
+                            description: 'Custom quantity limit, default 3'
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum:
+                                - remote_url
+                                - local_file
+                            description: 'Transfer method list, must choose one'
+                        description: Custom settings
                     description: File upload configuration
                   system_parameters:
                     type: object

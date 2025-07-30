@@ -1,7 +1,7 @@
 overlay: 1.0.0
 info:
   title: "English translation overlay for Dify API - Advanced Chat Application"
-  version: "1.4.3"
+  version: "1.7.0"
 extends: ../app_advanced_chat.zh.yaml
 actions:
   - target: $.info
@@ -12,7 +12,7 @@ actions:
         Chat applications support session persistence, allowing previous chat history to be used as context for responses, suitable for chat/customer service AI, etc.
         All API requests require an application-level API-Key in the Authorization HTTP Header.
         It is strongly recommended that developers store the API-Key on the backend rather than sharing or storing it on the client side to prevent API-Key leakage and financial loss.
-        official raw document: https://github.com/langgenius/dify/blob/1.4.3/web/app/components/develop/template/template_advanced_chat.en.mdx
+        official raw document: https://github.com/langgenius/dify/blob/1.7.0/web/app/components/develop/template/template_advanced_chat.en.mdx
 
   - target: $.servers[0]
     update:
@@ -267,6 +267,10 @@ actions:
     update:
       description: "(Optional) Automatically generate title, default `true`. If set to `false`, you can call the conversation rename interface and set `auto_generate` to `true` to generate a title asynchronously."
 
+  - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.trace_id
+    update:
+      description: "(Optional) Trace ID. Suitable for integrating with existing trace components in business systems to achieve end-to-end distributed tracing scenarios. If not specified, the system will automatically generate a trace_id. Three methods are supported with the following priority order: Header: Pass through HTTP Header X-Trace-Id, highest priority. Query parameter: Pass through URL query parameter trace_id. Request Body: Pass through request body field trace_id (this field)."
+
   - target: $.paths['/chat-messages'].post.responses['200'].description
     update: "Successful response"
 
@@ -431,6 +435,18 @@ actions:
   - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.description
     update: "File upload configuration"
 
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.document.description
+    update: "Document settings. Currently only supports document types: txt, md, markdown, pdf, html, xlsx, xls, docx, csv, eml, msg, pptx, ppt, xml, epub"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.document.properties.enabled.description
+    update: "Whether to enable"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.document.properties.number_limits.description
+    update: "Document quantity limit, default 3"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.document.properties.transfer_methods.description
+    update: "Transfer method list: remote_url, local_file, one must be selected"
+
   - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.image.description
     update: "Image settings. Currently only supports image types: png, jpg, jpeg, webp, gif"
 
@@ -441,7 +457,43 @@ actions:
     update: "Image quantity limit, default 3"
 
   - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.image.properties.transfer_methods.description
-    update: "Transfer method list, remote_url, local_file, one must be selected"
+    update: "Transfer method list: remote_url, local_file, one must be selected"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.audio.description
+    update: "Audio settings. Currently only supports audio types: mp3, m4a, wav, webm, amr"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.audio.properties.enabled.description
+    update: "Whether to enable"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.audio.properties.number_limits.description
+    update: "Audio quantity limit, default 3"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.audio.properties.transfer_methods.description
+    update: "Transfer method list: remote_url, local_file, one must be selected"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.video.description
+    update: "Video settings. Currently only supports video types: mp4, mov, mpeg, mpga"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.video.properties.enabled.description
+    update: "Whether to enable"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.video.properties.number_limits.description
+    update: "Video quantity limit, default 3"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.video.properties.transfer_methods.description
+    update: "Transfer method list: remote_url, local_file, one must be selected"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.custom.description
+    update: "Custom settings"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.custom.properties.enabled.description
+    update: "Whether to enable"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.custom.properties.number_limits.description
+    update: "Custom quantity limit, default 3"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.custom.properties.transfer_methods.description
+    update: "Transfer method list: remote_url, local_file, one must be selected"
 
   - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.system_parameters.description
     update: "System parameters"

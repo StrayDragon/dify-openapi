@@ -334,7 +334,7 @@ class RawDatasetsClient:
         permission: typing.Optional[PatchDatasetsDatasetIdRequestPermission] = OMIT,
         embedding_model_provider: typing.Optional[str] = OMIT,
         embedding_model: typing.Optional[str] = OMIT,
-        retrieval_model: typing.Optional[str] = OMIT,
+        retrieval_model: typing.Optional[RetrievalModel] = OMIT,
         partial_member_list: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[Dataset]:
@@ -366,8 +366,7 @@ class RawDatasetsClient:
         embedding_model : typing.Optional[str]
             Embedding model (optional)
 
-        retrieval_model : typing.Optional[str]
-            Retrieval model (optional)
+        retrieval_model : typing.Optional[RetrievalModel]
 
         partial_member_list : typing.Optional[typing.Sequence[str]]
             Partial team members ID list (optional)
@@ -389,7 +388,9 @@ class RawDatasetsClient:
                 "permission": permission,
                 "embedding_model_provider": embedding_model_provider,
                 "embedding_model": embedding_model,
-                "retrieval_model": retrieval_model,
+                "retrieval_model": convert_and_respect_annotation_metadata(
+                    object_=retrieval_model, annotation=RetrievalModel, direction="write"
+                ),
                 "partial_member_list": partial_member_list,
             },
             headers={
@@ -825,7 +826,7 @@ class AsyncRawDatasetsClient:
         permission: typing.Optional[PatchDatasetsDatasetIdRequestPermission] = OMIT,
         embedding_model_provider: typing.Optional[str] = OMIT,
         embedding_model: typing.Optional[str] = OMIT,
-        retrieval_model: typing.Optional[str] = OMIT,
+        retrieval_model: typing.Optional[RetrievalModel] = OMIT,
         partial_member_list: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[Dataset]:
@@ -857,8 +858,7 @@ class AsyncRawDatasetsClient:
         embedding_model : typing.Optional[str]
             Embedding model (optional)
 
-        retrieval_model : typing.Optional[str]
-            Retrieval model (optional)
+        retrieval_model : typing.Optional[RetrievalModel]
 
         partial_member_list : typing.Optional[typing.Sequence[str]]
             Partial team members ID list (optional)
@@ -880,7 +880,9 @@ class AsyncRawDatasetsClient:
                 "permission": permission,
                 "embedding_model_provider": embedding_model_provider,
                 "embedding_model": embedding_model,
-                "retrieval_model": retrieval_model,
+                "retrieval_model": convert_and_respect_annotation_metadata(
+                    object_=retrieval_model, annotation=RetrievalModel, direction="write"
+                ),
                 "partial_member_list": partial_member_list,
             },
             headers={

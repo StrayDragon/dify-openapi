@@ -4,8 +4,10 @@ import typing
 
 import pydantic
 from ...core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from .process_rule_rules_parent_mode import ProcessRuleRulesParentMode
 from .process_rule_rules_pre_processing_rules_item import ProcessRuleRulesPreProcessingRulesItem
 from .process_rule_rules_segmentation import ProcessRuleRulesSegmentation
+from .process_rule_rules_subchunk_segmentation import ProcessRuleRulesSubchunkSegmentation
 
 
 class ProcessRuleRules(UniversalBaseModel):
@@ -23,6 +25,18 @@ class ProcessRuleRules(UniversalBaseModel):
     segmentation: typing.Optional[ProcessRuleRulesSegmentation] = pydantic.Field(default=None)
     """
     Segmentation configuration
+    """
+
+    parent_mode: typing.Optional[ProcessRuleRulesParentMode] = pydantic.Field(default=None)
+    """
+    Parent segment recall mode
+    - full-doc: Full document recall
+    - paragraph: Paragraph recall
+    """
+
+    subchunk_segmentation: typing.Optional[ProcessRuleRulesSubchunkSegmentation] = pydantic.Field(default=None)
+    """
+    Sub-chunk segmentation rules
     """
 
     if IS_PYDANTIC_V2:

@@ -4,8 +4,20 @@ import typing
 
 import pydantic
 from ...core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from .get_application_parameters_by_app_advanced_chat_response_file_upload_audio import (
+    GetApplicationParametersByAppAdvancedChatResponseFileUploadAudio,
+)
+from .get_application_parameters_by_app_advanced_chat_response_file_upload_custom import (
+    GetApplicationParametersByAppAdvancedChatResponseFileUploadCustom,
+)
+from .get_application_parameters_by_app_advanced_chat_response_file_upload_document import (
+    GetApplicationParametersByAppAdvancedChatResponseFileUploadDocument,
+)
 from .get_application_parameters_by_app_advanced_chat_response_file_upload_image import (
     GetApplicationParametersByAppAdvancedChatResponseFileUploadImage,
+)
+from .get_application_parameters_by_app_advanced_chat_response_file_upload_video import (
+    GetApplicationParametersByAppAdvancedChatResponseFileUploadVideo,
 )
 
 
@@ -14,11 +26,39 @@ class GetApplicationParametersByAppAdvancedChatResponseFileUpload(UniversalBaseM
     File upload configuration
     """
 
+    document: typing.Optional[GetApplicationParametersByAppAdvancedChatResponseFileUploadDocument] = pydantic.Field(
+        default=None
+    )
+    """
+    Document settings. Currently only supports document types: txt, md, markdown, pdf, html, xlsx, xls, docx, csv, eml, msg, pptx, ppt, xml, epub
+    """
+
     image: typing.Optional[GetApplicationParametersByAppAdvancedChatResponseFileUploadImage] = pydantic.Field(
         default=None
     )
     """
     Image settings. Currently only supports image types: png, jpg, jpeg, webp, gif
+    """
+
+    audio: typing.Optional[GetApplicationParametersByAppAdvancedChatResponseFileUploadAudio] = pydantic.Field(
+        default=None
+    )
+    """
+    Audio settings. Currently only supports audio types: mp3, m4a, wav, webm, amr
+    """
+
+    video: typing.Optional[GetApplicationParametersByAppAdvancedChatResponseFileUploadVideo] = pydantic.Field(
+        default=None
+    )
+    """
+    Video settings. Currently only supports video types: mp4, mov, mpeg, mpga
+    """
+
+    custom: typing.Optional[GetApplicationParametersByAppAdvancedChatResponseFileUploadCustom] = pydantic.Field(
+        default=None
+    )
+    """
+    Custom settings
     """
 
     if IS_PYDANTIC_V2:

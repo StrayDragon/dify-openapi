@@ -4,8 +4,20 @@ import typing
 
 import pydantic
 from ...core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from .get_application_parameters_by_app_generation_response_file_upload_audio import (
+    GetApplicationParametersByAppGenerationResponseFileUploadAudio,
+)
+from .get_application_parameters_by_app_generation_response_file_upload_custom import (
+    GetApplicationParametersByAppGenerationResponseFileUploadCustom,
+)
+from .get_application_parameters_by_app_generation_response_file_upload_document import (
+    GetApplicationParametersByAppGenerationResponseFileUploadDocument,
+)
 from .get_application_parameters_by_app_generation_response_file_upload_image import (
     GetApplicationParametersByAppGenerationResponseFileUploadImage,
+)
+from .get_application_parameters_by_app_generation_response_file_upload_video import (
+    GetApplicationParametersByAppGenerationResponseFileUploadVideo,
 )
 
 
@@ -14,11 +26,43 @@ class GetApplicationParametersByAppGenerationResponseFileUpload(UniversalBaseMod
     File upload configuration
     """
 
+    document: typing.Optional[GetApplicationParametersByAppGenerationResponseFileUploadDocument] = pydantic.Field(
+        default=None
+    )
+    """
+    Document settings
+    Currently only supports document types: txt, md, markdown, pdf, html, xlsx, xls, docx, csv, eml, msg, pptx, ppt, xml, epub
+    """
+
     image: typing.Optional[GetApplicationParametersByAppGenerationResponseFileUploadImage] = pydantic.Field(
         default=None
     )
     """
     Image settings
+    Currently only supports image types: png, jpg, jpeg, webp, gif
+    """
+
+    audio: typing.Optional[GetApplicationParametersByAppGenerationResponseFileUploadAudio] = pydantic.Field(
+        default=None
+    )
+    """
+    Audio settings
+    Currently only supports audio types: mp3, m4a, wav, webm, amr
+    """
+
+    video: typing.Optional[GetApplicationParametersByAppGenerationResponseFileUploadVideo] = pydantic.Field(
+        default=None
+    )
+    """
+    Video settings
+    Currently only supports video types: mp4, mov, mpeg, mpga
+    """
+
+    custom: typing.Optional[GetApplicationParametersByAppGenerationResponseFileUploadCustom] = pydantic.Field(
+        default=None
+    )
+    """
+    Custom settings
     """
 
     if IS_PYDANTIC_V2:

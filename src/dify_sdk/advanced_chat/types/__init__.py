@@ -49,11 +49,35 @@ from .get_application_parameters_by_app_advanced_chat_response_annotation_reply 
 from .get_application_parameters_by_app_advanced_chat_response_file_upload import (
     GetApplicationParametersByAppAdvancedChatResponseFileUpload,
 )
+from .get_application_parameters_by_app_advanced_chat_response_file_upload_audio import (
+    GetApplicationParametersByAppAdvancedChatResponseFileUploadAudio,
+)
+from .get_application_parameters_by_app_advanced_chat_response_file_upload_audio_transfer_methods_item import (
+    GetApplicationParametersByAppAdvancedChatResponseFileUploadAudioTransferMethodsItem,
+)
+from .get_application_parameters_by_app_advanced_chat_response_file_upload_custom import (
+    GetApplicationParametersByAppAdvancedChatResponseFileUploadCustom,
+)
+from .get_application_parameters_by_app_advanced_chat_response_file_upload_custom_transfer_methods_item import (
+    GetApplicationParametersByAppAdvancedChatResponseFileUploadCustomTransferMethodsItem,
+)
+from .get_application_parameters_by_app_advanced_chat_response_file_upload_document import (
+    GetApplicationParametersByAppAdvancedChatResponseFileUploadDocument,
+)
+from .get_application_parameters_by_app_advanced_chat_response_file_upload_document_transfer_methods_item import (
+    GetApplicationParametersByAppAdvancedChatResponseFileUploadDocumentTransferMethodsItem,
+)
 from .get_application_parameters_by_app_advanced_chat_response_file_upload_image import (
     GetApplicationParametersByAppAdvancedChatResponseFileUploadImage,
 )
 from .get_application_parameters_by_app_advanced_chat_response_file_upload_image_transfer_methods_item import (
     GetApplicationParametersByAppAdvancedChatResponseFileUploadImageTransferMethodsItem,
+)
+from .get_application_parameters_by_app_advanced_chat_response_file_upload_video import (
+    GetApplicationParametersByAppAdvancedChatResponseFileUploadVideo,
+)
+from .get_application_parameters_by_app_advanced_chat_response_file_upload_video_transfer_methods_item import (
+    GetApplicationParametersByAppAdvancedChatResponseFileUploadVideoTransferMethodsItem,
 )
 from .get_application_parameters_by_app_advanced_chat_response_retriever_resource import (
     GetApplicationParametersByAppAdvancedChatResponseRetrieverResource,
@@ -139,8 +163,16 @@ __all__ = [
     "GetApplicationParametersByAppAdvancedChatResponse",
     "GetApplicationParametersByAppAdvancedChatResponseAnnotationReply",
     "GetApplicationParametersByAppAdvancedChatResponseFileUpload",
+    "GetApplicationParametersByAppAdvancedChatResponseFileUploadAudio",
+    "GetApplicationParametersByAppAdvancedChatResponseFileUploadAudioTransferMethodsItem",
+    "GetApplicationParametersByAppAdvancedChatResponseFileUploadCustom",
+    "GetApplicationParametersByAppAdvancedChatResponseFileUploadCustomTransferMethodsItem",
+    "GetApplicationParametersByAppAdvancedChatResponseFileUploadDocument",
+    "GetApplicationParametersByAppAdvancedChatResponseFileUploadDocumentTransferMethodsItem",
     "GetApplicationParametersByAppAdvancedChatResponseFileUploadImage",
     "GetApplicationParametersByAppAdvancedChatResponseFileUploadImageTransferMethodsItem",
+    "GetApplicationParametersByAppAdvancedChatResponseFileUploadVideo",
+    "GetApplicationParametersByAppAdvancedChatResponseFileUploadVideoTransferMethodsItem",
     "GetApplicationParametersByAppAdvancedChatResponseRetrieverResource",
     "GetApplicationParametersByAppAdvancedChatResponseSpeechToText",
     "GetApplicationParametersByAppAdvancedChatResponseSuggestedQuestionsAfterAnswer",

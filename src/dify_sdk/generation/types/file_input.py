@@ -5,12 +5,18 @@ import typing
 import pydantic
 from ...core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 from .file_input_transfer_method import FileInputTransferMethod
+from .file_input_type import FileInputType
 
 
 class FileInput(UniversalBaseModel):
-    type: typing.Optional[typing.Literal["image"]] = pydantic.Field(default=None)
+    type: typing.Optional[FileInputType] = pydantic.Field(default=None)
     """
-    File type, currently only supports images
+    File type:
+    - document: Document types (txt, md, markdown, pdf, html, xlsx, xls, docx, csv, eml, msg, pptx, ppt, xml, epub)
+    - image: Image types (png, jpg, jpeg, webp, gif)
+    - audio: Audio types (mp3, m4a, wav, webm, amr)
+    - video: Video types (mp4, mov, mpeg, mpga)
+    - custom: Custom types
     """
 
     transfer_method: typing.Optional[FileInputTransferMethod] = pydantic.Field(default=None)
@@ -20,7 +26,7 @@ class FileInput(UniversalBaseModel):
 
     url: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Image URL (only when transfer method is remote_url)
+    File URL (only when transfer method is remote_url)
     """
 
     upload_file_id: typing.Optional[str] = pydantic.Field(default=None)

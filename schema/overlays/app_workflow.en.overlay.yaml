@@ -746,3 +746,82 @@ actions:
 
   - target: $.paths['/info'].get.responses['200'].content['application/json'].schema.properties.author_name.description
     update: "Author name"
+
+  # Add new overlay actions for 1.7.0 updates
+  - target: $.info.version
+    update: "1.7.0"
+
+  - target: $.info.description
+    update: |
+      Dify API provides a series of interfaces for workflow functionality.
+      Workflow applications have no session support and are suitable for translation/article writing/summarization AI, etc.
+      All API requests require an application-level API-Key in the Authorization HTTP Header.
+      It is strongly recommended that developers store the API-Key on the backend rather than sharing or storing it on the client to prevent API-Key leakage and financial loss.
+      official raw document: https://github.com/langgenius/dify/blob/1.7.0/web/app/components/develop/template/template_workflow.en.mdx
+
+  - target: $.paths['/workflows/run'].post.requestBody.content['application/json'].schema.properties.files.description
+    update: "Optional file list"
+
+  - target: $.paths['/workflows/run'].post.requestBody.content['application/json'].schema.properties.trace_id.description
+    update: |
+      Tracing ID. Suitable for integrating with existing trace components in business systems to achieve end-to-end distributed tracing. If not specified, the system will automatically generate a `trace_id`. Supports the following three transmission methods, with priorities as follows:
+      1. Header: Recommended to pass through HTTP Header `X-Trace-Id`, highest priority.
+      2. Query parameter: Pass through URL query parameter `trace_id`.
+      3. Request Body: Pass through request body field `trace_id` (this field).
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.document.description
+    update: "Document settings"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.document.properties.enabled.description
+    update: "Whether enabled"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.document.properties.number_limits.description
+    update: "Document quantity limit, default 3"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.document.properties.transfer_methods.description
+    update: "Transfer method list: `remote_url`, `local_file`, must choose one"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.image.properties.enabled.description
+    update: "Whether enabled"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.image.properties.number_limits.description
+    update: "Image quantity limit, default 3"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.image.properties.transfer_methods.description
+    update: "Transfer method list: `remote_url`, `local_file`, must choose one"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.audio.description
+    update: "Audio settings"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.audio.properties.enabled.description
+    update: "Whether enabled"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.audio.properties.number_limits.description
+    update: "Audio quantity limit, default 3"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.audio.properties.transfer_methods.description
+    update: "Transfer method list: `remote_url`, `local_file`, must choose one"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.video.description
+    update: "Video settings"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.video.properties.enabled.description
+    update: "Whether enabled"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.video.properties.number_limits.description
+    update: "Video quantity limit, default 3"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.video.properties.transfer_methods.description
+    update: "Transfer method list: `remote_url`, `local_file`, must choose one"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.custom.description
+    update: "Custom settings"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.custom.properties.enabled.description
+    update: "Whether enabled"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.custom.properties.number_limits.description
+    update: "Custom quantity limit, default 3"
+
+  - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.custom.properties.transfer_methods.description
+    update: "Transfer method list: `remote_url`, `local_file`, must choose one"

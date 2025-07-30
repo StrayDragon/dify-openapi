@@ -6,8 +6,8 @@ info:
     Workflow applications have no session support and are suitable for translation/article writing/summarization AI, etc.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
     It is strongly recommended that developers store the API-Key on the backend rather than sharing or storing it on the client to prevent API-Key leakage and financial loss.
-    official raw document: https://github.com/langgenius/dify/blob/1.5.0/web/app/components/develop/template/template_workflow.en.mdx
-  version: 1.6.0
+    official raw document: https://github.com/langgenius/dify/blob/1.7.0/web/app/components/develop/template/template_workflow.en.mdx
+  version: 1.7.0
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -395,6 +395,18 @@ paths:
                   description: |
                     User identifier, used to define the identity of the end user, for easy retrieval and statistics.
                     Rules defined by the developer, the user identifier must be unique within the application. API cannot access sessions created by WebApp.
+                files:
+                  type: array
+                  items:
+                    type: object
+                  description: Optional file list
+                trace_id:
+                  type: string
+                  description: |
+                    Tracing ID. Suitable for integrating with existing trace components in business systems to achieve end-to-end distributed tracing. If not specified, the system will automatically generate a `trace_id`. Supports the following three transmission methods, with priorities as follows:
+                    1. Header: Recommended to pass through HTTP Header `X-Trace-Id`, highest priority.
+                    2. Query parameter: Pass through URL query parameter `trace_id`.
+                    3. Request Body: Pass through request body field `trace_id` (this field).
       responses:
         '200':
           description: Successful response
@@ -947,6 +959,24 @@ paths:
                     type: object
                     description: File upload configuration
                     properties:
+                      document:
+                        type: object
+                        description: Document settings
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: Whether enabled
+                          number_limits:
+                            type: integer
+                            description: 'Document quantity limit, default 3'
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum:
+                                - remote_url
+                                - local_file
+                            description: 'Transfer method list: `remote_url`, `local_file`, must choose one'
                       image:
                         type: object
                         description: Image settings
@@ -964,7 +994,61 @@ paths:
                               enum:
                                 - remote_url
                                 - local_file
-                            description: Transfer method list
+                            description: 'Transfer method list: `remote_url`, `local_file`, must choose one'
+                      audio:
+                        type: object
+                        description: Audio settings
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: Whether enabled
+                          number_limits:
+                            type: integer
+                            description: 'Audio quantity limit, default 3'
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum:
+                                - remote_url
+                                - local_file
+                            description: 'Transfer method list: `remote_url`, `local_file`, must choose one'
+                      video:
+                        type: object
+                        description: Video settings
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: Whether enabled
+                          number_limits:
+                            type: integer
+                            description: 'Video quantity limit, default 3'
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum:
+                                - remote_url
+                                - local_file
+                            description: 'Transfer method list: `remote_url`, `local_file`, must choose one'
+                      custom:
+                        type: object
+                        description: Custom settings
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: Whether enabled
+                          number_limits:
+                            type: integer
+                            description: 'Custom quantity limit, default 3'
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum:
+                                - remote_url
+                                - local_file
+                            description: 'Transfer method list: `remote_url`, `local_file`, must choose one'
                   system_parameters:
                     type: object
                     description: System parameters

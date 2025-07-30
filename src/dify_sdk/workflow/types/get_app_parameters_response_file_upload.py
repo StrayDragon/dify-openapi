@@ -4,7 +4,11 @@ import typing
 
 import pydantic
 from ...core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from .get_app_parameters_response_file_upload_audio import GetAppParametersResponseFileUploadAudio
+from .get_app_parameters_response_file_upload_custom import GetAppParametersResponseFileUploadCustom
+from .get_app_parameters_response_file_upload_document import GetAppParametersResponseFileUploadDocument
 from .get_app_parameters_response_file_upload_image import GetAppParametersResponseFileUploadImage
+from .get_app_parameters_response_file_upload_video import GetAppParametersResponseFileUploadVideo
 
 
 class GetAppParametersResponseFileUpload(UniversalBaseModel):
@@ -12,9 +16,29 @@ class GetAppParametersResponseFileUpload(UniversalBaseModel):
     File upload configuration
     """
 
+    document: typing.Optional[GetAppParametersResponseFileUploadDocument] = pydantic.Field(default=None)
+    """
+    Document settings
+    """
+
     image: typing.Optional[GetAppParametersResponseFileUploadImage] = pydantic.Field(default=None)
     """
     Image settings
+    """
+
+    audio: typing.Optional[GetAppParametersResponseFileUploadAudio] = pydantic.Field(default=None)
+    """
+    Audio settings
+    """
+
+    video: typing.Optional[GetAppParametersResponseFileUploadVideo] = pydantic.Field(default=None)
+    """
+    Video settings
+    """
+
+    custom: typing.Optional[GetAppParametersResponseFileUploadCustom] = pydantic.Field(default=None)
+    """
+    Custom settings
     """
 
     if IS_PYDANTIC_V2:

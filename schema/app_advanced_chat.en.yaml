@@ -6,8 +6,8 @@ info:
     Chat applications support session persistence, allowing previous chat history to be used as context for responses, suitable for chat/customer service AI, etc.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
     It is strongly recommended that developers store the API-Key on the backend rather than sharing or storing it on the client side to prevent API-Key leakage and financial loss.
-    official raw document: https://github.com/langgenius/dify/blob/1.4.3/web/app/components/develop/template/template_advanced_chat.en.mdx
-  version: 1.6.0
+    official raw document: https://github.com/langgenius/dify/blob/1.7.0/web/app/components/develop/template/template_advanced_chat.en.mdx
+  version: 1.7.0
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -350,6 +350,9 @@ paths:
                   type: boolean
                   description: '(Optional) Automatically generate title, default `true`. If set to `false`, you can call the conversation rename interface and set `auto_generate` to `true` to generate a title asynchronously.'
                   default: true
+                trace_id:
+                  type: string
+                  description: '(Optional) Trace ID. Suitable for integrating with existing trace components in business systems to achieve end-to-end distributed tracing scenarios. If not specified, the system will automatically generate a trace_id. Three methods are supported with the following priority order: Header: Pass through HTTP Header X-Trace-Id, highest priority. Query parameter: Pass through URL query parameter trace_id. Request Body: Pass through request body field trace_id (this field).'
       x-fern-streaming:
         format: sse
         # FIXME: @l8ng fern 暂时不支持
@@ -626,6 +629,25 @@ paths:
                   file_upload:
                     type: object
                     properties:
+                      document:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: Whether to enable
+                          number_limits:
+                            type: integer
+                            description: 'Document quantity limit, default 3'
+                            default: 3
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum:
+                                - remote_url
+                                - local_file
+                            description: 'Transfer method list: remote_url, local_file, one must be selected'
+                        description: 'Document settings. Currently only supports document types: txt, md, markdown, pdf, html, xlsx, xls, docx, csv, eml, msg, pptx, ppt, xml, epub'
                       image:
                         type: object
                         properties:
@@ -643,8 +665,65 @@ paths:
                               enum:
                                 - remote_url
                                 - local_file
-                            description: 'Transfer method list, remote_url, local_file, one must be selected'
+                            description: 'Transfer method list: remote_url, local_file, one must be selected'
                         description: 'Image settings. Currently only supports image types: png, jpg, jpeg, webp, gif'
+                      audio:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: Whether to enable
+                          number_limits:
+                            type: integer
+                            description: 'Audio quantity limit, default 3'
+                            default: 3
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum:
+                                - remote_url
+                                - local_file
+                            description: 'Transfer method list: remote_url, local_file, one must be selected'
+                        description: 'Audio settings. Currently only supports audio types: mp3, m4a, wav, webm, amr'
+                      video:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: Whether to enable
+                          number_limits:
+                            type: integer
+                            description: 'Video quantity limit, default 3'
+                            default: 3
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum:
+                                - remote_url
+                                - local_file
+                            description: 'Transfer method list: remote_url, local_file, one must be selected'
+                        description: 'Video settings. Currently only supports video types: mp4, mov, mpeg, mpga'
+                      custom:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: Whether to enable
+                          number_limits:
+                            type: integer
+                            description: 'Custom quantity limit, default 3'
+                            default: 3
+                          transfer_methods:
+                            type: array
+                            items:
+                              type: string
+                              enum:
+                                - remote_url
+                                - local_file
+                            description: 'Transfer method list: remote_url, local_file, one must be selected'
+                        description: Custom settings
                     description: File upload configuration
                   system_parameters:
                     type: object

@@ -56,9 +56,12 @@ from .metadata_filtering_conditions_logical_operator import MetadataFilteringCon
 from .process_rule import ProcessRule
 from .process_rule_mode import ProcessRuleMode
 from .process_rule_rules import ProcessRuleRules
+from .process_rule_rules_parent_mode import ProcessRuleRulesParentMode
 from .process_rule_rules_pre_processing_rules_item import ProcessRuleRulesPreProcessingRulesItem
 from .process_rule_rules_segmentation import ProcessRuleRulesSegmentation
+from .process_rule_rules_subchunk_segmentation import ProcessRuleRulesSubchunkSegmentation
 from .retrieval_model import RetrievalModel
+from .retrieval_model_reranking_mode import RetrievalModelRerankingMode
 from .retrieval_model_reranking_model import RetrievalModelRerankingModel
 from .retrieval_model_search_method import RetrievalModelSearchMethod
 from .segment import Segment
@@ -115,9 +118,12 @@ __all__ = [
     "ProcessRule",
     "ProcessRuleMode",
     "ProcessRuleRules",
+    "ProcessRuleRulesParentMode",
     "ProcessRuleRulesPreProcessingRulesItem",
     "ProcessRuleRulesSegmentation",
+    "ProcessRuleRulesSubchunkSegmentation",
     "RetrievalModel",
+    "RetrievalModelRerankingMode",
     "RetrievalModelRerankingModel",
     "RetrievalModelSearchMethod",
     "Segment",

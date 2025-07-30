@@ -69,6 +69,7 @@ class RawGenerationClient:
         response_mode: typing.Optional[SendCompletionMessageByAppGenerationRequestResponseMode] = OMIT,
         user: typing.Optional[str] = OMIT,
         files: typing.Optional[typing.Sequence[FileInput]] = OMIT,
+        trace_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Iterator[HttpResponse[typing.Iterator[ChunkChatCompletionResponse]]]:
         """
@@ -87,6 +88,13 @@ class RawGenerationClient:
             User identifier, used to define the identity of the end user for easy retrieval and statistics. Developer-defined rules must ensure that the user identifier is unique within the application
 
         files : typing.Optional[typing.Sequence[FileInput]]
+
+        trace_id : typing.Optional[str]
+            (Optional) Trace ID for linking with existing trace components in business systems to achieve end-to-end distributed tracing scenarios.
+            If not specified, the system will automatically generate a trace_id. Supports the following three transmission methods with priority order:
+            - Header: Pass through HTTP Header X-Trace-Id, highest priority
+            - Query parameter: Pass through URL query parameter trace_id
+            - Request Body: Pass through request body field trace_id (this field)
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -108,6 +116,7 @@ class RawGenerationClient:
                 "files": convert_and_respect_annotation_metadata(
                     object_=files, annotation=typing.Sequence[FileInput], direction="write"
                 ),
+                "trace_id": trace_id,
             },
             headers={
                 "content-type": "application/json",
@@ -944,6 +953,7 @@ class AsyncRawGenerationClient:
         response_mode: typing.Optional[SendCompletionMessageByAppGenerationRequestResponseMode] = OMIT,
         user: typing.Optional[str] = OMIT,
         files: typing.Optional[typing.Sequence[FileInput]] = OMIT,
+        trace_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[ChunkChatCompletionResponse]]]:
         """
@@ -962,6 +972,13 @@ class AsyncRawGenerationClient:
             User identifier, used to define the identity of the end user for easy retrieval and statistics. Developer-defined rules must ensure that the user identifier is unique within the application
 
         files : typing.Optional[typing.Sequence[FileInput]]
+
+        trace_id : typing.Optional[str]
+            (Optional) Trace ID for linking with existing trace components in business systems to achieve end-to-end distributed tracing scenarios.
+            If not specified, the system will automatically generate a trace_id. Supports the following three transmission methods with priority order:
+            - Header: Pass through HTTP Header X-Trace-Id, highest priority
+            - Query parameter: Pass through URL query parameter trace_id
+            - Request Body: Pass through request body field trace_id (this field)
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -983,6 +1000,7 @@ class AsyncRawGenerationClient:
                 "files": convert_and_respect_annotation_metadata(
                     object_=files, annotation=typing.Sequence[FileInput], direction="write"
                 ),
+                "trace_id": trace_id,
             },
             headers={
                 "content-type": "application/json",

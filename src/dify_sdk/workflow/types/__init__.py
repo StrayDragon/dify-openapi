@@ -15,9 +15,25 @@ from .file_input_type import FileInputType
 from .get_app_info_response import GetAppInfoResponse
 from .get_app_parameters_response import GetAppParametersResponse
 from .get_app_parameters_response_file_upload import GetAppParametersResponseFileUpload
+from .get_app_parameters_response_file_upload_audio import GetAppParametersResponseFileUploadAudio
+from .get_app_parameters_response_file_upload_audio_transfer_methods_item import (
+    GetAppParametersResponseFileUploadAudioTransferMethodsItem,
+)
+from .get_app_parameters_response_file_upload_custom import GetAppParametersResponseFileUploadCustom
+from .get_app_parameters_response_file_upload_custom_transfer_methods_item import (
+    GetAppParametersResponseFileUploadCustomTransferMethodsItem,
+)
+from .get_app_parameters_response_file_upload_document import GetAppParametersResponseFileUploadDocument
+from .get_app_parameters_response_file_upload_document_transfer_methods_item import (
+    GetAppParametersResponseFileUploadDocumentTransferMethodsItem,
+)
 from .get_app_parameters_response_file_upload_image import GetAppParametersResponseFileUploadImage
 from .get_app_parameters_response_file_upload_image_transfer_methods_item import (
     GetAppParametersResponseFileUploadImageTransferMethodsItem,
+)
+from .get_app_parameters_response_file_upload_video import GetAppParametersResponseFileUploadVideo
+from .get_app_parameters_response_file_upload_video_transfer_methods_item import (
+    GetAppParametersResponseFileUploadVideoTransferMethodsItem,
 )
 from .get_app_parameters_response_system_parameters import GetAppParametersResponseSystemParameters
 from .get_app_parameters_response_user_input_form_item import GetAppParametersResponseUserInputFormItem
@@ -60,8 +76,16 @@ __all__ = [
     "GetAppInfoResponse",
     "GetAppParametersResponse",
     "GetAppParametersResponseFileUpload",
+    "GetAppParametersResponseFileUploadAudio",
+    "GetAppParametersResponseFileUploadAudioTransferMethodsItem",
+    "GetAppParametersResponseFileUploadCustom",
+    "GetAppParametersResponseFileUploadCustomTransferMethodsItem",
+    "GetAppParametersResponseFileUploadDocument",
+    "GetAppParametersResponseFileUploadDocumentTransferMethodsItem",
     "GetAppParametersResponseFileUploadImage",
     "GetAppParametersResponseFileUploadImageTransferMethodsItem",
+    "GetAppParametersResponseFileUploadVideo",
+    "GetAppParametersResponseFileUploadVideoTransferMethodsItem",
     "GetAppParametersResponseSystemParameters",
     "GetAppParametersResponseUserInputFormItem",
     "GetAppParametersResponseUserInputFormItemParagraph",

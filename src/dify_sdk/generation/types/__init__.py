@@ -15,6 +15,7 @@ from .create_annotation_by_app_generation_response import CreateAnnotationByAppG
 from .error import Error
 from .file_input import FileInput
 from .file_input_transfer_method import FileInputTransferMethod
+from .file_input_type import FileInputType
 from .get_annotation_reply_status_by_app_generation_request_action import (
     GetAnnotationReplyStatusByAppGenerationRequestAction,
 )
@@ -39,11 +40,35 @@ from .get_application_parameters_by_app_generation_response_annotation_reply imp
 from .get_application_parameters_by_app_generation_response_file_upload import (
     GetApplicationParametersByAppGenerationResponseFileUpload,
 )
+from .get_application_parameters_by_app_generation_response_file_upload_audio import (
+    GetApplicationParametersByAppGenerationResponseFileUploadAudio,
+)
+from .get_application_parameters_by_app_generation_response_file_upload_audio_transfer_methods_item import (
+    GetApplicationParametersByAppGenerationResponseFileUploadAudioTransferMethodsItem,
+)
+from .get_application_parameters_by_app_generation_response_file_upload_custom import (
+    GetApplicationParametersByAppGenerationResponseFileUploadCustom,
+)
+from .get_application_parameters_by_app_generation_response_file_upload_custom_transfer_methods_item import (
+    GetApplicationParametersByAppGenerationResponseFileUploadCustomTransferMethodsItem,
+)
+from .get_application_parameters_by_app_generation_response_file_upload_document import (
+    GetApplicationParametersByAppGenerationResponseFileUploadDocument,
+)
+from .get_application_parameters_by_app_generation_response_file_upload_document_transfer_methods_item import (
+    GetApplicationParametersByAppGenerationResponseFileUploadDocumentTransferMethodsItem,
+)
 from .get_application_parameters_by_app_generation_response_file_upload_image import (
     GetApplicationParametersByAppGenerationResponseFileUploadImage,
 )
 from .get_application_parameters_by_app_generation_response_file_upload_image_transfer_methods_item import (
     GetApplicationParametersByAppGenerationResponseFileUploadImageTransferMethodsItem,
+)
+from .get_application_parameters_by_app_generation_response_file_upload_video import (
+    GetApplicationParametersByAppGenerationResponseFileUploadVideo,
+)
+from .get_application_parameters_by_app_generation_response_file_upload_video_transfer_methods_item import (
+    GetApplicationParametersByAppGenerationResponseFileUploadVideoTransferMethodsItem,
 )
 from .get_application_parameters_by_app_generation_response_retriever_resource import (
     GetApplicationParametersByAppGenerationResponseRetrieverResource,
@@ -102,6 +127,7 @@ __all__ = [
     "Error",
     "FileInput",
     "FileInputTransferMethod",
+    "FileInputType",
     "GetAnnotationReplyStatusByAppGenerationRequestAction",
     "GetAnnotationReplyStatusByAppGenerationResponse",
     "GetAnnotationsListByAppGenerationResponse",
@@ -116,8 +142,16 @@ __all__ = [
     "GetApplicationParametersByAppGenerationResponse",
     "GetApplicationParametersByAppGenerationResponseAnnotationReply",
     "GetApplicationParametersByAppGenerationResponseFileUpload",
+    "GetApplicationParametersByAppGenerationResponseFileUploadAudio",
+    "GetApplicationParametersByAppGenerationResponseFileUploadAudioTransferMethodsItem",
+    "GetApplicationParametersByAppGenerationResponseFileUploadCustom",
+    "GetApplicationParametersByAppGenerationResponseFileUploadCustomTransferMethodsItem",
+    "GetApplicationParametersByAppGenerationResponseFileUploadDocument",
+    "GetApplicationParametersByAppGenerationResponseFileUploadDocumentTransferMethodsItem",
     "GetApplicationParametersByAppGenerationResponseFileUploadImage",
     "GetApplicationParametersByAppGenerationResponseFileUploadImageTransferMethodsItem",
+    "GetApplicationParametersByAppGenerationResponseFileUploadVideo",
+    "GetApplicationParametersByAppGenerationResponseFileUploadVideoTransferMethodsItem",
     "GetApplicationParametersByAppGenerationResponseRetrieverResource",
     "GetApplicationParametersByAppGenerationResponseSpeechToText",
     "GetApplicationParametersByAppGenerationResponseSuggestedQuestionsAfterAnswer",
