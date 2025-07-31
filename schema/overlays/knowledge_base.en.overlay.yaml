@@ -1,7 +1,7 @@
 overlay: 1.0.0
 info:
   title: "English translation overlay for Dify Knowledge Base API"
-  version: "1.7.0"
+  version: "1.7.1"
 extends: ../knowledge_base.zh.yaml
 actions:
   - target: $.info

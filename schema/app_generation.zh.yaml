@@ -5,8 +5,8 @@ info:
     Dify API 提供了一系列接口用于文本生成功能。
     支持文本生成型应用。
     所有 API 请求都需要在 Authorization HTTP Header 中包含应用级 API-Key。
-    官方原始文档见: https://github.com/langgenius/dify/blob/1.7.0/web/app/components/develop/template/template.zh.mdx
-  version: 1.7.0
+    官方原始文档见: https://github.com/langgenius/dify/blob/1.7.1/web/app/components/develop/template/template.zh.mdx
+  version: 1.7.1
 
 servers:
   - url: https://api.dify.ai/v1

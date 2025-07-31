@@ -6,8 +6,8 @@ info:
     Workflow 应用无会话支持，适合用于翻译/文章写作/总结 AI 等等。
     所有 API 请求都需要在 Authorization HTTP Header 中包含应用级 API-Key。
     强烈建议开发者把 API-Key 放在后端存储，而非分享或者放在客户端存储，以免 API-Key 泄露，导致财产损失。
-    官方原始文档见: https://github.com/langgenius/dify/blob/1.7.0/web/app/components/develop/template/template_workflow.zh.mdx
-  version: 1.7.0
+    官方原始文档见: https://github.com/langgenius/dify/blob/1.7.1/web/app/components/develop/template/template_workflow.zh.mdx
+  version: 1.7.1
 
 servers:
   - url: https://api.dify.ai/v1
