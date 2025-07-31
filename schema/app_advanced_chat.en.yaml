@@ -6,8 +6,8 @@ info:
     Chat applications support session persistence, allowing previous chat history to be used as context for responses, suitable for chat/customer service AI, etc.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
     It is strongly recommended that developers store the API-Key on the backend rather than sharing or storing it on the client side to prevent API-Key leakage and financial loss.
-    official raw document: https://github.com/langgenius/dify/blob/1.7.0/web/app/components/develop/template/template_advanced_chat.en.mdx
-  version: 1.7.0
+    official raw document: https://github.com/langgenius/dify/blob/1.7.1/web/app/components/develop/template/template_advanced_chat.en.mdx
+  version: 1.7.1
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
