@@ -5,8 +5,8 @@ info:
     Dify API provides a series of interfaces for text generation functionality.
     It supports text generation applications.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
-    official raw document: https://github.com/langgenius/dify/blob/1.5.0/web/app/components/develop/template/template.en.mdx
-  version: 1.7.1
+    official raw document: https://github.com/langgenius/dify/blob/1.7.2/web/app/components/develop/template/template.en.mdx
+  version: 1.7.2
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -532,6 +532,93 @@ paths:
                     code: s3_file_too_large
                     status: 503
                     message: File exceeds S3 size limit
+  '/files/{file_id}/preview':
+    get:
+      operationId: previewFileByAppGeneration
+      summary: File Preview
+      description: |
+        Preview or download uploaded files. This endpoint allows you to access files previously uploaded through the file upload API.
+        Files can only be accessed within the message scope belonging to the requesting application.
+      parameters:
+        - name: file_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 'Unique identifier of the file to preview, obtained from the file upload API response'
+        - name: as_attachment
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: Whether to force file download as attachment. Defaults to false (preview in browser)
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+                description: File content
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: Set according to file MIME type
+            Content-Length:
+              schema:
+                type: integer
+              description: 'File size in bytes, if available'
+            Content-Disposition:
+              schema:
+                type: string
+              description: Set to 'attachment' if as_attachment=true
+            Cache-Control:
+              schema:
+                type: string
+              description: Cache headers for performance
+            Accept-Ranges:
+              schema:
+                type: string
+              description: Set to 'bytes' for audio/video files
+        '400':
+          description: Invalid parameter input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: invalid_param
+                status: 400
+                message: Invalid parameter input
+        '403':
+          description: File access denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: file_access_denied
+                status: 403
+                message: File access denied or file does not belong to current application
+        '404':
+          description: File not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: file_not_found
+                status: 404
+                message: File not found or has been deleted
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /info:
     get:
       operationId: getApplicationInfoByAppGeneration

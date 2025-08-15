@@ -11,7 +11,7 @@ actions:
         Dify API provides a series of interfaces for text generation functionality.
         It supports text generation applications.
         All API requests require an application-level API-Key in the Authorization HTTP Header.
-        official raw document: https://github.com/langgenius/dify/blob/1.5.0/web/app/components/develop/template/template.en.mdx
+        official raw document: https://github.com/langgenius/dify/blob/1.7.2/web/app/components/develop/template/template.en.mdx
 
   - target: $.servers[0]
     update:
@@ -290,6 +290,61 @@ actions:
 
   - target: $.paths['/files/upload'].post.responses['503'].description
     update: "Storage service error"
+
+  - target: $.paths['/files/{file_id}/preview'].get
+    update:
+      summary: "File Preview"
+      description: |
+        Preview or download uploaded files. This endpoint allows you to access files previously uploaded through the file upload API.
+        Files can only be accessed within the message scope belonging to the requesting application.
+
+  - target: $.paths['/files/{file_id}/preview'].get.parameters[0].description
+    update: "Unique identifier of the file to preview, obtained from the file upload API response"
+
+  - target: $.paths['/files/{file_id}/preview'].get.parameters[1].description
+    update: "Whether to force file download as attachment. Defaults to false (preview in browser)"
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['200'].content['application/octet-stream'].schema.description
+    update: "File content"
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['200'].headers['Content-Type'].description
+    update: "Set according to file MIME type"
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['200'].headers['Content-Length'].description
+    update: "File size in bytes, if available"
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['200'].headers['Content-Disposition'].description
+    update: "Set to 'attachment' if as_attachment=true"
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['200'].headers['Cache-Control'].description
+    update: "Cache headers for performance"
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['200'].headers['Accept-Ranges'].description
+    update: "Set to 'bytes' for audio/video files"
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['400'].description
+    update: "Invalid parameter input"
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['400'].content['application/json'].example.message
+    update: "Invalid parameter input"
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['403'].description
+    update: "File access denied"
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['403'].content['application/json'].example.message
+    update: "File access denied or file does not belong to current application"
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['404'].description
+    update: "File not found"
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['404'].content['application/json'].example.message
+    update: "File not found or has been deleted"
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['500'].description
+    update: "Internal server error"
 
   - target: $.paths['/info'].get
     update:

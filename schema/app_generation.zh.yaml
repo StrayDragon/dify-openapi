@@ -5,8 +5,8 @@ info:
     Dify API 提供了一系列接口用于文本生成功能。
     支持文本生成型应用。
     所有 API 请求都需要在 Authorization HTTP Header 中包含应用级 API-Key。
-    官方原始文档见: https://github.com/langgenius/dify/blob/1.7.1/web/app/components/develop/template/template.zh.mdx
-  version: 1.7.1
+    官方原始文档见: https://github.com/langgenius/dify/blob/1.7.2/web/app/components/develop/template/template.zh.mdx
+  version: 1.7.2
 
 servers:
   - url: https://api.dify.ai/v1
@@ -543,6 +543,94 @@ paths:
                     code: "s3_file_too_large"
                     status: 503
                     message: "文件超出 S3 大小限制"
+
+  /files/{file_id}/preview:
+    get:
+      operationId: previewFileByAppGeneration
+      summary: 文件预览
+      description: |
+        预览或下载已上传的文件。此端点允许您访问先前通过文件上传 API 上传的文件。
+        文件只能在属于请求应用程序的消息范围内访问。
+      parameters:
+        - name: file_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 要预览的文件的唯一标识符，从文件上传 API 响应中获得
+        - name: as_attachment
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: 是否强制将文件作为附件下载。默认为 false（在浏览器中预览）
+      responses:
+        "200":
+          description: 成功响应
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+                description: 文件内容
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: 根据文件 MIME 类型设置
+            Content-Length:
+              schema:
+                type: integer
+              description: 文件大小（以字节为单位，如果可用）
+            Content-Disposition:
+              schema:
+                type: string
+              description: 如果 as_attachment=true 则设置为 "attachment"
+            Cache-Control:
+              schema:
+                type: string
+              description: 用于性能的缓存标头
+            Accept-Ranges:
+              schema:
+                type: string
+              description: 对于音频/视频文件设置为 "bytes"
+        "400":
+          description: 参数输入异常
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                code: "invalid_param"
+                status: 400
+                message: "参数输入异常"
+        "403":
+          description: 文件访问被拒绝
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                code: "file_access_denied"
+                status: 403
+                message: "文件访问被拒绝或文件不属于当前应用程序"
+        "404":
+          description: 文件未找到
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                code: "file_not_found"
+                status: 404
+                message: "文件未找到或已被删除"
+        "500":
+          description: 服务内部错误
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   /info:
     get:
