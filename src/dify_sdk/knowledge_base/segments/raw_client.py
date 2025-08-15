@@ -12,7 +12,6 @@ from ...core.request_options import RequestOptions
 from ...core.serialization import convert_and_respect_annotation_metadata
 from ..errors.bad_request_error import BadRequestError
 from ..errors.forbidden_error import ForbiddenError
-from ..types.error import Error
 from .types.create_segments_request_segments_item import CreateSegmentsRequestSegmentsItem
 from .types.create_segments_response import CreateSegmentsResponse
 from .types.get_datasets_dataset_id_documents_document_id_segments_segment_id_child_chunks_response import (
@@ -103,9 +102,9 @@ class RawSegmentsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -171,9 +170,9 @@ class RawSegmentsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -181,9 +180,9 @@ class RawSegmentsClient:
             if _response.status_code == 403:
                 raise ForbiddenError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -258,9 +257,9 @@ class RawSegmentsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -329,9 +328,9 @@ class RawSegmentsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -339,9 +338,9 @@ class RawSegmentsClient:
             if _response.status_code == 403:
                 raise ForbiddenError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -395,9 +394,9 @@ class RawSegmentsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -405,9 +404,9 @@ class RawSegmentsClient:
             if _response.status_code == 403:
                 raise ForbiddenError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -480,9 +479,9 @@ class RawSegmentsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -490,9 +489,9 @@ class RawSegmentsClient:
             if _response.status_code == 403:
                 raise ForbiddenError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -550,9 +549,9 @@ class RawSegmentsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -560,9 +559,9 @@ class RawSegmentsClient:
             if _response.status_code == 403:
                 raise ForbiddenError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -632,9 +631,9 @@ class RawSegmentsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -642,9 +641,9 @@ class RawSegmentsClient:
             if _response.status_code == 403:
                 raise ForbiddenError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -694,9 +693,9 @@ class RawSegmentsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -704,9 +703,9 @@ class RawSegmentsClient:
             if _response.status_code == 403:
                 raise ForbiddenError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -787,9 +786,9 @@ class AsyncRawSegmentsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -855,9 +854,9 @@ class AsyncRawSegmentsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -865,9 +864,9 @@ class AsyncRawSegmentsClient:
             if _response.status_code == 403:
                 raise ForbiddenError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -942,9 +941,9 @@ class AsyncRawSegmentsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1013,9 +1012,9 @@ class AsyncRawSegmentsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1023,9 +1022,9 @@ class AsyncRawSegmentsClient:
             if _response.status_code == 403:
                 raise ForbiddenError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1079,9 +1078,9 @@ class AsyncRawSegmentsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1089,9 +1088,9 @@ class AsyncRawSegmentsClient:
             if _response.status_code == 403:
                 raise ForbiddenError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1164,9 +1163,9 @@ class AsyncRawSegmentsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1174,9 +1173,9 @@ class AsyncRawSegmentsClient:
             if _response.status_code == 403:
                 raise ForbiddenError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1234,9 +1233,9 @@ class AsyncRawSegmentsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1244,9 +1243,9 @@ class AsyncRawSegmentsClient:
             if _response.status_code == 403:
                 raise ForbiddenError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1316,9 +1315,9 @@ class AsyncRawSegmentsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1326,9 +1325,9 @@ class AsyncRawSegmentsClient:
             if _response.status_code == 403:
                 raise ForbiddenError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1378,9 +1377,9 @@ class AsyncRawSegmentsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1388,9 +1387,9 @@ class AsyncRawSegmentsClient:
             if _response.status_code == 403:
                 raise ForbiddenError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )

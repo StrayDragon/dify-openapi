@@ -4,10 +4,11 @@ import typing
 
 import pydantic
 from ...core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from .not_found_error_body_code import NotFoundErrorBodyCode
 
 
 class NotFoundErrorBody(UniversalBaseModel):
-    code: typing.Optional[typing.Literal["conversation_not_exists"]] = pydantic.Field(default=None)
+    code: typing.Optional[NotFoundErrorBodyCode] = pydantic.Field(default=None)
     """
     Error code
     """

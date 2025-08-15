@@ -13,6 +13,7 @@ from .types.get_app_site_response import GetAppSiteResponse
 from .types.get_workflow_execution_status_response import GetWorkflowExecutionStatusResponse
 from .types.get_workflow_logs_request_status import GetWorkflowLogsRequestStatus
 from .types.get_workflow_logs_response import GetWorkflowLogsResponse
+from .types.run_specific_workflow_request_response_mode import RunSpecificWorkflowRequestResponseMode
 from .types.run_workflow_request_response_mode import RunWorkflowRequestResponseMode
 from .types.stop_workflow_response import StopWorkflowResponse
 from .types.upload_file_response import UploadFileResponse
@@ -102,6 +103,86 @@ class WorkflowClient:
             yield chunk
         """
         with self._raw_client.run_workflow(
+            inputs=inputs,
+            response_mode=response_mode,
+            user=user,
+            files=files,
+            trace_id=trace_id,
+            request_options=request_options,
+        ) as r:
+            yield from r.data
+
+    def run_specific_workflow(
+        self,
+        workflow_id: str,
+        *,
+        inputs: typing.Dict[str, typing.Optional[typing.Any]],
+        response_mode: RunSpecificWorkflowRequestResponseMode,
+        user: str,
+        files: typing.Optional[typing.Sequence[typing.Dict[str, typing.Optional[typing.Any]]]] = OMIT,
+        trace_id: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.Iterator[ChunkWorkflowMessage]:
+        """
+        Execute a specific version of the workflow, specifying the workflow ID through the path parameter
+
+        Parameters
+        ----------
+        workflow_id : str
+            Workflow ID, used to specify a specific version of the workflow. How to obtain: You can query the specific version workflow ID in the version history.
+
+        inputs : typing.Dict[str, typing.Optional[typing.Any]]
+            Allows passing values for variables defined in the App.
+            The inputs parameter contains multiple key/value pairs, where each key corresponds to a specific variable and each value is the specific value for that variable. Variables can be of file list type.
+            File list type variables are suitable for passing files combined with text understanding to answer questions, only available when the model supports parsing capabilities for that type of file. If the variable is a file list type, the value corresponding to the variable should be in list format, where each element should include the following:
+              - `type` (string) Supported types:
+                - `document` Specific types include: 'TXT', 'MD', 'MARKDOWN', 'PDF', 'HTML', 'XLSX', 'XLS', 'DOCX', 'CSV', 'EML', 'MSG', 'PPTX', 'PPT', 'XML', 'EPUB'
+                - `image` Specific types include: 'JPG', 'JPEG', 'PNG', 'GIF', 'WEBP', 'SVG'
+                - `audio` Specific types include: 'MP3', 'M4A', 'WAV', 'WEBM', 'AMR'
+                - `video` Specific types include: 'MP4', 'MOV', 'MPEG', 'MPGA'
+                - `custom` Specific types include: other file types
+              - `transfer_method` (string) Transfer method, `remote_url` image address / `local_file` uploaded file
+              - `url` (string) Image address (only when the transfer method is `remote_url`)
+              - `upload_file_id` (string) Upload file ID (only when the transfer method is `local_file`)
+
+        response_mode : RunSpecificWorkflowRequestResponseMode
+            Response mode, supports:
+            - `streaming` Streaming mode (recommended). Implements streaming return similar to typewriter output based on SSE (Server-Sent Events).
+            - `blocking` Blocking mode, waits for execution to complete before returning results. (Requests may be interrupted if the process is lengthy).
+            Due to Cloudflare limitations, requests will be interrupted after 100 seconds of timeout with no response.
+
+        user : str
+            User identifier, used to define the identity of the end user, for easy retrieval and statistics.
+            Rules defined by the developer, the user identifier must be unique within the application. API cannot access sessions created by WebApp.
+
+        files : typing.Optional[typing.Sequence[typing.Dict[str, typing.Optional[typing.Any]]]]
+            Optional file list
+
+        trace_id : typing.Optional[str]
+            Tracing ID. Suitable for integrating with existing trace components in business systems to achieve end-to-end distributed tracing. If not specified, the system will automatically generate a `trace_id`. Supports the following three transmission methods, with priorities as follows:
+            1. Header: Recommended to pass through HTTP Header `X-Trace-Id`, highest priority.
+            2. Query parameter: Pass through URL query parameter `trace_id`.
+            3. Request Body: Pass through request body field `trace_id` (this field).
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Yields
+        ------
+        typing.Iterator[ChunkWorkflowMessage]
+            Successful response
+
+        Examples
+        --------
+        from dify import DifyApi
+        client = DifyApi(token="YOUR_TOKEN", )
+        response = client.workflow.run_specific_workflow(workflow_id='workflow_id', inputs={'key': 'value'
+        }, response_mode="streaming", user='user', )
+        for chunk in response:
+            yield chunk
+        """
+        with self._raw_client.run_specific_workflow(
+            workflow_id,
             inputs=inputs,
             response_mode=response_mode,
             user=user,
@@ -260,6 +341,35 @@ class WorkflowClient:
         _response = self._raw_client.upload_file(file=file, user=user, request_options=request_options)
         return _response.data
 
+    def preview_file(
+        self,
+        file_id: str,
+        *,
+        as_attachment: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.Iterator[bytes]:
+        """
+        Preview or download uploaded files. This endpoint allows you to access files previously uploaded through the file upload API. Files can only be accessed within the message scope belonging to the requesting application.
+
+        Parameters
+        ----------
+        file_id : str
+            Unique identifier of the file to preview, obtained from the file upload API response
+
+        as_attachment : typing.Optional[bool]
+            Whether to force the file to be downloaded as an attachment. Defaults to `false` (preview in browser)
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration. You can pass in configuration such as `chunk_size`, and more to customize the request and response.
+
+        Returns
+        -------
+        typing.Iterator[bytes]
+            Successfully retrieved file content
+        """
+        with self._raw_client.preview_file(file_id, as_attachment=as_attachment, request_options=request_options) as r:
+            yield from r.data
+
     def get_app_info(self, *, request_options: typing.Optional[RequestOptions] = None) -> GetAppInfoResponse:
         """
         Used to get basic information about the application
@@ -416,6 +526,90 @@ class AsyncWorkflowClient:
         asyncio.run(main())
         """
         async with self._raw_client.run_workflow(
+            inputs=inputs,
+            response_mode=response_mode,
+            user=user,
+            files=files,
+            trace_id=trace_id,
+            request_options=request_options,
+        ) as r:
+            async for data in r.data:
+                yield data
+
+    async def run_specific_workflow(
+        self,
+        workflow_id: str,
+        *,
+        inputs: typing.Dict[str, typing.Optional[typing.Any]],
+        response_mode: RunSpecificWorkflowRequestResponseMode,
+        user: str,
+        files: typing.Optional[typing.Sequence[typing.Dict[str, typing.Optional[typing.Any]]]] = OMIT,
+        trace_id: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.AsyncIterator[ChunkWorkflowMessage]:
+        """
+        Execute a specific version of the workflow, specifying the workflow ID through the path parameter
+
+        Parameters
+        ----------
+        workflow_id : str
+            Workflow ID, used to specify a specific version of the workflow. How to obtain: You can query the specific version workflow ID in the version history.
+
+        inputs : typing.Dict[str, typing.Optional[typing.Any]]
+            Allows passing values for variables defined in the App.
+            The inputs parameter contains multiple key/value pairs, where each key corresponds to a specific variable and each value is the specific value for that variable. Variables can be of file list type.
+            File list type variables are suitable for passing files combined with text understanding to answer questions, only available when the model supports parsing capabilities for that type of file. If the variable is a file list type, the value corresponding to the variable should be in list format, where each element should include the following:
+              - `type` (string) Supported types:
+                - `document` Specific types include: 'TXT', 'MD', 'MARKDOWN', 'PDF', 'HTML', 'XLSX', 'XLS', 'DOCX', 'CSV', 'EML', 'MSG', 'PPTX', 'PPT', 'XML', 'EPUB'
+                - `image` Specific types include: 'JPG', 'JPEG', 'PNG', 'GIF', 'WEBP', 'SVG'
+                - `audio` Specific types include: 'MP3', 'M4A', 'WAV', 'WEBM', 'AMR'
+                - `video` Specific types include: 'MP4', 'MOV', 'MPEG', 'MPGA'
+                - `custom` Specific types include: other file types
+              - `transfer_method` (string) Transfer method, `remote_url` image address / `local_file` uploaded file
+              - `url` (string) Image address (only when the transfer method is `remote_url`)
+              - `upload_file_id` (string) Upload file ID (only when the transfer method is `local_file`)
+
+        response_mode : RunSpecificWorkflowRequestResponseMode
+            Response mode, supports:
+            - `streaming` Streaming mode (recommended). Implements streaming return similar to typewriter output based on SSE (Server-Sent Events).
+            - `blocking` Blocking mode, waits for execution to complete before returning results. (Requests may be interrupted if the process is lengthy).
+            Due to Cloudflare limitations, requests will be interrupted after 100 seconds of timeout with no response.
+
+        user : str
+            User identifier, used to define the identity of the end user, for easy retrieval and statistics.
+            Rules defined by the developer, the user identifier must be unique within the application. API cannot access sessions created by WebApp.
+
+        files : typing.Optional[typing.Sequence[typing.Dict[str, typing.Optional[typing.Any]]]]
+            Optional file list
+
+        trace_id : typing.Optional[str]
+            Tracing ID. Suitable for integrating with existing trace components in business systems to achieve end-to-end distributed tracing. If not specified, the system will automatically generate a `trace_id`. Supports the following three transmission methods, with priorities as follows:
+            1. Header: Recommended to pass through HTTP Header `X-Trace-Id`, highest priority.
+            2. Query parameter: Pass through URL query parameter `trace_id`.
+            3. Request Body: Pass through request body field `trace_id` (this field).
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Yields
+        ------
+        typing.AsyncIterator[ChunkWorkflowMessage]
+            Successful response
+
+        Examples
+        --------
+        from dify import AsyncDifyApi
+        import asyncio
+        client = AsyncDifyApi(token="YOUR_TOKEN", )
+        async def main() -> None:
+            response = await client.workflow.run_specific_workflow(workflow_id='workflow_id', inputs={'key': 'value'
+            }, response_mode="streaming", user='user', )
+            async for chunk in response:
+                yield chunk
+        asyncio.run(main())
+        """
+        async with self._raw_client.run_specific_workflow(
+            workflow_id,
             inputs=inputs,
             response_mode=response_mode,
             user=user,
@@ -588,6 +782,38 @@ class AsyncWorkflowClient:
         """
         _response = await self._raw_client.upload_file(file=file, user=user, request_options=request_options)
         return _response.data
+
+    async def preview_file(
+        self,
+        file_id: str,
+        *,
+        as_attachment: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.AsyncIterator[bytes]:
+        """
+        Preview or download uploaded files. This endpoint allows you to access files previously uploaded through the file upload API. Files can only be accessed within the message scope belonging to the requesting application.
+
+        Parameters
+        ----------
+        file_id : str
+            Unique identifier of the file to preview, obtained from the file upload API response
+
+        as_attachment : typing.Optional[bool]
+            Whether to force the file to be downloaded as an attachment. Defaults to `false` (preview in browser)
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration. You can pass in configuration such as `chunk_size`, and more to customize the request and response.
+
+        Returns
+        -------
+        typing.AsyncIterator[bytes]
+            Successfully retrieved file content
+        """
+        async with self._raw_client.preview_file(
+            file_id, as_attachment=as_attachment, request_options=request_options
+        ) as r:
+            async for data in r.data:
+                yield data
 
     async def get_app_info(self, *, request_options: typing.Optional[RequestOptions] = None) -> GetAppInfoResponse:
         """

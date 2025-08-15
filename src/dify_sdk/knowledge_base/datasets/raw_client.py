@@ -80,9 +80,9 @@ class RawDatasetsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -193,9 +193,9 @@ class RawDatasetsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -252,9 +252,9 @@ class RawDatasetsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -262,9 +262,9 @@ class RawDatasetsClient:
             if _response.status_code == 403:
                 raise ForbiddenError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -303,9 +303,9 @@ class RawDatasetsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -313,9 +313,9 @@ class RawDatasetsClient:
             if _response.status_code == 403:
                 raise ForbiddenError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -412,9 +412,9 @@ class RawDatasetsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -422,9 +422,9 @@ class RawDatasetsClient:
             if _response.status_code == 403:
                 raise ForbiddenError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -497,9 +497,9 @@ class RawDatasetsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -507,9 +507,9 @@ class RawDatasetsClient:
             if _response.status_code == 403:
                 raise ForbiddenError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -572,9 +572,9 @@ class AsyncRawDatasetsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -685,9 +685,9 @@ class AsyncRawDatasetsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -744,9 +744,9 @@ class AsyncRawDatasetsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -754,9 +754,9 @@ class AsyncRawDatasetsClient:
             if _response.status_code == 403:
                 raise ForbiddenError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -795,9 +795,9 @@ class AsyncRawDatasetsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -805,9 +805,9 @@ class AsyncRawDatasetsClient:
             if _response.status_code == 403:
                 raise ForbiddenError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -904,9 +904,9 @@ class AsyncRawDatasetsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -914,9 +914,9 @@ class AsyncRawDatasetsClient:
             if _response.status_code == 403:
                 raise ForbiddenError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -989,9 +989,9 @@ class AsyncRawDatasetsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -999,9 +999,9 @@ class AsyncRawDatasetsClient:
             if _response.status_code == 403:
                 raise ForbiddenError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )

@@ -46,6 +46,9 @@ from .types.send_chat_message_by_app_advanced_chat_request_response_mode import 
 from .types.send_message_feedback_by_app_advanced_chat_response import SendMessageFeedbackByAppAdvancedChatResponse
 from .types.stop_chat_response_by_app_advanced_chat_response import StopChatResponseByAppAdvancedChatResponse
 from .types.update_annotation_by_app_advanced_chat_response import UpdateAnnotationByAppAdvancedChatResponse
+from .types.update_conversation_variable_by_app_advanced_chat_response import (
+    UpdateConversationVariableByAppAdvancedChatResponse,
+)
 from .types.uploaded_file import UploadedFile
 
 # this is used as the default value for optional parameters
@@ -77,6 +80,7 @@ class AdvancedChatClient:
         conversation_id: typing.Optional[str] = OMIT,
         files: typing.Optional[typing.Sequence[FileInput]] = OMIT,
         auto_generate_name: typing.Optional[bool] = OMIT,
+        workflow_id: typing.Optional[str] = OMIT,
         trace_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Iterator[ChunkChatCompletionResponse]:
@@ -108,6 +112,9 @@ class AdvancedChatClient:
         auto_generate_name : typing.Optional[bool]
             (Optional) Automatically generate title, default `true`. If set to `false`, you can call the conversation rename interface and set `auto_generate` to `true` to generate a title asynchronously.
 
+        workflow_id : typing.Optional[str]
+            (Optional) Workflow ID for specifying a specific version. If not provided, the default published version will be used.
+
         trace_id : typing.Optional[str]
             (Optional) Trace ID. Suitable for integrating with existing trace components in business systems to achieve end-to-end distributed tracing scenarios. If not specified, the system will automatically generate a trace_id. Three methods are supported with the following priority order: Header: Pass through HTTP Header X-Trace-Id, highest priority. Query parameter: Pass through URL query parameter trace_id. Request Body: Pass through request body field trace_id (this field).
 
@@ -135,6 +142,7 @@ class AdvancedChatClient:
             conversation_id=conversation_id,
             files=files,
             auto_generate_name=auto_generate_name,
+            workflow_id=workflow_id,
             trace_id=trace_id,
             request_options=request_options,
         ) as r:
@@ -211,6 +219,38 @@ class AdvancedChatClient:
             file=file, user=user, request_options=request_options
         )
         return _response.data
+
+    def preview_file_by_app_advanced_chat(
+        self,
+        file_id: str,
+        *,
+        as_attachment: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.Iterator[bytes]:
+        """
+        Preview or download uploaded files. This endpoint allows you to access files previously uploaded through the file upload API.
+        Files can only be accessed within the message scope belonging to the requesting application.
+
+        Parameters
+        ----------
+        file_id : str
+            Unique identifier of the file to preview, obtained from the file upload API response.
+
+        as_attachment : typing.Optional[bool]
+            Whether to force download the file as an attachment. Default is false (preview in browser).
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration. You can pass in configuration such as `chunk_size`, and more to customize the request and response.
+
+        Returns
+        -------
+        typing.Iterator[bytes]
+            File content
+        """
+        with self._raw_client.preview_file_by_app_advanced_chat(
+            file_id, as_attachment=as_attachment, request_options=request_options
+        ) as r:
+            yield from r.data
 
     def convert_audio_to_text_by_app_advanced_chat(
         self,
@@ -666,6 +706,51 @@ class AdvancedChatClient:
         )
         return _response.data
 
+    def update_conversation_variable_by_app_advanced_chat(
+        self,
+        conversation_id: str,
+        variable_id: str,
+        *,
+        user: str,
+        value: typing.Optional[typing.Any] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> UpdateConversationVariableByAppAdvancedChatResponse:
+        """
+        Update the value of a specific conversation variable. This endpoint allows you to modify variable values captured during conversations while preserving their name, type, and description.
+
+        Parameters
+        ----------
+        conversation_id : str
+            The conversation ID containing the variable to update.
+
+        variable_id : str
+            The ID of the variable to update.
+
+        user : str
+            User identifier, defined by developer rules, must be unique within the application.
+
+        value : typing.Optional[typing.Any]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        UpdateConversationVariableByAppAdvancedChatResponse
+            Successful response
+
+        Examples
+        --------
+        from dify import DifyApi
+        client = DifyApi(token="YOUR_TOKEN", )
+        client.advanced_chat.update_conversation_variable_by_app_advanced_chat(conversation_id='conversation_id', variable_id='variable_id', value={'key': 'value'}
+        , user='user', )
+        """
+        _response = self._raw_client.update_conversation_variable_by_app_advanced_chat(
+            conversation_id, variable_id, user=user, value=value, request_options=request_options
+        )
+        return _response.data
+
     def get_app_meta_info_by_app_advanced_chat(
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> GetAppMetaInfoByAppAdvancedChatResponse:
@@ -963,6 +1048,7 @@ class AsyncAdvancedChatClient:
         conversation_id: typing.Optional[str] = OMIT,
         files: typing.Optional[typing.Sequence[FileInput]] = OMIT,
         auto_generate_name: typing.Optional[bool] = OMIT,
+        workflow_id: typing.Optional[str] = OMIT,
         trace_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.AsyncIterator[ChunkChatCompletionResponse]:
@@ -994,6 +1080,9 @@ class AsyncAdvancedChatClient:
         auto_generate_name : typing.Optional[bool]
             (Optional) Automatically generate title, default `true`. If set to `false`, you can call the conversation rename interface and set `auto_generate` to `true` to generate a title asynchronously.
 
+        workflow_id : typing.Optional[str]
+            (Optional) Workflow ID for specifying a specific version. If not provided, the default published version will be used.
+
         trace_id : typing.Optional[str]
             (Optional) Trace ID. Suitable for integrating with existing trace components in business systems to achieve end-to-end distributed tracing scenarios. If not specified, the system will automatically generate a trace_id. Three methods are supported with the following priority order: Header: Pass through HTTP Header X-Trace-Id, highest priority. Query parameter: Pass through URL query parameter trace_id. Request Body: Pass through request body field trace_id (this field).
 
@@ -1024,6 +1113,7 @@ class AsyncAdvancedChatClient:
             conversation_id=conversation_id,
             files=files,
             auto_generate_name=auto_generate_name,
+            workflow_id=workflow_id,
             trace_id=trace_id,
             request_options=request_options,
         ) as r:
@@ -1107,6 +1197,39 @@ class AsyncAdvancedChatClient:
             file=file, user=user, request_options=request_options
         )
         return _response.data
+
+    async def preview_file_by_app_advanced_chat(
+        self,
+        file_id: str,
+        *,
+        as_attachment: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.AsyncIterator[bytes]:
+        """
+        Preview or download uploaded files. This endpoint allows you to access files previously uploaded through the file upload API.
+        Files can only be accessed within the message scope belonging to the requesting application.
+
+        Parameters
+        ----------
+        file_id : str
+            Unique identifier of the file to preview, obtained from the file upload API response.
+
+        as_attachment : typing.Optional[bool]
+            Whether to force download the file as an attachment. Default is false (preview in browser).
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration. You can pass in configuration such as `chunk_size`, and more to customize the request and response.
+
+        Returns
+        -------
+        typing.AsyncIterator[bytes]
+            File content
+        """
+        async with self._raw_client.preview_file_by_app_advanced_chat(
+            file_id, as_attachment=as_attachment, request_options=request_options
+        ) as r:
+            async for data in r.data:
+                yield data
 
     async def convert_audio_to_text_by_app_advanced_chat(
         self,
@@ -1595,6 +1718,54 @@ class AsyncAdvancedChatClient:
             limit=limit,
             variable_name=variable_name,
             request_options=request_options,
+        )
+        return _response.data
+
+    async def update_conversation_variable_by_app_advanced_chat(
+        self,
+        conversation_id: str,
+        variable_id: str,
+        *,
+        user: str,
+        value: typing.Optional[typing.Any] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> UpdateConversationVariableByAppAdvancedChatResponse:
+        """
+        Update the value of a specific conversation variable. This endpoint allows you to modify variable values captured during conversations while preserving their name, type, and description.
+
+        Parameters
+        ----------
+        conversation_id : str
+            The conversation ID containing the variable to update.
+
+        variable_id : str
+            The ID of the variable to update.
+
+        user : str
+            User identifier, defined by developer rules, must be unique within the application.
+
+        value : typing.Optional[typing.Any]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        UpdateConversationVariableByAppAdvancedChatResponse
+            Successful response
+
+        Examples
+        --------
+        from dify import AsyncDifyApi
+        import asyncio
+        client = AsyncDifyApi(token="YOUR_TOKEN", )
+        async def main() -> None:
+            await client.advanced_chat.update_conversation_variable_by_app_advanced_chat(conversation_id='conversation_id', variable_id='variable_id', value={'key': 'value'}
+            , user='user', )
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.update_conversation_variable_by_app_advanced_chat(
+            conversation_id, variable_id, user=user, value=value, request_options=request_options
         )
         return _response.data
 

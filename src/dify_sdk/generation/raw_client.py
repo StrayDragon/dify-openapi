@@ -15,6 +15,7 @@ from ..core.request_options import RequestOptions
 from ..core.serialization import convert_and_respect_annotation_metadata
 from .errors.bad_request_error import BadRequestError
 from .errors.content_too_large_error import ContentTooLargeError
+from .errors.forbidden_error import ForbiddenError
 from .errors.internal_server_error import InternalServerError
 from .errors.not_found_error import NotFoundError
 from .errors.service_unavailable_error import ServiceUnavailableError
@@ -145,9 +146,9 @@ class RawGenerationClient:
                     if _response.status_code == 400:
                         raise BadRequestError(
                             typing.cast(
-                                Error,
+                                typing.Optional[typing.Any],
                                 parse_obj_as(
-                                    type_=Error,  # type: ignore
+                                    type_=typing.Optional[typing.Any],  # type: ignore
                                     object_=_response.json(),
                                 ),
                             )
@@ -233,9 +234,9 @@ class RawGenerationClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -274,6 +275,100 @@ class RawGenerationClient:
         except JSONDecodeError:
             raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
         raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+    @contextlib.contextmanager
+    def preview_file_by_app_generation(
+        self,
+        file_id: str,
+        *,
+        as_attachment: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.Iterator[HttpResponse[typing.Iterator[bytes]]]:
+        """
+        Preview or download uploaded files. This endpoint allows you to access files previously uploaded through the file upload API.
+        Files can only be accessed within the message scope belonging to the requesting application.
+
+        Parameters
+        ----------
+        file_id : str
+            Unique identifier of the file to preview, obtained from the file upload API response
+
+        as_attachment : typing.Optional[bool]
+            Whether to force file download as attachment. Defaults to false (preview in browser)
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration. You can pass in configuration such as `chunk_size`, and more to customize the request and response.
+
+        Returns
+        -------
+        typing.Iterator[HttpResponse[typing.Iterator[bytes]]]
+            Successful response
+        """
+        with self._client_wrapper.httpx_client.stream(
+            f"files/{jsonable_encoder(file_id)}/preview",
+            method="GET",
+            params={
+                "as_attachment": as_attachment,
+            },
+            request_options=request_options,
+        ) as _response:
+
+            def stream() -> HttpResponse[typing.Iterator[bytes]]:
+                try:
+                    if 200 <= _response.status_code < 300:
+                        _chunk_size = request_options.get("chunk_size", None) if request_options is not None else None
+                        return HttpResponse(
+                            response=_response, data=(_chunk for _chunk in _response.iter_bytes(chunk_size=_chunk_size))
+                        )
+                    _response.read()
+                    if _response.status_code == 400:
+                        raise BadRequestError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 403:
+                        raise ForbiddenError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 404:
+                        raise NotFoundError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 500:
+                        raise InternalServerError(
+                            typing.cast(
+                                Error,
+                                parse_obj_as(
+                                    type_=Error,  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    _response_json = _response.json()
+                except JSONDecodeError:
+                    raise ApiError(
+                        headers=dict(_response.headers), status_code=_response.status_code, body=_response.text
+                    )
+                raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+            yield stream()
 
     def get_application_info_by_app_generation(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -1029,9 +1124,9 @@ class AsyncRawGenerationClient:
                     if _response.status_code == 400:
                         raise BadRequestError(
                             typing.cast(
-                                Error,
+                                typing.Optional[typing.Any],
                                 parse_obj_as(
-                                    type_=Error,  # type: ignore
+                                    type_=typing.Optional[typing.Any],  # type: ignore
                                     object_=_response.json(),
                                 ),
                             )
@@ -1117,9 +1212,9 @@ class AsyncRawGenerationClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1158,6 +1253,101 @@ class AsyncRawGenerationClient:
         except JSONDecodeError:
             raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
         raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+    @contextlib.asynccontextmanager
+    async def preview_file_by_app_generation(
+        self,
+        file_id: str,
+        *,
+        as_attachment: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[bytes]]]:
+        """
+        Preview or download uploaded files. This endpoint allows you to access files previously uploaded through the file upload API.
+        Files can only be accessed within the message scope belonging to the requesting application.
+
+        Parameters
+        ----------
+        file_id : str
+            Unique identifier of the file to preview, obtained from the file upload API response
+
+        as_attachment : typing.Optional[bool]
+            Whether to force file download as attachment. Defaults to false (preview in browser)
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration. You can pass in configuration such as `chunk_size`, and more to customize the request and response.
+
+        Returns
+        -------
+        typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[bytes]]]
+            Successful response
+        """
+        async with self._client_wrapper.httpx_client.stream(
+            f"files/{jsonable_encoder(file_id)}/preview",
+            method="GET",
+            params={
+                "as_attachment": as_attachment,
+            },
+            request_options=request_options,
+        ) as _response:
+
+            async def stream() -> AsyncHttpResponse[typing.AsyncIterator[bytes]]:
+                try:
+                    if 200 <= _response.status_code < 300:
+                        _chunk_size = request_options.get("chunk_size", None) if request_options is not None else None
+                        return AsyncHttpResponse(
+                            response=_response,
+                            data=(_chunk async for _chunk in _response.aiter_bytes(chunk_size=_chunk_size)),
+                        )
+                    await _response.aread()
+                    if _response.status_code == 400:
+                        raise BadRequestError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 403:
+                        raise ForbiddenError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 404:
+                        raise NotFoundError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 500:
+                        raise InternalServerError(
+                            typing.cast(
+                                Error,
+                                parse_obj_as(
+                                    type_=Error,  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    _response_json = _response.json()
+                except JSONDecodeError:
+                    raise ApiError(
+                        headers=dict(_response.headers), status_code=_response.status_code, body=_response.text
+                    )
+                raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+            yield await stream()
 
     async def get_application_info_by_app_generation(
         self, *, request_options: typing.Optional[RequestOptions] = None

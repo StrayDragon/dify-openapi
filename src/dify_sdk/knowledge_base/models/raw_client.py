@@ -9,7 +9,6 @@ from ...core.http_response import AsyncHttpResponse, HttpResponse
 from ...core.pydantic_utilities import parse_obj_as
 from ...core.request_options import RequestOptions
 from ..errors.bad_request_error import BadRequestError
-from ..types.error import Error
 from .types.get_embedding_models_response import GetEmbeddingModelsResponse
 
 
@@ -51,9 +50,9 @@ class RawModelsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -102,9 +101,9 @@ class AsyncRawModelsClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )

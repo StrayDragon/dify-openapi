@@ -63,6 +63,7 @@ from .types import (
 from .errors import (
     BadRequestError,
     ContentTooLargeError,
+    ForbiddenError,
     InternalServerError,
     NotFoundError,
     ServiceUnavailableError,
@@ -84,6 +85,7 @@ __all__ = [
     "FileInput",
     "FileInputTransferMethod",
     "FileInputType",
+    "ForbiddenError",
     "GetAnnotationReplyStatusByAppGenerationRequestAction",
     "GetAnnotationReplyStatusByAppGenerationResponse",
     "GetAnnotationsListByAppGenerationResponse",

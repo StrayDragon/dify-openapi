@@ -3,6 +3,8 @@
 # isort: skip_file
 
 from .types import (
+    BadRequestErrorBody,
+    BadRequestErrorBodyCode,
     ChatCompletionResponse,
     ChatCompletionResponseMetadata,
     ChatHistoryMessage,
@@ -23,6 +25,7 @@ from .types import (
     FileInput,
     FileInputTransferMethod,
     FileInputType,
+    ForbiddenErrorBody,
     GetAnnotationReplyStatusByAppChatRequestAction,
     GetAnnotationReplyStatusByAppChatResponse,
     GetAnnotationsListByAppChatResponse,
@@ -60,6 +63,7 @@ from .types import (
     GetConversationVariablesByAppChatResponseDataItem,
     GetSuggestedQuestionsByAppChatResponse,
     NotFoundErrorBody,
+    NotFoundErrorBodyCode,
     RetrieverResource,
     SendChatMessageByAppChatRequestFilesItem,
     SendChatMessageByAppChatRequestFilesItemTransferMethod,
@@ -67,12 +71,14 @@ from .types import (
     SendMessageFeedbackByAppChatResponse,
     StopChatResponseByAppChatResponse,
     UpdateAnnotationByAppChatResponse,
+    UpdateConversationVariableByAppChatResponse,
     UploadedFile,
     Usage,
 )
 from .errors import (
     BadRequestError,
     ContentTooLargeError,
+    ForbiddenError,
     InternalServerError,
     NotFoundError,
     ServiceUnavailableError,
@@ -81,6 +87,8 @@ from .errors import (
 
 __all__ = [
     "BadRequestError",
+    "BadRequestErrorBody",
+    "BadRequestErrorBodyCode",
     "ChatCompletionResponse",
     "ChatCompletionResponseMetadata",
     "ChatHistoryMessage",
@@ -102,6 +110,8 @@ __all__ = [
     "FileInput",
     "FileInputTransferMethod",
     "FileInputType",
+    "ForbiddenError",
+    "ForbiddenErrorBody",
     "GetAnnotationReplyStatusByAppChatRequestAction",
     "GetAnnotationReplyStatusByAppChatResponse",
     "GetAnnotationsListByAppChatResponse",
@@ -141,6 +151,7 @@ __all__ = [
     "InternalServerError",
     "NotFoundError",
     "NotFoundErrorBody",
+    "NotFoundErrorBodyCode",
     "RetrieverResource",
     "SendChatMessageByAppChatRequestFilesItem",
     "SendChatMessageByAppChatRequestFilesItemTransferMethod",
@@ -150,6 +161,7 @@ __all__ = [
     "StopChatResponseByAppChatResponse",
     "UnsupportedMediaTypeError",
     "UpdateAnnotationByAppChatResponse",
+    "UpdateConversationVariableByAppChatResponse",
     "UploadedFile",
     "Usage",
 ]

@@ -154,6 +154,38 @@ class GenerationClient:
         )
         return _response.data
 
+    def preview_file_by_app_generation(
+        self,
+        file_id: str,
+        *,
+        as_attachment: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.Iterator[bytes]:
+        """
+        Preview or download uploaded files. This endpoint allows you to access files previously uploaded through the file upload API.
+        Files can only be accessed within the message scope belonging to the requesting application.
+
+        Parameters
+        ----------
+        file_id : str
+            Unique identifier of the file to preview, obtained from the file upload API response
+
+        as_attachment : typing.Optional[bool]
+            Whether to force file download as attachment. Defaults to false (preview in browser)
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration. You can pass in configuration such as `chunk_size`, and more to customize the request and response.
+
+        Returns
+        -------
+        typing.Iterator[bytes]
+            Successful response
+        """
+        with self._raw_client.preview_file_by_app_generation(
+            file_id, as_attachment=as_attachment, request_options=request_options
+        ) as r:
+            yield from r.data
+
     def get_application_info_by_app_generation(
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> GetApplicationInfoByAppGenerationResponse:
@@ -743,6 +775,39 @@ class AsyncGenerationClient:
             file=file, user=user, request_options=request_options
         )
         return _response.data
+
+    async def preview_file_by_app_generation(
+        self,
+        file_id: str,
+        *,
+        as_attachment: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.AsyncIterator[bytes]:
+        """
+        Preview or download uploaded files. This endpoint allows you to access files previously uploaded through the file upload API.
+        Files can only be accessed within the message scope belonging to the requesting application.
+
+        Parameters
+        ----------
+        file_id : str
+            Unique identifier of the file to preview, obtained from the file upload API response
+
+        as_attachment : typing.Optional[bool]
+            Whether to force file download as attachment. Defaults to false (preview in browser)
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration. You can pass in configuration such as `chunk_size`, and more to customize the request and response.
+
+        Returns
+        -------
+        typing.AsyncIterator[bytes]
+            Successful response
+        """
+        async with self._raw_client.preview_file_by_app_generation(
+            file_id, as_attachment=as_attachment, request_options=request_options
+        ) as r:
+            async for data in r.data:
+                yield data
 
     async def get_application_info_by_app_generation(
         self, *, request_options: typing.Optional[RequestOptions] = None

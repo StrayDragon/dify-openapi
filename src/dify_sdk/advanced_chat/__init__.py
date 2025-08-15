@@ -3,6 +3,7 @@
 # isort: skip_file
 
 from .types import (
+    BadRequestErrorBody,
     ChatCompletionResponse,
     ChatCompletionResponseMetadata,
     ChunkChatCompletionResponse,
@@ -61,18 +62,21 @@ from .types import (
     GetConversationsByAppAdvancedChatResponseDataItem,
     GetSuggestedQuestionsByAppAdvancedChatResponse,
     NotFoundErrorBody,
+    NotFoundErrorBodyCode,
     RenameConversationByAppAdvancedChatResponse,
     RetrieverResource,
     SendChatMessageByAppAdvancedChatRequestResponseMode,
     SendMessageFeedbackByAppAdvancedChatResponse,
     StopChatResponseByAppAdvancedChatResponse,
     UpdateAnnotationByAppAdvancedChatResponse,
+    UpdateConversationVariableByAppAdvancedChatResponse,
     UploadedFile,
     Usage,
 )
 from .errors import (
     BadRequestError,
     ContentTooLargeError,
+    ForbiddenError,
     InternalServerError,
     NotFoundError,
     ServiceUnavailableError,
@@ -81,6 +85,7 @@ from .errors import (
 
 __all__ = [
     "BadRequestError",
+    "BadRequestErrorBody",
     "ChatCompletionResponse",
     "ChatCompletionResponseMetadata",
     "ChunkChatCompletionResponse",
@@ -95,6 +100,7 @@ __all__ = [
     "FileInput",
     "FileInputTransferMethod",
     "FileInputType",
+    "ForbiddenError",
     "GetAnnotationReplyStatusByAppAdvancedChatRequestAction",
     "GetAnnotationReplyStatusByAppAdvancedChatResponse",
     "GetAnnotationsListByAppAdvancedChatResponse",
@@ -142,6 +148,7 @@ __all__ = [
     "InternalServerError",
     "NotFoundError",
     "NotFoundErrorBody",
+    "NotFoundErrorBodyCode",
     "RenameConversationByAppAdvancedChatResponse",
     "RetrieverResource",
     "SendChatMessageByAppAdvancedChatRequestResponseMode",
@@ -150,6 +157,7 @@ __all__ = [
     "StopChatResponseByAppAdvancedChatResponse",
     "UnsupportedMediaTypeError",
     "UpdateAnnotationByAppAdvancedChatResponse",
+    "UpdateConversationVariableByAppAdvancedChatResponse",
     "UploadedFile",
     "Usage",
 ]

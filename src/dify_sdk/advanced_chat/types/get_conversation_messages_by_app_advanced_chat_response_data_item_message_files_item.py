@@ -22,7 +22,7 @@ class GetConversationMessagesByAppAdvancedChatResponseDataItemMessageFilesItem(U
 
     url: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Preview image URL
+    File preview URL, access files using the file preview API (`/files/{file_id}/preview`)
     """
 
     belongs_to: typing.Optional[GetConversationMessagesByAppAdvancedChatResponseDataItemMessageFilesItemBelongsTo] = (

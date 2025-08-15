@@ -5,6 +5,7 @@ import json
 import typing
 from json.decoder import JSONDecodeError
 
+import httpx_sse
 from .. import core
 from ..core.api_error import ApiError
 from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
@@ -14,6 +15,7 @@ from ..core.pydantic_utilities import parse_obj_as
 from ..core.request_options import RequestOptions
 from .errors.bad_request_error import BadRequestError
 from .errors.content_too_large_error import ContentTooLargeError
+from .errors.forbidden_error import ForbiddenError
 from .errors.internal_server_error import InternalServerError
 from .errors.not_found_error import NotFoundError
 from .errors.service_unavailable_error import ServiceUnavailableError
@@ -27,6 +29,7 @@ from .types.get_app_site_response import GetAppSiteResponse
 from .types.get_workflow_execution_status_response import GetWorkflowExecutionStatusResponse
 from .types.get_workflow_logs_request_status import GetWorkflowLogsRequestStatus
 from .types.get_workflow_logs_response import GetWorkflowLogsResponse
+from .types.run_specific_workflow_request_response_mode import RunSpecificWorkflowRequestResponseMode
 from .types.run_workflow_request_response_mode import RunWorkflowRequestResponseMode
 from .types.stop_workflow_response import StopWorkflowResponse
 from .types.upload_file_response import UploadFileResponse
@@ -140,9 +143,143 @@ class RawWorkflowClient:
                     if _response.status_code == 400:
                         raise BadRequestError(
                             typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 404:
+                        raise NotFoundError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 500:
+                        raise InternalServerError(
+                            typing.cast(
                                 Error,
                                 parse_obj_as(
                                     type_=Error,  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    _response_json = _response.json()
+                except JSONDecodeError:
+                    raise ApiError(
+                        headers=dict(_response.headers), status_code=_response.status_code, body=_response.text
+                    )
+                raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+            yield stream()
+
+    @contextlib.contextmanager
+    def run_specific_workflow(
+        self,
+        workflow_id: str,
+        *,
+        inputs: typing.Dict[str, typing.Optional[typing.Any]],
+        response_mode: RunSpecificWorkflowRequestResponseMode,
+        user: str,
+        files: typing.Optional[typing.Sequence[typing.Dict[str, typing.Optional[typing.Any]]]] = OMIT,
+        trace_id: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.Iterator[HttpResponse[typing.Iterator[ChunkWorkflowMessage]]]:
+        """
+        Execute a specific version of the workflow, specifying the workflow ID through the path parameter
+
+        Parameters
+        ----------
+        workflow_id : str
+            Workflow ID, used to specify a specific version of the workflow. How to obtain: You can query the specific version workflow ID in the version history.
+
+        inputs : typing.Dict[str, typing.Optional[typing.Any]]
+            Allows passing values for variables defined in the App.
+            The inputs parameter contains multiple key/value pairs, where each key corresponds to a specific variable and each value is the specific value for that variable. Variables can be of file list type.
+            File list type variables are suitable for passing files combined with text understanding to answer questions, only available when the model supports parsing capabilities for that type of file. If the variable is a file list type, the value corresponding to the variable should be in list format, where each element should include the following:
+              - `type` (string) Supported types:
+                - `document` Specific types include: 'TXT', 'MD', 'MARKDOWN', 'PDF', 'HTML', 'XLSX', 'XLS', 'DOCX', 'CSV', 'EML', 'MSG', 'PPTX', 'PPT', 'XML', 'EPUB'
+                - `image` Specific types include: 'JPG', 'JPEG', 'PNG', 'GIF', 'WEBP', 'SVG'
+                - `audio` Specific types include: 'MP3', 'M4A', 'WAV', 'WEBM', 'AMR'
+                - `video` Specific types include: 'MP4', 'MOV', 'MPEG', 'MPGA'
+                - `custom` Specific types include: other file types
+              - `transfer_method` (string) Transfer method, `remote_url` image address / `local_file` uploaded file
+              - `url` (string) Image address (only when the transfer method is `remote_url`)
+              - `upload_file_id` (string) Upload file ID (only when the transfer method is `local_file`)
+
+        response_mode : RunSpecificWorkflowRequestResponseMode
+            Response mode, supports:
+            - `streaming` Streaming mode (recommended). Implements streaming return similar to typewriter output based on SSE (Server-Sent Events).
+            - `blocking` Blocking mode, waits for execution to complete before returning results. (Requests may be interrupted if the process is lengthy).
+            Due to Cloudflare limitations, requests will be interrupted after 100 seconds of timeout with no response.
+
+        user : str
+            User identifier, used to define the identity of the end user, for easy retrieval and statistics.
+            Rules defined by the developer, the user identifier must be unique within the application. API cannot access sessions created by WebApp.
+
+        files : typing.Optional[typing.Sequence[typing.Dict[str, typing.Optional[typing.Any]]]]
+            Optional file list
+
+        trace_id : typing.Optional[str]
+            Tracing ID. Suitable for integrating with existing trace components in business systems to achieve end-to-end distributed tracing. If not specified, the system will automatically generate a `trace_id`. Supports the following three transmission methods, with priorities as follows:
+            1. Header: Recommended to pass through HTTP Header `X-Trace-Id`, highest priority.
+            2. Query parameter: Pass through URL query parameter `trace_id`.
+            3. Request Body: Pass through request body field `trace_id` (this field).
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Yields
+        ------
+        typing.Iterator[HttpResponse[typing.Iterator[ChunkWorkflowMessage]]]
+            Successful response
+        """
+        with self._client_wrapper.httpx_client.stream(
+            f"workflows/{jsonable_encoder(workflow_id)}/run",
+            method="POST",
+            json={
+                "inputs": inputs,
+                "response_mode": response_mode,
+                "user": user,
+                "files": files,
+                "trace_id": trace_id,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        ) as _response:
+
+            def stream() -> HttpResponse[typing.Iterator[ChunkWorkflowMessage]]:
+                try:
+                    if 200 <= _response.status_code < 300:
+
+                        def _iter():
+                            _event_source = httpx_sse.EventSource(_response)
+                            for _sse in _event_source.iter_sse():
+                                if _sse.data == None:
+                                    return
+                                try:
+                                    yield _sse.data
+                                except Exception:
+                                    pass
+                            return
+
+                        return HttpResponse(response=_response, data=_iter())
+                    _response.read()
+                    if _response.status_code == 400:
+                        raise BadRequestError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
                                     object_=_response.json(),
                                 ),
                             )
@@ -213,9 +350,9 @@ class RawWorkflowClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -302,9 +439,9 @@ class RawWorkflowClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -412,9 +549,9 @@ class RawWorkflowClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -504,9 +641,9 @@ class RawWorkflowClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -566,6 +703,99 @@ class RawWorkflowClient:
             raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
         raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
+    @contextlib.contextmanager
+    def preview_file(
+        self,
+        file_id: str,
+        *,
+        as_attachment: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.Iterator[HttpResponse[typing.Iterator[bytes]]]:
+        """
+        Preview or download uploaded files. This endpoint allows you to access files previously uploaded through the file upload API. Files can only be accessed within the message scope belonging to the requesting application.
+
+        Parameters
+        ----------
+        file_id : str
+            Unique identifier of the file to preview, obtained from the file upload API response
+
+        as_attachment : typing.Optional[bool]
+            Whether to force the file to be downloaded as an attachment. Defaults to `false` (preview in browser)
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration. You can pass in configuration such as `chunk_size`, and more to customize the request and response.
+
+        Returns
+        -------
+        typing.Iterator[HttpResponse[typing.Iterator[bytes]]]
+            Successfully retrieved file content
+        """
+        with self._client_wrapper.httpx_client.stream(
+            f"files/{jsonable_encoder(file_id)}/preview",
+            method="GET",
+            params={
+                "as_attachment": as_attachment,
+            },
+            request_options=request_options,
+        ) as _response:
+
+            def stream() -> HttpResponse[typing.Iterator[bytes]]:
+                try:
+                    if 200 <= _response.status_code < 300:
+                        _chunk_size = request_options.get("chunk_size", None) if request_options is not None else None
+                        return HttpResponse(
+                            response=_response, data=(_chunk for _chunk in _response.iter_bytes(chunk_size=_chunk_size))
+                        )
+                    _response.read()
+                    if _response.status_code == 400:
+                        raise BadRequestError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 403:
+                        raise ForbiddenError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 404:
+                        raise NotFoundError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 500:
+                        raise InternalServerError(
+                            typing.cast(
+                                Error,
+                                parse_obj_as(
+                                    type_=Error,  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    _response_json = _response.json()
+                except JSONDecodeError:
+                    raise ApiError(
+                        headers=dict(_response.headers), status_code=_response.status_code, body=_response.text
+                    )
+                raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+            yield stream()
+
     def get_app_info(
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> HttpResponse[GetAppInfoResponse]:
@@ -600,9 +830,9 @@ class RawWorkflowClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -676,9 +906,9 @@ class RawWorkflowClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -752,9 +982,9 @@ class RawWorkflowClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -900,9 +1130,143 @@ class AsyncRawWorkflowClient:
                     if _response.status_code == 400:
                         raise BadRequestError(
                             typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 404:
+                        raise NotFoundError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 500:
+                        raise InternalServerError(
+                            typing.cast(
                                 Error,
                                 parse_obj_as(
                                     type_=Error,  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    _response_json = _response.json()
+                except JSONDecodeError:
+                    raise ApiError(
+                        headers=dict(_response.headers), status_code=_response.status_code, body=_response.text
+                    )
+                raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+            yield await stream()
+
+    @contextlib.asynccontextmanager
+    async def run_specific_workflow(
+        self,
+        workflow_id: str,
+        *,
+        inputs: typing.Dict[str, typing.Optional[typing.Any]],
+        response_mode: RunSpecificWorkflowRequestResponseMode,
+        user: str,
+        files: typing.Optional[typing.Sequence[typing.Dict[str, typing.Optional[typing.Any]]]] = OMIT,
+        trace_id: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[ChunkWorkflowMessage]]]:
+        """
+        Execute a specific version of the workflow, specifying the workflow ID through the path parameter
+
+        Parameters
+        ----------
+        workflow_id : str
+            Workflow ID, used to specify a specific version of the workflow. How to obtain: You can query the specific version workflow ID in the version history.
+
+        inputs : typing.Dict[str, typing.Optional[typing.Any]]
+            Allows passing values for variables defined in the App.
+            The inputs parameter contains multiple key/value pairs, where each key corresponds to a specific variable and each value is the specific value for that variable. Variables can be of file list type.
+            File list type variables are suitable for passing files combined with text understanding to answer questions, only available when the model supports parsing capabilities for that type of file. If the variable is a file list type, the value corresponding to the variable should be in list format, where each element should include the following:
+              - `type` (string) Supported types:
+                - `document` Specific types include: 'TXT', 'MD', 'MARKDOWN', 'PDF', 'HTML', 'XLSX', 'XLS', 'DOCX', 'CSV', 'EML', 'MSG', 'PPTX', 'PPT', 'XML', 'EPUB'
+                - `image` Specific types include: 'JPG', 'JPEG', 'PNG', 'GIF', 'WEBP', 'SVG'
+                - `audio` Specific types include: 'MP3', 'M4A', 'WAV', 'WEBM', 'AMR'
+                - `video` Specific types include: 'MP4', 'MOV', 'MPEG', 'MPGA'
+                - `custom` Specific types include: other file types
+              - `transfer_method` (string) Transfer method, `remote_url` image address / `local_file` uploaded file
+              - `url` (string) Image address (only when the transfer method is `remote_url`)
+              - `upload_file_id` (string) Upload file ID (only when the transfer method is `local_file`)
+
+        response_mode : RunSpecificWorkflowRequestResponseMode
+            Response mode, supports:
+            - `streaming` Streaming mode (recommended). Implements streaming return similar to typewriter output based on SSE (Server-Sent Events).
+            - `blocking` Blocking mode, waits for execution to complete before returning results. (Requests may be interrupted if the process is lengthy).
+            Due to Cloudflare limitations, requests will be interrupted after 100 seconds of timeout with no response.
+
+        user : str
+            User identifier, used to define the identity of the end user, for easy retrieval and statistics.
+            Rules defined by the developer, the user identifier must be unique within the application. API cannot access sessions created by WebApp.
+
+        files : typing.Optional[typing.Sequence[typing.Dict[str, typing.Optional[typing.Any]]]]
+            Optional file list
+
+        trace_id : typing.Optional[str]
+            Tracing ID. Suitable for integrating with existing trace components in business systems to achieve end-to-end distributed tracing. If not specified, the system will automatically generate a `trace_id`. Supports the following three transmission methods, with priorities as follows:
+            1. Header: Recommended to pass through HTTP Header `X-Trace-Id`, highest priority.
+            2. Query parameter: Pass through URL query parameter `trace_id`.
+            3. Request Body: Pass through request body field `trace_id` (this field).
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Yields
+        ------
+        typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[ChunkWorkflowMessage]]]
+            Successful response
+        """
+        async with self._client_wrapper.httpx_client.stream(
+            f"workflows/{jsonable_encoder(workflow_id)}/run",
+            method="POST",
+            json={
+                "inputs": inputs,
+                "response_mode": response_mode,
+                "user": user,
+                "files": files,
+                "trace_id": trace_id,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        ) as _response:
+
+            async def stream() -> AsyncHttpResponse[typing.AsyncIterator[ChunkWorkflowMessage]]:
+                try:
+                    if 200 <= _response.status_code < 300:
+
+                        async def _iter():
+                            _event_source = httpx_sse.EventSource(_response)
+                            async for _sse in _event_source.aiter_sse():
+                                if _sse.data == None:
+                                    return
+                                try:
+                                    yield _sse.data
+                                except Exception:
+                                    pass
+                            return
+
+                        return AsyncHttpResponse(response=_response, data=_iter())
+                    await _response.aread()
+                    if _response.status_code == 400:
+                        raise BadRequestError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
                                     object_=_response.json(),
                                 ),
                             )
@@ -973,9 +1337,9 @@ class AsyncRawWorkflowClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1062,9 +1426,9 @@ class AsyncRawWorkflowClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1172,9 +1536,9 @@ class AsyncRawWorkflowClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1264,9 +1628,9 @@ class AsyncRawWorkflowClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1326,6 +1690,100 @@ class AsyncRawWorkflowClient:
             raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
         raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
 
+    @contextlib.asynccontextmanager
+    async def preview_file(
+        self,
+        file_id: str,
+        *,
+        as_attachment: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[bytes]]]:
+        """
+        Preview or download uploaded files. This endpoint allows you to access files previously uploaded through the file upload API. Files can only be accessed within the message scope belonging to the requesting application.
+
+        Parameters
+        ----------
+        file_id : str
+            Unique identifier of the file to preview, obtained from the file upload API response
+
+        as_attachment : typing.Optional[bool]
+            Whether to force the file to be downloaded as an attachment. Defaults to `false` (preview in browser)
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration. You can pass in configuration such as `chunk_size`, and more to customize the request and response.
+
+        Returns
+        -------
+        typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[bytes]]]
+            Successfully retrieved file content
+        """
+        async with self._client_wrapper.httpx_client.stream(
+            f"files/{jsonable_encoder(file_id)}/preview",
+            method="GET",
+            params={
+                "as_attachment": as_attachment,
+            },
+            request_options=request_options,
+        ) as _response:
+
+            async def stream() -> AsyncHttpResponse[typing.AsyncIterator[bytes]]:
+                try:
+                    if 200 <= _response.status_code < 300:
+                        _chunk_size = request_options.get("chunk_size", None) if request_options is not None else None
+                        return AsyncHttpResponse(
+                            response=_response,
+                            data=(_chunk async for _chunk in _response.aiter_bytes(chunk_size=_chunk_size)),
+                        )
+                    await _response.aread()
+                    if _response.status_code == 400:
+                        raise BadRequestError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 403:
+                        raise ForbiddenError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 404:
+                        raise NotFoundError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 500:
+                        raise InternalServerError(
+                            typing.cast(
+                                Error,
+                                parse_obj_as(
+                                    type_=Error,  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    _response_json = _response.json()
+                except JSONDecodeError:
+                    raise ApiError(
+                        headers=dict(_response.headers), status_code=_response.status_code, body=_response.text
+                    )
+                raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+            yield await stream()
+
     async def get_app_info(
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> AsyncHttpResponse[GetAppInfoResponse]:
@@ -1360,9 +1818,9 @@ class AsyncRawWorkflowClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1436,9 +1894,9 @@ class AsyncRawWorkflowClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1512,9 +1970,9 @@ class AsyncRawWorkflowClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )

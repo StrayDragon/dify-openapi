@@ -2,6 +2,7 @@
 
 # isort: skip_file
 
+from .bad_request_error_body import BadRequestErrorBody
 from .chat_completion_response import ChatCompletionResponse
 from .chat_completion_response_metadata import ChatCompletionResponseMetadata
 from .chunk_chat_completion_response import ChunkChatCompletionResponse
@@ -122,6 +123,7 @@ from .get_conversations_by_app_advanced_chat_response import GetConversationsByA
 from .get_conversations_by_app_advanced_chat_response_data_item import GetConversationsByAppAdvancedChatResponseDataItem
 from .get_suggested_questions_by_app_advanced_chat_response import GetSuggestedQuestionsByAppAdvancedChatResponse
 from .not_found_error_body import NotFoundErrorBody
+from .not_found_error_body_code import NotFoundErrorBodyCode
 from .rename_conversation_by_app_advanced_chat_response import RenameConversationByAppAdvancedChatResponse
 from .retriever_resource import RetrieverResource
 from .send_chat_message_by_app_advanced_chat_request_response_mode import (
@@ -130,10 +132,14 @@ from .send_chat_message_by_app_advanced_chat_request_response_mode import (
 from .send_message_feedback_by_app_advanced_chat_response import SendMessageFeedbackByAppAdvancedChatResponse
 from .stop_chat_response_by_app_advanced_chat_response import StopChatResponseByAppAdvancedChatResponse
 from .update_annotation_by_app_advanced_chat_response import UpdateAnnotationByAppAdvancedChatResponse
+from .update_conversation_variable_by_app_advanced_chat_response import (
+    UpdateConversationVariableByAppAdvancedChatResponse,
+)
 from .uploaded_file import UploadedFile
 from .usage import Usage
 
 __all__ = [
+    "BadRequestErrorBody",
     "ChatCompletionResponse",
     "ChatCompletionResponseMetadata",
     "ChunkChatCompletionResponse",
@@ -192,12 +198,14 @@ __all__ = [
     "GetConversationsByAppAdvancedChatResponseDataItem",
     "GetSuggestedQuestionsByAppAdvancedChatResponse",
     "NotFoundErrorBody",
+    "NotFoundErrorBodyCode",
     "RenameConversationByAppAdvancedChatResponse",
     "RetrieverResource",
     "SendChatMessageByAppAdvancedChatRequestResponseMode",
     "SendMessageFeedbackByAppAdvancedChatResponse",
     "StopChatResponseByAppAdvancedChatResponse",
     "UpdateAnnotationByAppAdvancedChatResponse",
+    "UpdateConversationVariableByAppAdvancedChatResponse",
     "UploadedFile",
     "Usage",
 ]
