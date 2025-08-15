@@ -1,7 +1,7 @@
 overlay: 1.0.0
 info:
   title: "English translation overlay for Dify API - Advanced Chat Application"
-  version: "1.7.1"
+  version: "1.7.2"
 extends: ../app_advanced_chat.zh.yaml
 actions:
   - target: $.info
@@ -12,7 +12,7 @@ actions:
         Chat applications support session persistence, allowing previous chat history to be used as context for responses, suitable for chat/customer service AI, etc.
         All API requests require an application-level API-Key in the Authorization HTTP Header.
         It is strongly recommended that developers store the API-Key on the backend rather than sharing or storing it on the client side to prevent API-Key leakage and financial loss.
-        official raw document: https://github.com/langgenius/dify/blob/1.7.1/web/app/components/develop/template/template_advanced_chat.en.mdx
+        official raw document: https://github.com/langgenius/dify/blob/1.7.2/web/app/components/develop/template/template_advanced_chat.en.mdx
 
   - target: $.servers[0]
     update:
@@ -267,6 +267,10 @@ actions:
     update:
       description: "(Optional) Automatically generate title, default `true`. If set to `false`, you can call the conversation rename interface and set `auto_generate` to `true` to generate a title asynchronously."
 
+  - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.workflow_id
+    update:
+      description: "(Optional) Workflow ID for specifying a specific version. If not provided, the default published version will be used."
+
   - target: $.paths['/chat-messages'].post.requestBody.content['application/json'].schema.properties.trace_id
     update:
       description: "(Optional) Trace ID. Suitable for integrating with existing trace components in business systems to achieve end-to-end distributed tracing scenarios. If not specified, the system will automatically generate a trace_id. Three methods are supported with the following priority order: Header: Pass through HTTP Header X-Trace-Id, highest priority. Query parameter: Pass through URL query parameter trace_id. Request Body: Pass through request body field trace_id (this field)."
@@ -318,6 +322,46 @@ actions:
 
   - target: $.paths['/files/upload'].post.responses['503'].description
     update: "Storage service error"
+
+  - target: $.paths['/files/{file_id}/preview'].get
+    update:
+      summary: "File Preview"
+      description: |
+        Preview or download uploaded files. This endpoint allows you to access files previously uploaded through the file upload API.
+        Files can only be accessed within the message scope belonging to the requesting application.
+
+  - target: $.paths['/files/{file_id}/preview'].get.parameters[0].description
+    update: "Unique identifier of the file to preview, obtained from the file upload API response."
+
+  - target: $.paths['/files/{file_id}/preview'].get.parameters[1].description
+    update: "Whether to force download the file as an attachment. Default is false (preview in browser)."
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['200'].description
+    update: "File content"
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['200'].headers['Content-Type'].description
+    update: "Set according to file MIME type"
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['200'].headers['Content-Length'].description
+    update: "File size in bytes (if available)"
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['200'].headers['Content-Disposition'].description
+    update: "Set to 'attachment' if as_attachment=true"
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['200'].headers['Cache-Control'].description
+    update: "Cache headers for performance"
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['200'].headers['Accept-Ranges'].description
+    update: "Set to 'bytes' for audio/video files"
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['400'].description
+    update: "Invalid parameter input"
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['403'].description
+    update: "File access denied or file does not belong to current application"
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['404'].description
+    update: "File not found or deleted"
 
   - target: $.paths['/audio-to-text'].post
     update:
@@ -668,7 +712,7 @@ actions:
     update: "File type, image for images"
 
   - target: $.paths['/messages'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.message_files.items.properties.url.description
-    update: "Preview image URL"
+    update: "File preview URL, access files using the file preview API (`/files/{file_id}/preview`)"
 
   - target: $.paths['/messages'].get.responses['200'].content['application/json'].schema.properties.data.items.properties.message_files.items.properties.belongs_to.description
     update: "File owner, user or assistant"
@@ -862,6 +906,65 @@ actions:
     update: "Error code"
 
   - target: $.paths['/conversations/{conversation_id}/variables'].get.responses['404'].content['application/json'].schema.properties.message.description
+    update: "Error message"
+
+  - target: $.paths['/conversations/{conversation_id}/variables/{variable_id}'].put
+    update:
+      summary: "Update Conversation Variable"
+      description: "Update the value of a specific conversation variable. This endpoint allows you to modify variable values captured during conversations while preserving their name, type, and description."
+
+  - target: $.paths['/conversations/{conversation_id}/variables/{variable_id}'].put.parameters[0].description
+    update: "The conversation ID containing the variable to update."
+
+  - target: $.paths['/conversations/{conversation_id}/variables/{variable_id}'].put.parameters[1].description
+    update: "The ID of the variable to update."
+
+  - target: $.paths['/conversations/{conversation_id}/variables/{variable_id}'].put.requestBody.content['application/json'].schema.properties.value.description
+    update: "New value for the variable. Must match the expected type of the variable (string, number, object, etc.)."
+
+  - target: $.paths['/conversations/{conversation_id}/variables/{variable_id}'].put.requestBody.content['application/json'].schema.properties.user.description
+    update: "User identifier, defined by developer rules, must be unique within the application."
+
+  - target: $.paths['/conversations/{conversation_id}/variables/{variable_id}'].put.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/conversations/{conversation_id}/variables/{variable_id}'].put.responses['200'].content['application/json'].schema.properties.id.description
+    update: "Variable ID"
+
+  - target: $.paths['/conversations/{conversation_id}/variables/{variable_id}'].put.responses['200'].content['application/json'].schema.properties.name.description
+    update: "Variable name"
+
+  - target: $.paths['/conversations/{conversation_id}/variables/{variable_id}'].put.responses['200'].content['application/json'].schema.properties.value_type.description
+    update: "Variable type (string, number, object, etc.)"
+
+  - target: $.paths['/conversations/{conversation_id}/variables/{variable_id}'].put.responses['200'].content['application/json'].schema.properties.value.description
+    update: "Updated variable value"
+
+  - target: $.paths['/conversations/{conversation_id}/variables/{variable_id}'].put.responses['200'].content['application/json'].schema.properties.description.description
+    update: "Variable description"
+
+  - target: $.paths['/conversations/{conversation_id}/variables/{variable_id}'].put.responses['200'].content['application/json'].schema.properties.created_at.description
+    update: "Creation timestamp"
+
+  - target: $.paths['/conversations/{conversation_id}/variables/{variable_id}'].put.responses['200'].content['application/json'].schema.properties.updated_at.description
+    update: "Last update timestamp"
+
+  - target: $.paths['/conversations/{conversation_id}/variables/{variable_id}'].put.responses['400'].description
+    update: "Value type mismatch with variable's expected type"
+
+  - target: $.paths['/conversations/{conversation_id}/variables/{variable_id}'].put.responses['400'].content['application/json'].schema.properties.code.description
+    update: "Error code"
+
+  - target: $.paths['/conversations/{conversation_id}/variables/{variable_id}'].put.responses['400'].content['application/json'].schema.properties.message.description
+    update: "Error message"
+
+  - target: $.paths['/conversations/{conversation_id}/variables/{variable_id}'].put.responses['404'].description
+    update: "Conversation not found or variable not found"
+
+  - target: $.paths['/conversations/{conversation_id}/variables/{variable_id}'].put.responses['404'].content['application/json'].schema.properties.code.description
+    update: "Error code"
+
+  - target: $.paths['/conversations/{conversation_id}/variables/{variable_id}'].put.responses['404'].content['application/json'].schema.properties.message.description
     update: "Error message"
 
   - target: $.paths['/site'].get
