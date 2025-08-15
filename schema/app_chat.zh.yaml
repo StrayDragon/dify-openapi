@@ -5,8 +5,8 @@ info:
     Dify API 提供了一系列接口用于对话功能。
     支持对话型应用。
     所有 API 请求都需要在 Authorization HTTP Header 中包含应用级 API-Key。
-    官方原始文档见: https://github.com/langgenius/dify/blob/1.7.1/web/app/components/develop/template/template_chat.zh.mdx
-  version: 1.7.1
+    官方原始文档见: https://github.com/langgenius/dify/blob/1.7.2/web/app/components/develop/template/template_chat.zh.mdx
+  version: 1.7.2
 
 servers:
   - url: https://api.dify.ai/v1
@@ -485,6 +485,9 @@ paths:
                   type: boolean
                   description: （选填）自动生成标题，默认 true。若设置为 false，则可通过调用会话重命名接口并设置 auto_generate 为 true 实现异步生成标题。
                   default: true
+                workflow_id:
+                  type: string
+                  description: （选填）工作流ID，用于指定特定版本，如果不提供则使用默认的已发布版本。
                 trace_id:
                   type: string
                   description: |
@@ -612,9 +615,104 @@ paths:
                     - message (string) 错误消息
                   - event: ping 每 10s 一次的 ping 事件，保持连接存活。
         "400":
-          $ref: "#/components/responses/Error400"
+          description: 请求错误
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Error"
+                  - type: object
+                    properties:
+                      code:
+                        enum: [invalid_param, app_unavailable, provider_not_initialize, provider_quota_exceeded, model_currently_not_support, workflow_not_found, draft_workflow_error, workflow_id_format_error, completion_request_error]
         "404":
           $ref: "#/components/responses/Error404"
+        "500":
+          $ref: "#/components/responses/Error500"
+
+  /files/{file_id}/preview:
+    get:
+      operationId: previewFileByAppChat
+      summary: 文件预览
+      description: |
+        预览或下载已上传的文件。此端点允许您访问先前通过文件上传 API 上传的文件。
+        文件只能在属于请求应用程序的消息范围内访问。
+      parameters:
+        - name: file_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 要预览的文件的唯一标识符，从文件上传 API 响应中获得
+        - name: as_attachment
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: 是否强制将文件作为附件下载。默认为 false（在浏览器中预览）
+      responses:
+        "200":
+          description: 文件内容
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Type:
+              description: 根据文件 MIME 类型设置
+              schema:
+                type: string
+            Content-Length:
+              description: 文件大小（以字节为单位，如果可用）
+              schema:
+                type: integer
+            Content-Disposition:
+              description: 如果 as_attachment=true 则设置为 "attachment"
+              schema:
+                type: string
+            Cache-Control:
+              description: 用于性能的缓存标头
+              schema:
+                type: string
+            Accept-Ranges:
+              description: 对于音频/视频文件设置为 "bytes"
+              schema:
+                type: string
+        "400":
+          description: 参数输入异常
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Error"
+                  - type: object
+                    properties:
+                      code:
+                        enum: [invalid_param]
+        "403":
+          description: 文件访问被拒绝或文件不属于当前应用程序
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Error"
+                  - type: object
+                    properties:
+                      code:
+                        enum: [file_access_denied]
+        "404":
+          description: 文件未找到或已被删除
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Error"
+                  - type: object
+                    properties:
+                      code:
+                        enum: [file_not_found]
         "500":
           $ref: "#/components/responses/Error500"
 
@@ -814,6 +912,90 @@ paths:
                   message:
                     type: string
                     description: 错误消息
+
+  /conversations/{conversation_id}/variables/{variable_id}:
+    put:
+      operationId: updateConversationVariableByAppChat
+      summary: 更新对话变量
+      description: 更新特定对话变量的值。此端点允许您修改在对话过程中捕获的变量值，同时保留其名称、类型和描述。
+      parameters:
+        - name: conversation_id
+          in: path
+          description: 包含要更新变量的对话ID
+          required: true
+          schema:
+            type: string
+        - name: variable_id
+          in: path
+          description: 要更新的变量ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user
+                - value
+              properties:
+                value:
+                  description: 变量的新值。必须匹配变量的预期类型（字符串、数字、对象等）。
+                user:
+                  type: string
+                  description: 用户标识符，由开发人员定义的规则，在应用程序内必须唯一。
+      responses:
+        "200":
+          description: 成功更新变量
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: 变量ID
+                  name:
+                    type: string
+                    description: 变量名称
+                  value_type:
+                    type: string
+                    description: 变量类型（字符串、数字、对象等）
+                  value:
+                    description: 更新后的变量值
+                  description:
+                    type: string
+                    description: 变量描述
+                  created_at:
+                    type: integer
+                    description: 创建时间戳
+                  updated_at:
+                    type: integer
+                    description: 最后更新时间戳
+        "400":
+          description: 值类型与变量的预期类型不匹配
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Error"
+                  - type: object
+                    properties:
+                      message:
+                        example: "Type mismatch: variable expects string, but got number type"
+        "404":
+          description: 对话不存在或变量不存在
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Error"
+                  - type: object
+                    properties:
+                      code:
+                        enum: [conversation_not_exists, conversation_variable_not_exists]
 
   /messages:
     get:

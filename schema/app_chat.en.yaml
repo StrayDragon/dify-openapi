@@ -5,8 +5,8 @@ info:
     Dify API provides a series of interfaces for conversation functionality.
     It supports conversational applications.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
-    official raw document: https://github.com/langgenius/dify/blob/1.7.1/web/app/components/develop/template/template_chat.en.mdx
-  version: 1.7.1
+    official raw document: https://github.com/langgenius/dify/blob/1.7.2/web/app/components/develop/template/template_chat.en.mdx
+  version: 1.7.2
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -478,6 +478,9 @@ paths:
                   type: boolean
                   description: '(Optional) Whether to automatically generate title, default is true. If set to false, you can call the conversation rename interface and set auto_generate to true to generate a title asynchronously.'
                   default: true
+                workflow_id:
+                  type: string
+                  description: '(Optional) Workflow ID, used to specify a specific version. If not provided, the default published version will be used.'
                 trace_id:
                   type: string
                   description: |
@@ -625,9 +628,115 @@ paths:
                     - message (string) Error message
                   - event: ping Ping event every 10s to keep the connection alive.
         '400':
-          $ref: '#/components/responses/Error400'
+          description: Request error
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Error'
+                  - type: object
+                    properties:
+                      code:
+                        enum:
+                          - invalid_param
+                          - app_unavailable
+                          - provider_not_initialize
+                          - provider_quota_exceeded
+                          - model_currently_not_support
+                          - workflow_not_found
+                          - draft_workflow_error
+                          - workflow_id_format_error
+                          - completion_request_error
         '404':
           $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+  '/files/{file_id}/preview':
+    get:
+      operationId: previewFileByAppChat
+      summary: File Preview
+      description: |
+        Preview or download uploaded files. This endpoint allows you to access files previously uploaded through the file upload API.
+        Files can only be accessed within the message scope belonging to the requesting application.
+      parameters:
+        - name: file_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 'Unique identifier of the file to preview, obtained from the file upload API response'
+        - name: as_attachment
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: Whether to force the file to be downloaded as an attachment. Default is false (preview in browser)
+      responses:
+        '200':
+          description: File content
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Type:
+              description: Set according to file MIME type
+              schema:
+                type: string
+            Content-Length:
+              description: File size in bytes (if available)
+              schema:
+                type: integer
+            Content-Disposition:
+              description: Set to "attachment" if as_attachment=true
+              schema:
+                type: string
+            Cache-Control:
+              description: Cache headers for performance
+              schema:
+                type: string
+            Accept-Ranges:
+              description: Set to "bytes" for audio/video files
+              schema:
+                type: string
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Error'
+                  - type: object
+                    properties:
+                      code:
+                        enum:
+                          - invalid_param
+        '403':
+          description: File access denied or file does not belong to current application
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Error'
+                  - type: object
+                    properties:
+                      code:
+                        enum:
+                          - file_access_denied
+        '404':
+          description: File not found or has been deleted
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Error'
+                  - type: object
+                    properties:
+                      code:
+                        enum:
+                          - file_not_found
         '500':
           $ref: '#/components/responses/Error500'
   /conversations:
@@ -829,6 +938,91 @@ paths:
                   message:
                     type: string
                     description: Error message
+  '/conversations/{conversation_id}/variables/{variable_id}':
+    put:
+      operationId: updateConversationVariableByAppChat
+      summary: Update Conversation Variable
+      description: 'Update the value of a specific conversation variable. This endpoint allows you to modify variable values captured during conversations while preserving their names, types, and descriptions.'
+      parameters:
+        - name: conversation_id
+          in: path
+          description: ID of the conversation containing the variable to update
+          required: true
+          schema:
+            type: string
+        - name: variable_id
+          in: path
+          description: ID of the variable to update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user
+                - value
+              properties:
+                value:
+                  description: 'New value for the variable. Must match the variable''s expected type (string, number, object, etc.)'
+                user:
+                  type: string
+                  description: 'User identifier, defined by developer rules, must be unique within the application.'
+      responses:
+        '200':
+          description: Successfully updated variable
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Variable ID
+                  name:
+                    type: string
+                    description: Variable name
+                  value_type:
+                    type: string
+                    description: 'Variable type (string, number, object, etc.)'
+                  value:
+                    description: Updated variable value
+                  description:
+                    type: string
+                    description: Variable description
+                  created_at:
+                    type: integer
+                    description: Creation timestamp
+                  updated_at:
+                    type: integer
+                    description: Last update timestamp
+        '400':
+          description: Value type mismatch with variable's expected type
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Error'
+                  - type: object
+                    properties:
+                      message:
+                        example: 'Type mismatch: variable expects string, but got number type'
+        '404':
+          description: Conversation not found or variable not found
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Error'
+                  - type: object
+                    properties:
+                      code:
+                        enum:
+                          - conversation_not_exists
+                          - conversation_variable_not_exists
   /messages:
     get:
       operationId: getConversationMessagesByAppChat
