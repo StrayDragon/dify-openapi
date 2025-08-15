@@ -6,8 +6,8 @@ info:
     Workflow applications have no session support and are suitable for translation/article writing/summarization AI, etc.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
     It is strongly recommended that developers store the API-Key on the backend rather than sharing or storing it on the client to prevent API-Key leakage and financial loss.
-    official raw document: https://github.com/langgenius/dify/blob/1.7.1/web/app/components/develop/template/template_workflow.en.mdx
-  version: 1.7.1
+    official raw document: https://github.com/langgenius/dify/blob/1.7.2/web/app/components/develop/template/template_workflow.en.mdx
+  version: 1.7.2
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -508,6 +508,98 @@ paths:
           $ref: '#/components/responses/Error404'
         '500':
           $ref: '#/components/responses/Error500'
+  '/workflows/{workflow_id}/run':
+    post:
+      operationId: runSpecificWorkflow
+      summary: Execute Specific Workflow
+      description: 'Execute a specific version of the workflow, specifying the workflow ID through the path parameter'
+      x-fern-streaming:
+        format: sse
+        response:
+          $ref: '#/components/schemas/WorkflowMessage'
+        response-stream:
+          $ref: '#/components/schemas/ChunkWorkflowMessage'
+      parameters:
+        - name: workflow_id
+          in: path
+          description: 'Workflow ID, used to specify a specific version of the workflow. How to obtain: You can query the specific version workflow ID in the version history.'
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - inputs
+                - response_mode
+                - user
+              properties:
+                inputs:
+                  type: object
+                  description: |
+                    Allows passing values for variables defined in the App.
+                    The inputs parameter contains multiple key/value pairs, where each key corresponds to a specific variable and each value is the specific value for that variable. Variables can be of file list type.
+                    File list type variables are suitable for passing files combined with text understanding to answer questions, only available when the model supports parsing capabilities for that type of file. If the variable is a file list type, the value corresponding to the variable should be in list format, where each element should include the following:
+                      - `type` (string) Supported types:
+                        - `document` Specific types include: 'TXT', 'MD', 'MARKDOWN', 'PDF', 'HTML', 'XLSX', 'XLS', 'DOCX', 'CSV', 'EML', 'MSG', 'PPTX', 'PPT', 'XML', 'EPUB'
+                        - `image` Specific types include: 'JPG', 'JPEG', 'PNG', 'GIF', 'WEBP', 'SVG'
+                        - `audio` Specific types include: 'MP3', 'M4A', 'WAV', 'WEBM', 'AMR'
+                        - `video` Specific types include: 'MP4', 'MOV', 'MPEG', 'MPGA'
+                        - `custom` Specific types include: other file types
+                      - `transfer_method` (string) Transfer method, `remote_url` image address / `local_file` uploaded file
+                      - `url` (string) Image address (only when the transfer method is `remote_url`)
+                      - `upload_file_id` (string) Upload file ID (only when the transfer method is `local_file`)
+                response_mode:
+                  type: string
+                  enum:
+                    - streaming
+                    - blocking
+                  description: |
+                    Response mode, supports:
+                    - `streaming` Streaming mode (recommended). Implements streaming return similar to typewriter output based on SSE (Server-Sent Events).
+                    - `blocking` Blocking mode, waits for execution to complete before returning results. (Requests may be interrupted if the process is lengthy).
+                    Due to Cloudflare limitations, requests will be interrupted after 100 seconds of timeout with no response.
+                user:
+                  type: string
+                  description: |
+                    User identifier, used to define the identity of the end user, for easy retrieval and statistics.
+                    Rules defined by the developer, the user identifier must be unique within the application. API cannot access sessions created by WebApp.
+                files:
+                  type: array
+                  items:
+                    type: object
+                  description: Optional file list
+                trace_id:
+                  type: string
+                  description: |
+                    Tracing ID. Suitable for integrating with existing trace components in business systems to achieve end-to-end distributed tracing. If not specified, the system will automatically generate a `trace_id`. Supports the following three transmission methods, with priorities as follows:
+                    1. Header: Recommended to pass through HTTP Header `X-Trace-Id`, highest priority.
+                    2. Query parameter: Pass through URL query parameter `trace_id`.
+                    3. Request Body: Pass through request body field `trace_id` (this field).
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowMessage'
+                description: 'When `response_mode` is `blocking`, returns a CompletionResponse object.'
+            text/event-stream:
+              schema:
+                $ref: '#/components/schemas/ChunkWorkflowMessage'
+                description: |
+                  When `response_mode` is `streaming`, returns a stream of ChunkCompletionResponse objects.
+                  Returns App output stream chunks, Content-Type is text/event-stream.
+                  Each stream chunk starts with data: and chunks are separated by `\n\n` (two newlines).
+        '400':
+          $ref: '#/components/responses/Error400'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
   '/workflows/run/{workflow_run_id}':
     get:
       operationId: getWorkflowExecutionStatus
@@ -845,6 +937,60 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  '/files/{file_id}/preview':
+    get:
+      operationId: previewFile
+      summary: File Preview
+      description: Preview or download uploaded files. This endpoint allows you to access files previously uploaded through the file upload API. Files can only be accessed within the message scope belonging to the requesting application.
+      parameters:
+        - name: file_id
+          in: path
+          description: 'Unique identifier of the file to preview, obtained from the file upload API response'
+          required: true
+          schema:
+            type: string
+        - name: as_attachment
+          in: query
+          description: Whether to force the file to be downloaded as an attachment. Defaults to `false` (preview in browser)
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Successfully retrieved file content
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+                description: |
+                  Returns file content with appropriate browser display or download headers.
+                  - `Content-Type` Set according to file MIME type
+                  - `Content-Length` File size in bytes (if available)
+                  - `Content-Disposition` Set to "attachment" if `as_attachment=true`
+                  - `Cache-Control` Cache headers for performance
+                  - `Accept-Ranges` Set to "bytes" for audio/video files
+        '400':
+          description: Invalid parameter input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: File access denied or file does not belong to the current application
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: File not found or has been deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/Error500'
   /info:
     get:
       operationId: getAppInfo
