@@ -6,8 +6,8 @@ info:
     Workflow 应用无会话支持，适合用于翻译/文章写作/总结 AI 等等。
     所有 API 请求都需要在 Authorization HTTP Header 中包含应用级 API-Key。
     强烈建议开发者把 API-Key 放在后端存储，而非分享或者放在客户端存储，以免 API-Key 泄露，导致财产损失。
-    官方原始文档见: https://github.com/langgenius/dify/blob/1.7.1/web/app/components/develop/template/template_workflow.zh.mdx
-  version: 1.7.1
+    官方原始文档见: https://github.com/langgenius/dify/blob/1.7.2/web/app/components/develop/template/template_workflow.zh.mdx
+  version: 1.7.2
 
 servers:
   - url: https://api.dify.ai/v1
@@ -519,6 +519,98 @@ paths:
         "500":
           $ref: "#/components/responses/Error500"
 
+  /workflows/{workflow_id}/run:
+    post:
+      operationId: runSpecificWorkflow
+      summary: 执行指定版本 workflow
+      description: 执行指定版本的工作流，通过路径参数指定工作流ID
+      x-fern-streaming:
+        format: sse
+        response:
+          $ref: "#/components/schemas/WorkflowMessage"
+        response-stream:
+          $ref: "#/components/schemas/ChunkWorkflowMessage"
+      parameters:
+        - name: workflow_id
+          in: path
+          description: 工作流ID，用于指定特定版本的工作流。获取方式：可以在版本历史中查询特定版本的工作流ID。
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - inputs
+                - response_mode
+                - user
+              properties:
+                inputs:
+                  type: object
+                  description: |
+                    允许传入 App 定义的各变量值。
+                    inputs 参数包含了多组键值对（Key/Value pairs），每组的键对应一个特定变量，每组的值则是该变量的具体值。变量可以是文件列表类型。
+                    文件列表类型变量适用于传入文件结合文本理解并回答问题，仅当模型支持该类型文件解析能力时可用。如果该变量是文件列表类型，该变量对应的值应是列表格式，其中每个元素应包含以下内容：
+                      - `type` (string) 支持类型：
+                        - `document` 具体类型包含：'TXT', 'MD', 'MARKDOWN', 'PDF', 'HTML', 'XLSX', 'XLS', 'DOCX', 'CSV', 'EML', 'MSG', 'PPTX', 'PPT', 'XML', 'EPUB'
+                        - `image` 具体类型包含：'JPG', 'JPEG', 'PNG', 'GIF', 'WEBP', 'SVG'
+                        - `audio` 具体类型包含：'MP3', 'M4A', 'WAV', 'WEBM', 'AMR'
+                        - `video` 具体类型包含：'MP4', 'MOV', 'MPEG', 'MPGA'
+                        - `custom` 具体类型包含：其他文件类型
+                      - `transfer_method` (string) 传递方式，`remote_url` 图片地址 / `local_file` 上传文件
+                      - `url` (string) 图片地址（仅当传递方式为 `remote_url` 时）
+                      - `upload_file_id` (string)  上传文件 ID（仅当传递方式为 `local_file` 时）
+                response_mode:
+                  type: string
+                  enum: [streaming, blocking]
+                  description: |
+                    返回响应模式，支持：
+                    - `streaming` 流式模式（推荐）。基于 SSE（Server-Sent Events）实现类似打字机输出方式的流式返回。
+                    - `blocking` 阻塞模式，等待执行完毕后返回结果。（请求若流程较长可能会被中断）。
+                    由于 Cloudflare 限制，请求会在 100 秒超时无返回后中断。
+                user:
+                  type: string
+                  description: |
+                    用户标识，用于定义终端用户的身份，方便检索、统计。
+                    由开发者定义规则，需保证用户标识在应用内唯一。API 无法访问 WebApp 创建的会话。
+                files:
+                  type: array
+                  items:
+                    type: object
+                  description: 可选文件列表
+                trace_id:
+                  type: string
+                  description: |
+                    链路追踪ID。适用于与业务系统已有的trace组件打通，实现端到端分布式追踪等场景。如果未指定，系统将自动生成 `trace_id`。支持以下三种方式传递，具体优先级依次为：
+                    1. Header：推荐通过 HTTP Header `X-Trace-Id` 传递，优先级最高。
+                    2. Query 参数：通过 URL 查询参数 `trace_id` 传递。
+                    3. Request Body：通过请求体字段 `trace_id` 传递（即本字段）。
+
+      responses:
+        "200":
+          description: 成功响应
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowMessage"
+                description: 当 `response_mode` 为 `blocking` 时，返回 CompletionResponse object。
+            text/event-stream:
+              schema:
+                $ref: "#/components/schemas/ChunkWorkflowMessage"
+                description: |
+                  当 `response_mode` 为 `streaming`时，返回 ChunkCompletionResponse object 流式序列。
+                  返回 App 输出的流式块，Content-Type 为 text/event-stream。
+                  每个流式块均为 data: 开头，块之间以 \n\n 即两个换行符分隔。
+        "400":
+          $ref: "#/components/responses/Error400"
+        "404":
+          $ref: "#/components/responses/Error404"
+        "500":
+          $ref: "#/components/responses/Error500"
+
   /workflows/run/{workflow_run_id}:
     get:
 
@@ -852,6 +944,61 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
+  /files/{file_id}/preview:
+    get:
+      operationId: previewFile
+      summary: 文件预览
+      description: 预览或下载已上传的文件。此端点允许您访问先前通过文件上传 API 上传的文件。文件只能在属于请求应用程序的消息范围内访问。
+      parameters:
+        - name: file_id
+          in: path
+          description: 要预览的文件的唯一标识符，从文件上传 API 响应中获得
+          required: true
+          schema:
+            type: string
+        - name: as_attachment
+          in: query
+          description: 是否强制将文件作为附件下载。默认为 `false`（在浏览器中预览）
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: 成功获取文件内容
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+                description: |
+                  返回带有适当浏览器显示或下载标头的文件内容。
+                  - `Content-Type` 根据文件 MIME 类型设置
+                  - `Content-Length` 文件大小（以字节为单位，如果可用）
+                  - `Content-Disposition` 如果 `as_attachment=true` 则设置为 "attachment"
+                  - `Cache-Control` 用于性能的缓存标头
+                  - `Accept-Ranges` 对于音频/视频文件设置为 "bytes"
+        '400':
+          description: 参数输入异常
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '403':
+          description: 文件访问被拒绝或文件不属于当前应用程序
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '404':
+          description: 文件未找到或已被删除
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '500':
+          $ref: "#/components/responses/Error500"
 
   /info:
     get:

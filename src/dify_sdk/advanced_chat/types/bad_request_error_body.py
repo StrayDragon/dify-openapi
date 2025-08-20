@@ -4,19 +4,17 @@ import typing
 
 import pydantic
 from ...core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
-from .not_found_error_body_code import NotFoundErrorBodyCode
 
 
-class NotFoundErrorBody(UniversalBaseModel):
-    code: typing.Optional[NotFoundErrorBodyCode] = None
-    status: int = pydantic.Field()
+class BadRequestErrorBody(UniversalBaseModel):
+    code: typing.Optional[str] = pydantic.Field(default=None)
     """
-    HTTP status code
+    Error code
     """
 
-    message: str = pydantic.Field()
+    message: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Error message description
+    Error message
     """
 
     if IS_PYDANTIC_V2:

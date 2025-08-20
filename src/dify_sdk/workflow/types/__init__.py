@@ -54,6 +54,7 @@ from .get_workflow_logs_response_data_item_created_by_end_user import GetWorkflo
 from .get_workflow_logs_response_data_item_workflow_run import GetWorkflowLogsResponseDataItemWorkflowRun
 from .get_workflow_logs_response_data_item_workflow_run_status import GetWorkflowLogsResponseDataItemWorkflowRunStatus
 from .retriever_resource import RetrieverResource
+from .run_specific_workflow_request_response_mode import RunSpecificWorkflowRequestResponseMode
 from .run_workflow_request_response_mode import RunWorkflowRequestResponseMode
 from .stop_workflow_response import StopWorkflowResponse
 from .upload_file_response import UploadFileResponse
@@ -101,6 +102,7 @@ __all__ = [
     "GetWorkflowLogsResponseDataItemWorkflowRun",
     "GetWorkflowLogsResponseDataItemWorkflowRunStatus",
     "RetrieverResource",
+    "RunSpecificWorkflowRequestResponseMode",
     "RunWorkflowRequestResponseMode",
     "StopWorkflowResponse",
     "UploadFileResponse",

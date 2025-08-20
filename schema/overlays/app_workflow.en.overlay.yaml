@@ -747,9 +747,9 @@ actions:
   - target: $.paths['/info'].get.responses['200'].content['application/json'].schema.properties.author_name.description
     update: "Author name"
 
-  # Add new overlay actions for 1.7.1 updates
+  # Add new overlay actions for 1.7.2 updates
   - target: $.info.version
-    update: "1.7.1"
+    update: "1.7.2"
 
   - target: $.info.description
     update: |
@@ -757,7 +757,7 @@ actions:
       Workflow applications have no session support and are suitable for translation/article writing/summarization AI, etc.
       All API requests require an application-level API-Key in the Authorization HTTP Header.
       It is strongly recommended that developers store the API-Key on the backend rather than sharing or storing it on the client to prevent API-Key leakage and financial loss.
-      official raw document: https://github.com/langgenius/dify/blob/1.7.1/web/app/components/develop/template/template_workflow.en.mdx
+      official raw document: https://github.com/langgenius/dify/blob/1.7.2/web/app/components/develop/template/template_workflow.en.mdx
 
   - target: $.paths['/workflows/run'].post.requestBody.content['application/json'].schema.properties.files.description
     update: "Optional file list"
@@ -825,3 +825,93 @@ actions:
 
   - target: $.paths['/parameters'].get.responses['200'].content['application/json'].schema.properties.file_upload.properties.custom.properties.transfer_methods.description
     update: "Transfer method list: `remote_url`, `local_file`, must choose one"
+
+  # New API endpoints for 1.7.2
+  - target: $.paths['/workflows/{workflow_id}/run'].post
+    update:
+      summary: "Execute Specific Workflow"
+      description: "Execute a specific version of the workflow, specifying the workflow ID through the path parameter"
+
+  - target: $.paths['/workflows/{workflow_id}/run'].post.parameters[0].description
+    update: "Workflow ID, used to specify a specific version of the workflow. How to obtain: You can query the specific version workflow ID in the version history."
+
+  - target: $.paths['/workflows/{workflow_id}/run'].post.requestBody.content['application/json'].schema.properties.inputs.description
+    update: |
+      Allows passing values for variables defined in the App.
+      The inputs parameter contains multiple key/value pairs, where each key corresponds to a specific variable and each value is the specific value for that variable. Variables can be of file list type.
+      File list type variables are suitable for passing files combined with text understanding to answer questions, only available when the model supports parsing capabilities for that type of file. If the variable is a file list type, the value corresponding to the variable should be in list format, where each element should include the following:
+        - `type` (string) Supported types:
+          - `document` Specific types include: 'TXT', 'MD', 'MARKDOWN', 'PDF', 'HTML', 'XLSX', 'XLS', 'DOCX', 'CSV', 'EML', 'MSG', 'PPTX', 'PPT', 'XML', 'EPUB'
+          - `image` Specific types include: 'JPG', 'JPEG', 'PNG', 'GIF', 'WEBP', 'SVG'
+          - `audio` Specific types include: 'MP3', 'M4A', 'WAV', 'WEBM', 'AMR'
+          - `video` Specific types include: 'MP4', 'MOV', 'MPEG', 'MPGA'
+          - `custom` Specific types include: other file types
+        - `transfer_method` (string) Transfer method, `remote_url` image address / `local_file` uploaded file
+        - `url` (string) Image address (only when the transfer method is `remote_url`)
+        - `upload_file_id` (string) Upload file ID (only when the transfer method is `local_file`)
+
+  - target: $.paths['/workflows/{workflow_id}/run'].post.requestBody.content['application/json'].schema.properties.response_mode.description
+    update: |
+      Response mode, supports:
+      - `streaming` Streaming mode (recommended). Implements streaming return similar to typewriter output based on SSE (Server-Sent Events).
+      - `blocking` Blocking mode, waits for execution to complete before returning results. (Requests may be interrupted if the process is lengthy).
+      Due to Cloudflare limitations, requests will be interrupted after 100 seconds of timeout with no response.
+
+  - target: $.paths['/workflows/{workflow_id}/run'].post.requestBody.content['application/json'].schema.properties.user.description
+    update: |
+      User identifier, used to define the identity of the end user, for easy retrieval and statistics.
+      Rules defined by the developer, the user identifier must be unique within the application. API cannot access sessions created by WebApp.
+
+  - target: $.paths['/workflows/{workflow_id}/run'].post.requestBody.content['application/json'].schema.properties.files.description
+    update: "Optional file list"
+
+  - target: $.paths['/workflows/{workflow_id}/run'].post.requestBody.content['application/json'].schema.properties.trace_id.description
+    update: |
+      Tracing ID. Suitable for integrating with existing trace components in business systems to achieve end-to-end distributed tracing. If not specified, the system will automatically generate a `trace_id`. Supports the following three transmission methods, with priorities as follows:
+      1. Header: Recommended to pass through HTTP Header `X-Trace-Id`, highest priority.
+      2. Query parameter: Pass through URL query parameter `trace_id`.
+      3. Request Body: Pass through request body field `trace_id` (this field).
+
+  - target: $.paths['/workflows/{workflow_id}/run'].post.responses['200'].description
+    update: "Successful response"
+
+  - target: $.paths['/workflows/{workflow_id}/run'].post.responses['200'].content['application/json'].schema.description
+    update: "When `response_mode` is `blocking`, returns a CompletionResponse object."
+
+  - target: $.paths['/workflows/{workflow_id}/run'].post.responses['200'].content['text/event-stream'].schema.description
+    update: |
+      When `response_mode` is `streaming`, returns a stream of ChunkCompletionResponse objects.
+      Returns App output stream chunks, Content-Type is text/event-stream.
+      Each stream chunk starts with data: and chunks are separated by `\n\n` (two newlines).
+
+  - target: $.paths['/files/{file_id}/preview'].get
+    update:
+      summary: "File Preview"
+      description: "Preview or download uploaded files. This endpoint allows you to access files previously uploaded through the file upload API. Files can only be accessed within the message scope belonging to the requesting application."
+
+  - target: $.paths['/files/{file_id}/preview'].get.parameters[0].description
+    update: "Unique identifier of the file to preview, obtained from the file upload API response"
+
+  - target: $.paths['/files/{file_id}/preview'].get.parameters[1].description
+    update: "Whether to force the file to be downloaded as an attachment. Defaults to `false` (preview in browser)"
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['200'].description
+    update: "Successfully retrieved file content"
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['200'].content['*/*'].schema.description
+    update: |
+      Returns file content with appropriate browser display or download headers.
+      - `Content-Type` Set according to file MIME type
+      - `Content-Length` File size in bytes (if available)
+      - `Content-Disposition` Set to "attachment" if `as_attachment=true`
+      - `Cache-Control` Cache headers for performance
+      - `Accept-Ranges` Set to "bytes" for audio/video files
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['400'].description
+    update: "Invalid parameter input"
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['403'].description
+    update: "File access denied or file does not belong to the current application"
+
+  - target: $.paths['/files/{file_id}/preview'].get.responses['404'].description
+    update: "File not found or has been deleted"

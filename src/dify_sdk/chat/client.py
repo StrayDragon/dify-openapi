@@ -31,6 +31,7 @@ from .types.send_chat_message_by_app_chat_request_response_mode import SendChatM
 from .types.send_message_feedback_by_app_chat_response import SendMessageFeedbackByAppChatResponse
 from .types.stop_chat_response_by_app_chat_response import StopChatResponseByAppChatResponse
 from .types.update_annotation_by_app_chat_response import UpdateAnnotationByAppChatResponse
+from .types.update_conversation_variable_by_app_chat_response import UpdateConversationVariableByAppChatResponse
 from .types.uploaded_file import UploadedFile
 
 # this is used as the default value for optional parameters
@@ -62,6 +63,7 @@ class ChatClient:
         conversation_id: typing.Optional[str] = OMIT,
         files: typing.Optional[typing.Sequence[SendChatMessageByAppChatRequestFilesItem]] = OMIT,
         auto_generate_name: typing.Optional[bool] = OMIT,
+        workflow_id: typing.Optional[str] = OMIT,
         trace_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Iterator[ChunkChatCompletionResponse]:
@@ -94,6 +96,9 @@ class ChatClient:
         auto_generate_name : typing.Optional[bool]
             (Optional) Whether to automatically generate title, default is true. If set to false, you can call the conversation rename interface and set auto_generate to true to generate a title asynchronously.
 
+        workflow_id : typing.Optional[str]
+            (Optional) Workflow ID, used to specify a specific version. If not provided, the default published version will be used.
+
         trace_id : typing.Optional[str]
             (Optional) Trace ID for linking with existing trace components in business systems, enabling end-to-end distributed tracing scenarios. If not specified, the system will automatically generate a trace_id. Supports the following three transmission methods, in order of priority:
             - Header: Passed through HTTP Header X-Trace-Id, highest priority.
@@ -124,8 +129,41 @@ class ChatClient:
             conversation_id=conversation_id,
             files=files,
             auto_generate_name=auto_generate_name,
+            workflow_id=workflow_id,
             trace_id=trace_id,
             request_options=request_options,
+        ) as r:
+            yield from r.data
+
+    def preview_file_by_app_chat(
+        self,
+        file_id: str,
+        *,
+        as_attachment: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.Iterator[bytes]:
+        """
+        Preview or download uploaded files. This endpoint allows you to access files previously uploaded through the file upload API.
+        Files can only be accessed within the message scope belonging to the requesting application.
+
+        Parameters
+        ----------
+        file_id : str
+            Unique identifier of the file to preview, obtained from the file upload API response
+
+        as_attachment : typing.Optional[bool]
+            Whether to force the file to be downloaded as an attachment. Default is false (preview in browser)
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration. You can pass in configuration such as `chunk_size`, and more to customize the request and response.
+
+        Returns
+        -------
+        typing.Iterator[bytes]
+            File content
+        """
+        with self._raw_client.preview_file_by_app_chat(
+            file_id, as_attachment=as_attachment, request_options=request_options
         ) as r:
             yield from r.data
 
@@ -288,6 +326,51 @@ class ChatClient:
         """
         _response = self._raw_client.get_conversation_variables_by_app_chat(
             conversation_id, user=user, last_id=last_id, limit=limit, request_options=request_options
+        )
+        return _response.data
+
+    def update_conversation_variable_by_app_chat(
+        self,
+        conversation_id: str,
+        variable_id: str,
+        *,
+        user: str,
+        value: typing.Optional[typing.Any] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> UpdateConversationVariableByAppChatResponse:
+        """
+        Update the value of a specific conversation variable. This endpoint allows you to modify variable values captured during conversations while preserving their names, types, and descriptions.
+
+        Parameters
+        ----------
+        conversation_id : str
+            ID of the conversation containing the variable to update
+
+        variable_id : str
+            ID of the variable to update
+
+        user : str
+            User identifier, defined by developer rules, must be unique within the application.
+
+        value : typing.Optional[typing.Any]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        UpdateConversationVariableByAppChatResponse
+            Successfully updated variable
+
+        Examples
+        --------
+        from dify import DifyApi
+        client = DifyApi(token="YOUR_TOKEN", )
+        client.chat.update_conversation_variable_by_app_chat(conversation_id='conversation_id', variable_id='variable_id', value={'key': 'value'}
+        , user='user', )
+        """
+        _response = self._raw_client.update_conversation_variable_by_app_chat(
+            conversation_id, variable_id, user=user, value=value, request_options=request_options
         )
         return _response.data
 
@@ -931,6 +1014,7 @@ class AsyncChatClient:
         conversation_id: typing.Optional[str] = OMIT,
         files: typing.Optional[typing.Sequence[SendChatMessageByAppChatRequestFilesItem]] = OMIT,
         auto_generate_name: typing.Optional[bool] = OMIT,
+        workflow_id: typing.Optional[str] = OMIT,
         trace_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.AsyncIterator[ChunkChatCompletionResponse]:
@@ -962,6 +1046,9 @@ class AsyncChatClient:
 
         auto_generate_name : typing.Optional[bool]
             (Optional) Whether to automatically generate title, default is true. If set to false, you can call the conversation rename interface and set auto_generate to true to generate a title asynchronously.
+
+        workflow_id : typing.Optional[str]
+            (Optional) Workflow ID, used to specify a specific version. If not provided, the default published version will be used.
 
         trace_id : typing.Optional[str]
             (Optional) Trace ID for linking with existing trace components in business systems, enabling end-to-end distributed tracing scenarios. If not specified, the system will automatically generate a trace_id. Supports the following three transmission methods, in order of priority:
@@ -996,8 +1083,42 @@ class AsyncChatClient:
             conversation_id=conversation_id,
             files=files,
             auto_generate_name=auto_generate_name,
+            workflow_id=workflow_id,
             trace_id=trace_id,
             request_options=request_options,
+        ) as r:
+            async for data in r.data:
+                yield data
+
+    async def preview_file_by_app_chat(
+        self,
+        file_id: str,
+        *,
+        as_attachment: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.AsyncIterator[bytes]:
+        """
+        Preview or download uploaded files. This endpoint allows you to access files previously uploaded through the file upload API.
+        Files can only be accessed within the message scope belonging to the requesting application.
+
+        Parameters
+        ----------
+        file_id : str
+            Unique identifier of the file to preview, obtained from the file upload API response
+
+        as_attachment : typing.Optional[bool]
+            Whether to force the file to be downloaded as an attachment. Default is false (preview in browser)
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration. You can pass in configuration such as `chunk_size`, and more to customize the request and response.
+
+        Returns
+        -------
+        typing.AsyncIterator[bytes]
+            File content
+        """
+        async with self._raw_client.preview_file_by_app_chat(
+            file_id, as_attachment=as_attachment, request_options=request_options
         ) as r:
             async for data in r.data:
                 yield data
@@ -1173,6 +1294,54 @@ class AsyncChatClient:
         """
         _response = await self._raw_client.get_conversation_variables_by_app_chat(
             conversation_id, user=user, last_id=last_id, limit=limit, request_options=request_options
+        )
+        return _response.data
+
+    async def update_conversation_variable_by_app_chat(
+        self,
+        conversation_id: str,
+        variable_id: str,
+        *,
+        user: str,
+        value: typing.Optional[typing.Any] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> UpdateConversationVariableByAppChatResponse:
+        """
+        Update the value of a specific conversation variable. This endpoint allows you to modify variable values captured during conversations while preserving their names, types, and descriptions.
+
+        Parameters
+        ----------
+        conversation_id : str
+            ID of the conversation containing the variable to update
+
+        variable_id : str
+            ID of the variable to update
+
+        user : str
+            User identifier, defined by developer rules, must be unique within the application.
+
+        value : typing.Optional[typing.Any]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        UpdateConversationVariableByAppChatResponse
+            Successfully updated variable
+
+        Examples
+        --------
+        from dify import AsyncDifyApi
+        import asyncio
+        client = AsyncDifyApi(token="YOUR_TOKEN", )
+        async def main() -> None:
+            await client.chat.update_conversation_variable_by_app_chat(conversation_id='conversation_id', variable_id='variable_id', value={'key': 'value'}
+            , user='user', )
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.update_conversation_variable_by_app_chat(
+            conversation_id, variable_id, user=user, value=value, request_options=request_options
         )
         return _response.data
 

@@ -2,6 +2,8 @@
 
 # isort: skip_file
 
+from .bad_request_error_body import BadRequestErrorBody
+from .bad_request_error_body_code import BadRequestErrorBodyCode
 from .chat_completion_response import ChatCompletionResponse
 from .chat_completion_response_metadata import ChatCompletionResponseMetadata
 from .chat_history_message import ChatHistoryMessage
@@ -22,6 +24,7 @@ from .error import Error
 from .file_input import FileInput
 from .file_input_transfer_method import FileInputTransferMethod
 from .file_input_type import FileInputType
+from .forbidden_error_body import ForbiddenErrorBody
 from .get_annotation_reply_status_by_app_chat_request_action import GetAnnotationReplyStatusByAppChatRequestAction
 from .get_annotation_reply_status_by_app_chat_response import GetAnnotationReplyStatusByAppChatResponse
 from .get_annotations_list_by_app_chat_response import GetAnnotationsListByAppChatResponse
@@ -97,6 +100,7 @@ from .get_conversation_variables_by_app_chat_response import GetConversationVari
 from .get_conversation_variables_by_app_chat_response_data_item import GetConversationVariablesByAppChatResponseDataItem
 from .get_suggested_questions_by_app_chat_response import GetSuggestedQuestionsByAppChatResponse
 from .not_found_error_body import NotFoundErrorBody
+from .not_found_error_body_code import NotFoundErrorBodyCode
 from .retriever_resource import RetrieverResource
 from .send_chat_message_by_app_chat_request_files_item import SendChatMessageByAppChatRequestFilesItem
 from .send_chat_message_by_app_chat_request_files_item_transfer_method import (
@@ -106,10 +110,13 @@ from .send_chat_message_by_app_chat_request_response_mode import SendChatMessage
 from .send_message_feedback_by_app_chat_response import SendMessageFeedbackByAppChatResponse
 from .stop_chat_response_by_app_chat_response import StopChatResponseByAppChatResponse
 from .update_annotation_by_app_chat_response import UpdateAnnotationByAppChatResponse
+from .update_conversation_variable_by_app_chat_response import UpdateConversationVariableByAppChatResponse
 from .uploaded_file import UploadedFile
 from .usage import Usage
 
 __all__ = [
+    "BadRequestErrorBody",
+    "BadRequestErrorBodyCode",
     "ChatCompletionResponse",
     "ChatCompletionResponseMetadata",
     "ChatHistoryMessage",
@@ -130,6 +137,7 @@ __all__ = [
     "FileInput",
     "FileInputTransferMethod",
     "FileInputType",
+    "ForbiddenErrorBody",
     "GetAnnotationReplyStatusByAppChatRequestAction",
     "GetAnnotationReplyStatusByAppChatResponse",
     "GetAnnotationsListByAppChatResponse",
@@ -167,6 +175,7 @@ __all__ = [
     "GetConversationVariablesByAppChatResponseDataItem",
     "GetSuggestedQuestionsByAppChatResponse",
     "NotFoundErrorBody",
+    "NotFoundErrorBodyCode",
     "RetrieverResource",
     "SendChatMessageByAppChatRequestFilesItem",
     "SendChatMessageByAppChatRequestFilesItemTransferMethod",
@@ -174,6 +183,7 @@ __all__ = [
     "SendMessageFeedbackByAppChatResponse",
     "StopChatResponseByAppChatResponse",
     "UpdateAnnotationByAppChatResponse",
+    "UpdateConversationVariableByAppChatResponse",
     "UploadedFile",
     "Usage",
 ]

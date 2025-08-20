@@ -4,6 +4,7 @@
 
 from .bad_request_error import BadRequestError
 from .content_too_large_error import ContentTooLargeError
+from .forbidden_error import ForbiddenError
 from .internal_server_error import InternalServerError
 from .not_found_error import NotFoundError
 from .service_unavailable_error import ServiceUnavailableError
@@ -12,6 +13,7 @@ from .unsupported_media_type_error import UnsupportedMediaTypeError
 __all__ = [
     "BadRequestError",
     "ContentTooLargeError",
+    "ForbiddenError",
     "InternalServerError",
     "NotFoundError",
     "ServiceUnavailableError",

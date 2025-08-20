@@ -15,6 +15,7 @@ from ..core.request_options import RequestOptions
 from ..core.serialization import convert_and_respect_annotation_metadata
 from .errors.bad_request_error import BadRequestError
 from .errors.content_too_large_error import ContentTooLargeError
+from .errors.forbidden_error import ForbiddenError
 from .errors.internal_server_error import InternalServerError
 from .errors.not_found_error import NotFoundError
 from .errors.service_unavailable_error import ServiceUnavailableError
@@ -45,6 +46,7 @@ from .types.send_chat_message_by_app_chat_request_response_mode import SendChatM
 from .types.send_message_feedback_by_app_chat_response import SendMessageFeedbackByAppChatResponse
 from .types.stop_chat_response_by_app_chat_response import StopChatResponseByAppChatResponse
 from .types.update_annotation_by_app_chat_response import UpdateAnnotationByAppChatResponse
+from .types.update_conversation_variable_by_app_chat_response import UpdateConversationVariableByAppChatResponse
 from .types.uploaded_file import UploadedFile
 
 # this is used as the default value for optional parameters
@@ -66,6 +68,7 @@ class RawChatClient:
         conversation_id: typing.Optional[str] = OMIT,
         files: typing.Optional[typing.Sequence[SendChatMessageByAppChatRequestFilesItem]] = OMIT,
         auto_generate_name: typing.Optional[bool] = OMIT,
+        workflow_id: typing.Optional[str] = OMIT,
         trace_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Iterator[HttpResponse[typing.Iterator[ChunkChatCompletionResponse]]]:
@@ -98,6 +101,9 @@ class RawChatClient:
         auto_generate_name : typing.Optional[bool]
             (Optional) Whether to automatically generate title, default is true. If set to false, you can call the conversation rename interface and set auto_generate to true to generate a title asynchronously.
 
+        workflow_id : typing.Optional[str]
+            (Optional) Workflow ID, used to specify a specific version. If not provided, the default published version will be used.
+
         trace_id : typing.Optional[str]
             (Optional) Trace ID for linking with existing trace components in business systems, enabling end-to-end distributed tracing scenarios. If not specified, the system will automatically generate a trace_id. Supports the following three transmission methods, in order of priority:
             - Header: Passed through HTTP Header X-Trace-Id, highest priority.
@@ -127,6 +133,7 @@ class RawChatClient:
                     direction="write",
                 ),
                 "auto_generate_name": auto_generate_name,
+                "workflow_id": workflow_id,
                 "trace_id": trace_id,
             },
             headers={
@@ -156,9 +163,103 @@ class RawChatClient:
                     if _response.status_code == 400:
                         raise BadRequestError(
                             typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 404:
+                        raise NotFoundError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 500:
+                        raise InternalServerError(
+                            typing.cast(
                                 Error,
                                 parse_obj_as(
                                     type_=Error,  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    _response_json = _response.json()
+                except JSONDecodeError:
+                    raise ApiError(
+                        headers=dict(_response.headers), status_code=_response.status_code, body=_response.text
+                    )
+                raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+            yield stream()
+
+    @contextlib.contextmanager
+    def preview_file_by_app_chat(
+        self,
+        file_id: str,
+        *,
+        as_attachment: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.Iterator[HttpResponse[typing.Iterator[bytes]]]:
+        """
+        Preview or download uploaded files. This endpoint allows you to access files previously uploaded through the file upload API.
+        Files can only be accessed within the message scope belonging to the requesting application.
+
+        Parameters
+        ----------
+        file_id : str
+            Unique identifier of the file to preview, obtained from the file upload API response
+
+        as_attachment : typing.Optional[bool]
+            Whether to force the file to be downloaded as an attachment. Default is false (preview in browser)
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration. You can pass in configuration such as `chunk_size`, and more to customize the request and response.
+
+        Returns
+        -------
+        typing.Iterator[HttpResponse[typing.Iterator[bytes]]]
+            File content
+        """
+        with self._client_wrapper.httpx_client.stream(
+            f"files/{jsonable_encoder(file_id)}/preview",
+            method="GET",
+            params={
+                "as_attachment": as_attachment,
+            },
+            request_options=request_options,
+        ) as _response:
+
+            def stream() -> HttpResponse[typing.Iterator[bytes]]:
+                try:
+                    if 200 <= _response.status_code < 300:
+                        _chunk_size = request_options.get("chunk_size", None) if request_options is not None else None
+                        return HttpResponse(
+                            response=_response, data=(_chunk for _chunk in _response.iter_bytes(chunk_size=_chunk_size))
+                        )
+                    _response.read()
+                    if _response.status_code == 400:
+                        raise BadRequestError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 403:
+                        raise ForbiddenError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
                                     object_=_response.json(),
                                 ),
                             )
@@ -405,6 +506,87 @@ class RawChatClient:
                     ),
                 )
                 return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+    def update_conversation_variable_by_app_chat(
+        self,
+        conversation_id: str,
+        variable_id: str,
+        *,
+        user: str,
+        value: typing.Optional[typing.Any] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> HttpResponse[UpdateConversationVariableByAppChatResponse]:
+        """
+        Update the value of a specific conversation variable. This endpoint allows you to modify variable values captured during conversations while preserving their names, types, and descriptions.
+
+        Parameters
+        ----------
+        conversation_id : str
+            ID of the conversation containing the variable to update
+
+        variable_id : str
+            ID of the variable to update
+
+        user : str
+            User identifier, defined by developer rules, must be unique within the application.
+
+        value : typing.Optional[typing.Any]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[UpdateConversationVariableByAppChatResponse]
+            Successfully updated variable
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"conversations/{jsonable_encoder(conversation_id)}/variables/{jsonable_encoder(variable_id)}",
+            method="PUT",
+            json={
+                "value": value,
+                "user": user,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    UpdateConversationVariableByAppChatResponse,
+                    parse_obj_as(
+                        type_=UpdateConversationVariableByAppChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(
@@ -692,9 +874,9 @@ class RawChatClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1359,6 +1541,7 @@ class AsyncRawChatClient:
         conversation_id: typing.Optional[str] = OMIT,
         files: typing.Optional[typing.Sequence[SendChatMessageByAppChatRequestFilesItem]] = OMIT,
         auto_generate_name: typing.Optional[bool] = OMIT,
+        workflow_id: typing.Optional[str] = OMIT,
         trace_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[ChunkChatCompletionResponse]]]:
@@ -1391,6 +1574,9 @@ class AsyncRawChatClient:
         auto_generate_name : typing.Optional[bool]
             (Optional) Whether to automatically generate title, default is true. If set to false, you can call the conversation rename interface and set auto_generate to true to generate a title asynchronously.
 
+        workflow_id : typing.Optional[str]
+            (Optional) Workflow ID, used to specify a specific version. If not provided, the default published version will be used.
+
         trace_id : typing.Optional[str]
             (Optional) Trace ID for linking with existing trace components in business systems, enabling end-to-end distributed tracing scenarios. If not specified, the system will automatically generate a trace_id. Supports the following three transmission methods, in order of priority:
             - Header: Passed through HTTP Header X-Trace-Id, highest priority.
@@ -1420,6 +1606,7 @@ class AsyncRawChatClient:
                     direction="write",
                 ),
                 "auto_generate_name": auto_generate_name,
+                "workflow_id": workflow_id,
                 "trace_id": trace_id,
             },
             headers={
@@ -1449,9 +1636,104 @@ class AsyncRawChatClient:
                     if _response.status_code == 400:
                         raise BadRequestError(
                             typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 404:
+                        raise NotFoundError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 500:
+                        raise InternalServerError(
+                            typing.cast(
                                 Error,
                                 parse_obj_as(
                                     type_=Error,  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    _response_json = _response.json()
+                except JSONDecodeError:
+                    raise ApiError(
+                        headers=dict(_response.headers), status_code=_response.status_code, body=_response.text
+                    )
+                raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+            yield await stream()
+
+    @contextlib.asynccontextmanager
+    async def preview_file_by_app_chat(
+        self,
+        file_id: str,
+        *,
+        as_attachment: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[bytes]]]:
+        """
+        Preview or download uploaded files. This endpoint allows you to access files previously uploaded through the file upload API.
+        Files can only be accessed within the message scope belonging to the requesting application.
+
+        Parameters
+        ----------
+        file_id : str
+            Unique identifier of the file to preview, obtained from the file upload API response
+
+        as_attachment : typing.Optional[bool]
+            Whether to force the file to be downloaded as an attachment. Default is false (preview in browser)
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration. You can pass in configuration such as `chunk_size`, and more to customize the request and response.
+
+        Returns
+        -------
+        typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[bytes]]]
+            File content
+        """
+        async with self._client_wrapper.httpx_client.stream(
+            f"files/{jsonable_encoder(file_id)}/preview",
+            method="GET",
+            params={
+                "as_attachment": as_attachment,
+            },
+            request_options=request_options,
+        ) as _response:
+
+            async def stream() -> AsyncHttpResponse[typing.AsyncIterator[bytes]]:
+                try:
+                    if 200 <= _response.status_code < 300:
+                        _chunk_size = request_options.get("chunk_size", None) if request_options is not None else None
+                        return AsyncHttpResponse(
+                            response=_response,
+                            data=(_chunk async for _chunk in _response.aiter_bytes(chunk_size=_chunk_size)),
+                        )
+                    await _response.aread()
+                    if _response.status_code == 400:
+                        raise BadRequestError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 403:
+                        raise ForbiddenError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
                                     object_=_response.json(),
                                 ),
                             )
@@ -1698,6 +1980,87 @@ class AsyncRawChatClient:
                     ),
                 )
                 return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response.text)
+        raise ApiError(headers=dict(_response.headers), status_code=_response.status_code, body=_response_json)
+
+    async def update_conversation_variable_by_app_chat(
+        self,
+        conversation_id: str,
+        variable_id: str,
+        *,
+        user: str,
+        value: typing.Optional[typing.Any] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AsyncHttpResponse[UpdateConversationVariableByAppChatResponse]:
+        """
+        Update the value of a specific conversation variable. This endpoint allows you to modify variable values captured during conversations while preserving their names, types, and descriptions.
+
+        Parameters
+        ----------
+        conversation_id : str
+            ID of the conversation containing the variable to update
+
+        variable_id : str
+            ID of the variable to update
+
+        user : str
+            User identifier, defined by developer rules, must be unique within the application.
+
+        value : typing.Optional[typing.Any]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[UpdateConversationVariableByAppChatResponse]
+            Successfully updated variable
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"conversations/{jsonable_encoder(conversation_id)}/variables/{jsonable_encoder(variable_id)}",
+            method="PUT",
+            json={
+                "value": value,
+                "user": user,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    UpdateConversationVariableByAppChatResponse,
+                    parse_obj_as(
+                        type_=UpdateConversationVariableByAppChatResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(
@@ -1985,9 +2348,9 @@ class AsyncRawChatClient:
             if _response.status_code == 400:
                 raise BadRequestError(
                     typing.cast(
-                        Error,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=Error,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )

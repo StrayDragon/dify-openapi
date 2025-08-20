@@ -6,8 +6,8 @@ info:
     Chat applications support session persistence, allowing previous chat history to be used as context for responses, suitable for chat/customer service AI, etc.
     All API requests require an application-level API-Key in the Authorization HTTP Header.
     It is strongly recommended that developers store the API-Key on the backend rather than sharing or storing it on the client side to prevent API-Key leakage and financial loss.
-    official raw document: https://github.com/langgenius/dify/blob/1.7.1/web/app/components/develop/template/template_advanced_chat.en.mdx
-  version: 1.7.1
+    official raw document: https://github.com/langgenius/dify/blob/1.7.2/web/app/components/develop/template/template_advanced_chat.en.mdx
+  version: 1.7.2
 servers:
   - url: 'https://api.dify.ai/v1'
     description: Dify API Server
@@ -350,6 +350,9 @@ paths:
                   type: boolean
                   description: '(Optional) Automatically generate title, default `true`. If set to `false`, you can call the conversation rename interface and set `auto_generate` to `true` to generate a title asynchronously.'
                   default: true
+                workflow_id:
+                  type: string
+                  description: '(Optional) Workflow ID for specifying a specific version. If not provided, the default published version will be used.'
                 trace_id:
                   type: string
                   description: '(Optional) Trace ID. Suitable for integrating with existing trace components in business systems to achieve end-to-end distributed tracing scenarios. If not specified, the system will automatically generate a trace_id. Three methods are supported with the following priority order: Header: Pass through HTTP Header X-Trace-Id, highest priority. Query parameter: Pass through URL query parameter trace_id. Request Body: Pass through request body field trace_id (this field).'
@@ -465,6 +468,76 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  '/files/{file_id}/preview':
+    get:
+      operationId: previewFileByAppAdvancedChat
+      summary: File Preview
+      description: |
+        Preview or download uploaded files. This endpoint allows you to access files previously uploaded through the file upload API.
+        Files can only be accessed within the message scope belonging to the requesting application.
+      parameters:
+        - name: file_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 'Unique identifier of the file to preview, obtained from the file upload API response.'
+        - name: as_attachment
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: Whether to force download the file as an attachment. Default is false (preview in browser).
+      responses:
+        '200':
+          description: File content
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Type:
+              description: Set according to file MIME type
+              schema:
+                type: string
+            Content-Length:
+              description: File size in bytes (if available)
+              schema:
+                type: integer
+            Content-Disposition:
+              description: Set to 'attachment' if as_attachment=true
+              schema:
+                type: string
+            Cache-Control:
+              description: Cache headers for performance
+              schema:
+                type: string
+            Accept-Ranges:
+              description: Set to 'bytes' for audio/video files
+              schema:
+                type: string
+        '400':
+          description: Invalid parameter input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: File access denied or file does not belong to current application
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: File not found or deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/Error500'
   /audio-to-text:
     post:
       operationId: convertAudioToTextByAppAdvancedChat
@@ -967,7 +1040,7 @@ paths:
                                 description: 'File type, image for images'
                               url:
                                 type: string
-                                description: Preview image URL
+                                description: 'File preview URL, access files using the file preview API (`/files/{file_id}/preview`)'
                               belongs_to:
                                 type: string
                                 enum:
@@ -1264,6 +1337,96 @@ paths:
                     type: string
                     enum:
                       - conversation_not_exists
+                    description: Error code
+                  message:
+                    type: string
+                    description: Error message
+  '/conversations/{conversation_id}/variables/{variable_id}':
+    put:
+      operationId: updateConversationVariableByAppAdvancedChat
+      summary: Update Conversation Variable
+      description: 'Update the value of a specific conversation variable. This endpoint allows you to modify variable values captured during conversations while preserving their name, type, and description.'
+      parameters:
+        - name: conversation_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The conversation ID containing the variable to update.
+        - name: variable_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the variable to update.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - value
+                - user
+              properties:
+                value:
+                  description: 'New value for the variable. Must match the expected type of the variable (string, number, object, etc.).'
+                user:
+                  type: string
+                  description: 'User identifier, defined by developer rules, must be unique within the application.'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Variable ID
+                  name:
+                    type: string
+                    description: Variable name
+                  value_type:
+                    type: string
+                    description: 'Variable type (string, number, object, etc.)'
+                  value:
+                    description: Updated variable value
+                  description:
+                    type: string
+                    description: Variable description
+                  created_at:
+                    type: integer
+                    description: Creation timestamp
+                  updated_at:
+                    type: integer
+                    description: Last update timestamp
+        '400':
+          description: Value type mismatch with variable's expected type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    description: Error code
+                  message:
+                    type: string
+                    description: Error message
+        '404':
+          description: Conversation not found or variable not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - conversation_not_exists
+                      - conversation_variable_not_exists
                     description: Error code
                   message:
                     type: string
