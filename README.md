@@ -14,7 +14,8 @@ English | [中文](./README.zh.md)
 </div>
 
 > [!warning]
-> This project will be discontinued due to Dify's official OpenAPI support. See https://docs.dify.ai/api-reference/chat/send-chat-message. You can copy the OpenAPI schema from there (I haven't checked the official documentation for a long time, and I just discovered this new tab a few minutes ago...).
+> This project will be discontinued due to Dify's official OpenAPI support. ~~See https://docs.dify.ai/api-reference/chat/send-chat-message. You can copy the OpenAPI schema from there (I haven't checked the official documentation for a long time, and I just discovered this new tab a few minutes ago...)~~
+> see the issue https://github.com/StrayDragon/dify-openapi/issues/31 to config and check swagger-ui of self-hosted dify version
 
 Provides OpenAPI Schema for [Dify](https://github.com/langgenius/dify) API, which can be previewed using [OpenAPI UI](https://github.com/swagger-api/swagger-ui) or used to generate clients with [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator)
 
